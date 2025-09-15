@@ -12,6 +12,8 @@ const Sidebar: React.FC = () => {
     'remove-duplicates',      // Удаление дубликатов  
     'text-to-html',          // Текст в HTML
     'text-optimizer',        // Оптимизатор текста
+    'spaces-to-paragraphs',  // Пробелы на абзацы
+    'text-sorting',          // Сортировка слов и строк
     'transliteration'        // Транслитерация (был готов ранее)
   ];
   

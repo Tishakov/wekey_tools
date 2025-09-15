@@ -18,6 +18,7 @@ import WordMixerTool from './pages/WordMixerTool';
 import FindReplaceTool from './pages/FindReplaceTool';
 import MinusWordsTool from './pages/MinusWordsTool';
 import SpacesToParagraphsTool from './pages/SpacesToParagraphsTool';
+import TextSortingTool from './pages/TextSortingTool';
 import EmojiTool from './pages/EmojiTool';
 import './styles/tool-pages.css';
 
@@ -44,6 +45,7 @@ function App() {
           <Route path="/find-replace" element={<FindReplaceTool />} />
           <Route path="/minus-words" element={<MinusWordsTool />} />
           <Route path="/spaces-to-paragraphs" element={<SpacesToParagraphsTool />} />
+          <Route path="/text-sorting" element={<TextSortingTool />} />
           <Route path="/emoji" element={<EmojiTool />} />
         </Routes>
       </Layout>
