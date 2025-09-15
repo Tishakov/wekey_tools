@@ -1,0 +1,76 @@
+/* MinusWordsTool специфичные стили */
+
+/* Секция обработки слов */
+.processing-section {
+    width: 50%;
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 15px;
+    padding: 20px;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Заглушка текста */
+.placeholder-text {
+    color: #888888;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Контейнер для слов */
+.words-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    line-height: 1.4;
+}
+
+/* Базовый стиль для слова */
+.word-item {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 4px;
+    color: #BCBBBD;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.word-item:hover {
+    background-color: #202123;
+    border-color: #404042;
+}
+
+/* Стиль для выбранного слова (красная подсветка) */
+.word-item.active {
+    background-color: #ff4444 !important;
+    border-color: #ff6666 !important;
+    color: #ffffff !important;
+}
+
+.word-item.active:hover {
+    background-color: #ff5555 !important;
+    border-color: #ff7777 !important;
+}
+
+/* Секция минус-слов */
+.minus-words-section {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Адаптивность */
+@media (max-width: 1240px) {
+    .processing-section {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
