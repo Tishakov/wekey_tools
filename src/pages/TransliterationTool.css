@@ -4,72 +4,6 @@
   padding: 0;
 }
 
-/* Header-остров инструмента */
-.tool-header-island {
-  width: 910px;
-  height: 70px;
-  background-color: #28282A;
-  border: 1px solid #333335;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 20px;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.back-button {
-  position: absolute;
-  left: 20px;
-  background-color: #1C1D1F;
-  border: none;
-  border-radius: 30px;
-  width: 170px;
-  height: 36px;
-  color: #484848;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  padding-left: 16px;
-}
-
-.back-button:hover {
-  color: #09CEA7;
-}
-
-.back-button img {
-  width: 12px;
-  height: 12px;
-  position: absolute;
-  left: 12px;
-  transition: filter 0.2s ease;
-}
-
-.back-button:hover img {
-  filter: brightness(0) saturate(100%) invert(74%) sepia(62%) saturate(2834%) hue-rotate(132deg) brightness(101%) contrast(96%);
-}
-
-.tool-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #BCBBBD;
-  margin: 0;
-}
-
-.tool-header-buttons {
-  position: absolute;
-  right: 20px;
-  display: flex;
-  gap: 8px;
-}
-
 /* Основная рабочая область */
 .main-workspace {
   display: flex;
@@ -189,140 +123,9 @@
   gap: 20px;
 }
 
-.settings-group {
-  background-color: #28282A;
-  border: 1px solid #333335;
-  border-radius: 15px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 445px;
-  height: 170px;
-  align-items: center;
-  justify-content: center;
-}
-
-.checkbox-item,
-.radio-item {
-  background-color: #1C1D1F;
-  border: 1px solid #333335;
-  border-radius: 8px;
-  width: 385px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #BCBBBD;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-  padding: 2px 15px 0 15px;
-  box-sizing: border-box;
-  transition: background-color 0.2s ease;
-}
-
-.checkbox-item:hover,
-.radio-item:hover {
-  background-color: #202123;
-}
-
-.checkbox-item input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #09CEA7;
-  background: transparent;
-  cursor: pointer;
-  outline: none;
-  box-shadow: none;
-  display: inline-block;
-  position: relative;
-  transform: translateY(-1px);
-}
-
-.radio-item input[type="radio"] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #09CEA7;
-  background: transparent;
-  cursor: pointer;
-  outline: none;
-  box-shadow: none;
-  display: inline-block;
-  position: relative;
-  transform: translateY(-3px);
-}
-
-.checkbox-item input[type="checkbox"] {
-  border-radius: 4px;
-}
-
-.radio-item input[type="radio"] {
-  border-radius: 50%;
-}
-
-.checkbox-item input[type="checkbox"]:checked::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 75%;
-  height: 75%;
-  background: #09CEA7;
-  border-radius: 2px;
-}
-
-.radio-item input[type="radio"]:checked::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70%;
-  height: 70%;
-  background: #09CEA7;
-  border-radius: 50%;
-}
-
-.checkbox-item input[type="checkbox"]:focus,
-.radio-item input[type="radio"]:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.checkbox-item input[type="checkbox"]:focus-visible,
-.radio-item input[type="radio"]:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.checkbox-item input[type="checkbox"]:active,
-.radio-item input[type="radio"]:active {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Кнопки управления */
-.control-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
 /* Поле результата */
 .result-section {
   width: 100%;
-}
-
-.result-section {
   position: relative;
 }
 
@@ -364,27 +167,6 @@
   top: -2px;
 }
 
-/* Адаптивность */
-@media (max-width: 1240px) {
-  .tool-header-island {
-    width: 100%;
-    max-width: 910px;
-  }
-  
-  .main-workspace {
-    flex-direction: column;
-  }
-  
-  .settings-section {
-    width: 100%;
-  }
-  
-  .control-buttons {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
 /* SEO блок */
 .seo-section {
   width: 910px;
@@ -415,8 +197,16 @@
   margin-bottom: 0;
 }
 
-/* Адаптивность для SEO блока */
+/* Адаптивность */
 @media (max-width: 1240px) {
+  .main-workspace {
+    flex-direction: column;
+  }
+  
+  .settings-section {
+    width: 100%;
+  }
+  
   .seo-section {
     width: 100%;
     max-width: 910px;

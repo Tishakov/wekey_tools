@@ -43,3 +43,356 @@
     font-size: 2rem;
   }
 }
+
+/* ===== ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ ИНСТРУМЕНТОВ ===== */
+
+/* Header-остров инструмента */
+.tool-header-island {
+  width: 910px;
+  height: 70px;
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 20px;
+  background-color: #1C1D1F;
+  border: none;
+  border-radius: 30px;
+  width: 170px;
+  height: 36px;
+  color: #484848;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding-left: 16px;
+}
+
+.back-button:hover {
+  color: #09CEA7;
+}
+
+.back-button img {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  left: 12px;
+  transition: filter 0.2s ease;
+}
+
+.back-button:hover img {
+  filter: brightness(0) saturate(100%) invert(74%) sepia(62%) saturate(2834%) hue-rotate(132deg) brightness(101%) contrast(96%);
+}
+
+.tool-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #BCBBBD;
+  margin: 0;
+}
+
+.tool-header-buttons {
+  position: absolute;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+}
+
+/* Группы настроек */
+.settings-group {
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 445px;
+  height: 170px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Чекбоксы и радио-кнопки */
+.checkbox-item,
+.radio-item {
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  width: 385px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #BCBBBD;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 15px 0 15px;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-item:hover,
+.radio-item:hover {
+  background-color: #202123;
+}
+
+.checkbox-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #09CEA7;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  display: inline-block;
+  position: relative;
+  transform: translateY(-1px);
+}
+
+.radio-item input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #09CEA7;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  display: inline-block;
+  position: relative;
+  transform: translateY(-3px);
+}
+
+.checkbox-item input[type="checkbox"] {
+  border-radius: 4px;
+}
+
+.radio-item input[type="radio"] {
+  border-radius: 50%;
+}
+
+.checkbox-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 75%;
+  height: 75%;
+  background: #09CEA7;
+  border-radius: 2px;
+}
+
+.radio-item input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  background: #09CEA7;
+  border-radius: 50%;
+}
+
+.checkbox-item input[type="checkbox"]:focus,
+.radio-item input[type="radio"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.checkbox-item input[type="checkbox"]:focus-visible,
+.radio-item input[type="radio"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.checkbox-item input[type="checkbox"]:active,
+.radio-item input[type="radio"]:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Адаптивность для общих элементов */
+@media (max-width: 1240px) {
+  .tool-header-island {
+    width: 100%;
+    max-width: 910px;
+  }
+  
+  .settings-group {
+    width: 100%;
+  }
+}
+
+/* ===== СТИЛИ КНОПОК ===== */
+
+/* Общие стили для кнопок действия */
+.action-btn {
+  border: 1px solid #333335;
+  border-radius: 8px;
+  color: #BCBBBD;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.action-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.action-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Варианты кнопок */
+.action-btn.primary {
+  background-color: #28282A;
+}
+
+.action-btn.primary:hover {
+  background-color: #2a2a2c;
+}
+
+.action-btn.secondary {
+  background-color: #1C1D1F;
+}
+
+.action-btn.secondary:hover {
+  background-color: #1e1f21;
+}
+
+/* Иконка в кнопке */
+.action-btn img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
+}
+
+/* Иконка слева */
+.action-btn.icon-left img {
+  position: absolute;
+  left: 14px;
+}
+
+/* Кнопки инструментов в header */
+.tool-header-btn {
+  background-color: #1C1D1F;
+  border: none;
+  border-radius: 30px;
+  height: 36px;
+  color: #484848;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 12px;
+  outline: none;
+}
+
+/* Кнопка со счетчиком */
+.tool-header-btn.counter-btn {
+  min-width: 90px;
+  width: auto;
+  justify-content: center;
+  position: relative;
+}
+
+.tool-header-btn.counter-btn img {
+  position: absolute;
+  left: 12px;
+}
+
+.tool-header-btn.counter-btn .counter {
+  margin: 0;
+  margin-left: 14px;
+}
+
+/* Кнопки с иконками только */
+.tool-header-btn.icon-only {
+  width: 36px;
+  padding: 0;
+}
+
+.tool-header-btn:hover {
+  background-color: #2a2a2c;
+}
+
+.tool-header-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.tool-header-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+.tool-header-btn img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) saturate(100%) invert(28%) sepia(8%) saturate(373%) hue-rotate(353deg) brightness(95%) contrast(89%);
+}
+
+/* Увеличенные иконки для кнопок lamp и camera */
+.tool-header-btn.icon-only img {
+  width: 18px;
+  height: 18px;
+}
+
+/* Счетчик в кнопке */
+.tool-header-btn .counter {
+  font-size: 14px;
+  font-weight: 700;
+  color: #484848;
+}
+
+/* Кнопки управления */
+.control-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Адаптивность для кнопок */
+@media (max-width: 1240px) {
+  .control-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

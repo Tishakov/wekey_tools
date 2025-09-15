@@ -6,6 +6,7 @@
   width: 1200px;
   margin-left: auto;
   margin-right: auto;
+  flex-shrink: 0;
 }
 
 /* Левая часть футера - кнопка основатель проекта (под сайдбаром) */

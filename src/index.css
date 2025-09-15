@@ -36,6 +36,10 @@ body {
   font-family: 'Gilroy', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
+#root {
+  min-height: 100vh;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
