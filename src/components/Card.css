@@ -36,6 +36,7 @@
 .card-icon-svg {
   width: 2rem;
   height: 2rem;
+  color: #BCBBBD;
   filter: brightness(0) saturate(100%) invert(74%) sepia(3%) saturate(339%) hue-rotate(314deg) brightness(96%) contrast(92%);
 }
 
