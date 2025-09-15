@@ -11,6 +11,7 @@ const Sidebar: React.FC = () => {
     'case-changer',           // Изменения регистра
     'remove-duplicates',      // Удаление дубликатов  
     'text-to-html',          // Текст в HTML
+    'text-optimizer',        // Оптимизатор текста
     'transliteration'        // Транслитерация (был готов ранее)
   ];
   
