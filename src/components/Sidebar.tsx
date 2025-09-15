@@ -6,6 +6,14 @@ import './Sidebar.css';
 const Sidebar: React.FC = () => {
   const location = useLocation();
   
+  // Список готовых инструментов (которые мы уже разработали)
+  const completedTools = [
+    'case-changer',           // Изменения регистра
+    'remove-duplicates',      // Удаление дубликатов  
+    'text-to-html',          // Текст в HTML
+    'transliteration'        // Транслитерация (был готов ранее)
+  ];
+  
   // Сортируем инструменты по алфавиту
   const sortedTools = [...toolsConfig].sort((a, b) => a.title.localeCompare(b.title));
   
@@ -13,16 +21,21 @@ const Sidebar: React.FC = () => {
     <aside className="sidebar">
       <nav className="sidebar-nav">
         <ul className="sidebar-menu">
-          {sortedTools.map((tool) => (
-            <li key={tool.id} className="sidebar-menu-item">
-              <Link 
-                to={tool.path} 
-                className={`sidebar-link ${location.pathname === tool.path ? 'active' : ''}`}
-              >
-                {tool.title}
-              </Link>
-            </li>
-          ))}
+          {sortedTools.map((tool) => {
+            const isCompleted = completedTools.includes(tool.id);
+            const isActive = location.pathname === tool.path;
+            
+            return (
+              <li key={tool.id} className="sidebar-menu-item">
+                <Link 
+                  to={tool.path} 
+                  className={`sidebar-link ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                >
+                  {tool.title}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </aside>

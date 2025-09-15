@@ -6,6 +6,7 @@ import UtmGeneratorTool from './pages/UtmGeneratorTool';
 import CharCounterTool from './pages/CharCounterTool';
 import TextOptimizerTool from './pages/TextOptimizerTool';
 import DuplicateFinderTool from './pages/DuplicateFinderTool';
+import DuplicateRemovalTool from './pages/DuplicateRemovalTool';
 import TextToHtmlTool from './pages/TextToHtmlTool';
 import SynonymGeneratorTool from './pages/SynonymGeneratorTool';
 import PasswordGeneratorTool from './pages/PasswordGeneratorTool';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/char-counter" element={<CharCounterTool />} />
           <Route path="/text-optimizer" element={<TextOptimizerTool />} />
           <Route path="/duplicate-finder" element={<DuplicateFinderTool />} />
+          <Route path="/duplicate-removal" element={<DuplicateRemovalTool />} />
           <Route path="/text-to-html" element={<TextToHtmlTool />} />
           <Route path="/synonym-generator" element={<SynonymGeneratorTool />} />
           <Route path="/password-generator" element={<PasswordGeneratorTool />} />

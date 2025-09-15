@@ -189,7 +189,7 @@ export const toolsConfig: Tool[] = [
     title: 'Удаление дубликатов',
     description: 'Удаление повторяющихся строк',
     icon: '/icons/tool_udalenie_dublikatov.svg',
-    path: '/remove-duplicates',
+    path: '/duplicate-removal',
     category: 'text-processing'
   },
   {

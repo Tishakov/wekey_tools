@@ -46,6 +46,22 @@
   color: #BCBBBD;
 }
 
+/* Стили для готовых инструментов */
+.sidebar-link.completed {
+  color: #09CEA7;
+  font-weight: 500;
+}
+
+.sidebar-link.completed:hover {
+  background-color: #333335;
+  color: #09CEA7;
+}
+
+.sidebar-link.completed.active {
+  background-color: #333335;
+  color: #09CEA7;
+}
+
 /* Скролл для sidebar */
 .sidebar::-webkit-scrollbar {
   width: 4px;
