@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { statsService } from '../utils/statsService';
 import './TransliterationTool.css';
 
 const TransliterationTool: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
+  const [launchCount, setLaunchCount] = useState(0);
   
   // Состояние для чекбоксов первой группы
   const [replaceSpaces, setReplaceSpaces] = useState(false);
@@ -17,6 +19,12 @@ const TransliterationTool: React.FC = () => {
   const [removeDoubleSpaces, setRemoveDoubleSpaces] = useState(false);
   const [trimEdges, setTrimEdges] = useState(false);
 
+  // Загружаем счетчик запусков при монтировании компонента
+  useEffect(() => {
+    const count = statsService.getLaunchCount('transliteration');
+    setLaunchCount(count);
+  }, []);
+
   const handlePasteText = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -28,6 +36,10 @@ const TransliterationTool: React.FC = () => {
 
   const handleShowResult = () => {
     let result = inputText;
+    
+    // Увеличиваем счетчик запусков
+    statsService.incrementLaunchCount('transliteration');
+    setLaunchCount(prev => prev + 1);
     
     // ОСНОВНАЯ ФУНКЦИЯ: Всегда применяем транслитерацию
     result = transliterate(result);
@@ -102,9 +114,22 @@ const TransliterationTool: React.FC = () => {
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
         <Link to="/" className="back-button">
-          ← Все инструменты
+          <img src="/icons/arrow_left.svg" alt="" />
+          Все инструменты
         </Link>
         <h1 className="tool-title">Транслитерация</h1>
+        <div className="tool-header-buttons">
+          <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+            <img src="/icons/rocket.svg" alt="" />
+            <span className="counter">{launchCount}</span>
+          </button>
+          <button className="tool-header-btn icon-only" title="Подсказки">
+            <img src="/icons/lamp.svg" alt="" />
+          </button>
+          <button className="tool-header-btn icon-only" title="Скриншот">
+            <img src="/icons/camera.svg" alt="" />
+          </button>
+        </div>
       </div>
 
       {/* Основная рабочая область */}
@@ -198,10 +223,10 @@ const TransliterationTool: React.FC = () => {
 
       {/* Кнопки управления */}
       <div className="control-buttons">
-        <button className="show-result-button" onClick={handleShowResult}>
+        <button className="action-btn primary" style={{ width: '445px' }} onClick={handleShowResult}>
           Показать результат
         </button>
-        <button className="copy-result-button" onClick={handleCopyResult}>
+        <button className="action-btn secondary icon-left" style={{ width: '445px' }} onClick={handleCopyResult}>
           <img src="/icons/button_copy.svg" alt="" />
           Скопировать результат
         </button>
@@ -218,6 +243,27 @@ const TransliterationTool: React.FC = () => {
         <div className="result-controls">
           <span className="result-counter">{countLines(outputText)} стр.</span>
         </div>
+      </div>
+
+      {/* SEO блок */}
+      <div className="seo-section">
+        <h3>Что такое транслитерация?</h3>
+        <p>Транслитерация — это процесс замены букв одного алфавита символами другого, при котором сохраняется звучание слова. Чаще всего речь идёт о переводе кириллических букв в латинские. Такой способ записи позволяет использовать имена, названия или целые тексты там, где кириллица недоступна или неудобна. Онлайн-сервис Wekey Tools упрощает этот процесс, автоматически конвертируя текст в транслит.</p>
+
+        <h3>Зачем нужна транслитерация?</h3>
+        <p>Транслитерация необходима в самых разных сферах. Она применяется при создании доменных имён, URL-адресов и логинов, используется в заполнении международных анкет и документов, помогает адаптировать контент для поисковых систем и социальных сетей. Для специалистов по маркетингу и SEO транслит особенно полезен: он делает ссылки понятными и читаемыми, улучшая восприятие сайта пользователями и поисковиками.</p>
+
+        <h3>Как работает инструмент «Транслитерация»?</h3>
+        <p>Инструмент Wekey Tools автоматически преобразует каждую букву кириллицы в её латинский аналог по стандартным правилам. Вам достаточно вставить текст в поле ввода и нажать кнопку «Показать результат». При необходимости можно задействовать дополнительные опции: менять регистр букв, заменять пробелы на тире, удалять лишние символы или пробелы. Но даже если не выбирать ни одного правила, инструмент всё равно выдаст корректный результат.</p>
+
+        <h3>Какие тексты можно переводить?</h3>
+        <p>Инструмент подходит для любых кириллических текстов — от отдельных слов до больших абзацев. Он одинаково корректно обрабатывает имена, фамилии, названия брендов, тексты для сайтов и рекламные материалы. При этом результат можно сразу скопировать и использовать в работе.</p>
+
+        <h3>Чем полезна транслитерация для специалистов?</h3>
+        <p>Для маркетологов, копирайтеров и SEO-специалистов транслитерация — это способ экономить время и избегать ошибок при подготовке текстов. Автоматический конвертер в Wekey Tools делает процесс максимально быстрым и удобным. Достаточно одного клика, чтобы получить латинизированный текст, готовый к использованию в URL-ах, публикациях или документах.</p>
+
+        <h3>Как пользоваться транслитерацией онлайн?</h3>
+        <p>Все просто: введите текст на кириллице, выберите нужные опции или оставьте настройки по умолчанию и нажмите «Показать результат». Сервис мгновенно преобразует ваш текст в транслит, а кнопка «Скопировать результат» позволит тут же перенести его в любое другое приложение.</p>
       </div>
     </div>
   );

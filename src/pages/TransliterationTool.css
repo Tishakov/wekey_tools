@@ -29,18 +29,31 @@
   height: 36px;
   color: #484848;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
+  padding-left: 16px;
 }
 
 .back-button:hover {
-  background-color: #2a2a2c;
+  color: #09CEA7;
+}
+
+.back-button img {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  left: 12px;
+  transition: filter 0.2s ease;
+}
+
+.back-button:hover img {
+  filter: brightness(0) saturate(100%) invert(74%) sepia(62%) saturate(2834%) hue-rotate(132deg) brightness(101%) contrast(96%);
 }
 
 .tool-title {
@@ -48,6 +61,13 @@
   font-weight: 600;
   color: #BCBBBD;
   margin: 0;
+}
+
+.tool-header-buttons {
+  position: absolute;
+  right: 20px;
+  display: flex;
+  gap: 8px;
 }
 
 /* Основная рабочая область */
@@ -133,7 +153,7 @@
   border-radius: 8px;
   color: #BCBBBD;
   padding: 8px 16px 8px 13px;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -156,7 +176,9 @@
 
 .char-counter {
   color: #888888;
-  font-size: 14px;
+  font-size: 12px;
+  position: relative;
+  top: 2px;
 }
 
 /* Правая часть - настройки */
@@ -195,11 +217,32 @@
   font-size: 14px;
   cursor: pointer;
   user-select: none;
-  padding: 0 15px;
+  padding: 2px 15px 0 15px;
   box-sizing: border-box;
+  transition: background-color 0.2s ease;
 }
 
-.checkbox-item input[type="checkbox"],
+.checkbox-item:hover,
+.radio-item:hover {
+  background-color: #202123;
+}
+
+.checkbox-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #09CEA7;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  display: inline-block;
+  position: relative;
+  transform: translateY(-1px);
+}
+
 .radio-item input[type="radio"] {
   appearance: none;
   -webkit-appearance: none;
@@ -213,6 +256,7 @@
   box-shadow: none;
   display: inline-block;
   position: relative;
+  transform: translateY(-3px);
 }
 
 .checkbox-item input[type="checkbox"] {
@@ -273,53 +317,6 @@
   width: 100%;
 }
 
-.show-result-button {
-  background-color: #28282A;
-  border: 1px solid #333335;
-  border-radius: 8px;
-  color: #BCBBBD;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 445px;
-}
-
-.show-result-button:hover {
-  background-color: #2a2a2c;
-  transform: translateY(-1px);
-}
-
-.copy-result-button {
-  background-color: #1C1D1F;
-  border: 1px solid #333335;
-  color: #BCBBBD;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 445px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.copy-result-button img {
-  width: 16px;
-  height: 16px;
-  filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
-  position: absolute;
-  left: 14px;
-}
-
-.copy-result-button:hover {
-  background-color: #1e1f21;
-}
-
 /* Поле результата */
 .result-section {
   width: 100%;
@@ -362,7 +359,9 @@
 
 .result-counter {
   color: #888888;
-  font-size: 14px;
+  font-size: 12px;
+  position: relative;
+  top: -2px;
 }
 
 /* Адаптивность */
@@ -383,5 +382,43 @@
   .control-buttons {
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+/* SEO блок */
+.seo-section {
+  width: 910px;
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  padding: 30px;
+  margin-top: 30px;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
+  line-height: 1.6;
+}
+
+.seo-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #BCBBBD;
+  margin: 0 0 15px 0;
+}
+
+.seo-section p {
+  font-size: 14px;
+  margin: 0 0 20px 0;
+  color: #BCBBBD;
+}
+
+.seo-section p:last-child {
+  margin-bottom: 0;
+}
+
+/* Адаптивность для SEO блока */
+@media (max-width: 1240px) {
+  .seo-section {
+    width: 100%;
+    max-width: 910px;
   }
 }
