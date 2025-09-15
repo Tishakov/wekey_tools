@@ -1,5 +1,10 @@
 /* MinusWordsTool специфичные стили */
 
+/* Убираем padding у .tool-page для этого инструмента */
+.tool-page {
+    padding: 0;
+}
+
 /* Кастомная высота для полей в MinusWordsTool */
 .left-column .input-textarea {
     height: 260px;
