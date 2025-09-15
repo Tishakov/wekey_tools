@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import '../styles/tool-pages.css';
 import './TransliterationTool.css';
 
 const TransliterationTool: React.FC = () => {
