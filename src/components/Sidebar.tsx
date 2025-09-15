@@ -14,6 +14,7 @@ const Sidebar: React.FC = () => {
     'text-optimizer',        // Оптимизатор текста
     'spaces-to-paragraphs',  // Пробелы на абзацы
     'text-sorting',          // Сортировка слов и строк
+    'remove-empty-lines',    // Удаление пустых строк
     'transliteration'        // Транслитерация (был готов ранее)
   ];
   

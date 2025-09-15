@@ -19,6 +19,7 @@ import FindReplaceTool from './pages/FindReplaceTool';
 import MinusWordsTool from './pages/MinusWordsTool';
 import SpacesToParagraphsTool from './pages/SpacesToParagraphsTool';
 import TextSortingTool from './pages/TextSortingTool';
+import EmptyLinesRemovalTool from './pages/EmptyLinesRemovalTool';
 import EmojiTool from './pages/EmojiTool';
 import './styles/tool-pages.css';
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="/minus-words" element={<MinusWordsTool />} />
           <Route path="/spaces-to-paragraphs" element={<SpacesToParagraphsTool />} />
           <Route path="/text-sorting" element={<TextSortingTool />} />
+          <Route path="/remove-empty-lines" element={<EmptyLinesRemovalTool />} />
           <Route path="/emoji" element={<EmojiTool />} />
         </Routes>
       </Layout>
