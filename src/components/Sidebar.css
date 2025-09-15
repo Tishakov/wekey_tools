@@ -1,0 +1,65 @@
+.sidebar {
+  width: 250px;
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar-nav {
+  height: 100%;
+}
+
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-menu-item {
+  margin: 0;
+}
+
+.sidebar-menu-item:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 16px;
+  color: #BCBBBD;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.sidebar-link:hover {
+  background-color: #333335;
+  color: #BCBBBD;
+}
+
+.sidebar-link.active {
+  background-color: #333335;
+  color: #BCBBBD;
+}
+
+/* Скролл для sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #28282A;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #333335;
+  border-radius: 2px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #404042;
+}

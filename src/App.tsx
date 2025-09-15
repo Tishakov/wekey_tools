@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import TransliterationTool from './pages/TransliterationTool';
+import UtmGeneratorTool from './pages/UtmGeneratorTool';
+import CharCounterTool from './pages/CharCounterTool';
+import TextOptimizerTool from './pages/TextOptimizerTool';
+import DuplicateFinderTool from './pages/DuplicateFinderTool';
+import TextToHtmlTool from './pages/TextToHtmlTool';
+import SynonymGeneratorTool from './pages/SynonymGeneratorTool';
+import PasswordGeneratorTool from './pages/PasswordGeneratorTool';
+import TextGeneratorTool from './pages/TextGeneratorTool';
+import NumberGeneratorTool from './pages/NumberGeneratorTool';
+import AddSymbolTool from './pages/AddSymbolTool';
+import CaseChangerTool from './pages/CaseChangerTool';
+import WordMixerTool from './pages/WordMixerTool';
+import FindReplaceTool from './pages/FindReplaceTool';
+import MinusWordsTool from './pages/MinusWordsTool';
+import SpacesToParagraphsTool from './pages/SpacesToParagraphsTool';
+import EmojiTool from './pages/EmojiTool';
+import './styles/tool-pages.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/transliteration" element={<TransliterationTool />} />
+          <Route path="/utm-generator" element={<UtmGeneratorTool />} />
+          <Route path="/char-counter" element={<CharCounterTool />} />
+          <Route path="/text-optimizer" element={<TextOptimizerTool />} />
+          <Route path="/duplicate-finder" element={<DuplicateFinderTool />} />
+          <Route path="/text-to-html" element={<TextToHtmlTool />} />
+          <Route path="/synonym-generator" element={<SynonymGeneratorTool />} />
+          <Route path="/password-generator" element={<PasswordGeneratorTool />} />
+          <Route path="/text-generator" element={<TextGeneratorTool />} />
+          <Route path="/number-generator" element={<NumberGeneratorTool />} />
+          <Route path="/add-symbol" element={<AddSymbolTool />} />
+          <Route path="/case-changer" element={<CaseChangerTool />} />
+          <Route path="/word-mixer" element={<WordMixerTool />} />
+          <Route path="/find-replace" element={<FindReplaceTool />} />
+          <Route path="/minus-words" element={<MinusWordsTool />} />
+          <Route path="/spaces-to-paragraphs" element={<SpacesToParagraphsTool />} />
+          <Route path="/emoji" element={<EmojiTool />} />
+        </Routes>
+      </Layout>
+    </Router>
+  );
 }
 
-export default App
+export default App;

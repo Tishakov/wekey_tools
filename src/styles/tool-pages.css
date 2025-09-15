@@ -1,0 +1,45 @@
+.tool-page {
+  width: 100%;
+  padding: 20px 0;
+}
+
+.tool-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+}
+
+.tool-header-icon {
+  margin-bottom: 1rem;
+}
+
+.tool-header-icon img {
+  width: 4rem;
+  height: 4rem;
+  filter: invert(0.74) sepia(0) saturate(0) hue-rotate(0deg) brightness(0.9) contrast(1);
+}
+
+.tool-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #BCBBBD;
+}
+
+.tool-header p {
+  font-size: 1.125rem;
+  color: #BCBBBD;
+}
+
+.tool-content {
+  padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+  .tool-page {
+    padding: 1rem 0;
+  }
+  
+  .tool-header h1 {
+    font-size: 2rem;
+  }
+}
