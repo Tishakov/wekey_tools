@@ -15,7 +15,8 @@ const Sidebar: React.FC = () => {
     'spaces-to-paragraphs',  // Пробелы на абзацы
     'text-sorting',          // Сортировка слов и строк
     'remove-empty-lines',    // Удаление пустых строк
-    'transliteration'        // Транслитерация (был готов ранее)
+    'transliteration',       // Транслитерация (был готов ранее)
+    'minus-words'            // Обработка минус-слов
   ];
   
   // Сортируем инструменты по алфавиту

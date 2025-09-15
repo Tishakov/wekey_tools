@@ -28,18 +28,36 @@ const MinusWordsTool: React.FC = () => {
         }
     };
 
-    // Обработчик показа результата - разбивает текст на слова
+    // Обработчик показа результата - разбивает текст на строки и слова
     const handleShowResult = () => {
-        if (!inputText.trim()) return;
+        if (!inputText.trim()) {
+            setWords([]);
+            return;
+        }
         
-        // Разбиваем текст на слова (по пробелам, табам, переносам строк и знакам препинания)
-        const wordList = inputText
-            .replace(/[^\w\s]/g, ' ') // Заменяем знаки препинания на пробелы
-            .split(/\s+/)
-            .filter(word => word.trim().length > 0)
-            .map(word => word.trim());
+        // Разбиваем текст на строки, затем каждую строку на слова
+        const lines = inputText.split('\n');
+        const processedLines: string[] = [];
         
-        setWords(wordList);
+        lines.forEach(line => {
+            if (line.trim()) {
+                // Обрабатываем каждую строку: убираем знаки препинания и разбиваем на слова
+                const wordsInLine = line
+                    .replace(/[^\u0400-\u04FF\w\s]/g, ' ')
+                    .split(/\s+/)
+                    .filter(word => word.trim().length > 0)
+                    .map(word => word.trim());
+                
+                if (wordsInLine.length > 0) {
+                    processedLines.push(wordsInLine.join(' '));
+                }
+            } else {
+                // Пустая строка - добавляем как есть для сохранения структуры
+                processedLines.push('');
+            }
+        });
+        
+        setWords(processedLines);
         
         // Увеличиваем счетчик запусков
         statsService.incrementLaunchCount('obrabotka_minus_slov');
@@ -60,6 +78,11 @@ const MinusWordsTool: React.FC = () => {
         });
     };
 
+    // Обработчик удаления слова из минус-слов
+    const handleRemoveMinusWord = (wordToRemove: string) => {
+        setMinusWords(prev => prev.filter(word => word !== wordToRemove));
+    };
+
     // Обработчик копирования минус-слов
     const handleCopy = async () => {
         if (minusWords.length === 0) return;
@@ -74,10 +97,12 @@ const MinusWordsTool: React.FC = () => {
         }
     };
 
-    // Очистка результатов при изменении текста
+    // Очистка результатов только при полной очистке текста
     useEffect(() => {
-        setWords([]);
-        setMinusWords([]);
+        if (inputText === '') {
+            setWords([]);
+            setMinusWords([]);
+        }
     }, [inputText]);
 
     return (
@@ -105,66 +130,93 @@ const MinusWordsTool: React.FC = () => {
 
             {/* Основная рабочая область */}
             <div className="main-workspace">
-                {/* Левая половина - поле ввода */}
-                <div className="input-section">
-                    <textarea
-                        className="input-textarea"
-                        placeholder="Введите ваш текст..."
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                    />
-                    <div className="input-controls">
-                        <button className="paste-button" onClick={handlePaste}>
-                            <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
-                        </button>
-                        <span className="char-counter">{inputText.trim() ? inputText.split('\n').length : 0} стр.</span>
+                {/* Левая половина - вертикальная структура */}
+                <div className="left-column">
+                    {/* Поле ввода текста */}
+                    <div className="input-section">
+                        <textarea
+                            className="input-textarea"
+                            placeholder="Введите ваш текст..."
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                        />
+                        <div className="input-controls">
+                            <button className="paste-button" onClick={handlePaste}>
+                                <img src="/icons/button_paste.svg" alt="" />
+                                Вставить
+                            </button>
+                            <span className="char-counter">{inputText.trim() ? inputText.split('\n').length : 0} стр.</span>
+                        </div>
                     </div>
+
+                    {/* Кнопка "Показать результат" */}
+                    <button className="show-result-btn" onClick={handleShowResult}>
+                        Показать результат
+                    </button>
+
+                    {/* Поле минус-слов */}
+                    <div className="minus-words-section">
+                        <div className="result-textarea">
+                            {minusWords.length === 0 ? (
+                                <div className="placeholder">Здесь будут отобранные минус-слова</div>
+                            ) : (
+                                <div className="minus-words-list">
+                                    {minusWords.map((word, index) => (
+                                        <div key={index} className="minus-word-item">
+                                            <span className="minus-word-text">{word}</span>
+                                            <button 
+                                                className="remove-word-btn"
+                                                onClick={() => handleRemoveMinusWord(word)}
+                                                title="Удалить слово"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Кнопка "Скопировать минус-слова" */}
+                    <button className="copy-btn" onClick={handleCopy}>
+                        <img src="/icons/button_copy.svg" alt="" />
+                        {copied ? 'Скопировано!' : 'Скопировать минус-слова'}
+                    </button>
                 </div>
 
                 {/* Правая половина - обработка слов */}
-                <div className="processing-section">
-                    {words.length === 0 ? (
-                        <div className="placeholder-text">
-                            Здесь будут слова для обработки
+                <div className="right-column">
+                    <div className="processing-section full-height">
+                        {words.length === 0 ? (
+                            <div className="placeholder-text">
+                                Здесь будут слова для обработки
+                            </div>
+                        ) : (
+                            <div className="words-container">
+                                {words.map((line, lineIndex) => (
+                                    <div key={lineIndex} className="line-container">
+                                        {line ? (
+                                            line.split(' ').map((word, wordIndex) => (
+                                                <span 
+                                                    key={`${lineIndex}-${wordIndex}`}
+                                                    className={`word-item ${minusWords.includes(word) ? 'active' : ''}`}
+                                                    onClick={() => handleWordClick(word)}
+                                                >
+                                                    {word}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <div className="empty-line">&nbsp;</div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <div className="processing-counter">
+                            <span className="result-counter">{minusWords.length} слов</span>
                         </div>
-                    ) : (
-                        <div className="words-container">
-                            {words.map((word, index) => (
-                                <span 
-                                    key={index}
-                                    className={`word-item ${minusWords.includes(word) ? 'active' : ''}`}
-                                    onClick={() => handleWordClick(word)}
-                                >
-                                    {word}
-                                </span>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Кнопки управления */}
-            <div className="control-buttons">
-                <button className="action-btn primary" onClick={handleShowResult}>
-                    Показать результат
-                </button>
-                <button className="action-btn secondary icon-left" onClick={handleCopy}>
-                    <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать минус-слова'}
-                </button>
-            </div>
-
-            {/* Секция минус-слов */}
-            <div className="minus-words-section">
-                <textarea
-                    className="result-textarea"
-                    placeholder="Здесь будут отобранные минус-слова"
-                    value={minusWords.join('\n')}
-                    readOnly
-                />
-                <div className="result-controls">
-                    <span className="result-counter">{minusWords.length} стр.</span>
+                    </div>
                 </div>
             </div>
         </div>
