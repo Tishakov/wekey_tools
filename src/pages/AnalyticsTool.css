@@ -11,38 +11,106 @@
 /* Заголовки таблицы */
 .table-header {
   display: grid;
-  grid-template-columns: 300px 1fr 240px;
+  grid-template-columns: 240px 1fr 240px;
   gap: 24px;
   padding: 16px 0;
   margin-bottom: 16px;
-  width: 100%;
-  background: #28282A;
+  margin-left: 40px;
+  border-radius: 10px;
   border: 1px solid #333335;
+  background: #28282A;
   height: 41px;
   align-items: center;
   align-content: center;
 }
 
 .column-header {
-  color: #9CA3AF;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.column-header.param-header {
+  padding-left: 32px;
+}
+
+.column-header.control-header {
+  text-align: center;
 }
 
 .dual-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   padding: 0 12px;
+}
+
+.period-input-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(20px);
+}
+
+.period-input {
+  width: 45px;
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid #333335;
+  background: #1C1D1F;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 12px;
+  text-align: center;
+  padding: 0 4px;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.period-input::-webkit-outer-spin-button,
+.period-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.period-input:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.period-label {
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  color: #BCBBBD;
+}
+
+.day-header {
+  transform: translateX(22px);
+  align-content: center;
 }
 
 /* Группы метрик */
 .metrics-group {
   position: relative;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+}
+
+/* Дуга слева от группы - охватывает всю высоту группы */
+.metrics-group::before {
+  content: '';
+  position: absolute;
+  left: 25px;
+  top: 19px;
+  bottom: 26px;
+  width: 10px;
+  border: 1px solid var(--group-color, #6B7280);
+  border-right: none;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  z-index: 0;
 }
 
 /* Вертикальный заголовок группы слева */
@@ -57,6 +125,8 @@
   align-items: center;
   justify-content: center;
   margin-right: 20px;
+  margin-top: -10px;
+  font-family: 'Gilroy', sans-serif;
   font-size: 14px;
   font-weight: 600;
   z-index: 2;
@@ -64,55 +134,6 @@
 
 .group-text {
   white-space: nowrap;
-}
-
-/* Подложка под иконку */
-.group-title-vertical .icon-background {
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 26px;
-  background-color: #1C1D1F;
-  border-radius: 2px;
-  z-index: 1;
-}
-
-/* Дуга слева от группы */
-.group-title-vertical::before {
-  content: '';
-  position: absolute;
-  left: -18px;
-  top: 20px;
-  bottom: 20px;
-  width: 16px;
-  border-right: 1px solid currentColor;
-  border-top: 1px solid currentColor;
-  border-bottom: 1px solid currentColor;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-  z-index: 0;
-}
-
-/* Иконка по центру дуги */
-.group-title-vertical::after {
-  content: '?';
-  position: absolute;
-  left: -9px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  background-color: currentColor;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
-  z-index: 3;
 }
 
 /* Контейнер для метрик группы */
@@ -123,15 +144,16 @@
 /* Строки метрик */
 .metric-row {
   display: grid;
-  grid-template-columns: 300px 1fr 240px;
+  grid-template-columns: 240px 1fr 240px;
   gap: 24px;
   padding: 12px 0;
   align-items: center;
   align-content: center;
-  width: 100%;
-  height: 41px;
-  background: #28282A;
+  width: 865px;
+  height: 40px;
+  border-radius: 10px;
   border: 1px solid #333335;
+  background: #28282A;
   margin-bottom: 8px;
 }
 
@@ -146,14 +168,16 @@
   gap: 8px;
   height: 100%;
   line-height: 1;
+  padding-left: 10px;
 }
 
 .help-button {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: none;
   color: white;
+  font-family: 'Gilroy', sans-serif;
   font-size: 10px;
   font-weight: bold;
   cursor: pointer;
@@ -163,6 +187,8 @@
   opacity: 0.8;
   transition: opacity 0.2s ease;
   flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 .help-button:hover {
@@ -170,7 +196,8 @@
 }
 
 .metric-name span {
-  color: #E5E7EB;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 1;
@@ -178,6 +205,7 @@
 
 /* Слайдеры */
 .metric-slider {
+  width: 340px;
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -233,19 +261,56 @@
   position: relative;
   align-items: center;
   height: 100%;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+/* Контейнер для поля с процентами */
+.percentage-input-container {
+  position: relative;
+  display: inline-block;
 }
 
 .value-input {
   width: 100px;
   padding: 8px 12px;
   background: #1C1D1F;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #333335;
   border-radius: 6px;
-  color: #E5E7EB;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
   font-size: 14px;
   text-align: center;
   transition: all 0.2s ease;
   height: 28px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Убираем стрелки spinner в полях number */
+.value-input::-webkit-outer-spin-button,
+.value-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.value-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Широкое поле для процентов (занимает место двух полей) */
+.value-input.percentage-field {
+  width: 208px;
+  padding-left: 32px; /* компенсируем отступ справа для центрирования */
+  padding-right: 32px; /* место для символа % */
+}
+
+/* Широкое поле для единичных значений (не проценты, без периода) */
+.value-input.single-field {
+  width: 208px;
 }
 
 .value-input:focus {
@@ -255,8 +320,9 @@
 }
 
 .value-input.readonly {
-  background: #374151;
-  color: #9CA3AF;
+  background: #252526;
+  border: 1px solid #333335;
+  color: #BCBBBD;
   cursor: not-allowed;
 }
 
@@ -265,10 +331,17 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #9CA3AF;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
   font-size: 14px;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Для контейнера процентного поля */
+.percentage-input-container .percentage-symbol {
+  right: 12px;
+  top: 50%;
 }
 
 /* Адаптивность */
