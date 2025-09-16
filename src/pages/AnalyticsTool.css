@@ -61,7 +61,7 @@
   background: #1C1D1F;
   color: #BCBBBD;
   font-family: 'Gilroy', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   padding: 0 4px;
   appearance: textfield;
@@ -236,7 +236,7 @@
   border-radius: 50%;
   background: var(--thumb-color, #6B7280);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), inset 0 0 0 2px #28282A;
+  border: 2px solid #28282A;
   transition: transform 0.2s ease;
 }
 
@@ -251,7 +251,6 @@
   background: var(--thumb-color, #6B7280);
   cursor: pointer;
   border: 2px solid #28282A;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Поля ввода значений */

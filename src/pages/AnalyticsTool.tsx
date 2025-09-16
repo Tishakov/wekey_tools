@@ -27,7 +27,7 @@ const metricsConfig: Group[] = [
     metrics: [
       { id: 'clicks', name: 'Клики', tooltip: 'Количество кликов по рекламе', isPercentage: false, defaultValue: 100, hasPeriod: true },
       { id: 'impressions', name: 'Показы', tooltip: 'Количество показов рекламы', isPercentage: false, defaultValue: 1000, hasPeriod: true },
-      { id: 'ctr', name: 'CTR', tooltip: 'Click Through Rate - отношение кликов к показам', isPercentage: true, defaultValue: 10, hasPeriod: false },
+      { id: 'ctr', name: 'CTR %', tooltip: 'Click Through Rate - отношение кликов к показам', isPercentage: true, defaultValue: 10, hasPeriod: false },
     ]
   },
   {
