@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
 
@@ -563,6 +564,67 @@ const AnalyticsTool: React.FC = () => {
     }
   };
 
+  // Функция экспорта в Excel
+  const exportToExcel = () => {
+    try {
+      // Собираем данные из всех метрик
+      const exportData = metricsConfig.flatMap((group: Group) => 
+        group.metrics.map((metric: Metric) => {
+          const dayValue = metrics[metric.id];
+          let periodValue;
+          
+          // Рассчитываем значение за период
+          if (metric.isPercentage) {
+            // Для процентов - то же значение
+            periodValue = dayValue;
+          } else if (metric.hasPeriod) {
+            // Для полей с периодом - умножаем на период
+            const numericDay = typeof dayValue === 'string' ? parseFloat(dayValue) || 0 : dayValue;
+            periodValue = Math.round(numericDay * period);
+          } else {
+            // Для обычных полей - то же значение
+            periodValue = dayValue;
+          }
+          
+          // Форматируем значения для отображения
+          const formatValue = (value: number | string, isPercentage: boolean) => {
+            if (typeof value === 'string') {
+              return isPercentage ? `${value} %` : value;
+            }
+            return isPercentage ? `${value} %` : value.toString();
+          };
+
+          return {
+            'Параметр': metric.name,
+            'Значение за 1 день': formatValue(dayValue, metric.isPercentage),
+            [`Значение за ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}`]: formatValue(periodValue, metric.isPercentage)
+          };
+        })
+      );
+
+      // Создаем книгу Excel
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      
+      // Добавляем лист в книгу
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Аналитика');
+      
+      // Генерируем имя файла с текущей датой и временем
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+      const timeStr = today.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+      const fileName = `analytics_result_wekey_tools_${dateStr}_${timeStr}.xlsx`;
+      
+      // Скачиваем файл
+      XLSX.writeFile(workbook, fileName);
+      
+      console.log('Файл успешно экспортирован:', fileName);
+    } catch (error) {
+      console.error('Ошибка при экспорте:', error);
+      alert('Произошла ошибка при экспорте данных');
+    }
+  };
+
   return (
     <div className="tool-container">
       {/* Заголовок */}
@@ -593,8 +655,19 @@ const AnalyticsTool: React.FC = () => {
         <div className="analytics-container">
           {/* Заголовки таблицы */}
           <div className="table-header">
-            <div className="column-header param-header">Параметр</div>
-            <div className="column-header control-header">На что можно влиять</div>
+            <div className="column-header param-header">
+              <div className="param-header-content">
+                <span>Параметр</span>
+                <button 
+                  className="header-export-button"
+                  onClick={exportToExcel}
+                  title="Скачать все результаты в формате Excel"
+                >
+                  <img src="/icons/download.svg" alt="Download" width="11" height="11" />
+                  Скачать результат
+                </button>
+              </div>
+            </div>
             <div className="column-header values-header">
               <div className="dual-header">
                 <span className="day-header">День</span>

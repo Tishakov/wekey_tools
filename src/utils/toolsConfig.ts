@@ -5,6 +5,7 @@ export interface Tool {
   icon: string;
   path: string;
   category: string;
+  status?: 'ready' | 'in-development' | 'planned';
 }
 
 export const toolsConfig: Tool[] = [
@@ -126,7 +127,8 @@ export const toolsConfig: Tool[] = [
     description: 'Инструмент для анализа воронки продаж и маркетинговых метрик',
     icon: '/icons/tool_skvoznaya_analitika.svg',
     path: '/cross-analytics',
-    category: 'analytics'
+    category: 'analytics',
+    status: 'ready'
   },
   {
     id: 'word-gluing',

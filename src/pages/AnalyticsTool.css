@@ -11,7 +11,7 @@
 /* Заголовки таблицы */
 .table-header {
   display: grid;
-  grid-template-columns: 240px 1fr 240px;
+  grid-template-columns: 1fr 240px;
   gap: 24px;
   padding: 16px 0;
   margin-bottom: 16px;
@@ -36,8 +36,40 @@
   padding-left: 32px;
 }
 
-.column-header.control-header {
-  text-align: center;
+.param-header-content {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+}
+
+.header-export-button {
+  width: 143px;
+  height: 28px;
+  border-radius: 55px;
+  background: #1C1D1F;
+  color: #BCBBBD;
+  border: none;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Gilroy', sans-serif;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.header-export-button:hover {
+  color: #09CEA7;
+}
+
+.header-export-button:active {
+  background: rgba(30, 30, 32, 0.3);
+  transform: translateY(0);
 }
 
 .dual-header {

@@ -17,7 +17,8 @@ const Sidebar: React.FC = () => {
     'remove-empty-lines',    // Удаление пустых строк
     'transliteration',       // Транслитерация (был готов ранее)
     'minus-words',           // Обработка минус-слов
-    'utm-generator'          // Генератор UTM-меток
+    'utm-generator',         // Генератор UTM-меток
+    'cross-analytics'        // Сквозная аналитика
   ];
   
   // Сортируем инструменты по алфавиту
