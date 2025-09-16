@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
@@ -9,6 +9,7 @@ interface Metric {
   name: string;
   tooltip: string;
   isPercentage: boolean;
+  isDecimal?: boolean; // для полей которые должны показывать десятичные значения но без символа %
   defaultValue: number;
   hasPeriod: boolean; // флаг для двух полей (день + 30 дней)
 }
@@ -22,7 +23,7 @@ interface Group {
 // Конфигурация групп и параметров
 const metricsConfig: Group[] = [
   {
-    title: 'Реклама',
+    title: 'Трафик',
     color: '#6B7280', // серый
     metrics: [
       { id: 'clicks', name: 'Клики', tooltip: 'Количество кликов по рекламе', isPercentage: false, defaultValue: 100, hasPeriod: true },
@@ -34,7 +35,7 @@ const metricsConfig: Group[] = [
     title: 'Расходы',
     color: '#EF4444', // красный
     metrics: [
-      { id: 'cpc', name: 'CPC – стоимость клика', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, defaultValue: 10, hasPeriod: false },
+      { id: 'cpc', name: 'CPC – стоимость клика', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, isDecimal: true, defaultValue: 10, hasPeriod: false },
       { id: 'adCost', name: 'Затраты на рекламу', tooltip: 'Общие затраты на рекламную кампанию', isPercentage: false, defaultValue: 1000, hasPeriod: true },
     ]
   },
@@ -93,15 +94,45 @@ const AnalyticsTool: React.FC = () => {
   const [period, setPeriod] = useState<number>(30);
   
   // Состояние для всех метрик
-  const [metrics, setMetrics] = useState<Record<string, number>>(() => {
-    const initialState: Record<string, number> = {};
+  const [metrics, setMetrics] = useState<Record<string, number | string>>(() => {
+    const initialState: Record<string, number | string> = {};
     metricsConfig.forEach(group => {
       group.metrics.forEach(metric => {
-        initialState[metric.id] = metric.defaultValue;
+        // Для процентных и десятичных полей обеспечиваем десятичный формат
+        if (metric.isPercentage || metric.isDecimal) {
+          initialState[metric.id] = parseFloat(metric.defaultValue.toFixed(1));
+        } else {
+          initialState[metric.id] = metric.defaultValue;
+        }
       });
     });
     return initialState;
   });
+
+  // Форматируем процентные и десятичные поля при инициализации
+  useEffect(() => {
+    const updatedMetrics: Record<string, number | string> = {};
+    let hasUpdates = false;
+
+    metricsConfig.forEach(group => {
+      group.metrics.forEach(metric => {
+        if ((metric.isPercentage || metric.isDecimal) && typeof metrics[metric.id] === 'number') {
+          const currentValue = metrics[metric.id] as number;
+          if (Number.isInteger(currentValue)) {
+            updatedMetrics[metric.id] = currentValue.toFixed(1);
+            hasUpdates = true;
+          }
+        }
+      });
+    });
+
+    if (hasUpdates) {
+      setMetrics(prev => ({
+        ...prev,
+        ...updatedMetrics
+      }));
+    }
+  }, []); // Запускаем только один раз при монтировании
 
   // Проверка, должно ли поле быть readonly
   const isReadonlyField = (metricId: string): boolean => {
@@ -123,40 +154,143 @@ const AnalyticsTool: React.FC = () => {
     return readonlyMetrics.includes(metricId);
   };
 
-  // Обработчик изменения значения метрики
-  const handleMetricChange = (metricId: string, value: number) => {
-    setMetrics(prev => ({
-      ...prev,
-      [metricId]: value
-    }));
-  };
-
   // Обработчик изменения слайдера
   const handleSliderChange = (metricId: string, sliderValue: number, metric: Metric) => {
     // Более умное масштабирование в зависимости от типа метрики
-    let scaledValue: number;
+    let scaledValue: number | string;
     
     if (metric.isPercentage) {
-      // Для процентов: 0-100 слайдер -> 0-100% значение
-      scaledValue = sliderValue;
+      // Для процентов: 0-100 слайдер -> 0-100% значение в десятичном формате
+      scaledValue = sliderValue.toFixed(1);
+    } else if (metric.isDecimal) {
+      // Для десятичных полей: масштабируем и форматируем в десятичный вид
+      const baseValue = metric.defaultValue;
+      const numericValue = (sliderValue / 50) * baseValue;
+      scaledValue = numericValue.toFixed(1);
     } else {
       // Для обычных значений: масштабируем в зависимости от базового значения
       const baseValue = metric.defaultValue;
       scaledValue = (sliderValue / 50) * baseValue; // 50 = средняя позиция слайдера
     }
     
-    handleMetricChange(metricId, scaledValue);
+    setMetrics(prev => ({
+      ...prev,
+      [metricId]: scaledValue
+    }));
+  };
+
+  // Новые обработчики для полей ввода
+  const handleInputFocus = (metricId: string) => {
+    const currentValue = metrics[metricId];
+    if (currentValue === 0) {
+      // Очищаем поле при фокусе, если значение равно 0
+      setMetrics(prev => ({
+        ...prev,
+        [metricId]: '' as any // Временно сохраняем пустую строку
+      }));
+    }
+  };
+
+  const handleInputBlur = (metricId: string, isPercentage: boolean, inputValue: string, isDecimal: boolean = false) => {
+    if (inputValue === '' || inputValue === undefined) {
+      // Возвращаем 0 если поле пустое
+      const defaultValue = (isPercentage || isDecimal) ? '0.0' : 0;
+      setMetrics(prev => ({
+        ...prev,
+        [metricId]: defaultValue
+      }));
+    } else if (isPercentage || isDecimal) {
+      // Для процентных и десятичных полей: если введено целое число, добавляем .0
+      if (/^\d+$/.test(inputValue)) {
+        const formattedValue = inputValue + '.0';
+        setMetrics(prev => ({
+          ...prev,
+          [metricId]: formattedValue
+        }));
+      } else {
+        // Если уже есть десятичная часть, преобразуем в число и обратно для нормализации
+        const numericValue = parseFloat(inputValue);
+        if (!isNaN(numericValue)) {
+          setMetrics(prev => ({
+            ...prev,
+            [metricId]: numericValue.toFixed(1)
+          }));
+        }
+      }
+    } else {
+      // Для обычных полей преобразуем в число
+      const numericValue = parseFloat(inputValue);
+      if (!isNaN(numericValue)) {
+        setMetrics(prev => ({
+          ...prev,
+          [metricId]: numericValue
+        }));
+      }
+    }
+  };
+
+  const handleInputChange = (metricId: string, value: string, isPercentage: boolean, isDecimal: boolean = false) => {
+    if (isReadonlyField(metricId)) return;
+
+    if (isPercentage || isDecimal) {
+      // Заменяем запятую на точку
+      let processedValue = value.replace(',', '.');
+      
+      // Разрешаем пустое поле во время ввода
+      if (processedValue === '') {
+        setMetrics(prev => ({
+          ...prev,
+          [metricId]: ''
+        }));
+        return;
+      }
+      
+      // Ограничиваем формат: число с максимум 1 знаком после точки
+      if (!/^\d*\.?\d{0,1}$/.test(processedValue)) {
+        return; // Не обновляем если формат неверный
+      }
+
+      // Сохраняем строку во время ввода для естественного редактирования
+      setMetrics(prev => ({
+        ...prev,
+        [metricId]: processedValue
+      }));
+    } else {
+      // Для обычных полей
+      if (value === '') {
+        setMetrics(prev => ({
+          ...prev,
+          [metricId]: ''
+        }));
+        return;
+      }
+      
+      const numericValue = parseFloat(value);
+      if (!isNaN(numericValue)) {
+        setMetrics(prev => ({
+          ...prev,
+          [metricId]: numericValue
+        }));
+      }
+    }
+  };
+
+  // Обработчик нажатия клавиш
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur(); // Снимаем фокус с поля
+    }
   };
 
   // Получение значения слайдера из текущего значения метрики
   const getSliderValue = (metricId: string, metric: Metric): number => {
-    const currentValue = metrics[metricId];
+    const currentValue = typeof metrics[metricId] === 'string' ? parseFloat(metrics[metricId] as string) || 0 : metrics[metricId] as number;
     
     if (metric.isPercentage) {
       // Для процентов: прямое соответствие
       return Math.min(100, Math.max(0, currentValue));
     } else {
-      // Для обычных значений: обратное масштабирование
+      // Для обычных и десятичных значений: обратное масштабирование
       const baseValue = metric.defaultValue;
       return Math.min(100, Math.max(0, (currentValue / baseValue) * 50));
     }
@@ -247,7 +381,7 @@ const AnalyticsTool: React.FC = () => {
                         min="0"
                         max="100"
                         value={getSliderValue(metric.id, metric)}
-                        onChange={(e) => handleSliderChange(metric.id, parseInt(e.target.value), metric)}
+                        onChange={(e) => !isReadonlyField(metric.id) && handleSliderChange(metric.id, parseInt(e.target.value), metric)}
                         className="slider"
                         style={{
                           '--thumb-color': group.color
@@ -263,10 +397,13 @@ const AnalyticsTool: React.FC = () => {
                         <div className="percentage-input-container">
                           <input
                             type="number"
-                            value={parseFloat(metrics[metric.id].toFixed(1))}
-                            onChange={(e) => !isReadonlyField(metric.id) && handleMetricChange(metric.id, parseFloat(e.target.value) || 0)}
+                            value={metrics[metric.id]}
+                            onFocus={() => handleInputFocus(metric.id)}
+                            onBlur={(e) => handleInputBlur(metric.id, true, e.target.value, false)}
+                            onChange={(e) => handleInputChange(metric.id, e.target.value, true, false)}
+                            onKeyDown={handleKeyDown}
                             className={`value-input percentage-field ${isReadonlyField(metric.id) ? 'readonly' : ''}`}
-                            placeholder="0"
+                            placeholder="0.0"
                             step="0.1"
                             readOnly={isReadonlyField(metric.id)}
                           />
@@ -276,14 +413,14 @@ const AnalyticsTool: React.FC = () => {
                         // Обычное поле
                         <input
                           type="number"
-                          value={metric.isPercentage ? 
-                            parseFloat(metrics[metric.id].toFixed(1)) : 
-                            metrics[metric.id]
-                          }
-                          onChange={(e) => !isReadonlyField(metric.id) && handleMetricChange(metric.id, parseFloat(e.target.value) || 0)}
+                          value={metrics[metric.id]}
+                          onFocus={() => handleInputFocus(metric.id)}
+                          onBlur={(e) => handleInputBlur(metric.id, metric.isPercentage, e.target.value, metric.isDecimal)}
+                          onChange={(e) => handleInputChange(metric.id, e.target.value, metric.isPercentage, metric.isDecimal)}
+                          onKeyDown={handleKeyDown}
                           className={`value-input ${!metric.isPercentage && !metric.hasPeriod ? 'single-field' : ''} ${isReadonlyField(metric.id) ? 'readonly' : ''}`}
-                          placeholder="0"
-                          step={metric.isPercentage ? "0.1" : "1"}
+                          placeholder={metric.isPercentage || metric.isDecimal ? "0.0" : "0"}
+                          step={metric.isPercentage || metric.isDecimal ? "0.1" : "1"}
                           readOnly={isReadonlyField(metric.id)}
                         />
                       )}
@@ -293,8 +430,14 @@ const AnalyticsTool: React.FC = () => {
                         <input
                           type="number"
                           value={metric.isPercentage ? 
-                            parseFloat(metrics[metric.id].toFixed(1)) : 
-                            metrics[metric.id] * period
+                            (typeof metrics[metric.id] === 'string' ? 
+                              parseFloat(metrics[metric.id] as string) || 0 : 
+                              parseFloat((metrics[metric.id] as number).toFixed(1))
+                            ) : 
+                            (typeof metrics[metric.id] === 'string' ? 
+                              (parseFloat(metrics[metric.id] as string) || 0) * period : 
+                              (metrics[metric.id] as number) * period
+                            )
                           }
                           readOnly
                           className="value-input readonly"
