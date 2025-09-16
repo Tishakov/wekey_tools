@@ -16,9 +16,79 @@ const UtmGeneratorTool: React.FC = () => {
     const [utmTerm, setUtmTerm] = useState('');
     const [noBaseUrl, setNoBaseUrl] = useState(false);
     const [transliterate, setTransliterate] = useState(false);
+    const [otherSources, setOtherSources] = useState(false);
+    const [selectedSource, setSelectedSource] = useState('custom');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
     const [launchCount, setLaunchCount] = useState(0);
+
+    // Структура источников трафика
+    const trafficSources = {
+        custom: {
+            name: 'Свои значения',
+            utm_source: '',
+            utm_medium: '',
+            utm_campaign: '',
+            utm_content: '',
+            utm_term: ''
+        },
+        google_ads: {
+            name: 'Google ADS',
+            utm_source: 'google',
+            utm_medium: 'cpc',
+            utm_campaign: 'google_ads_campaign',
+            utm_content: 'google_ad',
+            utm_term: 'keyword'
+        },
+        esputnik_email: {
+            name: 'eSputnik Email',
+            utm_source: 'esputnik',
+            utm_medium: 'email',
+            utm_campaign: 'email_campaign',
+            utm_content: 'newsletter',
+            utm_term: ''
+        },
+        tiktok: {
+            name: 'Tik-Tok',
+            utm_source: 'tiktok',
+            utm_medium: 'social',
+            utm_campaign: 'tiktok_campaign',
+            utm_content: 'video_ad',
+            utm_term: ''
+        },
+        facebook: {
+            name: 'Facebook',
+            utm_source: 'facebook',
+            utm_medium: 'social',
+            utm_campaign: 'facebook_campaign',
+            utm_content: 'post',
+            utm_term: ''
+        },
+        instagram: {
+            name: 'Instagram',
+            utm_source: 'instagram',
+            utm_medium: 'social',
+            utm_campaign: 'instagram_campaign',
+            utm_content: 'story',
+            utm_term: ''
+        },
+        telegram: {
+            name: 'Telegram',
+            utm_source: 'telegram',
+            utm_medium: 'messenger',
+            utm_campaign: 'telegram_campaign',
+            utm_content: 'channel_post',
+            utm_term: ''
+        },
+        viber: {
+            name: 'Viber',
+            utm_source: 'viber',
+            utm_medium: 'messenger',
+            utm_campaign: 'viber_campaign',
+            utm_content: 'message',
+            utm_term: ''
+        }
+    };
 
     // Загрузка статистики при монтировании компонента
     useEffect(() => {
@@ -75,8 +145,26 @@ const UtmGeneratorTool: React.FC = () => {
 
     // Функция транслитерации
     const transliterateText = (text: string): string => {
+        // Таблица транслитерации кириллицы в латиницу
+        const transliterationMap: { [key: string]: string } = {
+            'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh',
+            'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
+            'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts',
+            'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+            'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh',
+            'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O',
+            'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts',
+            'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+            // Украинские символы
+            'і': 'i', 'ї': 'yi', 'є': 'ye', 'ґ': 'g',
+            'І': 'I', 'Ї': 'Yi', 'Є': 'Ye', 'Ґ': 'G'
+        };
+
         return text
             .trim() // убираем пробелы в начале и конце
+            .split('') // разбиваем на символы
+            .map(char => transliterationMap[char] || char) // транслитерируем кириллицу
+            .join('') // собираем обратно
             .toLowerCase() // приводим к нижнему регистру
             .replace(/[''""«»„"]/g, '') // удаляем апострофы и кавычки (включая разные типы кавычек)
             .replace(/[^\w\s\-\/\.]/g, '') // удаляем все спецсимволы кроме букв, цифр, пробелов, дефисов, слешей и точек
@@ -84,6 +172,28 @@ const UtmGeneratorTool: React.FC = () => {
             .replace(/-+/g, '-') // заменяем множественные дефисы на один
             .replace(/\/+/g, '/') // заменяем множественные слеши на один
             .replace(/^-+|-+$/g, ''); // убираем дефисы в начале и конце
+    };
+
+    // Функция для заполнения UTM полей при выборе источника
+    const handleSourceSelect = (sourceKey: string) => {
+        setSelectedSource(sourceKey);
+        
+        if (sourceKey === 'custom') {
+            // Очищаем поля при выборе "Свои значения"
+            setUtmSource('');
+            setUtmMedium('');
+            setUtmCampaign('');
+            setUtmContent('');
+            setUtmTerm('');
+        } else {
+            // Заполняем UTM поля значениями из выбранного источника
+            const sourceData = trafficSources[sourceKey as keyof typeof trafficSources];
+            setUtmSource(sourceData.utm_source);
+            setUtmMedium(sourceData.utm_medium);
+            setUtmCampaign(sourceData.utm_campaign);
+            setUtmContent(sourceData.utm_content);
+            setUtmTerm(sourceData.utm_term);
+        }
     };
 
     // Обработчик показа результата
@@ -118,11 +228,11 @@ const UtmGeneratorTool: React.FC = () => {
             return;
         }
 
-        const utmString = `?${params.join('&')}`;
+        const utmString = params.join('&');
         
         if (noBaseUrl) {
             // Только хвост UTM
-            setResult(utmString);
+            setResult('?' + utmString);
         } else {
             // Полная ссылка с протоколом
             let url = baseUrl.trim();
@@ -130,13 +240,21 @@ const UtmGeneratorTool: React.FC = () => {
                 url = 'example.com';
             }
             
-            // Убираем существующие параметры если есть
-            const cleanUrl = url.split('?')[0];
+            // Разделяем URL на основную часть и параметры
+            const [baseUrlPart, existingParams] = url.split('?');
             
-            // Применяем транслитерацию к URL если включена
-            const finalUrl = transliterate ? transliterateText(cleanUrl) : cleanUrl;
+            // Применяем транслитерацию только к основной части URL
+            const transliteratedBase = transliterate ? transliterateText(baseUrlPart) : baseUrlPart;
             
-            setResult(protocol + finalUrl + utmString);
+            // Собираем финальный URL
+            let finalUrl = transliteratedBase;
+            if (existingParams) {
+                finalUrl += '?' + existingParams + '&' + params.join('&');
+            } else {
+                finalUrl += '?' + params.join('&');
+            }
+            
+            setResult(protocol + finalUrl);
         }
 
         // Увеличиваем счетчик запусков
@@ -237,6 +355,41 @@ const UtmGeneratorTool: React.FC = () => {
                 {/* Ряд 2: UTM поля */}
                 <div className="utm-row">
                     <div className="utm-main-container">
+                        {/* Переключатель "Другие источники" */}
+                        <div className="other-sources-toggle">
+                            <div className="other-sources-block">
+                                <div className="toggle-container">
+                                    <span className="toggle-label">Другие источники</span>
+                                    <label className="toggle-switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={otherSources}
+                                            onChange={(e) => setOtherSources(e.target.checked)}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Радиокнопки источников трафика */}
+                        {otherSources && (
+                            <div className="traffic-sources-grid">
+                                {Object.entries(trafficSources).map(([key, source]) => (
+                                    <label key={key} className="radio-item">
+                                        <input
+                                            type="radio"
+                                            name="trafficSource"
+                                            value={key}
+                                            checked={selectedSource === key}
+                                            onChange={() => handleSourceSelect(key)}
+                                        />
+                                        <span>{source.name}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="utm-fields-container">
                             {/* Первый ряд: utm_source и utm_content */}
                             <div className="utm-fields-row">
@@ -249,7 +402,7 @@ const UtmGeneratorTool: React.FC = () => {
                                         <input
                                             type="text"
                                             className="utm-field-input"
-                                            placeholder="google, yandex, facebook..."
+                                            placeholder="google, instagram, facebook..."
                                             value={utmSource}
                                             onChange={(e) => setUtmSource(e.target.value)}
                                         />
@@ -346,7 +499,7 @@ const UtmGeneratorTool: React.FC = () => {
                         <button className="btn primary-btn" onClick={handleShowResult}>
                             Показать результат
                         </button>
-                        <button className="btn secondary-btn" onClick={handleCopyResult}>
+                        <button className="btn secondary-btn btn-with-left-icon" onClick={handleCopyResult}>
                             <img src="/icons/button_copy.svg" alt="" />
                             {copied ? 'Скопировано!' : 'Скопировать результат'}
                         </button>

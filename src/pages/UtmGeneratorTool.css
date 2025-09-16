@@ -27,6 +27,7 @@
     border: 1px solid #333335;
     border-radius: 8px;
     padding: 20px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -154,6 +155,11 @@
     width: 100%;
     max-width: 910px;
     margin: 0 auto 20px auto;
+}
+
+/* Специфический стиль кнопок управления для UTM генератора */
+.utm-generator-page .control-buttons {
+    margin-bottom: 0;
 }
 
 /* Поле результата */
@@ -479,15 +485,21 @@
     flex: 1;
 }
 
+.btn:focus,
+.btn:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .primary-btn {
-    background-color: #6366F1;
-    border: 1px solid #6366F1;
-    color: #ffffff;
+    background-color: #28282A;
+    border: 1px solid #333335;
+    color: #BCBBBD;
 }
 
 .primary-btn:hover {
-    background-color: #5856EB;
-    border-color: #5856EB;
+    background-color: #2a2a2c;
+    border-color: #404042;
 }
 
 .secondary-btn {
@@ -502,6 +514,20 @@
 }
 
 .secondary-btn img {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
+}
+
+/* Специальный стиль для кнопки с иконкой слева */
+.btn-with-left-icon {
+    position: relative;
+    justify-content: center;
+}
+
+.btn-with-left-icon img {
+    position: absolute;
+    left: 15px;
     width: 16px;
     height: 16px;
     filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
@@ -522,12 +548,30 @@
     color: #BCBBBD;
     font-size: 14px;
     outline: none;
-    font-family: 'Courier New', monospace;
+    font-family: 'Gilroy';
     box-sizing: border-box;
+    resize: none !important;
+    overflow: hidden;
+}
+
+/* Убираем resize handle через псевдоэлементы */
+.result-input::-webkit-resizer {
+    display: none !important;
+}
+
+.result-input::-moz-resizer {
+    display: none !important;
+}
+
+/* Убираем псевдоэлемент ::after который создает resize handle */
+.result-input::after,
+.result-section::after {
+    display: none !important;
 }
 
 .result-input::placeholder {
     color: #888888;
+    font-family: 'Gilroy';
 }
 
 /* Адаптивность */
@@ -544,4 +588,100 @@
     .utm-fields-grid {
         gap: 8px;
     }
+}
+
+/* Переключатель "Другие источники" */
+.other-sources-toggle {
+    margin-bottom: 20px;
+    margin-top: -33px;
+}
+
+.other-sources-block {
+    background-color: #28282A;
+    border-radius: 50px;
+    padding: 2px 4px 3px 14px;
+    display: inline-block;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggle-label {
+    color: #BCBBBD;
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1C1D1F;
+    transition: 0.3s;
+    border-radius: 20px;
+    border: 1px solid #333335;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #BCBBBD;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #09CEA7;
+    border-color: #09CEA7;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+    background-color: #ffffff;
+}
+
+.toggle-switch:hover .toggle-slider {
+    background-color: #2a2a2c;
+}
+
+.toggle-switch input:checked:hover + .toggle-slider {
+    background-color: #08b89a;
+}
+
+/* Сетка источников трафика */
+.traffic-sources-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+    max-width: 910px;
+}
+
+/* Переопределение ширины радиокнопок для UTM генератора */
+.traffic-sources-grid .radio-item {
+    width: auto; /* Убираем фиксированную ширину 385px */
 }
