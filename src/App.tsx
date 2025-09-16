@@ -50,7 +50,7 @@ function App() {
           <Route path="/text-sorting" element={<TextSortingTool />} />
           <Route path="/remove-empty-lines" element={<EmptyLinesRemovalTool />} />
           <Route path="/emoji" element={<EmojiTool />} />
-          <Route path="/analytics" element={<AnalyticsTool />} />
+          <Route path="/cross-analytics" element={<AnalyticsTool />} />
         </Routes>
       </Layout>
     </Router>

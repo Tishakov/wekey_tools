@@ -122,8 +122,8 @@ export const toolsConfig: Tool[] = [
   },
   {
     id: 'cross-analytics',
-    title: 'Сквозная Аналитика',
-    description: 'Сквозная аналитика данных',
+    title: 'Сквозная аналитика',
+    description: 'Инструмент для анализа воронки продаж и маркетинговых метрик',
     icon: '/icons/tool_skvoznaya_analitika.svg',
     path: '/cross-analytics',
     category: 'analytics'
@@ -215,14 +215,6 @@ export const toolsConfig: Tool[] = [
     icon: '/icons/tool_emoji.svg',
     path: '/emoji',
     category: 'text-processing'
-  },
-  {
-    id: 'analytics',
-    title: 'Сквозная Аналитика',
-    description: 'Инструмент для анализа воронки продаж и маркетинговых метрик',
-    icon: '/icons/tool_skvoznaya_analitika.svg',
-    path: '/analytics',
-    category: 'analytics'
   }
 ];
 

@@ -147,7 +147,7 @@ const AnalyticsTool: React.FC = () => {
           Все инструменты
         </Link>
         
-        <h1 className="tool-title">Сквозная Аналитика</h1>
+        <h1 className="tool-title">Сквозная аналитика</h1>
         
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn" title="Счетчик запусков">
