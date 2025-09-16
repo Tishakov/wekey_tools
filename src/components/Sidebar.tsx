@@ -16,7 +16,8 @@ const Sidebar: React.FC = () => {
     'text-sorting',          // Сортировка слов и строк
     'remove-empty-lines',    // Удаление пустых строк
     'transliteration',       // Транслитерация (был готов ранее)
-    'minus-words'            // Обработка минус-слов
+    'minus-words',           // Обработка минус-слов
+    'utm-generator'          // Генератор UTM-меток
   ];
   
   // Сортируем инструменты по алфавиту
