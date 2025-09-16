@@ -93,7 +93,7 @@
 /* Группы метрик */
 .metrics-group {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   display: flex;
   align-items: center;
 }
@@ -154,7 +154,7 @@
   border-radius: 10px;
   border: 1px solid #333335;
   background: #28282A;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
 }
 
 .metric-row:hover {
