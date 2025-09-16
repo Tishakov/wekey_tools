@@ -142,24 +142,23 @@ const AnalyticsTool: React.FC = () => {
     <div className="tool-container">
       {/* Заголовок */}
       <header className="tool-header-island">
-        <div className="tool-nav">
-          <Link to="/" className="back-button">
-            ← Все инструменты
-          </Link>
-        </div>
+        <Link to="/" className="back-button">
+          <img src="/icons/arrow_left.svg" alt="" />
+          Все инструменты
+        </Link>
         
         <h1 className="tool-title">Сквозная Аналитика</h1>
         
-        <div className="tool-actions">
-          <div className="usage-counter">
-            <span className="counter-number">0</span>
-            <span className="counter-label">запусков</span>
-          </div>
-          <button className="action-button" title="Подсказка">
-            💡
+        <div className="tool-header-buttons">
+          <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+            <img src="/icons/rocket.svg" alt="" />
+            <span className="counter">0</span>
           </button>
-          <button className="action-button" title="Скриншот">
-            📷
+          <button className="tool-header-btn icon-only" title="Подсказки">
+            <img src="/icons/lamp.svg" alt="" />
+          </button>
+          <button className="tool-header-btn icon-only" title="Скриншот">
+            <img src="/icons/camera.svg" alt="" />
           </button>
         </div>
       </header>
@@ -182,69 +181,71 @@ const AnalyticsTool: React.FC = () => {
           {/* Группы параметров */}
           {metricsConfig.map((group) => (
             <div key={group.title} className="metrics-group">
-              {/* Заголовок группы */}
-              <div className="group-header" style={{ borderLeftColor: group.color }}>
-                <div className="group-indicator" style={{ backgroundColor: group.color }}></div>
-                <h3 className="group-title">{group.title}</h3>
+              {/* Заголовок группы - вертикальный слева */}
+              <div className="group-title-vertical" style={{ color: group.color }}>
+                <div className="icon-background"></div>
+                <span className="group-text">{group.title}</span>
               </div>
 
               {/* Метрики группы */}
-              {group.metrics.map((metric) => (
-                <div key={metric.id} className="metric-row">
-                  {/* Название параметра */}
-                  <div className="metric-name">
-                    <button 
-                      className="help-button" 
-                      title={metric.tooltip}
-                      style={{ backgroundColor: group.color }}
-                    >
-                      ?
-                    </button>
-                    <span>{metric.name}</span>
-                  </div>
+              <div className="group-metrics">
+                {group.metrics.map((metric) => (
+                  <div key={metric.id} className="metric-row">
+                    {/* Название параметра */}
+                    <div className="metric-name">
+                      <button 
+                        className="help-button" 
+                        title={metric.tooltip}
+                        style={{ backgroundColor: group.color }}
+                      >
+                        ?
+                      </button>
+                      <span>{metric.name}</span>
+                    </div>
 
-                  {/* Слайдер */}
-                  <div className="metric-slider">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={getSliderValue(metric.id, metric)}
-                      onChange={(e) => handleSliderChange(metric.id, parseInt(e.target.value), metric)}
-                      className="slider"
-                      style={{
-                        '--thumb-color': group.color
-                      } as React.CSSProperties}
-                    />
-                  </div>
+                    {/* Слайдер */}
+                    <div className="metric-slider">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={getSliderValue(metric.id, metric)}
+                        onChange={(e) => handleSliderChange(metric.id, parseInt(e.target.value), metric)}
+                        className="slider"
+                        style={{
+                          '--thumb-color': group.color
+                        } as React.CSSProperties}
+                      />
+                    </div>
 
-                  {/* Поля ввода */}
-                  <div className="metric-values">
-                    <input
-                      type="number"
-                      value={metric.isPercentage ? 
-                        parseFloat(metrics[metric.id].toFixed(1)) : 
-                        metrics[metric.id]
-                      }
-                      onChange={(e) => handleMetricChange(metric.id, parseFloat(e.target.value) || 0)}
-                      className="value-input"
-                      placeholder="0"
-                      step={metric.isPercentage ? "0.1" : "1"}
-                    />
-                    <input
-                      type="number"
-                      value={metric.isPercentage ? 
-                        parseFloat((metrics[metric.id] * 30).toFixed(1)) : 
-                        metrics[metric.id] * 30
-                      }
-                      readOnly
-                      className="value-input readonly"
-                      placeholder="0"
-                    />
-                    {metric.isPercentage && <span className="percentage-symbol">%</span>}
+                    {/* Поля ввода */}
+                    <div className="metric-values">
+                      <input
+                        type="number"
+                        value={metric.isPercentage ? 
+                          parseFloat(metrics[metric.id].toFixed(1)) : 
+                          metrics[metric.id]
+                        }
+                        onChange={(e) => handleMetricChange(metric.id, parseFloat(e.target.value) || 0)}
+                        className="value-input"
+                        placeholder="0"
+                        step={metric.isPercentage ? "0.1" : "1"}
+                      />
+                      <input
+                        type="number"
+                        value={metric.isPercentage ? 
+                          parseFloat((metrics[metric.id] * 30).toFixed(1)) : 
+                          metrics[metric.id] * 30
+                        }
+                        readOnly
+                        className="value-input readonly"
+                        placeholder="0"
+                      />
+                      {metric.isPercentage && <span className="percentage-symbol">%</span>}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           ))}
         </div>
