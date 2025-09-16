@@ -21,6 +21,7 @@ import SpacesToParagraphsTool from './pages/SpacesToParagraphsTool';
 import TextSortingTool from './pages/TextSortingTool';
 import EmptyLinesRemovalTool from './pages/EmptyLinesRemovalTool';
 import EmojiTool from './pages/EmojiTool';
+import AnalyticsTool from './pages/AnalyticsTool';
 import './styles/tool-pages.css';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
           <Route path="/text-sorting" element={<TextSortingTool />} />
           <Route path="/remove-empty-lines" element={<EmptyLinesRemovalTool />} />
           <Route path="/emoji" element={<EmojiTool />} />
+          <Route path="/analytics" element={<AnalyticsTool />} />
         </Routes>
       </Layout>
     </Router>

@@ -215,6 +215,14 @@ export const toolsConfig: Tool[] = [
     icon: '/icons/tool_emoji.svg',
     path: '/emoji',
     category: 'text-processing'
+  },
+  {
+    id: 'analytics',
+    title: 'Сквозная Аналитика',
+    description: 'Инструмент для анализа воронки продаж и маркетинговых метрик',
+    icon: '/icons/tool_skvoznaya_analitika.svg',
+    path: '/analytics',
+    category: 'analytics'
   }
 ];
 
