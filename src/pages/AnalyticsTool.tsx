@@ -12,6 +12,7 @@ interface Metric {
   isDecimal?: boolean; // для полей которые должны показывать десятичные значения но без символа %
   defaultValue: number;
   hasPeriod: boolean; // флаг для двух полей (день + 30 дней)
+  sliderRange?: { min: number; max: number }; // диапазон для слайдера
 }
 
 interface Group {
@@ -26,65 +27,65 @@ const metricsConfig: Group[] = [
     title: 'Трафик',
     color: '#6B7280', // серый
     metrics: [
-      { id: 'clicks', name: 'Клики', tooltip: 'Количество кликов по рекламе', isPercentage: false, defaultValue: 100, hasPeriod: true },
-      { id: 'impressions', name: 'Показы', tooltip: 'Количество показов рекламы', isPercentage: false, defaultValue: 1000, hasPeriod: true },
-      { id: 'ctr', name: 'CTR %', tooltip: 'Click Through Rate - отношение кликов к показам', isPercentage: true, defaultValue: 10, hasPeriod: false },
+      { id: 'clicks', name: 'Клики', tooltip: 'Количество кликов по рекламе', isPercentage: false, defaultValue: 300, hasPeriod: true, sliderRange: { min: 0, max: 500 } },
+      { id: 'impressions', name: 'Показы', tooltip: 'Количество показов рекламы', isPercentage: false, defaultValue: 8000, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
+      { id: 'ctr', name: 'CTR %', tooltip: 'Click Through Rate - отношение кликов к показам', isPercentage: true, defaultValue: 3.75, hasPeriod: false },
     ]
   },
   {
     title: 'Расходы',
     color: '#EF4444', // красный
     metrics: [
-      { id: 'cpc', name: 'CPC – стоимость клика', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, isDecimal: true, defaultValue: 10, hasPeriod: false },
-      { id: 'adCost', name: 'Затраты на рекламу', tooltip: 'Общие затраты на рекламную кампанию', isPercentage: false, defaultValue: 1000, hasPeriod: true },
+      { id: 'cpc', name: 'CPC – стоимость клика', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
+      { id: 'adCost', name: 'Затраты на рекламу', tooltip: 'Общие затраты на рекламную кампанию', isPercentage: false, defaultValue: 3600, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
     ]
   },
   {
     title: 'Сайт',
     color: '#F59E0B', // жёлтый
     metrics: [
-      { id: 'cr1', name: 'CR1 – Конверсия сайта %', tooltip: 'Conversion Rate 1 - процент посетителей, ставших лидами', isPercentage: true, defaultValue: 5, hasPeriod: false },
-      { id: 'leads', name: 'Лидов, продаж', tooltip: 'Количество полученных лидов', isPercentage: false, defaultValue: 50, hasPeriod: true },
-      { id: 'cpl', name: 'CPL – стоимость лида', tooltip: 'Cost Per Lead - стоимость получения одного лида', isPercentage: false, defaultValue: 20, hasPeriod: false },
+      { id: 'cr1', name: 'CR1 – Конверсия сайта %', tooltip: 'Conversion Rate 1 - процент посетителей, ставших лидами', isPercentage: true, defaultValue: 4.0, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
+      { id: 'leads', name: 'Лидов, продаж', tooltip: 'Количество полученных лидов', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: true, sliderRange: { min: 0, max: 200 } },
+      { id: 'cpl', name: 'CPL – стоимость лида', tooltip: 'Cost Per Lead - стоимость получения одного лида', isPercentage: false, defaultValue: 300, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
     ]
   },
   {
     title: 'Отдел продаж',
     color: '#3B82F6', // синий
     metrics: [
-      { id: 'cr2', name: 'CR2 – Из лида в продажу %', tooltip: 'Conversion Rate 2 - процент лидов, ставших продажами', isPercentage: true, defaultValue: 20, hasPeriod: false },
-      { id: 'sales', name: 'Сделок, продаж', tooltip: 'Количество заключенных сделок', isPercentage: false, defaultValue: 10, hasPeriod: true },
-      { id: 'cpo', name: 'CPO – цена сделки, продажи', tooltip: 'Cost Per Order - стоимость получения одной сделки', isPercentage: false, defaultValue: 100, hasPeriod: false },
+      { id: 'cr2', name: 'CR2 – Из лида в продажу %', tooltip: 'Conversion Rate 2 - процент лидов, ставших продажами', isPercentage: true, defaultValue: 75.0, hasPeriod: false },
+      { id: 'sales', name: 'Сделок, продаж', tooltip: 'Количество заключенных сделок', isPercentage: false, isDecimal: true, defaultValue: 9, hasPeriod: true, sliderRange: { min: 0, max: 100 } },
+      { id: 'cpo', name: 'CPO – цена сделки, продажи', tooltip: 'Cost Per Order - стоимость получения одной сделки', isPercentage: false, defaultValue: 400, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
     ]
   },
   {
     title: 'Ценообразование',
     color: '#8B5CF6', // фиолетовый
     metrics: [
-      { id: 'aov', name: 'AOV – средний чек (одной)', tooltip: 'Average Order Value - средняя стоимость одного заказа', isPercentage: false, defaultValue: 500, hasPeriod: false },
-      { id: 'revenue', name: 'Валовой доход', tooltip: 'Общий доход от продаж', isPercentage: false, defaultValue: 5000, hasPeriod: true },
+      { id: 'aov', name: 'AOV – средний чек (одной)', tooltip: 'Average Order Value - средняя стоимость одного заказа', isPercentage: false, defaultValue: 3000, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
+      { id: 'revenue', name: 'Валовой доход', tooltip: 'Общий доход от продаж', isPercentage: false, defaultValue: 27000, hasPeriod: true, sliderRange: { min: 0, max: 100000 } },
       { id: 'marginPercent', name: 'Маржинальность %', tooltip: 'Процент маржи от дохода', isPercentage: true, defaultValue: 50, hasPeriod: false },
-      { id: 'marginPerUnit', name: 'Маржа с одной', tooltip: 'Маржа с одной единицы товара', isPercentage: false, defaultValue: 250, hasPeriod: false },
+      { id: 'marginPerUnit', name: 'Маржа с одной', tooltip: 'Маржа с одной единицы товара', isPercentage: false, defaultValue: 1500, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
+      { id: 'totalMargin', name: 'Общая маржа (Прибыль)', tooltip: 'Общая маржа от всех продаж', isPercentage: false, defaultValue: 13500, hasPeriod: false, sliderRange: { min: 0, max: 50000 } },
     ]
   },
   {
     title: 'Доходы',
     color: '#10B981', // зелёный
     metrics: [
-      { id: 'profit', name: 'Прибыль', tooltip: 'Общая прибыль', isPercentage: false, defaultValue: 2500, hasPeriod: true },
-      { id: 'netProfit', name: 'Чистая прибыль', tooltip: 'Чистая прибыль после всех расходов', isPercentage: false, defaultValue: 1500, hasPeriod: true },
-      { id: 'netProfitPerUnit', name: 'Чистая прибыль с одной', tooltip: 'Чистая прибыль с одной единицы', isPercentage: false, defaultValue: 150, hasPeriod: true },
-      { id: 'romi', name: 'ROMI %', tooltip: 'Return on Marketing Investment - возврат инвестиций в маркетинг', isPercentage: true, defaultValue: 150, hasPeriod: false },
-      { id: 'roas', name: 'ROAS', tooltip: 'Return on Advertising Spend - возврат рекламных инвестиций', isPercentage: false, defaultValue: 5, hasPeriod: false },
+      { id: 'netProfit', name: 'Чистая прибыль', tooltip: 'Чистая прибыль после всех расходов', isPercentage: false, defaultValue: 9900, hasPeriod: true, sliderRange: { min: 0, max: 50000 } },
+      { id: 'netProfitPerUnit', name: 'Чистая прибыль с одной', tooltip: 'Чистая прибыль с одной единицы', isPercentage: false, defaultValue: 1100, hasPeriod: true, sliderRange: { min: 0, max: 5000 } },
+      { id: 'romi', name: 'ROMI %', tooltip: 'Return on Marketing Investment - возврат инвестиций в маркетинг', isPercentage: true, defaultValue: 275, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+      { id: 'roas', name: 'ROAS', tooltip: 'Return on Advertising Spend - возврат рекламных инвестиций', isPercentage: false, defaultValue: 7.5, hasPeriod: false, sliderRange: { min: 0, max: 10 } },
     ]
   },
   {
     title: 'Формулы',
     color: '#6B7280', // серый
     metrics: [
-      { id: 'drr', name: 'ДРР %', tooltip: 'Доля рекламных расходов', isPercentage: true, defaultValue: 20, hasPeriod: false },
-      { id: 'iccr', name: 'ICCR %', tooltip: 'Index of Customer Conversion Rate', isPercentage: true, defaultValue: 25, hasPeriod: false },
-      { id: 'cpm', name: 'CPM', tooltip: 'Cost Per Mille - стоимость тысячи показов', isPercentage: false, defaultValue: 10, hasPeriod: false },
+      { id: 'drr', name: 'ДРР %', tooltip: 'Доля рекламных расходов', isPercentage: true, isDecimal: true, defaultValue: 13.33, hasPeriod: false },
+      { id: 'iccr', name: 'ICCR %', tooltip: 'Index of Customer Conversion Rate', isPercentage: true, isDecimal: true, defaultValue: 26.67, hasPeriod: false },
+      { id: 'cpm', name: 'CPM', tooltip: 'Cost Per Mille - стоимость тысячи показов', isPercentage: false, defaultValue: 450, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
     ]
   }
 ];
@@ -140,6 +141,7 @@ const AnalyticsTool: React.FC = () => {
       'ctr',        // CTR
       'cpl',        // CPL – стоимость лида
       'cpo',        // CPO – цена сделки, продажи
+      'totalMargin', // Общая маржа
       // Все поля в блоке Доходы
       'profit',     // Прибыль
       'netProfit',  // Чистая прибыль
@@ -154,13 +156,43 @@ const AnalyticsTool: React.FC = () => {
     return readonlyMetrics.includes(metricId);
   };
 
+  // Проверка, должен ли слайдер быть заблокирован
+  const isSliderDisabled = (metricId: string): boolean => {
+    // Находим метрику в конфигурации
+    const metric = metricsConfig
+      .flatMap(group => group.metrics)
+      .find(m => m.id === metricId);
+    
+    if (!metric) return true; // Если метрика не найдена, блокируем слайдер
+    
+    // Блокируем слайдеры для расчетных полей
+    const calculatedFields = ['netProfit', 'netProfitPerUnit'];
+    if (calculatedFields.includes(metricId)) return true;
+    
+    // Разрешаем слайдеры для:
+    // 1. Полей с периодом (hasPeriod: true): клики, показы, затраты, лиды, сделки, доходы  
+    // 2. Особых полей: CPC, CR1, CR2, AOV, маржинальность
+    const allowedFields = ['cpc', 'cr1', 'cr2', 'aov', 'marginPercent'];
+    return !metric.hasPeriod && !allowedFields.includes(metricId);
+  };
+
   // Обработчик изменения слайдера
   const handleSliderChange = (metricId: string, sliderValue: number, metric: Metric) => {
+    // Проверяем, не заблокирован ли слайдер для этой метрики
+    if (isSliderDisabled(metricId)) return;
+    
     // Более умное масштабирование в зависимости от типа метрики
     let scaledValue: number | string;
     
-    if (metric.isPercentage) {
-      // Для процентов: 0-100 слайдер -> 0-100% значение в десятичном формате
+    if (metric.sliderRange) {
+      // Для полей с настроенным диапазоном слайдера (включая проценты)
+      const { min, max } = metric.sliderRange;
+      const numericValue = (sliderValue / 100) * (max - min) + min;
+      scaledValue = metric.isDecimal ? numericValue.toFixed(1) : 
+                   metric.isPercentage ? numericValue.toFixed(1) : 
+                   Math.round(numericValue);
+    } else if (metric.isPercentage) {
+      // Для процентов без диапазона: 0-100 слайдер -> 0-100% значение в десятичном формате
       scaledValue = sliderValue.toFixed(1);
     } else if (metric.isDecimal) {
       // Для десятичных полей: масштабируем и форматируем в десятичный вид
@@ -177,6 +209,9 @@ const AnalyticsTool: React.FC = () => {
       ...prev,
       [metricId]: scaledValue
     }));
+    
+    // Обновляем связанные поля
+    updateRelatedFields(metricId, scaledValue);
   };
 
   // Новые обработчики для полей ввода
@@ -192,41 +227,41 @@ const AnalyticsTool: React.FC = () => {
   };
 
   const handleInputBlur = (metricId: string, isPercentage: boolean, inputValue: string, isDecimal: boolean = false) => {
+    let finalValue: number | string;
+    
     if (inputValue === '' || inputValue === undefined) {
       // Возвращаем 0 если поле пустое
-      const defaultValue = (isPercentage || isDecimal) ? '0.0' : 0;
-      setMetrics(prev => ({
-        ...prev,
-        [metricId]: defaultValue
-      }));
+      finalValue = (isPercentage || isDecimal) ? '0.0' : 0;
     } else if (isPercentage || isDecimal) {
       // Для процентных и десятичных полей: если введено целое число, добавляем .0
       if (/^\d+$/.test(inputValue)) {
-        const formattedValue = inputValue + '.0';
-        setMetrics(prev => ({
-          ...prev,
-          [metricId]: formattedValue
-        }));
+        finalValue = inputValue + '.0';
       } else {
         // Если уже есть десятичная часть, преобразуем в число и обратно для нормализации
         const numericValue = parseFloat(inputValue);
         if (!isNaN(numericValue)) {
-          setMetrics(prev => ({
-            ...prev,
-            [metricId]: numericValue.toFixed(1)
-          }));
+          finalValue = numericValue.toFixed(1);
+        } else {
+          return;
         }
       }
     } else {
       // Для обычных полей преобразуем в число
       const numericValue = parseFloat(inputValue);
       if (!isNaN(numericValue)) {
-        setMetrics(prev => ({
-          ...prev,
-          [metricId]: numericValue
-        }));
+        finalValue = numericValue;
+      } else {
+        return;
       }
     }
+    
+    setMetrics(prev => ({
+      ...prev,
+      [metricId]: finalValue
+    }));
+    
+    // Обновляем связанные поля
+    updateRelatedFields(metricId, finalValue);
   };
 
   const handleInputChange = (metricId: string, value: string, isPercentage: boolean, isDecimal: boolean = false) => {
@@ -255,6 +290,12 @@ const AnalyticsTool: React.FC = () => {
         ...prev,
         [metricId]: processedValue
       }));
+      
+      // Обновляем связанные поля в реальном времени (только если есть корректное число)
+      const numericValue = parseFloat(processedValue);
+      if (!isNaN(numericValue)) {
+        updateRelatedFields(metricId, processedValue);
+      }
     } else {
       // Для обычных полей
       if (value === '') {
@@ -271,6 +312,9 @@ const AnalyticsTool: React.FC = () => {
           ...prev,
           [metricId]: numericValue
         }));
+        
+        // Обновляем связанные поля в реальном времени
+        updateRelatedFields(metricId, numericValue);
       }
     }
   };
@@ -282,12 +326,235 @@ const AnalyticsTool: React.FC = () => {
     }
   };
 
+  // Функция для обновления связанных полей
+  const updateRelatedFields = (changedMetricId: string, newValue: number | string) => {
+    const numericValue = typeof newValue === 'string' ? parseFloat(newValue) || 0 : newValue;
+    
+    setMetrics(prev => {
+      const updated = { ...prev };
+      
+      // Получаем текущие значения
+      const getNumericValue = (id: string) => {
+        const val = updated[id];
+        return typeof val === 'string' ? parseFloat(val) || 0 : val;
+      };
+      
+      // 1. CPC ↔ Затраты на рекламу (через клики)
+      if (changedMetricId === 'cpc') {
+        const clicks = getNumericValue('clicks');
+        const newAdCost = numericValue * clicks;
+        if (clicks > 0) {
+          updated['adCost'] = newAdCost;
+        }
+      } else if (changedMetricId === 'adCost') {
+        const clicks = getNumericValue('clicks');
+        if (clicks > 0) {
+          const newCpc = numericValue / clicks;
+          updated['cpc'] = newCpc.toFixed(1);
+        }
+      }
+      
+      // 2. CR1 ↔ Лидов/продаж (через клики)
+      if (changedMetricId === 'cr1') {
+        const clicks = getNumericValue('clicks');
+        const cr2 = getNumericValue('cr2');
+        const cr1Percent = numericValue;
+        const newLeads = (clicks * cr1Percent) / 100;
+        updated['leads'] = newLeads.toFixed(1);
+        
+        // Обновляем количество сделок при изменении CR1 (через новые лиды)
+        const newSales = (newLeads * cr2) / 100;
+        updated['sales'] = newSales.toFixed(1);
+      } else if (changedMetricId === 'leads') {
+        const clicks = getNumericValue('clicks');
+        const cr2 = getNumericValue('cr2');
+        if (clicks > 0) {
+          const newCr1 = (numericValue / clicks) * 100;
+          updated['cr1'] = newCr1.toFixed(1);
+        }
+        
+        // Обновляем количество сделок при изменении лидов
+        const newSales = (numericValue * cr2) / 100;
+        updated['sales'] = newSales.toFixed(1);
+      }
+      
+      // 2.5. CR2 ↔ Сделок (через лидов)
+      if (changedMetricId === 'cr2') {
+        const leads = getNumericValue('leads');
+        const cr2Percent = numericValue;
+        const newSales = (leads * cr2Percent) / 100;
+        updated['sales'] = newSales.toFixed(1);
+      } else if (changedMetricId === 'sales') {
+        const leads = getNumericValue('leads');
+        if (leads > 0) {
+          const newCr2 = (numericValue / leads) * 100;
+          updated['cr2'] = newCr2.toFixed(1);
+        }
+      }
+      
+      // 3. Обновляем клики и пересчитываем все связанные поля
+      if (changedMetricId === 'clicks') {
+        const cpc = getNumericValue('cpc');
+        const cr1 = getNumericValue('cr1');
+        const cr2 = getNumericValue('cr2');
+        const impressions = getNumericValue('impressions');
+        
+        // Обновляем затраты на рекламу
+        updated['adCost'] = numericValue * cpc;
+        
+        // Обновляем количество лидов
+        const newLeads = (numericValue * cr1) / 100;
+        updated['leads'] = newLeads.toFixed(1);
+        
+        // Обновляем количество сделок
+        const newSales = (newLeads * cr2) / 100;
+        updated['sales'] = newSales.toFixed(1);
+        
+        // Обновляем CTR
+        if (impressions > 0) {
+          const newCtr = (numericValue / impressions) * 100;
+          updated['ctr'] = newCtr.toFixed(1);
+        }
+      }
+      
+      // 4. Обновляем показы и пересчитываем CTR
+      if (changedMetricId === 'impressions') {
+        const clicks = getNumericValue('clicks');
+        if (clicks > 0) {
+          const newCtr = (clicks / numericValue) * 100;
+          updated['ctr'] = newCtr.toFixed(1);
+        }
+      }
+      
+      // 5. Пересчитываем CPL при изменении затрат или лидов
+      const adCost = getNumericValue('adCost');
+      const leads = getNumericValue('leads');
+      const sales = getNumericValue('sales');
+      
+      if ((changedMetricId === 'adCost' || changedMetricId === 'leads' || changedMetricId === 'clicks' || changedMetricId === 'cpc' || changedMetricId === 'cr1') && leads > 0) {
+        const newCpl = adCost / leads;
+        updated['cpl'] = newCpl.toFixed(0); // Округляем до целого числа
+      }
+      
+      // 6. Пересчитываем CPO при изменении затрат или сделок
+      if ((changedMetricId === 'adCost' || changedMetricId === 'sales' || changedMetricId === 'clicks' || changedMetricId === 'cpc' || changedMetricId === 'cr1' || changedMetricId === 'cr2' || changedMetricId === 'leads') && sales > 0) {
+        const newCpo = adCost / sales;
+        updated['cpo'] = newCpo.toFixed(0); // Округляем до целого числа
+      }
+      
+      // 7. Пересчитываем валовой доход при изменении AOV или сделок
+      const aov = getNumericValue('aov');
+      
+      if (changedMetricId === 'aov' || changedMetricId === 'sales' || changedMetricId === 'clicks' || changedMetricId === 'cr1' || changedMetricId === 'cr2' || changedMetricId === 'leads') {
+        const newRevenue = aov * sales;
+        updated['revenue'] = Math.round(newRevenue);
+      }
+      
+      // 8. Пересчитываем AOV при изменении валового дохода
+      if (changedMetricId === 'revenue' && sales > 0) {
+        const newAov = numericValue / sales;
+        updated['aov'] = Math.round(newAov);
+      }
+      
+      // 9. Пересчитываем маржу с одной и общую маржу при изменении связанных полей
+      const revenue = getNumericValue('revenue');
+      const marginPercent = getNumericValue('marginPercent');
+      
+      if (changedMetricId === 'marginPercent' || changedMetricId === 'revenue' || changedMetricId === 'aov' || changedMetricId === 'sales' || changedMetricId === 'clicks' || changedMetricId === 'cr1' || changedMetricId === 'cr2' || changedMetricId === 'leads' || changedMetricId === 'cpc' || changedMetricId === 'impressions') {
+        // Маржа с одной = AOV × Маржинальность %
+        const newMarginPerUnit = (aov * marginPercent) / 100;
+        updated['marginPerUnit'] = Math.round(newMarginPerUnit);
+        
+        // Общая маржа = Валовой доход × Маржинальность %
+        const newTotalMargin = (revenue * marginPercent) / 100;
+        updated['totalMargin'] = Math.round(newTotalMargin);
+      }
+      
+      // 10. Обратные расчеты при изменении маржи
+      if (changedMetricId === 'marginPerUnit' && aov > 0) {
+        // Если изменили маржу с одной, пересчитываем маржинальность
+        const newMarginPercent = (numericValue / aov) * 100;
+        updated['marginPercent'] = Math.round(newMarginPercent);
+        
+        // И пересчитываем общую маржу с новой маржинальностью
+        const newTotalMargin = (revenue * newMarginPercent) / 100;
+        updated['totalMargin'] = Math.round(newTotalMargin);
+      }
+      
+      if (changedMetricId === 'totalMargin' && revenue > 0) {
+        // Если изменили общую маржу, пересчитываем маржинальность
+        const newMarginPercent = (numericValue / revenue) * 100;
+        updated['marginPercent'] = Math.round(newMarginPercent);
+        
+        // И пересчитываем маржу с одной с новой маржинальностью
+        const newMarginPerUnit = (aov * newMarginPercent) / 100;
+        updated['marginPerUnit'] = Math.round(newMarginPerUnit);
+      }
+      
+      // 11. Расчеты для группы "Доходы"
+      const totalMargin = getNumericValue('totalMargin');
+      const impressions = getNumericValue('impressions');
+      
+      if (changedMetricId === 'totalMargin' || changedMetricId === 'adCost' || changedMetricId === 'cpc' || changedMetricId === 'revenue' || changedMetricId === 'marginPercent' || changedMetricId === 'sales' || changedMetricId === 'clicks' || changedMetricId === 'cr1' || changedMetricId === 'cr2' || changedMetricId === 'leads' || changedMetricId === 'aov' || changedMetricId === 'impressions') {
+        // Чистая прибыль = Общая маржа (Прибыль) - Затраты на рекламу
+        const newNetProfit = totalMargin - adCost;
+        updated['netProfit'] = Math.round(newNetProfit);
+        
+        // Чистая прибыль с одной = Чистая прибыль ÷ Сделок
+        if (sales > 0) {
+          const newNetProfitPerUnit = newNetProfit / sales;
+          updated['netProfitPerUnit'] = Math.round(newNetProfitPerUnit);
+        }
+        
+        // ROMI % = (Чистая прибыль ÷ Затраты на рекламу) × 100%
+        if (adCost > 0) {
+          const newRomi = (newNetProfit / adCost) * 100;
+          updated['romi'] = Math.round(newRomi);
+        }
+        
+        // ROAS = Валовой доход ÷ Затраты на рекламу
+        if (adCost > 0) {
+          const newRoas = revenue / adCost;
+          updated['roas'] = newRoas.toFixed(1);
+        }
+      }
+      
+      // 12. Расчеты для группы "Формулы"
+      if (changedMetricId === 'adCost' || changedMetricId === 'cpc' || changedMetricId === 'revenue' || changedMetricId === 'impressions' || changedMetricId === 'clicks' || changedMetricId === 'cr1' || changedMetricId === 'cr2' || changedMetricId === 'leads' || changedMetricId === 'sales' || changedMetricId === 'aov' || changedMetricId === 'marginPercent' || changedMetricId === 'totalMargin') {
+        // ДРР % = (Затраты на рекламу ÷ Валовой доход) × 100%
+        if (revenue > 0) {
+          const newDrr = (adCost / revenue) * 100;
+          updated['drr'] = Math.round(newDrr);
+        }
+        
+        // CPM = (Затраты на рекламу ÷ Показы) × 1000
+        if (impressions > 0) {
+          const newCpm = (adCost / impressions) * 1000;
+          updated['cpm'] = Math.round(newCpm);
+        }
+        
+        // ICCR % = (Затраты на рекламу ÷ Общая маржа (Прибыль)) × 100%
+        if (totalMargin > 0) {
+          const newIccr = (adCost / totalMargin) * 100;
+          updated['iccr'] = Math.round(newIccr);
+        }
+      }
+      
+      return updated;
+    });
+  };
+
   // Получение значения слайдера из текущего значения метрики
   const getSliderValue = (metricId: string, metric: Metric): number => {
     const currentValue = typeof metrics[metricId] === 'string' ? parseFloat(metrics[metricId] as string) || 0 : metrics[metricId] as number;
     
-    if (metric.isPercentage) {
-      // Для процентов: прямое соответствие
+    if (metric.sliderRange) {
+      // Для полей с настроенным диапазоном слайдера (включая проценты)
+      const { min, max } = metric.sliderRange;
+      const percentage = (currentValue - min) / (max - min);
+      return Math.min(100, Math.max(0, percentage * 100));
+    } else if (metric.isPercentage) {
+      // Для процентов без диапазона: прямое соответствие
       return Math.min(100, Math.max(0, currentValue));
     } else {
       // Для обычных и десятичных значений: обратное масштабирование
@@ -381,8 +648,8 @@ const AnalyticsTool: React.FC = () => {
                         min="0"
                         max="100"
                         value={getSliderValue(metric.id, metric)}
-                        onChange={(e) => !isReadonlyField(metric.id) && handleSliderChange(metric.id, parseInt(e.target.value), metric)}
-                        className="slider"
+                        onChange={(e) => !isSliderDisabled(metric.id) && handleSliderChange(metric.id, parseInt(e.target.value), metric)}
+                        className={`slider ${isSliderDisabled(metric.id) ? 'slider-disabled' : ''}`}
                         style={{
                           '--thumb-color': group.color
                         } as React.CSSProperties}
@@ -434,7 +701,7 @@ const AnalyticsTool: React.FC = () => {
                               parseFloat(metrics[metric.id] as string) || 0 : 
                               parseFloat((metrics[metric.id] as number).toFixed(1))
                             ) : 
-                            (typeof metrics[metric.id] === 'string' ? 
+                            Math.round(typeof metrics[metric.id] === 'string' ? 
                               (parseFloat(metrics[metric.id] as string) || 0) * period : 
                               (metrics[metric.id] as number) * period
                             )
