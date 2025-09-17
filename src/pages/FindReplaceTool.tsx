@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import '../styles/tool-pages.css';
 import './FindReplaceTool.css';
 
 const FindReplaceTool: React.FC = () => {
@@ -18,23 +19,20 @@ const FindReplaceTool: React.FC = () => {
     setLaunchCount(count);
   }, []);
 
-  const handleTextareaResize = (element: HTMLTextAreaElement) => {
-    element.style.height = 'auto';
-    element.style.height = element.scrollHeight + 'px';
-  };
+  // Очистка результата при изменении входных данных
+  useEffect(() => {
+    setResult('');
+  }, [inputText, searchText, replaceText, caseSensitive, replaceMode]);
 
-  const processText = () => {
-    if (!inputText.trim()) {
-      setResult('');
-      return;
-    }
+  const processText = (text: string): string => {
+    if (!text.trim()) return '';
+    if (!searchText.trim()) return text;
 
-    let processedText = inputText;
+    let processedText = text;
     const searchTerms = searchText.split('\n').filter(term => term.trim() !== '');
     
     if (searchTerms.length === 0) {
-      setResult(inputText);
-      return;
+      return text;
     }
 
     let replacement = '';
@@ -59,9 +57,7 @@ const FindReplaceTool: React.FC = () => {
       }
     }
 
-    setResult(processedText);
-    statsService.incrementLaunchCount('find-replace');
-    setLaunchCount(prev => prev + 1);
+    return processedText;
   };
 
   const escapeRegExp = (string: string) => {
@@ -69,7 +65,10 @@ const FindReplaceTool: React.FC = () => {
   };
 
   const handleShowResult = () => {
-    processText();
+    const processedText = processText(inputText);
+    setResult(processedText);
+    statsService.incrementLaunchCount('find-replace');
+    setLaunchCount(prev => prev + 1);
   };
 
   const handleCopy = async () => {
@@ -88,136 +87,171 @@ const FindReplaceTool: React.FC = () => {
     try {
       const text = await navigator.clipboard.readText();
       setInputText(text);
-      setTimeout(() => {
-        const textarea = document.querySelector('.input-section textarea') as HTMLTextAreaElement;
-        if (textarea) handleTextareaResize(textarea);
-      }, 0);
     } catch (err) {
       console.error('Не удалось вставить текст:', err);
     }
   };
 
-  const handleRadioClick = (mode: 'custom' | 'empty' | 'paragraph') => {
-    setReplaceMode(mode);
+  const handlePasteSearch = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setSearchText(text);
+    } catch (err) {
+      console.error('Не удалось вставить текст:', err);
+    }
   };
 
-  const getLineCount = (text: string) => {
-    return text ? text.split('\n').length : 0;
+  const handlePasteReplace = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setReplaceText(text);
+    } catch (err) {
+      console.error('Не удалось вставить текст:', err);
+    }
+  };
+
+  const handleRadioClick = (clickedValue: 'custom' | 'empty' | 'paragraph') => {
+    if (replaceMode === clickedValue) {
+      setReplaceMode('custom'); // Возвращаем к custom, если кликнули по уже выбранной
+    } else {
+      setReplaceMode(clickedValue);
+    }
+  };
+
+  const countLines = (text: string): number => {
+    if (text === '') return 0;
+    return text.split('\n').length;
   };
 
   return (
-    <div className="tool-container find-replace-tool">
-      {/* Шапка инструмента */}
+    <div className="find-replace-tool">
+      {/* Header-остров инструмента */}
       <div className="tool-header-island">
         <Link to="/" className="back-button">
-          <img src="/icons/arrow_left.svg" alt="Назад" />
+          <img src="/icons/arrow_left.svg" alt="" />
           Все инструменты
         </Link>
-        <h1>Найти и заменить</h1>
-        <div className="header-icons">
-          <span className="launch-count">{launchCount}</span>
-          <button className="icon-button">
-            <img src="/icons/lamp.svg" alt="Подсказка" />
+        <h1 className="tool-title">Найти и заменить</h1>
+        <div className="tool-header-buttons">
+          <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+            <img src="/icons/rocket.svg" alt="" />
+            <span className="counter">{launchCount}</span>
           </button>
-          <button className="icon-button">
-            <img src="/icons/camera.svg" alt="Скриншот" />
+          <button className="tool-header-btn" title="Подсказка">
+            <img src="/icons/lamp.svg" alt="" />
+          </button>
+          <button className="tool-header-btn" title="Сделать скриншот">
+            <img src="/icons/camera.svg" alt="" />
           </button>
         </div>
       </div>
 
-      {/* Рабочая область */}
+      {/* Основная рабочая область */}
       <div className="main-workspace">
+        {/* Левая часть - поле ввода */}
         <div className="input-section">
           <textarea
+            className="input-textarea"
             value={inputText}
-            onChange={(e) => {
-              setInputText(e.target.value);
-              handleTextareaResize(e.target);
-            }}
-            placeholder="Вставьте текст для обработки..."
-            className="main-textarea"
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Введите или вставьте ваш текст здесь..."
           />
           <div className="input-controls">
-            <button onClick={handlePaste} className="paste-button">
-              <img src="/icons/button_paste.svg" alt="Вставить" />
+            <button className="paste-btn" onClick={handlePaste}>
+              <img src="/icons/button_paste.svg" alt="" />
               Вставить
             </button>
-            <span className="line-count">{getLineCount(inputText)} строк</span>
+            <span className="char-counter">{countLines(inputText)} стр.</span>
           </div>
         </div>
 
+        {/* Правая часть - настройки */}
         <div className="settings-section">
+          {/* Поле поиска */}
           <div className="settings-group">
-            <h3>Настройки поиска и замены</h3>
-            
-            <div className="setting-item">
-              <label>Что искать (каждая строка - отдельный поиск):</label>
-              <textarea
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  handleTextareaResize(e.target);
-                }}
-                placeholder="Введите слова для поиска, каждое с новой строки"
-                className="filter-input auto-resize"
+            <label htmlFor="search-field" className="settings-label">
+              Что искать (каждая строка - отдельный поиск):
+            </label>
+            <textarea
+              id="search-field"
+              className="filter-input"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Введите слова для поиска, каждое с новой строки"
+              rows={3}
+            />
+            <button className="filter-paste-btn" onClick={handlePasteSearch}>
+              <img src="/icons/button_paste.svg" alt="" />
+            </button>
+          </div>
+
+          {/* Чекбокс учета регистра */}
+          <div className="settings-group">
+            <label className="checkbox-item">
+              <input
+                type="checkbox"
+                checked={caseSensitive}
+                onChange={(e) => setCaseSensitive(e.target.checked)}
               />
-            </div>
+              Учитывать регистр
+            </label>
+          </div>
 
-            <div className="setting-item">
-              <label className="checkbox-item">
-                <input
-                  type="checkbox"
-                  checked={caseSensitive}
-                  onChange={(e) => setCaseSensitive(e.target.checked)}
-                />
-                Учитывать регистр
-              </label>
-            </div>
+          {/* Группа радио-кнопок для режима замены */}
+          <div className="settings-group">
+            <div className="settings-label">На что заменять:</div>
+            
+            <label className="radio-item">
+              <input
+                type="radio"
+                name="replaceMode"
+                value="custom"
+                checked={replaceMode === 'custom'}
+                onClick={() => handleRadioClick('custom')}
+                onChange={() => {}}
+              />
+              Заменить на текст:
+            </label>
+            
+            <label className="radio-item">
+              <input
+                type="radio"
+                name="replaceMode"
+                value="empty"
+                checked={replaceMode === 'empty'}
+                onClick={() => handleRadioClick('empty')}
+                onChange={() => {}}
+              />
+              Удалить (заменить на пустое место)
+            </label>
+            
+            <label className="radio-item">
+              <input
+                type="radio"
+                name="replaceMode"
+                value="paragraph"
+                checked={replaceMode === 'paragraph'}
+                onClick={() => handleRadioClick('paragraph')}
+                onChange={() => {}}
+              />
+              Заменить на абзац (двойной перенос строки)
+            </label>
 
-            <div className="setting-item">
-              <label>На что заменять:</label>
-              
-              <div className="radio-group">
-                <label className="radio-item">
-                  <input
-                    type="radio"
-                    checked={replaceMode === 'custom'}
-                    onChange={() => handleRadioClick('custom')}
-                  />
-                  Заменить на текст:
-                </label>
-                
-                <label className="radio-item">
-                  <input
-                    type="radio"
-                    checked={replaceMode === 'empty'}
-                    onChange={() => handleRadioClick('empty')}
-                  />
-                  Удалить (заменить на пустое место)
-                </label>
-                
-                <label className="radio-item">
-                  <input
-                    type="radio"
-                    checked={replaceMode === 'paragraph'}
-                    onChange={() => handleRadioClick('paragraph')}
-                  />
-                  Заменить на абзац (двойной перенос строки)
-                </label>
-              </div>
-
-              {replaceMode === 'custom' && (
+            {/* Поле замены - показываем только в режиме custom */}
+            {replaceMode === 'custom' && (
+              <div className="filter-input-wrapper">
                 <textarea
+                  className="filter-input"
                   value={replaceText}
-                  onChange={(e) => {
-                    setReplaceText(e.target.value);
-                    handleTextareaResize(e.target);
-                  }}
+                  onChange={(e) => setReplaceText(e.target.value)}
                   placeholder="Введите текст для замены"
-                  className="filter-input auto-resize"
+                  rows={2}
                 />
-              )}
-            </div>
+                <button className="filter-paste-btn" onClick={handlePasteReplace}>
+                  <img src="/icons/button_paste.svg" alt="" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -225,18 +259,20 @@ const FindReplaceTool: React.FC = () => {
       {/* Кнопки управления */}
       <div className="control-buttons">
         <button 
-          className="primary-button" 
+          className="action-btn primary" 
+          style={{ width: '445px' }} 
           onClick={handleShowResult}
           disabled={!inputText.trim() || !searchText.trim()}
         >
           Заменить
         </button>
         <button 
-          className="secondary-button" 
+          className="action-btn secondary icon-left" 
+          style={{ width: '445px' }} 
           onClick={handleCopy}
           disabled={!result}
         >
-          <img src="/icons/button_copy.svg" alt="Копировать" />
+          <img src="/icons/button_copy.svg" alt="" />
           {copied ? 'Скопировано!' : 'Скопировать результат'}
         </button>
       </div>
@@ -244,13 +280,13 @@ const FindReplaceTool: React.FC = () => {
       {/* Поле результата */}
       <div className="result-section">
         <textarea
+          className="result-textarea"
           value={result}
           readOnly
-          placeholder="Результат появится здесь после обработки..."
-          className="result-textarea"
+          placeholder="Здесь будет результат"
         />
-        <div className="result-info">
-          <span className="line-count">{getLineCount(result)} строк</span>
+        <div className="result-controls">
+          <span className="result-counter">{countLines(result)} стр.</span>
         </div>
       </div>
     </div>
