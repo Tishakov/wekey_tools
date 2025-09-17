@@ -453,44 +453,69 @@
 }
 
 .modal-content {
-  background: #28282A;
-  border-radius: 12px;
-  padding: 32px;
-  max-width: 500px;
-  width: 90%;
+  width: 445px;
+  height: 340px;
+  border-radius: 10px;
   border: 1px solid #333335;
+  background: #28282A;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+  align-items: center;
 }
 
 .modal-content h3 {
   color: #BCBBBD;
-  font-family: 'Gilroy', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 24px 0;
   text-align: center;
+  font-family: Gilroy;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin: 0;
 }
 
 .export-options {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 32px;
+  width: 100%;
+  align-items: center;
 }
 
 .radio-option {
+  width: 360px;
+  height: 65px;
+  border-radius: 10px;
+  border: 2px solid #333335;
+  background: #28282A;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   cursor: pointer;
-  padding: 16px;
-  border: 1px solid #333335;
-  border-radius: 8px;
   transition: all 0.2s ease;
+  padding: 0 20px;
+  position: relative;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  color: #484848; /* Неактивный цвет по умолчанию */
 }
 
-.radio-option:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-color: #6366f1;
+.radio-option:focus {
+  outline: none;
+}
+
+.radio-option:active {
+  transform: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.radio-option.active {
+  border: 2px solid #09CEA7;
+  color: #09CEA7; /* Активный цвет */
 }
 
 .radio-option input[type="radio"] {
@@ -498,29 +523,16 @@
 }
 
 .radio-custom {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #555559;
-  border-radius: 50%;
-  position: relative;
+  display: none;
+}
+
+.option-icon {
+  width: 24px;
+  height: 24px;
   transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.radio-option input[type="radio"]:checked + .radio-custom {
-  border-color: #6366f1;
-}
-
-.radio-option input[type="radio"]:checked + .radio-custom:after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6366f1;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .option-details {
@@ -529,53 +541,49 @@
 
 .option-details strong {
   color: #BCBBBD;
-  font-family: 'Gilroy', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-family: Gilroy;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
   display: block;
-  margin-bottom: 4px;
 }
 
 .option-details p {
-  color: #8B8B8D;
-  font-family: 'Gilroy', sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-  margin: 0;
+  display: none;
 }
 
 .modal-buttons {
   display: flex;
-  gap: 12px;
+  gap: 20px;
+  width: 100%;
   justify-content: center;
 }
 
 .analytics-button {
-  padding: 12px 24px;
-  border-radius: 8px;
-  border: none;
-  font-family: 'Gilroy', sans-serif;
+  width: 170px;
+  height: 50px;
+  border-radius: 10px;
+  border: 1px solid #333335;
+  font-family: Gilroy;
   font-size: 14px;
-  font-weight: 500;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .analytics-button.export-button {
-  background: #6366f1;
-  color: white;
-}
-
-.analytics-button.export-button:hover {
-  background: #5856eb;
+  background: #09CEA7;
+  color: #28282A;
 }
 
 .analytics-button.clear-button {
-  background: #333335;
+  background: #28282A;
   color: #BCBBBD;
-}
-
-.analytics-button.clear-button:hover {
-  background: #444449;
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ExcelJS from 'exceljs';
+import ColumnIcon from '../assets/icons/column.svg?react';
+import StringIcon from '../assets/icons/string.svg?react';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
 
@@ -979,37 +981,27 @@ const AnalyticsTool: React.FC = () => {
       {showExportModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Выберите формат экспорта</h3>
+            <h3>Выберите формат отображения</h3>
             <div className="export-options">
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="exportFormat"
-                  value="vertical"
-                  checked={exportFormat === 'vertical'}
-                  onChange={(e) => setExportFormat(e.target.value as 'vertical' | 'horizontal')}
-                />
-                <span className="radio-custom"></span>
+              <div 
+                className={`radio-option ${exportFormat === 'vertical' ? 'active' : ''}`}
+                onClick={() => setExportFormat('vertical')}
+              >
+                <ColumnIcon className="option-icon" />
                 <div className="option-details">
                   <strong>Вертикальный формат</strong>
-                  <p>Параметры в строках, колонки: Параметр | За 1 день | За период</p>
                 </div>
-              </label>
+              </div>
               
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="exportFormat"
-                  value="horizontal"
-                  checked={exportFormat === 'horizontal'}
-                  onChange={(e) => setExportFormat(e.target.value as 'vertical' | 'horizontal')}
-                />
-                <span className="radio-custom"></span>
+              <div 
+                className={`radio-option ${exportFormat === 'horizontal' ? 'active' : ''}`}
+                onClick={() => setExportFormat('horizontal')}
+              >
+                <StringIcon className="option-icon" />
                 <div className="option-details">
                   <strong>Горизонтальный формат</strong>
-                  <p>Параметры в колонках, строки: За 1 день | За период</p>
                 </div>
-              </label>
+              </div>
             </div>
             
             <div className="modal-buttons">
@@ -1020,7 +1012,7 @@ const AnalyticsTool: React.FC = () => {
                 }}
                 className="analytics-button export-button"
               >
-                Экспортировать
+                Скачать таблицу
               </button>
               <button
                 onClick={() => setShowExportModal(false)}
