@@ -7,10 +7,9 @@
 
 /* Стили для полей фильтрации - автоматическая высота без скролла */
 .find-replace-tool .filter-input {
-    width: 100%;
-    min-height: 36px !important;
-    max-height: 200px !important;
-    padding: 8px 12px !important;
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 15px 10px 10px 14px !important;
     background-color: #1C1D1F;
     border: 1px solid #333335;
     border-radius: 8px;
@@ -20,6 +19,18 @@
     line-height: 1.4 !important;
     font-family: inherit !important;
     color: #BCBBBD;
+}
+
+/* Визуально отключенное состояние поля */
+.find-replace-tool .filter-input.visual-disabled {
+    opacity: 0.5;
+    background-color: #2a2b2d !important;
+    color: #6b7280 !important;
+    border-color: #404244 !important;
+}
+
+.find-replace-tool .filter-input.visual-disabled::placeholder {
+    color: #6b7280 !important;
 }
 
 .find-replace-tool .filter-input:focus {

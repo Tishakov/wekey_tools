@@ -17,6 +17,14 @@ const FindReplaceTool: React.FC = () => {
   useEffect(() => {
     const count = statsService.getLaunchCount('find-replace');
     setLaunchCount(count);
+    
+    // Устанавливаем правильную высоту полей при загрузке
+    setTimeout(() => {
+      const textareas = document.querySelectorAll('.find-replace-tool .filter-input') as NodeListOf<HTMLTextAreaElement>;
+      textareas.forEach(textarea => {
+        textarea.style.height = '50px';
+      });
+    }, 0);
   }, []);
 
   // Очистка результата при изменении входных данных или настроек
@@ -46,7 +54,7 @@ const FindReplaceTool: React.FC = () => {
         break;
       case 'custom':
       default:
-        replacement = replaceText; // Используем поле замены
+        replacement = replaceText || ''; // Используем поле замены, если пустое - то пустую строку
         break;
     }
 
@@ -56,6 +64,25 @@ const FindReplaceTool: React.FC = () => {
         const regex = new RegExp(escapeRegExp(term.trim()), flags);
         processedText = processedText.replace(regex, replacement);
       }
+    }
+
+    // Если заменяем на пустоту, убираем лишние пробелы
+    if (replaceMode === 'empty') {
+      // Убираем множественные пробелы, оставляя только одинарные
+      processedText = processedText.replace(/\s+/g, ' ');
+      // Убираем пробелы в начале и конце строк
+      processedText = processedText.replace(/^\s+|\s+$/gm, '');
+      // Убираем пустые строки
+      processedText = processedText.replace(/^\s*$/gm, '').replace(/\n+/g, '\n');
+    }
+
+    // Если заменяем на абзац, тоже убираем лишние пробелы вокруг замен
+    if (replaceMode === 'paragraph') {
+      // Убираем пробелы перед и после абзацев
+      processedText = processedText.replace(/\s+\n\n/g, '\n\n');
+      processedText = processedText.replace(/\n\n\s+/g, '\n\n');
+      // Убираем множественные переносы строк (больше 2 подряд)
+      processedText = processedText.replace(/\n{3,}/g, '\n\n');
     }
 
     return processedText;
@@ -106,8 +133,8 @@ const FindReplaceTool: React.FC = () => {
   };
 
   const handleTextareaResize = (element: HTMLTextAreaElement) => {
-    element.style.height = 'auto';
-    element.style.height = element.scrollHeight + 'px';
+    element.style.height = '50px'; // Возвращаем к минимальной высоте
+    element.style.height = element.scrollHeight + 'px'; // Устанавливаем точную высоту содержимого
   };
 
   const countLines = (text: string): number => {
@@ -172,21 +199,26 @@ const FindReplaceTool: React.FC = () => {
                 handleTextareaResize(e.target);
               }}
               placeholder="Что заменить... (несколько с новой строки)"
-              rows={3}
             />
           </div>
 
           {/* Поле замены - ВСЕГДА показываем */}
           <div className="settings-group">
             <textarea
-              className="filter-input"
+              className={`filter-input ${replaceMode !== 'custom' ? 'visual-disabled' : ''}`}
               value={replaceText}
               onChange={(e) => {
-                setReplaceText(e.target.value);
-                handleTextareaResize(e.target);
+                if (replaceMode === 'custom') {
+                  setReplaceText(e.target.value);
+                  handleTextareaResize(e.target);
+                }
+              }}
+              onClick={() => {
+                if (replaceMode !== 'custom') {
+                  setReplaceMode('custom');
+                }
               }}
               placeholder="На что заменить..."
-              rows={2}
             />
           </div>
 
