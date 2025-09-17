@@ -405,3 +405,14 @@
   background-color: initial;
   border-color: initial;
 }
+
+/* Правильные стили для кнопок */
+.text-generator-tool .action-btn.primary {
+  background-color: #28282A;
+  color: #BCBBBD;
+}
+
+.text-generator-tool .action-btn.secondary {
+  background-color: #1C1D1F;
+  color: #BCBBBD;
+}

@@ -575,3 +575,28 @@
     width: 100%;
   }
 }
+
+/* ===== СТИЛИ ДЛЯ ГЕНЕРАТОРА СИНОНИМОВ ===== */
+
+/* Synonym Generator Tool - равные колонки */
+.synonym-generator-tool .input-section,
+.synonym-generator-tool .result-section {
+  width: 50%;
+}
+
+.synonym-generator-tool .result-textarea {
+  flex: 1;
+  height: auto;
+  min-height: 350px;
+}
+
+/* Состояние отключенной кнопки как в TextGeneratorTool */
+.synonym-generator-tool .action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.synonym-generator-tool .action-btn:disabled:hover {
+  background-color: initial;
+  border-color: initial;
+}
