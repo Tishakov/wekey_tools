@@ -21,7 +21,8 @@ const Sidebar: React.FC = () => {
     'cross-analytics',       // Сквозная аналитика
     'word-gluing',           // Склейка слов
     'find-replace',          // Найти и заменить
-    'text-generator'         // Генератор текста
+    'text-generator',        // Генератор текста
+    'synonym-generator'      // Генератор синонимов
   ];
   
   // Сортируем инструменты по алфавиту
