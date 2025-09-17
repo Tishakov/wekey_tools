@@ -1,0 +1,107 @@
+/* Специфичные стили для инструмента "Найти и заменить" */
+
+.find-replace-tool .filter-input {
+  min-height: 36px !important;
+  max-height: 200px !important;
+  resize: vertical !important;
+  overflow-y: auto !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  padding: 8px 12px !important;
+}
+
+.find-replace-tool .auto-resize {
+  resize: none !important;
+  overflow: hidden !important;
+}
+
+.find-replace-tool .radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.find-replace-tool .radio-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #BCBBBD;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.find-replace-tool .radio-item input[type="radio"] {
+  margin: 0;
+  accent-color: #09CEA7;
+}
+
+.find-replace-tool .setting-item {
+  margin-bottom: 20px;
+}
+
+.find-replace-tool .setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.find-replace-tool .setting-item > label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #BCBBBD;
+}
+
+.find-replace-tool .checkbox-item {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #BCBBBD;
+  cursor: pointer;
+  margin-bottom: 0 !important;
+  padding: 8px 0;
+}
+
+.find-replace-tool .checkbox-item input[type="checkbox"] {
+  margin: 0;
+  accent-color: #09CEA7;
+}
+
+/* Стили для отключенных полей */
+.find-replace-tool .visual-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  background-color: #1a1a1a !important;
+  color: #666 !important;
+}
+
+/* Стили для кнопок */
+.find-replace-tool .primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #333 !important;
+}
+
+.find-replace-tool .secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .find-replace-tool .main-workspace {
+    flex-direction: column;
+  }
+  
+  .find-replace-tool .input-section,
+  .find-replace-tool .settings-section {
+    width: 100%;
+  }
+  
+  .find-replace-tool .radio-group {
+    gap: 12px;
+  }
+}
