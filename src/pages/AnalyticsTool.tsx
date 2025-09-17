@@ -648,6 +648,96 @@ const AnalyticsTool: React.FC = () => {
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       
+      // Настройка автоширины столбцов
+      const colWidths = [];
+      
+      if (format === 'vertical') {
+        // Для вертикального формата: Параметр | День | Период
+        const maxParamLength = Math.max(
+          ...exportData.map(row => (row['Параметр'] || '').toString().length),
+          'Параметр'.length
+        );
+        const maxDayLength = Math.max(
+          ...exportData.map(row => (row['Значение за 1 день'] || '').toString().length),
+          'Значение за 1 день'.length
+        );
+        const maxPeriodLength = Math.max(
+          ...exportData.map(row => {
+            const periodKey = Object.keys(row).find(key => key.startsWith('Значение за '));
+            return periodKey ? (row[periodKey] || '').toString().length : 0;
+          }),
+          25 // Минимальная ширина для заголовка периода
+        );
+        
+        colWidths.push(
+          { wch: Math.min(Math.max(maxParamLength + 2, 15), 50) }, // Параметр: мин 15, макс 50
+          { wch: Math.min(Math.max(maxDayLength + 2, 12), 25) },   // День: мин 12, макс 25
+          { wch: Math.min(Math.max(maxPeriodLength + 2, 15), 30) } // Период: мин 15, макс 30
+        );
+      } else {
+        // Для горизонтального формата: каждый параметр - отдельный столбец
+        const firstRow = exportData[0];
+        Object.keys(firstRow).forEach((key, index) => {
+          if (index === 0) {
+            // Первый столбец "Период"
+            colWidths.push({ wch: 20 });
+          } else {
+            // Столбцы параметров
+            const maxLength = Math.max(
+              ...exportData.map(row => (row[key] || '').toString().length),
+              key.length
+            );
+            colWidths.push({ wch: Math.min(Math.max(maxLength + 2, 10), 25) });
+          }
+        });
+      }
+      
+      worksheet['!cols'] = colWidths;
+      
+      // Добавляем стили для заголовков (жирный шрифт)
+      const range = worksheet['!ref'] ? XLSX.utils.decode_range(worksheet['!ref']) : null;
+      
+      if (range) {
+        // Стилизуем первую строку как заголовок
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+          if (!worksheet[cellAddress]) continue;
+          
+          worksheet[cellAddress].s = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "366092" } },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            }
+          };
+        }
+        
+        // Добавляем границы для всех ячеек
+        for (let row = range.s.r; row <= range.e.r; row++) {
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+            if (!worksheet[cellAddress]) continue;
+            
+            if (row > 0) { // Не заголовки
+              worksheet[cellAddress].s = {
+                ...worksheet[cellAddress].s,
+                border: {
+                  top: { style: "thin", color: { rgb: "CCCCCC" } },
+                  bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+                  left: { style: "thin", color: { rgb: "CCCCCC" } },
+                  right: { style: "thin", color: { rgb: "CCCCCC" } }
+                },
+                alignment: { vertical: "center" }
+              };
+            }
+          }
+        }
+      }
+      
       // Добавляем лист в книгу
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Аналитика');
       
