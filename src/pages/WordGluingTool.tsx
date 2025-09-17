@@ -99,8 +99,8 @@ const WordGluingTool: React.FC = () => {
             case 'dash':
                 connectorStr = '-';
                 break;
-            case 'slash':
-                connectorStr = '/';
+            case 'long-dash':
+                connectorStr = ' — ';
                 break;
             case 'other':
                 connectorStr = customConnector;
@@ -293,7 +293,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'dash')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Тире</span>
+                                <span className="radio-text">Тире без пробела</span>
                             </label>
 
                             <label className="radio-item">
@@ -312,12 +312,12 @@ const WordGluingTool: React.FC = () => {
                                 <input
                                     type="radio"
                                     name="connector"
-                                    value="slash"
-                                    checked={connector === 'slash'}
-                                    onClick={() => handleRadioClick(connector, setConnector, 'slash')}
+                                    value="long-dash"
+                                    checked={connector === 'long-dash'}
+                                    onClick={() => handleRadioClick(connector, setConnector, 'long-dash')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Косая черта</span>
+                                <span className="radio-text">Длинное тире</span>
                             </label>
                         </div>
                     </div>
