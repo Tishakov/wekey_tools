@@ -677,8 +677,12 @@ const AnalyticsTool: React.FC = () => {
       // Стилизация заголовков (первая строка)
       const headerRow = worksheet.getRow(1);
       headerRow.eachCell((cell) => {
-        cell.font = { bold: true, size: 12 };
-        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.font = { bold: true, size: 10 }; // Уменьшили размер шрифта до 10
+        cell.alignment = { 
+          horizontal: 'center', 
+          vertical: 'middle',
+          wrapText: true // Перенос текста в заголовках
+        };
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
@@ -692,17 +696,87 @@ const AnalyticsTool: React.FC = () => {
         };
       });
       
-      // Автоширина столбцов
+      // Адаптивная высота строки заголовков на основе содержимого
+      let maxLines = 1;
+      headerRow.eachCell((cell, colNumber) => {
+        if (cell.value) {
+          const text = cell.value.toString();
+          const columnWidth = colNumber <= worksheet.columns.length ? 
+            (worksheet.getColumn(colNumber).width || 15) : 15;
+          
+          // Приблизительный расчет количества строк на основе длины текста и ширины столбца
+          // Средняя ширина символа ~1.2, учитываем padding
+          const charsPerLine = Math.floor((columnWidth - 2) / 1.2);
+          const lines = Math.ceil(text.length / charsPerLine);
+          maxLines = Math.max(maxLines, lines);
+        }
+      });
+      
+      // Устанавливаем высоту с минимумом 25 и максимумом 60
+      let adaptiveHeight = Math.max(25, Math.min(60, maxLines * 15 + 10));
+      
+      // Добавляем дополнительные 10 пикселей для горизонтального формата
+      if (format === 'horizontal') {
+        adaptiveHeight += 10;
+      }
+      
+      headerRow.height = adaptiveHeight;
+      
+      // Добавляем обводку для всех ячеек с содержимым (начиная со 2-й строки)
+      for (let rowIndex = 2; rowIndex <= worksheet.rowCount; rowIndex++) {
+        const dataRow = worksheet.getRow(rowIndex);
+        dataRow.eachCell((cell, colNumber) => {
+          if (cell.value) {
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+            // Выравнивание: первый столбец - по левому краю, остальные - по центру
+            if (colNumber === 1) {
+              cell.alignment = { 
+                horizontal: 'left', 
+                vertical: 'middle' 
+              };
+            } else {
+              cell.alignment = { 
+                horizontal: 'center', 
+                vertical: 'middle' 
+              };
+            }
+          }
+        });
+      }
+      
+      // Автоширина столбцов на основе содержимого данных (начиная со 2-й строки)
       worksheet.columns.forEach((column, index) => {
+        let maxLength = 8; // Минимальная ширина
+        
+        // Проходим по всем строкам данных (начиная со второй)
+        for (let rowIndex = 2; rowIndex <= worksheet.rowCount; rowIndex++) {
+          const cell = worksheet.getCell(rowIndex, index + 1);
+          if (cell.value) {
+            const cellText = cell.value.toString();
+            maxLength = Math.max(maxLength, cellText.length);
+          }
+        }
+        
+        // Устанавливаем ширину с разумными ограничениями
         if (format === 'vertical') {
           // Для вертикального формата
-          if (index === 0) column.width = 25; // Параметр
-          else if (index === 1) column.width = 12; // День
-          else column.width = 15; // Период
+          if (index === 0) {
+            column.width = Math.min(Math.max(maxLength + 2, 15), 35); // Параметр: мин 15, макс 35
+          } else {
+            column.width = Math.min(Math.max(maxLength + 2, 10), 20); // Данные: мин 10, макс 20
+          }
         } else {
           // Для горизонтального формата
-          if (index === 0) column.width = 15; // Период
-          else column.width = 12; // Параметры
+          if (index === 0) {
+            column.width = Math.min(Math.max(maxLength + 2, 12), 25); // Период: мин 12, макс 25
+          } else {
+            column.width = Math.min(Math.max(maxLength + 2, 8), 18); // Параметры: мин 8, макс 18
+          }
         }
       });
       
