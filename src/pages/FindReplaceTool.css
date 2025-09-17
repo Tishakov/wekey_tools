@@ -33,15 +33,16 @@
     color: #707070;
 }
 
-/* Контейнер для поля фильтрации с кнопкой */
-.find-replace-tool .filter-input-wrapper {
+/* Контейнер для поля фильтрации с кнопкой - как в EmptyLinesRemovalTool */
+.find-replace-tool .filter-controls {
     position: relative;
     width: 385px;
-    margin: 8px 0 0 0;
+    min-height: 80px;
+    margin: 0;
     padding: 0;
 }
 
-.find-replace-tool .filter-paste-btn {
+.find-replace-tool .filter-paste-button {
     position: absolute;
     bottom: 11px;
     left: 10px;
@@ -58,27 +59,15 @@
     color: #BCBBBD;
 }
 
-.find-replace-tool .filter-paste-btn:hover:not(:disabled) {
+.find-replace-tool .filter-paste-button:hover:not(:disabled) {
     background: #404042;
     border-color: #4a4b4d;
 }
 
-.find-replace-tool .filter-paste-btn img {
+.find-replace-tool .filter-paste-button img {
     width: 12px;
     height: 12px;
     filter: brightness(0) saturate(100%) invert(74%) sepia(4%) saturate(257%) hue-rotate(314deg) brightness(95%) contrast(87%);
-}
-
-/* Кнопка вставки для поля поиска */
-.find-replace-tool .settings-group:first-child {
-    position: relative;
-}
-
-.find-replace-tool .settings-group:first-child .filter-paste-btn {
-    position: absolute;
-    bottom: 11px;
-    right: 10px;
-    z-index: 1;
 }
 
 /* Стили для радио кнопок */

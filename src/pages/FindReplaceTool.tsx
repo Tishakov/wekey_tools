@@ -19,9 +19,10 @@ const FindReplaceTool: React.FC = () => {
     setLaunchCount(count);
   }, []);
 
-  // Очистка результата при изменении входных данных
+  // Очистка результата при изменении входных данных или настроек
   useEffect(() => {
     setResult('');
+    setCopied(false);
   }, [inputText, searchText, replaceText, caseSensitive, replaceMode]);
 
   const processText = (text: string): string => {
@@ -87,6 +88,10 @@ const FindReplaceTool: React.FC = () => {
     try {
       const text = await navigator.clipboard.readText();
       setInputText(text);
+      setTimeout(() => {
+        const textarea = document.querySelector('.input-textarea') as HTMLTextAreaElement;
+        if (textarea) handleTextareaResize(textarea);
+      }, 0);
     } catch (err) {
       console.error('Не удалось вставить текст:', err);
     }
@@ -112,10 +117,15 @@ const FindReplaceTool: React.FC = () => {
 
   const handleRadioClick = (clickedValue: 'custom' | 'empty' | 'paragraph') => {
     if (replaceMode === clickedValue) {
-      setReplaceMode('custom'); // Возвращаем к custom, если кликнули по уже выбранной
+      setReplaceMode('custom'); // Возвращаем к custom по умолчанию
     } else {
       setReplaceMode(clickedValue);
     }
+  };
+
+  const handleTextareaResize = (element: HTMLTextAreaElement) => {
+    element.style.height = 'auto';
+    element.style.height = element.scrollHeight + 'px';
   };
 
   const countLines = (text: string): number => {
@@ -153,7 +163,10 @@ const FindReplaceTool: React.FC = () => {
           <textarea
             className="input-textarea"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(e) => {
+              setInputText(e.target.value);
+              handleTextareaResize(e.target);
+            }}
             placeholder="Введите или вставьте ваш текст здесь..."
           />
           <div className="input-controls">
@@ -172,17 +185,23 @@ const FindReplaceTool: React.FC = () => {
             <label htmlFor="search-field" className="settings-label">
               Что искать (каждая строка - отдельный поиск):
             </label>
-            <textarea
-              id="search-field"
-              className="filter-input"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Введите слова для поиска, каждое с новой строки"
-              rows={3}
-            />
-            <button className="filter-paste-btn" onClick={handlePasteSearch}>
-              <img src="/icons/button_paste.svg" alt="" />
-            </button>
+            <div className="filter-controls">
+              <textarea
+                id="search-field"
+                className="filter-input"
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  handleTextareaResize(e.target);
+                }}
+                placeholder="Введите слова для поиска, каждое с новой строки"
+                rows={3}
+              />
+              <button className="filter-paste-button" onClick={handlePasteSearch}>
+                <img src="/icons/button_paste.svg" alt="" />
+                Вставить
+              </button>
+            </div>
           </div>
 
           {/* Чекбокс учета регистра */}
@@ -239,16 +258,20 @@ const FindReplaceTool: React.FC = () => {
 
             {/* Поле замены - показываем только в режиме custom */}
             {replaceMode === 'custom' && (
-              <div className="filter-input-wrapper">
+              <div className="filter-controls">
                 <textarea
                   className="filter-input"
                   value={replaceText}
-                  onChange={(e) => setReplaceText(e.target.value)}
+                  onChange={(e) => {
+                    setReplaceText(e.target.value);
+                    handleTextareaResize(e.target);
+                  }}
                   placeholder="Введите текст для замены"
                   rows={2}
                 />
-                <button className="filter-paste-btn" onClick={handlePasteReplace}>
+                <button className="filter-paste-button" onClick={handlePasteReplace}>
                   <img src="/icons/button_paste.svg" alt="" />
+                  Вставить
                 </button>
               </div>
             )}
