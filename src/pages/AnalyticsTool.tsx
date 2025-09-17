@@ -101,6 +101,29 @@ const AnalyticsTool: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [exportFormat, setExportFormat] = useState<'vertical' | 'horizontal'>('vertical');
   
+  // Состояние для кратности масштабирования слайдеров
+  const [scaleFactor, setScaleFactor] = useState<number>(1);
+  
+  // Функции управления кратностью
+  const increaseScale = () => {
+    setScaleFactor(prev => Math.min(20, prev + 1));
+  };
+  
+  const decreaseScale = () => {
+    setScaleFactor(prev => Math.max(1, prev - 1));
+  };
+  
+  // Получить масштабированный диапазон для слайдера
+  const getScaledRange = (metric: Metric) => {
+    if (metric.sliderRange) {
+      return {
+        min: metric.sliderRange.min,
+        max: metric.sliderRange.max * scaleFactor
+      };
+    }
+    return null;
+  };
+  
   // Состояние для всех метрик
   const [metrics, setMetrics] = useState<Record<string, number | string>>(() => {
     const initialState: Record<string, number | string> = {};
@@ -192,12 +215,22 @@ const AnalyticsTool: React.FC = () => {
     let scaledValue: number | string;
     
     if (metric.sliderRange) {
-      // Для полей с настроенным диапазоном слайдера (включая проценты)
-      const { min, max } = metric.sliderRange;
-      const numericValue = (sliderValue / 100) * (max - min) + min;
-      scaledValue = metric.isDecimal ? numericValue.toFixed(1) : 
-                   metric.isPercentage ? numericValue.toFixed(1) : 
-                   Math.round(numericValue);
+      // Для полей с настроенным диапазоном слайдера - используем масштабированный диапазон
+      const scaledRange = getScaledRange(metric);
+      if (scaledRange) {
+        const { min, max } = scaledRange;
+        const numericValue = (sliderValue / 100) * (max - min) + min;
+        scaledValue = metric.isDecimal ? numericValue.toFixed(1) : 
+                     metric.isPercentage ? numericValue.toFixed(1) : 
+                     Math.round(numericValue);
+      } else {
+        // Резервный вариант для случая когда масштабированный диапазон недоступен
+        const { min, max } = metric.sliderRange;
+        const numericValue = (sliderValue / 100) * (max - min) + min;
+        scaledValue = metric.isDecimal ? numericValue.toFixed(1) : 
+                     metric.isPercentage ? numericValue.toFixed(1) : 
+                     Math.round(numericValue);
+      }
     } else if (metric.isPercentage) {
       // Для процентов без диапазона: 0-100 слайдер -> 0-100% значение в десятичном формате
       scaledValue = sliderValue.toFixed(1);
@@ -556,10 +589,13 @@ const AnalyticsTool: React.FC = () => {
     const currentValue = typeof metrics[metricId] === 'string' ? parseFloat(metrics[metricId] as string) || 0 : metrics[metricId] as number;
     
     if (metric.sliderRange) {
-      // Для полей с настроенным диапазоном слайдера (включая проценты)
-      const { min, max } = metric.sliderRange;
-      const percentage = (currentValue - min) / (max - min);
-      return Math.min(100, Math.max(0, percentage * 100));
+      // Для полей с настроенным диапазоном слайдера - используем масштабированный диапазон
+      const scaledRange = getScaledRange(metric);
+      if (scaledRange) {
+        const { min, max } = scaledRange;
+        const percentage = (currentValue - min) / (max - min);
+        return Math.min(100, Math.max(0, percentage * 100));
+      }
     } else if (metric.isPercentage) {
       // Для процентов без диапазона: прямое соответствие
       return Math.min(100, Math.max(0, currentValue));
@@ -568,6 +604,8 @@ const AnalyticsTool: React.FC = () => {
       const baseValue = metric.defaultValue;
       return Math.min(100, Math.max(0, (currentValue / baseValue) * 50));
     }
+    
+    return 0;
   };
 
   // Функция экспорта в Excel
@@ -839,6 +877,28 @@ const AnalyticsTool: React.FC = () => {
             <div className="column-header param-header">
               <div className="param-header-content">
                 <span>Параметр</span>
+                
+                {/* Блок управления кратностью */}
+                <div className="scale-controls">
+                  <button 
+                    className="scale-button"
+                    onClick={decreaseScale}
+                    disabled={scaleFactor <= 1}
+                    title="Уменьшить масштаб слайдеров"
+                  >
+                    –
+                  </button>
+                  <span className="scale-value">×{scaleFactor}</span>
+                  <button 
+                    className="scale-button"
+                    onClick={increaseScale}
+                    disabled={scaleFactor >= 20}
+                    title="Увеличить масштаб слайдеров"
+                  >
+                    +
+                  </button>
+                </div>
+                
                 <button 
                   className="header-export-button"
                   onClick={() => setShowExportModal(true)}

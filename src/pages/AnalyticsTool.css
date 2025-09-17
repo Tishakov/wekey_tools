@@ -43,6 +43,61 @@
   align-items: center;
 }
 
+/* Управление кратностью слайдеров */
+.scale-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1C1D1F;
+  border-radius: 18px;
+  padding: 4px 8px;
+  height: 28px;
+}
+
+.scale-button {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  border-radius: 50%;
+  background: #333335;
+  color: #BCBBBD;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.scale-button:hover:not(:disabled) {
+  background: #09CEA7;
+  color: #000;
+}
+
+.scale-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.scale-value {
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+  padding-top: 2px;
+}
+
 .header-export-button {
   width: 143px;
   height: 28px;
@@ -453,12 +508,12 @@
 }
 
 .modal-content {
-  width: 445px;
-  height: 340px;
+  width: 350px;
+  height: 300px;
   border-radius: 10px;
   border: 1px solid #333335;
   background: #28282A;
-  padding: 32px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
   gap: 27px;
@@ -469,7 +524,7 @@
   color: #BCBBBD;
   text-align: center;
   font-family: Gilroy;
-  font-size: 20px;
+  font-size: 16px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
@@ -485,8 +540,8 @@
 }
 
 .radio-option {
-  width: 360px;
-  height: 65px;
+  width: 280px;
+  height: 50px;
   border-radius: 10px;
   border: 2px solid #333335;
   background: #28282A;
@@ -542,9 +597,9 @@
 .option-details strong {
   color: #BCBBBD;
   font-family: Gilroy;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 500;
   line-height: normal;
   display: block;
 }
@@ -555,16 +610,16 @@
 
 .modal-buttons {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   width: 100%;
   justify-content: center;
 }
 
 .analytics-button {
-  width: 170px;
-  height: 50px;
+  width: 180px;
+  height: 40px;
   border-radius: 10px;
-  border: 1px solid #333335;
+  border: 2px solid #333335;
   font-family: Gilroy;
   font-size: 14px;
   font-style: normal;
@@ -581,9 +636,11 @@
 .analytics-button.export-button {
   background: #09CEA7;
   color: #28282A;
+  border: none;
 }
 
 .analytics-button.clear-button {
-  background: #28282A;
+  width: 90px;
+  background: #333335;
   color: #BCBBBD;
 }
