@@ -100,6 +100,16 @@ const AnalyticsTool: React.FC = () => {
   // Состояние для попапа экспорта
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [exportFormat, setExportFormat] = useState<'vertical' | 'horizontal'>('vertical');
+  const [isModalClosing, setIsModalClosing] = useState<boolean>(false);
+  
+  // Функция плавного закрытия модального окна
+  const closeModal = () => {
+    setIsModalClosing(true);
+    setTimeout(() => {
+      setShowExportModal(false);
+      setIsModalClosing(false);
+    }, 300); // Совпадает с длительностью анимации
+  };
   
   // Состояние для кратности масштабирования слайдеров
   const [scaleFactor, setScaleFactor] = useState<number>(1);
@@ -1039,8 +1049,14 @@ const AnalyticsTool: React.FC = () => {
       
       {/* Модальное окно выбора формата экспорта */}
       {showExportModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div 
+          className={`modal-overlay ${isModalClosing ? 'closing' : ''}`}
+          onClick={closeModal}
+        >
+          <div 
+            className={`modal-content ${isModalClosing ? 'closing' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Выберите формат отображения</h3>
             <div className="export-options">
               <div 
@@ -1068,14 +1084,14 @@ const AnalyticsTool: React.FC = () => {
               <button
                 onClick={() => {
                   exportToExcel(exportFormat);
-                  setShowExportModal(false);
+                  closeModal();
                 }}
                 className="analytics-button export-button"
               >
                 Скачать таблицу
               </button>
               <button
-                onClick={() => setShowExportModal(false)}
+                onClick={closeModal}
                 className="analytics-button clear-button"
               >
                 Отмена
