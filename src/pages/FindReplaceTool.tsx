@@ -46,7 +46,7 @@ const FindReplaceTool: React.FC = () => {
         break;
       case 'custom':
       default:
-        replacement = replaceText;
+        replacement = replaceText; // Используем поле замены
         break;
     }
 
@@ -115,9 +115,9 @@ const FindReplaceTool: React.FC = () => {
     }
   };
 
-  const handleRadioClick = (clickedValue: 'custom' | 'empty' | 'paragraph') => {
+  const handleRadioClick = (clickedValue: 'empty' | 'paragraph') => {
     if (replaceMode === clickedValue) {
-      setReplaceMode('custom'); // Возвращаем к custom по умолчанию
+      setReplaceMode('custom'); // Возвращаем к обычной замене
     } else {
       setReplaceMode(clickedValue);
     }
@@ -183,7 +183,7 @@ const FindReplaceTool: React.FC = () => {
           {/* Поле поиска */}
           <div className="settings-group">
             <label htmlFor="search-field" className="settings-label">
-              Что искать (каждая строка - отдельный поиск):
+              Что заменить... (несколько с новой строки):
             </label>
             <div className="filter-controls">
               <textarea
@@ -204,6 +204,29 @@ const FindReplaceTool: React.FC = () => {
             </div>
           </div>
 
+          {/* Поле замены - ВСЕГДА показываем */}
+          <div className="settings-group">
+            <label className="settings-label">
+              На что заменить:
+            </label>
+            <div className="filter-controls">
+              <textarea
+                className="filter-input"
+                value={replaceText}
+                onChange={(e) => {
+                  setReplaceText(e.target.value);
+                  handleTextareaResize(e.target);
+                }}
+                placeholder="Введите текст для замены"
+                rows={2}
+              />
+              <button className="filter-paste-button" onClick={handlePasteReplace}>
+                <img src="/icons/button_paste.svg" alt="" />
+                Вставить
+              </button>
+            </div>
+          </div>
+
           {/* Чекбокс учета регистра */}
           <div className="settings-group">
             <label className="checkbox-item">
@@ -212,26 +235,12 @@ const FindReplaceTool: React.FC = () => {
                 checked={caseSensitive}
                 onChange={(e) => setCaseSensitive(e.target.checked)}
               />
-              Учитывать регистр
+              С учётом регистра
             </label>
           </div>
 
-          {/* Группа радио-кнопок для режима замены */}
+          {/* Радио-кнопки для специальных режимов */}
           <div className="settings-group">
-            <div className="settings-label">На что заменять:</div>
-            
-            <label className="radio-item">
-              <input
-                type="radio"
-                name="replaceMode"
-                value="custom"
-                checked={replaceMode === 'custom'}
-                onClick={() => handleRadioClick('custom')}
-                onChange={() => {}}
-              />
-              Заменить на текст:
-            </label>
-            
             <label className="radio-item">
               <input
                 type="radio"
@@ -241,7 +250,7 @@ const FindReplaceTool: React.FC = () => {
                 onClick={() => handleRadioClick('empty')}
                 onChange={() => {}}
               />
-              Удалить (заменить на пустое место)
+              Заменить на пустоту
             </label>
             
             <label className="radio-item">
@@ -253,28 +262,8 @@ const FindReplaceTool: React.FC = () => {
                 onClick={() => handleRadioClick('paragraph')}
                 onChange={() => {}}
               />
-              Заменить на абзац (двойной перенос строки)
+              Заменить на абзац
             </label>
-
-            {/* Поле замены - показываем только в режиме custom */}
-            {replaceMode === 'custom' && (
-              <div className="filter-controls">
-                <textarea
-                  className="filter-input"
-                  value={replaceText}
-                  onChange={(e) => {
-                    setReplaceText(e.target.value);
-                    handleTextareaResize(e.target);
-                  }}
-                  placeholder="Введите текст для замены"
-                  rows={2}
-                />
-                <button className="filter-paste-button" onClick={handlePasteReplace}>
-                  <img src="/icons/button_paste.svg" alt="" />
-                  Вставить
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
