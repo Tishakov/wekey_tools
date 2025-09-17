@@ -18,7 +18,8 @@ const Sidebar: React.FC = () => {
     'transliteration',       // Транслитерация (был готов ранее)
     'minus-words',           // Обработка минус-слов
     'utm-generator',         // Генератор UTM-меток
-    'cross-analytics'        // Сквозная аналитика
+    'cross-analytics',       // Сквозная аналитика
+    'word-gluing'            // Склейка слов
   ];
   
   // Сортируем инструменты по алфавиту
