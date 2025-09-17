@@ -179,7 +179,7 @@ const FindReplaceTool: React.FC = () => {
             placeholder="Введите или вставьте ваш текст здесь..."
           />
           <div className="input-controls">
-            <button className="paste-btn" onClick={handlePaste}>
+            <button className="paste-button" onClick={handlePaste}>
               <img src="/icons/button_paste.svg" alt="" />
               Вставить
             </button>

@@ -38,6 +38,7 @@ public/
    import React, { useState, useEffect } from 'react';
    import { Link } from 'react-router-dom';
    import { statsService } from '../utils/statsService';
+   import '../styles/tool-pages.css';
    import './НазваниеTool.css';
    ```
 3. **Базовые состояния**:
@@ -51,50 +52,84 @@ public/
 
 ### ШАГ 2: Layout компонента (СТРОГО сверху вниз)
 ```tsx
-<div className="tool-container">
+<div className="название-tool">
   {/* 1. ШАПКА ИНСТРУМЕНТА */}
   <div className="tool-header-island">
-    <Link to="/" className="back-button">← Все инструменты</Link>
-    <h1>Название инструмента</h1>
-    <div className="header-icons">
-      <span className="launch-count">{launchCount}</span>
-      <button className="icon-button"><img src="/icons/lamp.svg" /></button>
-      <button className="icon-button"><img src="/icons/camera.svg" /></button>
+    <Link to="/" className="back-button">
+      <img src="/icons/arrow_left.svg" alt="" />
+      Все инструменты
+    </Link>
+    <h1 className="tool-title">Название инструмента</h1>
+    <div className="tool-header-buttons">
+      <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+        <img src="/icons/rocket.svg" alt="" />
+        <span className="counter">{launchCount}</span>
+      </button>
+      <button className="tool-header-btn" title="Подсказка">
+        <img src="/icons/lamp.svg" alt="" />
+      </button>
+      <button className="tool-header-btn" title="Сделать скриншот">
+        <img src="/icons/camera.svg" alt="" />
+      </button>
     </div>
   </div>
 
   {/* 2. РАБОЧАЯ ОБЛАСТЬ 50/50 */}
   <div className="main-workspace">
     <div className="input-section">
-      <textarea value={inputText} onChange={...} />
+      <textarea
+        className="input-textarea"
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        placeholder="Введите или вставьте ваш текст здесь..."
+      />
       <div className="input-controls">
-        <button onClick={handlePaste}>📋 Вставить</button>
-        <span className="line-count">{inputText.split('\n').length} строк</span>
+        <button className="paste-button" onClick={handlePaste}>
+          <img src="/icons/button_paste.svg" alt="" />
+          Вставить
+        </button>
+        <span className="char-counter">{countLines(inputText)} стр.</span>
       </div>
     </div>
     <div className="settings-section">
       <div className="settings-group">
-        <h3>Настройки</h3>
-        {/* Чекбоксы/радио-кнопки/настройки */}
+        {/* Чекбоксы/радио-кнопки/настройки/поля фильтрации */}
       </div>
     </div>
   </div>
 
   {/* 3. КНОПКИ УПРАВЛЕНИЯ */}
   <div className="control-buttons">
-    <button className="primary-button" onClick={handleShowResult}>
+    <button 
+      className="action-btn primary" 
+      style={{ width: '445px' }} 
+      onClick={handleShowResult}
+      disabled={!inputText.trim()}
+    >
       Показать результат
     </button>
-    <button className="secondary-button" onClick={handleCopy}>
-      <img src="/icons/button_copy.svg" />
-      Скопировать результат
+    <button 
+      className="action-btn secondary icon-left" 
+      style={{ width: '445px' }} 
+      onClick={handleCopy}
+      disabled={!result}
+    >
+      <img src="/icons/button_copy.svg" alt="" />
+      {copied ? 'Скопировано!' : 'Скопировать результат'}
     </button>
   </div>
 
   {/* 4. ПОЛЕ РЕЗУЛЬТАТА */}
   <div className="result-section">
-    <textarea value={result} readOnly />
-    <span className="line-count">{result.split('\n').length} строк</span>
+    <textarea
+      className="result-textarea"
+      value={result}
+      readOnly
+      placeholder="Здесь будет результат"
+    />
+    <div className="result-controls">
+      <span className="result-counter">{countLines(result)} стр.</span>
+    </div>
   </div>
 </div>
 ```
@@ -103,18 +138,23 @@ public/
 ```tsx
 // Загрузка статистики
 useEffect(() => {
-  setLaunchCount(statsService.getLaunchCount('tool-name'));
+  const count = statsService.getLaunchCount('tool-name');
+  setLaunchCount(count);
 }, []);
 
 // Вставка из буфера
 const handlePaste = async () => {
-  const text = await navigator.clipboard.readText();
-  setInputText(text);
+  try {
+    const text = await navigator.clipboard.readText();
+    setInputText(text);
+  } catch (err) {
+    console.error('Не удалось вставить текст:', err);
+  }
 };
 
 // Основная логика + статистика
 const handleShowResult = () => {
-  // Логика обработки inputText
+  const processedText = processText(inputText);
   setResult(processedText);
   statsService.incrementLaunchCount('tool-name');
   setLaunchCount(prev => prev + 1);
@@ -122,14 +162,27 @@ const handleShowResult = () => {
 
 // Копирование результата
 const handleCopy = async () => {
-  await navigator.clipboard.writeText(result);
-  setCopied(true);
-  setTimeout(() => setCopied(false), 2000);
+  if (result) {
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Не удалось скопировать текст:', err);
+    }
+  }
+};
+
+// Подсчет строк
+const countLines = (text: string): number => {
+  if (text === '') return 0;
+  return text.split('\n').length;
 };
 
 // Очистка результата при изменениях
 useEffect(() => {
   setResult('');
+  setCopied(false);
 }, [inputText, /* состояния настроек */]);
 ```
 
@@ -190,6 +243,82 @@ useEffect(() => {
 - **Desktop-first** подход
 - **Минимальная ширина**: 1200px для комфортной работы
 - **Мобильная версия**: упрощенный layout без сайдбара
+
+## 🎯 СПЕЦИАЛЬНЫЕ ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
+
+### 🔍 Поля фильтрации (.filter-input)
+Для инструментов с многострочным вводом настроек используются специальные поля:
+
+```tsx
+// Состояние для автоматического изменения высоты
+const handleTextareaResize = (element: HTMLTextAreaElement) => {
+  element.style.height = '50px'; // Возвращаем к минимальной высоте
+  element.style.height = element.scrollHeight + 'px'; // Устанавливаем точную высоту содержимого
+};
+
+// JSX для поля фильтрации
+<textarea
+  className="filter-input"
+  value={searchText}
+  onChange={(e) => {
+    setSearchText(e.target.value);
+    handleTextareaResize(e.target);
+  }}
+  placeholder="Что заменить... (несколько с новой строки)"
+/>
+```
+
+**⚠️ ВАЖНО:** НЕ используй HTML атрибут `rows` - он ломает автоматическое изменение высоты!
+
+### CSS для .filter-input:
+```css
+/* В tool-pages.css уже есть базовые стили */
+/* Для специфичных инструментов добавляй с префиксом: */
+.инструмент-tool .filter-input {
+  width: 100% !important;
+  min-height: 50px !important;
+  padding: 15px 10px 10px 14px !important;
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  resize: none !important;
+  overflow: hidden !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+```
+
+### 🎨 Визуальные состояния полей
+```tsx
+// Визуально отключенное поле
+const [isDisabled, setIsDisabled] = useState(false);
+
+<textarea
+  className={`filter-input ${isDisabled ? 'visual-disabled' : ''}`}
+  value={text}
+  onChange={(e) => {
+    if (!isDisabled) {
+      setText(e.target.value);
+      handleTextareaResize(e.target);
+    }
+  }}
+  onClick={() => {
+    if (isDisabled) {
+      setIsDisabled(false); // Активировать поле при клике
+    }
+  }}
+/>
+```
+
+### CSS для visual-disabled:
+```css
+.инструмент-tool .filter-input.visual-disabled {
+  opacity: 0.5;
+  background-color: #2a2b2d !important;
+  color: #6b7280 !important;
+  border-color: #404244 !important;
+}
+```
 
 ## 🔧 СПЕЦИАЛЬНЫЕ ИНСТРУМЕНТЫ
 
@@ -422,6 +551,36 @@ const totalBudget = campaigns.reduce((sum, campaign) => {
 
 ## 🔍 ДЕБАГ И ЧАСТЫЕ ПРОБЛЕМЫ
 
+### ❌ CSS проблемы с полями фильтрации:
+**Проблема**: Поля .filter-input не автоматически изменяют высоту
+**Решение**: 
+1. НЕ используй HTML атрибут `rows` 
+2. Используй функцию `handleTextareaResize`
+3. Добавь CSS специфичность с префиксом инструмента: `.инструмент-tool .filter-input`
+
+### ❌ Неправильные CSS классы кнопок:
+**Проблема**: Кнопка "Вставить" выглядит не так, как в других инструментах
+**Решение**: Используй класс `paste-button`, НЕ `paste-btn`
+
+### ❌ Проблемы с логикой замены текста:
+**Проблема**: Остаются лишние пробелы при замене "на пустоту" или "на абзац"
+**Решение**: Добавь постобработку текста:
+```tsx
+// Для режима "пустота"
+if (replaceMode === 'empty') {
+  processedText = processedText.replace(/\s+/g, ' '); // Убираем множественные пробелы
+  processedText = processedText.replace(/^\s+|\s+$/gm, ''); // Убираем пробелы в начале/конце строк
+  processedText = processedText.replace(/^\s*$/gm, '').replace(/\n+/g, '\n'); // Убираем пустые строки
+}
+
+// Для режима "абзац"
+if (replaceMode === 'paragraph') {
+  processedText = processedText.replace(/\s+\n\n/g, '\n\n'); // Убираем пробелы перед абзацами
+  processedText = processedText.replace(/\n\n\s+/g, '\n\n'); // Убираем пробелы после абзацев
+  processedText = processedText.replace(/\n{3,}/g, '\n\n'); // Максимум 2 перевода строки
+}
+```
+
 ### Проблема: Excel экспорт не работает
 **Решение**: Проверь, что используешь ExcelJS, не XLSX. Формулы должны быть строками с '=' в начале.
 
@@ -458,22 +617,23 @@ const totalBudget = campaigns.reduce((sum, campaign) => {
 2. **РАБОТАТЬ ТОЛЬКО** с файлом `Sidebar.tsx`
 3. **ДОБАВИТЬ** id инструмента в массив `completedTools`
 
-### Как это работает:
+### Готовые инструменты (список для completedTools):
 ```tsx
-// В src/components/Sidebar.tsx уже есть готовая механика:
 const completedTools = [
   'case-changer',           // Изменения регистра
   'remove-duplicates',      // Удаление дубликатов  
   'text-to-html',          // Текст в HTML
-  // ... остальные готовые инструменты
-  'find-replace'           // ← Добавить сюда новый инструмент
+  'text-optimizer',        // Оптимизатор текста
+  'spaces-to-paragraphs',  // Пробелы на абзацы
+  'text-sorting',          // Сортировка слов и строк
+  'remove-empty-lines',    // Удаление пустых строк
+  'transliteration',       // Транслитерация
+  'minus-words',           // Обработка минус-слов
+  'utm-generator',         // Генератор UTM-меток
+  'cross-analytics',       // Сквозная аналитика
+  'word-gluing',           // Склейка слов
+  'find-replace'           // Найти и заменить
 ];
-
-// CSS уже готов в Sidebar.css:
-.sidebar-link.completed {
-  color: #09CEA7;  /* Зеленый цвет */
-  font-weight: 500;
-}
 ```
 
 ### Пример правильного добавления:
@@ -493,7 +653,8 @@ const completedTools = [
 ## 📈 ТЕКУЩЕЕ СОСТОЯНИЕ ПРОЕКТА (сентябрь 2025)
 
 ### Последние релизы:
-- **analytics_popup_done** (последний) - Analytics Tool 2.3 с модальными окнами и анимациями
+- **find_replace_done_1.2** (последний) - Инструмент "Найти и заменить" v1.2 с многострочным поиском, визуальными состояниями и корректной обработкой пробелов
+- **analytics_popup_done** - Analytics Tool 2.3 с модальными окнами и анимациями
 - **analytics_2.3_done** - Analytics Tool с ExcelJS формулами
 - **translit_done_1.1** - Инструмент транслитерации  
 - **text_to_html_done** - Конвертация текста в HTML
@@ -503,6 +664,7 @@ const completedTools = [
 - ✅ Dist папка с оптимизированными ассетами
 - ✅ .htaccess для корректной маршрутизации
 - ✅ Все анимации и модальные окна протестированы
+- ✅ Инструмент "Найди и заменить" полностью готов
 
 ### Следующие задачи (примеры):
 - Новые SEO инструменты
@@ -511,3 +673,13 @@ const completedTools = [
 - Добавление новых экспорт-форматов
 
 **Проект стабилен и готов к расширению!**
+
+### 🎪 ГОТОВЫЕ ИНСТРУМЕНТЫ (для референса):
+- **FindReplaceTool.tsx** - многострочный поиск/замена с визуальными состояниями (версия 1.2)
+- **AnalyticsTool.tsx** - самый продвинутый (слайдеры, экспорт, модальные окна)
+- **CaseChangerTool.tsx** - стандартный с радио-кнопками
+- **DuplicateRemovalTool.tsx** - с чекбоксами
+- **TextOptimizerTool.tsx** - образец правильного использования .paste-button
+- **MinusWordsTool.tsx** - базовый text-processing
+
+**Используй эти файлы как референс для понимания паттернов и стилей!**
