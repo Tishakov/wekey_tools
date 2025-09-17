@@ -165,7 +165,6 @@ const FindReplaceTool: React.FC = () => {
           {/* Поле поиска */}
           <div className="settings-group">
             <textarea
-              id="search-field"
               className="filter-input"
               value={searchText}
               onChange={(e) => {
