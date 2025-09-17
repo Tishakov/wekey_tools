@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
 
@@ -644,123 +644,84 @@ const AnalyticsTool: React.FC = () => {
         exportData = [dayRow, periodRow];
       }
 
-      // Создаем книгу Excel
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      // Создаем файл Excel с помощью ExcelJS для надежной стилизации
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Аналитика');
       
-      // Настройка автоширины столбцов
-      const colWidths = [];
-      
+      // Добавляем данные
       if (format === 'vertical') {
-        // Для вертикального формата: Параметр | День | Период
-        // Рассчитываем ширину только по данным (исключая заголовки)
-        const dataRows = exportData.slice(1); // Пропускаем первую строку (заголовки)
+        // Вертикальный формат
+        const headers = ['Параметр', 'За 1 день', `За ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}`];
+        worksheet.addRow(headers);
         
-        const maxParamLength = dataRows.length > 0 ? Math.max(
-          ...dataRows.map(row => (row['Параметр'] || '').toString().length),
-          8 // Минимальная ширина для читаемости
-        ) : 8;
-        
-        const maxDayLength = dataRows.length > 0 ? Math.max(
-          ...dataRows.map(row => (row['За 1 день'] || '').toString().length),
-          8 // Минимальная ширина
-        ) : 8;
-        
-        const maxPeriodLength = dataRows.length > 0 ? Math.max(
-          ...dataRows.map(row => {
-            const periodKey = Object.keys(row).find(key => key.startsWith('За '));
-            return periodKey ? (row[periodKey] || '').toString().length : 0;
-          }),
-          8 // Минимальная ширина
-        ) : 8;
-        
-        colWidths.push(
-          { wch: Math.min(Math.max(maxParamLength + 2, 10), 35) }, // Параметр: мин 10, макс 35
-          { wch: Math.min(Math.max(maxDayLength + 2, 10), 20) },   // День: мин 10, макс 20
-          { wch: Math.min(Math.max(maxPeriodLength + 2, 10), 25) } // Период: мин 10, макс 25
-        );
+        // Добавляем данные строки
+        exportData.slice(1).forEach(row => {
+          const rowData = [
+            row['Параметр'],
+            row['За 1 день'],
+            row[Object.keys(row).find(key => key.startsWith('За ') && key !== 'За 1 день') || '']
+          ];
+          worksheet.addRow(rowData);
+        });
       } else {
-        // Для горизонтального формата: каждый параметр - отдельный столбец
-        // Берем данные строки (исключая заголовки)
-        const dataRows = exportData.slice(1);
-        const firstRow = exportData[0];
+        // Горизонтальный формат
+        const headers = Object.keys(exportData[0]);
+        worksheet.addRow(headers);
         
-        Object.keys(firstRow).forEach((key, index) => {
-          if (index === 0) {
-            // Первый столбец "Период" - рассчитываем по данным
-            const maxLength = dataRows.length > 0 ? Math.max(
-              ...dataRows.map(row => (row[key] || '').toString().length),
-              8
-            ) : 8;
-            colWidths.push({ wch: Math.min(Math.max(maxLength + 2, 10), 20) });
-          } else {
-            // Столбцы параметров - рассчитываем только по значениям данных
-            const maxLength = dataRows.length > 0 ? Math.max(
-              ...dataRows.map(row => (row[key] || '').toString().length),
-              6 // Минимальная ширина для коротких значений
-            ) : 6;
-            colWidths.push({ wch: Math.min(Math.max(maxLength + 2, 8), 18) });
-          }
+        exportData.forEach(row => {
+          const rowData = headers.map(header => row[header]);
+          worksheet.addRow(rowData);
         });
       }
       
-      worksheet['!cols'] = colWidths;
+      // Стилизация заголовков (первая строка)
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 12 };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFE6E6E6' } // Светло-серый фон
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
       
-      // Добавляем стили для заголовков (жирный шрифт)
-      const range = worksheet['!ref'] ? XLSX.utils.decode_range(worksheet['!ref']) : null;
-      
-      if (range) {
-        // Стилизуем первую строку как заголовок
-        for (let col = range.s.c; col <= range.e.c; col++) {
-          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
-          if (!worksheet[cellAddress]) continue;
-          
-          worksheet[cellAddress].s = {
-            font: { bold: true, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "366092" } },
-            alignment: { horizontal: "center", vertical: "center" },
-            border: {
-              top: { style: "thin", color: { rgb: "000000" } },
-              bottom: { style: "thin", color: { rgb: "000000" } },
-              left: { style: "thin", color: { rgb: "000000" } },
-              right: { style: "thin", color: { rgb: "000000" } }
-            }
-          };
+      // Автоширина столбцов
+      worksheet.columns.forEach((column, index) => {
+        if (format === 'vertical') {
+          // Для вертикального формата
+          if (index === 0) column.width = 25; // Параметр
+          else if (index === 1) column.width = 12; // День
+          else column.width = 15; // Период
+        } else {
+          // Для горизонтального формата
+          if (index === 0) column.width = 15; // Период
+          else column.width = 12; // Параметры
         }
-        
-        // Добавляем границы для всех ячеек
-        for (let row = range.s.r; row <= range.e.r; row++) {
-          for (let col = range.s.c; col <= range.e.c; col++) {
-            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
-            if (!worksheet[cellAddress]) continue;
-            
-            if (row > 0) { // Не заголовки
-              worksheet[cellAddress].s = {
-                ...worksheet[cellAddress].s,
-                border: {
-                  top: { style: "thin", color: { rgb: "CCCCCC" } },
-                  bottom: { style: "thin", color: { rgb: "CCCCCC" } },
-                  left: { style: "thin", color: { rgb: "CCCCCC" } },
-                  right: { style: "thin", color: { rgb: "CCCCCC" } }
-                },
-                alignment: { vertical: "center" }
-              };
-            }
-          }
-        }
-      }
+      });
       
-      // Добавляем лист в книгу
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Аналитика');
-      
-      // Генерируем имя файла с текущей датой и временем
+      // Генерируем имя файла
       const today = new Date();
-      const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
-      const timeStr = today.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+      const dateStr = today.toISOString().split('T')[0];
+      const timeStr = today.toTimeString().split(' ')[0].replace(/:/g, '-');
       const fileName = `analytics_result_wekey_tools_${dateStr}_${timeStr}.xlsx`;
       
       // Скачиваем файл
-      XLSX.writeFile(workbook, fileName);
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      });
       
       console.log('Файл успешно экспортирован:', fileName);
     } catch (error) {
