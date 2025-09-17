@@ -97,24 +97,6 @@ const FindReplaceTool: React.FC = () => {
     }
   };
 
-  const handlePasteSearch = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setSearchText(text);
-    } catch (err) {
-      console.error('Не удалось вставить текст:', err);
-    }
-  };
-
-  const handlePasteReplace = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setReplaceText(text);
-    } catch (err) {
-      console.error('Не удалось вставить текст:', err);
-    }
-  };
-
   const handleRadioClick = (clickedValue: 'empty' | 'paragraph') => {
     if (replaceMode === clickedValue) {
       setReplaceMode('custom'); // Возвращаем к обычной замене
@@ -182,49 +164,31 @@ const FindReplaceTool: React.FC = () => {
         <div className="settings-section">
           {/* Поле поиска */}
           <div className="settings-group">
-            <label htmlFor="search-field" className="settings-label">
-              Что заменить... (несколько с новой строки):
-            </label>
-            <div className="filter-controls">
-              <textarea
-                id="search-field"
-                className="filter-input"
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  handleTextareaResize(e.target);
-                }}
-                placeholder="Введите слова для поиска, каждое с новой строки"
-                rows={3}
-              />
-              <button className="filter-paste-button" onClick={handlePasteSearch}>
-                <img src="/icons/button_paste.svg" alt="" />
-                Вставить
-              </button>
-            </div>
+            <textarea
+              id="search-field"
+              className="filter-input"
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                handleTextareaResize(e.target);
+              }}
+              placeholder="Что заменить... (несколько с новой строки)"
+              rows={3}
+            />
           </div>
 
           {/* Поле замены - ВСЕГДА показываем */}
           <div className="settings-group">
-            <label className="settings-label">
-              На что заменить:
-            </label>
-            <div className="filter-controls">
-              <textarea
-                className="filter-input"
-                value={replaceText}
-                onChange={(e) => {
-                  setReplaceText(e.target.value);
-                  handleTextareaResize(e.target);
-                }}
-                placeholder="Введите текст для замены"
-                rows={2}
-              />
-              <button className="filter-paste-button" onClick={handlePasteReplace}>
-                <img src="/icons/button_paste.svg" alt="" />
-                Вставить
-              </button>
-            </div>
+            <textarea
+              className="filter-input"
+              value={replaceText}
+              onChange={(e) => {
+                setReplaceText(e.target.value);
+                handleTextareaResize(e.target);
+              }}
+              placeholder="На что заменить..."
+              rows={2}
+            />
           </div>
 
           {/* Чекбокс учета регистра */}
