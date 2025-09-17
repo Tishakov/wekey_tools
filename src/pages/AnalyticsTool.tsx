@@ -37,7 +37,7 @@ const metricsConfig: Group[] = [
     title: 'Расходы',
     color: '#EF4444', // красный
     metrics: [
-      { id: 'cpc', name: 'CPC – стоимость клика', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
+      { id: 'cpc', name: 'CPC (Стоимость клика)', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
       { id: 'adCost', name: 'Затраты на рекламу', tooltip: 'Общие затраты на рекламную кампанию', isPercentage: false, defaultValue: 3600, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
     ]
   },
@@ -45,25 +45,25 @@ const metricsConfig: Group[] = [
     title: 'Сайт',
     color: '#F59E0B', // жёлтый
     metrics: [
-      { id: 'cr1', name: 'CR1 – Конверсия сайта %', tooltip: 'Conversion Rate 1 - процент посетителей, ставших лидами', isPercentage: true, defaultValue: 4.0, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
+      { id: 'cr1', name: 'CR1 (Конверсия сайта %)', tooltip: 'Conversion Rate 1 - процент посетителей, ставших лидами', isPercentage: true, defaultValue: 4.0, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
       { id: 'leads', name: 'Лидов, продаж', tooltip: 'Количество полученных лидов', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: true, sliderRange: { min: 0, max: 200 } },
-      { id: 'cpl', name: 'CPL – стоимость лида', tooltip: 'Cost Per Lead - стоимость получения одного лида', isPercentage: false, defaultValue: 300, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+      { id: 'cpl', name: 'CPL (Стоимость лида)', tooltip: 'Cost Per Lead - стоимость получения одного лида', isPercentage: false, defaultValue: 300, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
     ]
   },
   {
     title: 'Отдел продаж',
     color: '#3B82F6', // синий
     metrics: [
-      { id: 'cr2', name: 'CR2 – Из лида в продажу %', tooltip: 'Conversion Rate 2 - процент лидов, ставших продажами', isPercentage: true, defaultValue: 75.0, hasPeriod: false },
+      { id: 'cr2', name: 'CR2 (Из лида в продажу %)', tooltip: 'Conversion Rate 2 - процент лидов, ставших продажами', isPercentage: true, defaultValue: 75.0, hasPeriod: false },
       { id: 'sales', name: 'Сделок, продаж', tooltip: 'Количество заключенных сделок', isPercentage: false, isDecimal: true, defaultValue: 9, hasPeriod: true, sliderRange: { min: 0, max: 100 } },
-      { id: 'cpo', name: 'CPO – цена сделки, продажи', tooltip: 'Cost Per Order - стоимость получения одной сделки', isPercentage: false, defaultValue: 400, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+      { id: 'cpo', name: 'CPO (Цена сделки, продажи)', tooltip: 'Cost Per Order - стоимость получения одной сделки', isPercentage: false, defaultValue: 400, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
     ]
   },
   {
     title: 'Ценообразование',
     color: '#8B5CF6', // фиолетовый
     metrics: [
-      { id: 'aov', name: 'AOV – средний чек (одной)', tooltip: 'Average Order Value - средняя стоимость одного заказа', isPercentage: false, defaultValue: 3000, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
+      { id: 'aov', name: 'AOV (Средний чек одной)', tooltip: 'Average Order Value - средняя стоимость одного заказа', isPercentage: false, defaultValue: 3000, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
       { id: 'revenue', name: 'Валовой доход', tooltip: 'Общий доход от продаж', isPercentage: false, defaultValue: 27000, hasPeriod: true, sliderRange: { min: 0, max: 100000 } },
       { id: 'marginPercent', name: 'Маржинальность %', tooltip: 'Процент маржи от дохода', isPercentage: true, defaultValue: 50, hasPeriod: false },
       { id: 'marginPerUnit', name: 'Маржа с одной', tooltip: 'Маржа с одной единицы товара', isPercentage: false, defaultValue: 1500, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
@@ -603,15 +603,15 @@ const AnalyticsTool: React.FC = () => {
 
             return {
               'Параметр': metric.name,
-              'Значение за 1 день': formatValue(dayValue, metric.isPercentage),
-              [`Значение за ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}`]: formatValue(periodValue, metric.isPercentage)
+              'За 1 день': formatValue(dayValue, metric.isPercentage),
+              [`За ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}`]: formatValue(periodValue, metric.isPercentage)
             };
           })
         );
       } else {
         // Горизонтальный формат: каждый параметр - отдельная колонка
-        const dayRow: Record<string, any> = { 'Период': 'Значение за 1 день' };
-        const periodRow: Record<string, any> = { 'Период': `Значение за ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}` };
+        const dayRow: Record<string, any> = { 'Период': 'За 1 день' };
+        const periodRow: Record<string, any> = { 'Период': `За ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}` };
         
         metricsConfig.forEach((group: Group) => {
           group.metrics.forEach((metric: Metric) => {
@@ -653,41 +653,53 @@ const AnalyticsTool: React.FC = () => {
       
       if (format === 'vertical') {
         // Для вертикального формата: Параметр | День | Период
-        const maxParamLength = Math.max(
-          ...exportData.map(row => (row['Параметр'] || '').toString().length),
-          'Параметр'.length
-        );
-        const maxDayLength = Math.max(
-          ...exportData.map(row => (row['Значение за 1 день'] || '').toString().length),
-          'Значение за 1 день'.length
-        );
-        const maxPeriodLength = Math.max(
-          ...exportData.map(row => {
-            const periodKey = Object.keys(row).find(key => key.startsWith('Значение за '));
+        // Рассчитываем ширину только по данным (исключая заголовки)
+        const dataRows = exportData.slice(1); // Пропускаем первую строку (заголовки)
+        
+        const maxParamLength = dataRows.length > 0 ? Math.max(
+          ...dataRows.map(row => (row['Параметр'] || '').toString().length),
+          8 // Минимальная ширина для читаемости
+        ) : 8;
+        
+        const maxDayLength = dataRows.length > 0 ? Math.max(
+          ...dataRows.map(row => (row['За 1 день'] || '').toString().length),
+          8 // Минимальная ширина
+        ) : 8;
+        
+        const maxPeriodLength = dataRows.length > 0 ? Math.max(
+          ...dataRows.map(row => {
+            const periodKey = Object.keys(row).find(key => key.startsWith('За '));
             return periodKey ? (row[periodKey] || '').toString().length : 0;
           }),
-          25 // Минимальная ширина для заголовка периода
-        );
+          8 // Минимальная ширина
+        ) : 8;
         
         colWidths.push(
-          { wch: Math.min(Math.max(maxParamLength + 2, 15), 50) }, // Параметр: мин 15, макс 50
-          { wch: Math.min(Math.max(maxDayLength + 2, 12), 25) },   // День: мин 12, макс 25
-          { wch: Math.min(Math.max(maxPeriodLength + 2, 15), 30) } // Период: мин 15, макс 30
+          { wch: Math.min(Math.max(maxParamLength + 2, 10), 35) }, // Параметр: мин 10, макс 35
+          { wch: Math.min(Math.max(maxDayLength + 2, 10), 20) },   // День: мин 10, макс 20
+          { wch: Math.min(Math.max(maxPeriodLength + 2, 10), 25) } // Период: мин 10, макс 25
         );
       } else {
         // Для горизонтального формата: каждый параметр - отдельный столбец
+        // Берем данные строки (исключая заголовки)
+        const dataRows = exportData.slice(1);
         const firstRow = exportData[0];
+        
         Object.keys(firstRow).forEach((key, index) => {
           if (index === 0) {
-            // Первый столбец "Период"
-            colWidths.push({ wch: 20 });
+            // Первый столбец "Период" - рассчитываем по данным
+            const maxLength = dataRows.length > 0 ? Math.max(
+              ...dataRows.map(row => (row[key] || '').toString().length),
+              8
+            ) : 8;
+            colWidths.push({ wch: Math.min(Math.max(maxLength + 2, 10), 20) });
           } else {
-            // Столбцы параметров
-            const maxLength = Math.max(
-              ...exportData.map(row => (row[key] || '').toString().length),
-              key.length
-            );
-            colWidths.push({ wch: Math.min(Math.max(maxLength + 2, 10), 25) });
+            // Столбцы параметров - рассчитываем только по значениям данных
+            const maxLength = dataRows.length > 0 ? Math.max(
+              ...dataRows.map(row => (row[key] || '').toString().length),
+              6 // Минимальная ширина для коротких значений
+            ) : 6;
+            colWidths.push({ wch: Math.min(Math.max(maxLength + 2, 8), 18) });
           }
         });
       }
@@ -945,7 +957,7 @@ const AnalyticsTool: React.FC = () => {
                 <span className="radio-custom"></span>
                 <div className="option-details">
                   <strong>Вертикальный формат</strong>
-                  <p>Параметры в строках, колонки: Параметр | Значение за 1 день | Значение за период</p>
+                  <p>Параметры в строках, колонки: Параметр | За 1 день | За период</p>
                 </div>
               </label>
               
@@ -960,7 +972,7 @@ const AnalyticsTool: React.FC = () => {
                 <span className="radio-custom"></span>
                 <div className="option-details">
                   <strong>Горизонтальный формат</strong>
-                  <p>Параметры в колонках, строки: Значение за 1 день | Значение за период</p>
+                  <p>Параметры в колонках, строки: За 1 день | За период</p>
                 </div>
               </label>
             </div>
