@@ -25,6 +25,13 @@ const WordGluingTool: React.FC = () => {
         setResult('');
     }, [inputText1, inputText2, connector, customConnector]);
 
+    // Функция для обмена значений между полями
+    const swapValues = () => {
+        const temp = inputText1;
+        setInputText1(inputText2);
+        setInputText2(temp);
+    };
+
     // Вставка из буфера для первого поля
     const handlePaste1 = async () => {
         try {
@@ -163,7 +170,7 @@ const WordGluingTool: React.FC = () => {
 
             {/* Основная рабочая область */}
             <div className="main-workspace">
-                {/* Левая часть - два поля ввода рядом */}
+                {/* Левая часть - два поля ввода рядом с кнопкой обмена поверх */}
                 <div className="input-section">
                     <div className="double-input">
                         <div className="input-field">
@@ -196,6 +203,13 @@ const WordGluingTool: React.FC = () => {
                                 </button>
                                 <span className="char-counter">{inputLines2} стр.</span>
                             </div>
+                        </div>
+                        
+                        {/* Кнопка обмена значений - поверх полей по центру */}
+                        <div className="swap-button-container">
+                            <button className="swap-button" onClick={swapValues} title="Поменять местами">
+                                <img src="/icons/change.svg" alt="Поменять местами" />
+                            </button>
                         </div>
                     </div>
                 </div>
