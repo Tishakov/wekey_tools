@@ -5,18 +5,20 @@
     gap: 10px;
 }
 
-/* Стили для полей фильтрации */
+/* Стили для полей фильтрации - автоматическая высота без скролла */
 .find-replace-tool .filter-input {
     width: 100%;
-    min-height: 80px;
-    padding: 12px;
+    min-height: 36px !important;
+    max-height: 200px !important;
+    padding: 8px 12px !important;
     background-color: #1C1D1F;
     border: 1px solid #333335;
     border-radius: 8px;
-    resize: vertical;
-    font-size: 14px;
-    line-height: 1.5;
-    font-family: inherit;
+    resize: none !important;
+    overflow: hidden !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-family: inherit !important;
     color: #BCBBBD;
 }
 
@@ -31,43 +33,6 @@
 
 .find-replace-tool .filter-input::placeholder {
     color: #707070;
-}
-
-/* Контейнер для поля фильтрации с кнопкой - как в EmptyLinesRemovalTool */
-.find-replace-tool .filter-controls {
-    position: relative;
-    width: 385px;
-    min-height: 80px;
-    margin: 0;
-    padding: 0;
-}
-
-.find-replace-tool .filter-paste-button {
-    position: absolute;
-    bottom: 11px;
-    left: 10px;
-    padding: 6px 12px;
-    background: #333335;
-    border: 1px solid #404042;
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    z-index: 1;
-    color: #BCBBBD;
-}
-
-.find-replace-tool .filter-paste-button:hover:not(:disabled) {
-    background: #404042;
-    border-color: #4a4b4d;
-}
-
-.find-replace-tool .filter-paste-button img {
-    width: 12px;
-    height: 12px;
-    filter: brightness(0) saturate(100%) invert(74%) sepia(4%) saturate(257%) hue-rotate(314deg) brightness(95%) contrast(87%);
 }
 
 /* Стили для радио кнопок */
