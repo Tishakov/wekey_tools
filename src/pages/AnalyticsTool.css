@@ -437,3 +437,145 @@
     font-size: 13px;
   }
 }
+
+/* Модальное окно экспорта */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #28282A;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  border: 1px solid #333335;
+}
+
+.modal-content h3 {
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  padding: 16px;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.radio-option:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: #6366f1;
+}
+
+.radio-option input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #555559;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+  border-color: #6366f1;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom:after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6366f1;
+}
+
+.option-details {
+  flex: 1;
+}
+
+.option-details strong {
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.option-details p {
+  color: #8B8B8D;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.analytics-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.analytics-button.export-button {
+  background: #6366f1;
+  color: white;
+}
+
+.analytics-button.export-button:hover {
+  background: #5856eb;
+}
+
+.analytics-button.clear-button {
+  background: #333335;
+  color: #BCBBBD;
+}
+
+.analytics-button.clear-button:hover {
+  background: #444449;
+}

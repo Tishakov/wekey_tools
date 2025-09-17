@@ -95,6 +95,10 @@ const AnalyticsTool: React.FC = () => {
   // Состояние для периода (по умолчанию 30 дней)
   const [period, setPeriod] = useState<number>(30);
   
+  // Состояние для попапа экспорта
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [exportFormat, setExportFormat] = useState<'vertical' | 'horizontal'>('vertical');
+  
   // Состояние для всех метрик
   const [metrics, setMetrics] = useState<Record<string, number | string>>(() => {
     const initialState: Record<string, number | string> = {};
@@ -565,42 +569,80 @@ const AnalyticsTool: React.FC = () => {
   };
 
   // Функция экспорта в Excel
-  const exportToExcel = () => {
+  const exportToExcel = (format: 'vertical' | 'horizontal' = 'vertical') => {
     try {
-      // Собираем данные из всех метрик
-      const exportData = metricsConfig.flatMap((group: Group) => 
-        group.metrics.map((metric: Metric) => {
-          const dayValue = metrics[metric.id];
-          let periodValue;
-          
-          // Рассчитываем значение за период
-          if (metric.isPercentage) {
-            // Для процентов - то же значение
-            periodValue = dayValue;
-          } else if (metric.hasPeriod) {
-            // Для полей с периодом - умножаем на период
-            const numericDay = typeof dayValue === 'string' ? parseFloat(dayValue) || 0 : dayValue;
-            periodValue = Math.round(numericDay * period);
-          } else {
-            // Для обычных полей - то же значение
-            periodValue = dayValue;
-          }
-          
-          // Форматируем значения для отображения
-          const formatValue = (value: number | string, isPercentage: boolean) => {
-            if (typeof value === 'string') {
-              return isPercentage ? `${value} %` : value;
+      let exportData;
+      
+      if (format === 'vertical') {
+        // Вертикальный формат (как сейчас): 3 колонки
+        exportData = metricsConfig.flatMap((group: Group) => 
+          group.metrics.map((metric: Metric) => {
+            const dayValue = metrics[metric.id];
+            let periodValue;
+            
+            // Рассчитываем значение за период
+            if (metric.isPercentage) {
+              // Для процентов - то же значение
+              periodValue = dayValue;
+            } else if (metric.hasPeriod) {
+              // Для полей с периодом - умножаем на период
+              const numericDay = typeof dayValue === 'string' ? parseFloat(dayValue) || 0 : dayValue;
+              periodValue = Math.round(numericDay * period);
+            } else {
+              // Для обычных полей - то же значение
+              periodValue = dayValue;
             }
-            return isPercentage ? `${value} %` : value.toString();
-          };
+            
+            // Форматируем значения для отображения
+            const formatValue = (value: number | string, isPercentage: boolean) => {
+              if (typeof value === 'string') {
+                return isPercentage ? `${value} %` : value;
+              }
+              return isPercentage ? `${value} %` : value.toString();
+            };
 
-          return {
-            'Параметр': metric.name,
-            'Значение за 1 день': formatValue(dayValue, metric.isPercentage),
-            [`Значение за ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}`]: formatValue(periodValue, metric.isPercentage)
-          };
-        })
-      );
+            return {
+              'Параметр': metric.name,
+              'Значение за 1 день': formatValue(dayValue, metric.isPercentage),
+              [`Значение за ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}`]: formatValue(periodValue, metric.isPercentage)
+            };
+          })
+        );
+      } else {
+        // Горизонтальный формат: каждый параметр - отдельная колонка
+        const dayRow: Record<string, any> = { 'Период': 'Значение за 1 день' };
+        const periodRow: Record<string, any> = { 'Период': `Значение за ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}` };
+        
+        metricsConfig.forEach((group: Group) => {
+          group.metrics.forEach((metric: Metric) => {
+            const dayValue = metrics[metric.id];
+            let periodValue;
+            
+            // Рассчитываем значение за период
+            if (metric.isPercentage) {
+              periodValue = dayValue;
+            } else if (metric.hasPeriod) {
+              const numericDay = typeof dayValue === 'string' ? parseFloat(dayValue) || 0 : dayValue;
+              periodValue = Math.round(numericDay * period);
+            } else {
+              periodValue = dayValue;
+            }
+            
+            // Форматируем значения для отображения
+            const formatValue = (value: number | string, isPercentage: boolean) => {
+              if (typeof value === 'string') {
+                return isPercentage ? `${value} %` : value;
+              }
+              return isPercentage ? `${value} %` : value.toString();
+            };
+            
+            dayRow[metric.name] = formatValue(dayValue, metric.isPercentage);
+            periodRow[metric.name] = formatValue(periodValue, metric.isPercentage);
+          });
+        });
+        
+        exportData = [dayRow, periodRow];
+      }
 
       // Создаем книгу Excel
       const workbook = XLSX.utils.book_new();
@@ -660,7 +702,7 @@ const AnalyticsTool: React.FC = () => {
                 <span>Параметр</span>
                 <button 
                   className="header-export-button"
-                  onClick={exportToExcel}
+                  onClick={() => setShowExportModal(true)}
                   title="Скачать все результаты в формате Excel"
                 >
                   <img src="/icons/download.svg" alt="Download" width="11" height="11" />
@@ -795,6 +837,64 @@ const AnalyticsTool: React.FC = () => {
           ))}
         </div>
       </main>
+      
+      {/* Модальное окно выбора формата экспорта */}
+      {showExportModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Выберите формат экспорта</h3>
+            <div className="export-options">
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="exportFormat"
+                  value="vertical"
+                  checked={exportFormat === 'vertical'}
+                  onChange={(e) => setExportFormat(e.target.value as 'vertical' | 'horizontal')}
+                />
+                <span className="radio-custom"></span>
+                <div className="option-details">
+                  <strong>Вертикальный формат</strong>
+                  <p>Параметры в строках, колонки: Параметр | Значение за 1 день | Значение за период</p>
+                </div>
+              </label>
+              
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="exportFormat"
+                  value="horizontal"
+                  checked={exportFormat === 'horizontal'}
+                  onChange={(e) => setExportFormat(e.target.value as 'vertical' | 'horizontal')}
+                />
+                <span className="radio-custom"></span>
+                <div className="option-details">
+                  <strong>Горизонтальный формат</strong>
+                  <p>Параметры в колонках, строки: Значение за 1 день | Значение за период</p>
+                </div>
+              </label>
+            </div>
+            
+            <div className="modal-buttons">
+              <button
+                onClick={() => {
+                  exportToExcel(exportFormat);
+                  setShowExportModal(false);
+                }}
+                className="analytics-button export-button"
+              >
+                Экспортировать
+              </button>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="analytics-button clear-button"
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
