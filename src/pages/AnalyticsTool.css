@@ -288,15 +288,15 @@
 /* Заблокированное состояние для слайдеров */
 .slider-disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  cursor: url('/icons/lock.svg') 12 12, not-allowed;
 }
 
 .slider-disabled::-webkit-slider-thumb {
-  cursor: not-allowed;
+  cursor: url('/icons/lock.svg') 12 12, not-allowed;
 }
 
 .slider-disabled::-moz-range-thumb {
-  cursor: not-allowed;
+  cursor: url('/icons/lock.svg') 12 12, not-allowed;
 }
 
 /* Поля ввода значений */
@@ -368,7 +368,7 @@
   background: #252526;
   border: 1px solid #333335;
   color: #BCBBBD;
-  cursor: not-allowed;
+  cursor: url('/icons/lock.svg') 12 12, not-allowed;
 }
 
 .percentage-symbol {
