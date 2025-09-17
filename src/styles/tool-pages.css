@@ -424,7 +424,7 @@
   color: #BCBBBD;
   font-family: 'Gilroy', sans-serif;
   font-size: 14px;
-  resize: vertical;
+  resize: none;
   outline: none;
   box-sizing: border-box;
   flex: 1;
@@ -436,14 +436,12 @@
   color: #888888;
 }
 
-/* Полностью скрываем стандартный resizer */
-.input-textarea::-webkit-resizer,
-.result-textarea::-webkit-resizer {
+/* Полностью скрываем стандартный resizer только для input-textarea */
+.input-textarea::-webkit-resizer {
   display: none;
 }
 
-/* Создаем свой кастомный resizer */
-.input-section::after,
+/* Создаем свой кастомный resizer только для result-textarea */
 .result-section::after {
   content: '';
   position: absolute;

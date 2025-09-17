@@ -1,0 +1,122 @@
+/* WordGluingTool специфичные стили */
+
+/* Двойной инпут - два поля рядом */
+.double-input {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  height: 100%;
+}
+
+.input-field {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Textarea на всю высоту родителя */
+.word-gluing-tool .input-textarea {
+  flex: 1 !important;
+  height: 100% !important;
+  min-height: auto !important;
+}
+
+/* Кнопки и счетчики внутри textarea - внизу */
+.word-gluing-tool .input-controls {
+  position: absolute !important;
+  bottom: 3px !important;
+  left: 10px !important;
+  right: 10px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  pointer-events: auto !important;
+}
+
+.word-gluing-tool .paste-button {
+  margin-left: 0px;
+  margin-bottom: 7px;
+}
+
+.word-gluing-tool .char-counter {
+  top: 0px;
+}
+
+/* Относительное позиционирование для settings-group с плашкой */
+.word-gluing-tool .settings-group {
+  position: relative;
+  padding: 20px 20px;
+}
+
+/* Стильная плашка заголовка "Соединитель" внутри блока */
+.connector-label {
+  width: 106px;
+  height: 21px;
+  border-radius: 55px;
+  background: #09CEA7;
+  color: #1C1D1F;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Сетка для радио-кнопок - 2 колонки по 4 штуки */
+.connector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+
+/* Специфичные размеры для радио-кнопок в этом инструменте */
+.word-gluing-tool .radio-item {
+  width: 187px;
+  height: 50px;
+}
+
+/* Группа с отдельной радиокнопкой "Другой" и полем справа */
+.custom-connector-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.custom-connector-group .radio-item {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.custom-connector-input {
+  width: 187px;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #333335;
+  background: #1C1D1F;
+  padding: 8px 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Визуально неактивное состояние когда "Другой" не выбран */
+.custom-connector-group .radio-item input[type="radio"]:not(:checked) ~ .custom-connector-input,
+.custom-connector-group:has(input[type="radio"]:not(:checked)) .custom-connector-input {
+  background: #1C1D1F;
+  color: #666666;
+  opacity: 0.7;
+}
+
+.custom-connector-input:focus {
+  outline: none;
+  border-color: #0E7490;
+}
+
+.custom-connector-input::placeholder {
+  color: #666666;
+}

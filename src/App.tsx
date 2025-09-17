@@ -22,6 +22,7 @@ import TextSortingTool from './pages/TextSortingTool';
 import EmptyLinesRemovalTool from './pages/EmptyLinesRemovalTool';
 import EmojiTool from './pages/EmojiTool';
 import AnalyticsTool from './pages/AnalyticsTool';
+import WordGluingTool from './pages/WordGluingTool';
 import './styles/tool-pages.css';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
           <Route path="/remove-empty-lines" element={<EmptyLinesRemovalTool />} />
           <Route path="/emoji" element={<EmojiTool />} />
           <Route path="/cross-analytics" element={<AnalyticsTool />} />
+          <Route path="/word-gluing" element={<WordGluingTool />} />
         </Routes>
       </Layout>
     </Router>
