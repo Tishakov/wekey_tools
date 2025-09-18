@@ -167,12 +167,24 @@ const SynonymGeneratorTool: React.FC = () => {
 
         {/* Правая колонка - результат */}
         <div className="result-section">
-          <textarea
-            className="result-textarea"
-            value={result}
-            placeholder="Здесь будет результат"
-            readOnly
-          />
+          <div className="result-textarea-container">
+            <textarea
+              className="result-textarea"
+              value={result}
+              placeholder="Здесь будет результат"
+              readOnly
+            />
+            {isGenerating && (
+              <div className="ai-loading-overlay">
+                <div className="loading-spinner"></div>
+                <div className="loading-text">
+                  <p>Генерируем синонимы для ваших слов.</p>
+                  <p>Это может занять до 1 минуты.</p>
+                  <p>Пожалуйста, не закрывайте инструмент.</p>
+                </div>
+              </div>
+            )}
+          </div>
           <div className="result-controls">
             <div className="result-counter">
               {getLineCount(result)} стр.

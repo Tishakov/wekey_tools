@@ -584,6 +584,12 @@
   width: 50%;
 }
 
+.synonym-generator-tool .result-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;
+}
+
 .synonym-generator-tool .result-textarea {
   flex: 1;
   height: auto;
@@ -599,4 +605,60 @@
 .synonym-generator-tool .action-btn:disabled:hover {
   background-color: initial;
   border-color: initial;
+}
+
+/* Анимация загрузки для SynonymGeneratorTool */
+.synonym-generator-tool .result-textarea-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.synonym-generator-tool .ai-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(40, 40, 42, 0.95);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+}
+
+.synonym-generator-tool .loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #333335;
+  border-top: 3px solid #09CEA7;
+  border-radius: 50%;
+  animation: synonymSpinner 1s linear infinite;
+}
+
+@keyframes synonymSpinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.synonym-generator-tool .loading-text {
+  text-align: center;
+}
+
+.synonym-generator-tool .loading-text p {
+  color: #BCBBBD;
+  font-family: Gilroy, sans-serif;
+  font-size: 14px;
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.synonym-generator-tool .loading-text p:first-child {
+  font-weight: 600;
 }
