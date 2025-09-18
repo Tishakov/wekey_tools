@@ -971,8 +971,6 @@ const AnalyticsTool: React.FC = () => {
           <div className="table-header">
             <div className="column-header param-header">
               <div className="param-header-content">
-                <span>Параметр</span>
-                
                 {/* Блок управления кратностью */}
                 <div className="scale-controls">
                   <button 
@@ -1012,6 +1010,13 @@ const AnalyticsTool: React.FC = () => {
                   Получить анализ от ИИ
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Второй заголовок таблицы */}
+          <div className="table-header secondary-header">
+            <div className="column-header param-header-secondary">
+              <span>Параметр</span>
             </div>
             <div className="column-header values-header">
               <div className="dual-header">
