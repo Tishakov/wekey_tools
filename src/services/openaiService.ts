@@ -2,7 +2,10 @@ import OpenAI from 'openai';
 
 // Интерфейсы для типизации
 interface AnalyticsData {
-  businessType: 'ecommerce' | 'landing';
+  businessType: 'ecommerce' | 'landing' | 'instagram';
+  landingType: 'ecommerce' | 'landing' | 'instagram';
+  businessModel: 'product' | 'service';
+  trafficSource: 'google-search' | 'google-shopping' | 'meta' | 'tiktok' | 'email';
   niche: string;
   metrics: Record<string, number | string>;
   period: number;
@@ -57,7 +60,7 @@ class OpenAIService {
    * Создает промпт для анализа аналитических данных
    */
   private createAnalysisPrompt(data: AnalyticsData): string {
-    const { businessType, niche, metrics, period, currency } = data;
+    const { landingType, businessModel, trafficSource, niche, metrics, period, currency } = data;
     
     // Определяем валютный символ и контекст страны
     const currencyInfo = {
@@ -67,6 +70,26 @@ class OpenAIService {
     };
     
     const currentCurrency = currencyInfo[currency];
+    
+    // Переводим значения для отображения
+    const landingTypeNames = {
+      'ecommerce': 'Интернет-магазин',
+      'landing': 'Лендинг',
+      'instagram': 'Instagram Direct'
+    };
+    
+    const businessModelNames = {
+      'product': 'Продажа товара',
+      'service': 'Оказание услуг'
+    };
+    
+    const trafficSourceNames = {
+      'google-search': 'Поиск Google ADS',
+      'google-shopping': 'Shopping Google ADS',
+      'meta': 'Meta ADS',
+      'tiktok': 'Tik-Tok ADS',
+      'email': 'Email рассылка'
+    };
     
     // Форматируем метрики для отправки
     const metricsText = Object.entries(metrics)
@@ -117,7 +140,9 @@ class OpenAIService {
 Ты - эксперт по интернет-маркетингу и аналитике с 10+ лет опыта. Проанализируй данные рекламной кампании и дай практические рекомендации.
 
 ДАННЫЕ КАМПАНИИ:
-Тип бизнеса: ${businessType === 'ecommerce' ? 'Интернет-магазин' : 'Лендинг'}
+Точка входа: ${landingTypeNames[landingType]}
+Тип бизнеса: ${businessModelNames[businessModel]}
+Источник трафика: ${trafficSourceNames[trafficSource]}
 Ниша: ${niche}
 Период анализа: ${period} ${period === 1 ? 'день' : period < 5 ? 'дня' : 'дней'}
 Валюта: ${currentCurrency.name} (${currentCurrency.symbol})
@@ -126,23 +151,24 @@ class OpenAIService {
 ПОКАЗАТЕЛИ ЭФФЕКТИВНОСТИ:
 ${metricsText}
 
-ЗАДАЧА: Проведи бизнес-анализ эффективности кампании с учетом специфики ${currentCurrency.market}
+ЗАДАЧА: Проведи бизнес-анализ эффективности кампании с учетом специфики ${currentCurrency.market}, особенностей точки входа "${landingTypeNames[landingType]}", типа бизнеса "${businessModelNames[businessModel]}" и источника трафика "${trafficSourceNames[trafficSource]}"
 
 1. ОЦЕНКА ЭФФЕКТИВНОСТИ
 - Оцени ключевые показатели: CPC, CPL, CPO, ROMI, конверсии
-- Сравни с нормами для ${businessType === 'ecommerce' ? 'интернет-магазинов' : 'лендингов'} в нише "${niche}" на ${currentCurrency.market}
+- Сравни с нормами для ${businessModelNames[businessModel]} через ${landingTypeNames[landingType]} в нише "${niche}" на ${currentCurrency.market}
+- Учти специфику источника трафика "${trafficSourceNames[trafficSource]}" при оценке показателей
 - Определи, какие метрики в норме, а какие критично плохие
 - Оцени общую эффективность от 1 до 10
 
 2. АНАЛИЗ ПРИБЫЛЬНОСТИ
-- Проанализируй структуру затрат и доходов
+- Проанализируй структуру затрат и доходов с учетом особенностей ${trafficSourceNames[trafficSource]}
 - Найди главные проблемы в воронке продаж (фокус на конверсиях, а не на "потерянных клиентах")
 - Определи этап с наибольшим потенциалом для роста прибыли
 - Рассчитай реальную маржинальность бизнеса
 
 3. ПЛАН УЛУЧШЕНИЙ
-- Дай 3-4 конкретные рекомендации с приоритетами
-- Укажи целевые показатели для каждой метрики
+- Дай 3-4 конкретные рекомендации с приоритетами, специфичными для ${trafficSourceNames[trafficSource]} и ${landingTypeNames[landingType]}
+- Укажи целевые показатели для каждой метрики с учетом особенностей канала
 - Рассчитай потенциальный рост прибыли от изменений
 - Учти особенности и тренды ${currentCurrency.market}
 4. ФИНАНСОВЫЙ ПРОГНОЗ

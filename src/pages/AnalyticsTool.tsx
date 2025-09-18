@@ -108,7 +108,6 @@ const AnalyticsTool: React.FC = () => {
   const [isAIModalClosing, setIsAIModalClosing] = useState<boolean>(false);
   
   // Состояние для формы ИИ анализа
-  const [businessType, setBusinessType] = useState<'ecommerce' | 'landing'>('ecommerce');
   const [niche, setNiche] = useState<string>('');
   const [currency, setCurrency] = useState<'uah' | 'usd' | 'rub'>('uah');
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -159,7 +158,10 @@ const AnalyticsTool: React.FC = () => {
     try {
       // Подготавливаем данные для анализа
       const analyticsData: AnalyticsData = {
-        businessType,
+        businessType: landingType, // используем landingType как businessType для совместимости
+        landingType,
+        businessModel,
+        trafficSource,
         niche: niche.trim(),
         metrics,
         period,
@@ -999,9 +1001,9 @@ const AnalyticsTool: React.FC = () => {
                 
                 {/* Дропдауны сегментации */}
                 <div className="segmentation-dropdowns">
-                  {/* Посадка */}
+                  {/* Точка входа */}
                   <div className="dropdown-container">
-                    <label className="dropdown-label">Посадка</label>
+                    <label className="dropdown-label">Точка входа</label>
                     <select 
                       value={landingType} 
                       onChange={(e) => setLandingType(e.target.value as 'ecommerce' | 'landing' | 'instagram')}
@@ -1210,25 +1212,6 @@ const AnalyticsTool: React.FC = () => {
             {/* Левая часть - форма */}
             <div className="ai-modal-left">
               <h3>Анализ от ИИ</h3>
-              
-              {/* Тумблер тип бизнеса */}
-              <div className="business-type-toggle">
-                <label className="toggle-label">Тип бизнеса:</label>
-                <div className="toggle-buttons">
-                  <button 
-                    className={`toggle-btn ${businessType === 'ecommerce' ? 'active' : ''}`}
-                    onClick={() => setBusinessType('ecommerce')}
-                  >
-                    Интернет-магазин
-                  </button>
-                  <button 
-                    className={`toggle-btn ${businessType === 'landing' ? 'active' : ''}`}
-                    onClick={() => setBusinessType('landing')}
-                  >
-                    Лендинг
-                  </button>
-                </div>
-              </div>
               
               {/* Тумблер валюты */}
               <div className="business-type-toggle">
