@@ -30,6 +30,12 @@ interface WordInflectionResponse {
   error?: string;
 }
 
+interface TextGenerationResponse {
+  success: boolean;
+  text?: string;
+  error?: string;
+}
+
 class OpenAIService {
   private client: OpenAI | null = null;
   private isInitialized = false;
@@ -537,6 +543,116 @@ ${metricsText}
   }
 
   /**
+   * Генерирует текст с помощью ChatGPT
+   */
+  public async generateText(
+    language: string,
+    characterCount: number,
+    wordCount: number,
+    paragraphCount: number,
+    countMode: 'characters' | 'words'
+  ): Promise<TextGenerationResponse> {
+    if (!this.isReady()) {
+      return {
+        success: false,
+        error: 'OpenAI сервис не инициализирован. Проверьте API ключ.'
+      };
+    }
+
+    try {
+      const prompt = this.createTextGenerationPrompt(language, characterCount, wordCount, paragraphCount, countMode);
+      console.log('🤖 Generating text with prompt length:', prompt.length);
+
+      const response = await this.client!.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: countMode === 'characters' ? Math.min(Math.ceil(characterCount * 1.5), 4000) : Math.min(Math.ceil(wordCount * 2), 4000),
+        temperature: 0.8
+      });
+
+      const generatedText = response.choices[0]?.message?.content?.trim();
+
+      if (!generatedText) {
+        return {
+          success: false,
+          error: 'Не удалось сгенерировать текст'
+        };
+      }
+
+      console.log('✅ Text generated successfully, length:', generatedText.length);
+
+      return {
+        success: true,
+        text: generatedText
+      };
+
+    } catch (error: any) {
+      console.error('❌ Text generation error:', error);
+      
+      let errorMessage = 'Произошла ошибка при генерации текста';
+      
+      if (error.response?.status === 401) {
+        errorMessage = 'Ошибка авторизации API. Проверьте API ключ OpenAI.';
+      } else if (error.response?.status === 429) {
+        errorMessage = 'Превышен лимит запросов. Попробуйте позже.';
+      } else if (error.message) {
+        errorMessage = `Ошибка: ${error.message}`;
+      }
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+  }
+
+  /**
+   * Создает промпт для генерации текста
+   */
+  private createTextGenerationPrompt(
+    language: string,
+    characterCount: number,
+    wordCount: number,
+    paragraphCount: number,
+    countMode: 'characters' | 'words'
+  ): string {
+    const languageMap: Record<string, string> = {
+      'russian': 'русском',
+      'ukrainian': 'украинском', 
+      'english': 'английском'
+    };
+
+    const targetLanguage = languageMap[language] || 'русском';
+    const targetCount = countMode === 'characters' ? characterCount : wordCount;
+    const countType = countMode === 'characters' ? 'символов' : 'слов';
+
+    return `
+Сгенерируй связный и осмысленный текст на ${targetLanguage} языке.
+
+Требования:
+- Примерно ${targetCount} ${countType}
+- ${paragraphCount} абзац${paragraphCount === 1 ? '' : paragraphCount < 5 ? 'а' : 'ев'}
+- БЕЗ заголовков, списков, маркированных списков
+- БЕЗ длинных тире (—), используй только обычные дефисы (-)
+- БЕЗ специального форматирования
+- Простой, сухой информационный стиль
+- Связный текст без разрывов
+- Каждый абзац с новой строки (двойной перенос)
+
+Тематика: бизнес, технологии, маркетинг, или общие информационные темы.
+
+Стиль: нейтральный, информационный, без эмоциональности.
+
+Начни генерацию текста сразу, без введений и комментариев.
+`.trim();
+  }
+
+  /**
    * Тестовый метод для проверки подключения
    */
   public async testConnection(): Promise<boolean> {
@@ -566,4 +682,4 @@ ${metricsText}
 
 // Экспортируем единственный экземпляр сервиса
 export const openaiService = new OpenAIService();
-export type { AnalyticsData, AIAnalysisResponse, SynonymResponse, WordInflectionResponse };
+export type { AnalyticsData, AIAnalysisResponse, SynonymResponse, WordInflectionResponse, TextGenerationResponse };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { openaiService, type TextGenerationResponse } from '../services/openaiService';
 import '../styles/tool-pages.css';
 import './TextGeneratorTool.css';
 
@@ -15,6 +16,10 @@ const TextGeneratorTool: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [launchCount, setLaunchCount] = useState(0);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  
+  // Состояния для работы с AI
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   // Опции языков
   const languageOptions = {
@@ -34,6 +39,7 @@ const TextGeneratorTool: React.FC = () => {
   useEffect(() => {
     setResult('');
     setCopied(false);
+    setAiError('');
   }, [language, countMode, characterCount, wordCount, paragraphCount]);
 
   // Закрытие dropdown при клике вне его области
@@ -52,106 +58,6 @@ const TextGeneratorTool: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [languageDropdownOpen]);
-
-  // Словари для генерации осмысленного текста
-  const textDictionaries = {
-    english: {
-      words: [
-        'business', 'development', 'marketing', 'strategy', 'innovation', 'technology', 'solution', 'product',
-        'service', 'customer', 'client', 'market', 'growth', 'success', 'team', 'company', 'organization',
-        'project', 'management', 'leadership', 'experience', 'quality', 'professional', 'industry', 'modern',
-        'digital', 'online', 'platform', 'system', 'process', 'analysis', 'research', 'data', 'information',
-        'network', 'communication', 'collaboration', 'partnership', 'opportunity', 'challenge', 'goal',
-        'objective', 'result', 'performance', 'efficiency', 'effectiveness', 'improvement', 'optimization',
-        'enterprise', 'corporation', 'startup', 'entrepreneur', 'venture', 'investment', 'capital', 'finance',
-        'revenue', 'profit', 'budget', 'resource', 'asset', 'value', 'brand', 'reputation', 'trust',
-        'competition', 'competitive', 'advantage', 'marketplace', 'consumer', 'audience', 'segment', 'niche',
-        'trend', 'insight', 'intelligence', 'analytics', 'metrics', 'KPI', 'ROI', 'conversion', 'funnel',
-        'engagement', 'acquisition', 'retention', 'loyalty', 'satisfaction', 'feedback', 'survey', 'review',
-        'content', 'creative', 'design', 'visual', 'branding', 'identity', 'message', 'campaign', 'promotion',
-        'channel', 'media', 'social', 'influencer', 'viral', 'organic', 'paid', 'advertising', 'publicity',
-        'automation', 'workflow', 'integration', 'API', 'cloud', 'software', 'application', 'mobile', 'web',
-        'responsive', 'user', 'interface', 'UX', 'journey', 'touchpoint', 'interaction', 'usability', 'accessibility',
-        'sustainable', 'environmental', 'social', 'responsibility', 'ethics', 'compliance', 'governance', 'risk',
-        'security', 'privacy', 'protection', 'encryption', 'backup', 'recovery', 'continuity', 'resilience',
-        'scalable', 'flexible', 'agile', 'lean', 'iterative', 'prototype', 'testing', 'validation', 'launch'
-      ],
-      sentences: [
-        'The modern business landscape requires innovative approaches to customer engagement.',
-        'Digital transformation has become a critical factor for organizational success.',
-        'Effective marketing strategies drive sustainable growth and market expansion.',
-        'Technology solutions enable companies to streamline their operational processes.',
-        'Professional teams collaborate to deliver high-quality products and services.',
-        'Data analysis provides valuable insights for informed decision-making.',
-        'Strategic partnerships create new opportunities for business development.',
-        'Customer experience remains the cornerstone of competitive advantage.'
-      ]
-    },
-    russian: {
-      words: [
-        'бизнес', 'развитие', 'маркетинг', 'стратегия', 'инновации', 'технологии', 'решение', 'продукт',
-        'услуга', 'клиент', 'заказчик', 'рынок', 'рост', 'успех', 'команда', 'компания', 'организация',
-        'проект', 'управление', 'лидерство', 'опыт', 'качество', 'профессионал', 'индустрия', 'современный',
-        'цифровой', 'онлайн', 'платформа', 'система', 'процесс', 'анализ', 'исследование', 'данные',
-        'информация', 'сеть', 'коммуникация', 'сотрудничество', 'партнерство', 'возможность', 'вызов',
-        'цель', 'задача', 'результат', 'производительность', 'эффективность', 'улучшение', 'оптимизация',
-        'предприятие', 'корпорация', 'стартап', 'предприниматель', 'инвестиции', 'капитал', 'финансы',
-        'доход', 'прибыль', 'бюджет', 'ресурс', 'актив', 'ценность', 'бренд', 'репутация', 'доверие',
-        'конкуренция', 'конкурентный', 'преимущество', 'рыночный', 'потребитель', 'аудитория', 'сегмент',
-        'тренд', 'инсайт', 'аналитика', 'метрики', 'показатели', 'конверсия', 'воронка', 'лиды',
-        'вовлечение', 'привлечение', 'удержание', 'лояльность', 'удовлетворенность', 'отзывы', 'обратная связь',
-        'контент', 'креатив', 'дизайн', 'визуал', 'брендинг', 'идентичность', 'сообщение', 'кампания',
-        'канал', 'медиа', 'социальный', 'инфлюенсер', 'вирусный', 'органический', 'реклама', 'продвижение',
-        'автоматизация', 'процесс', 'интеграция', 'облако', 'программа', 'приложение', 'мобильный', 'веб',
-        'адаптивный', 'пользователь', 'интерфейс', 'опыт', 'путешествие', 'взаимодействие', 'юзабилити',
-        'устойчивый', 'экологический', 'социальный', 'ответственность', 'этика', 'соответствие', 'риск',
-        'безопасность', 'конфиденциальность', 'защита', 'шифрование', 'резервный', 'восстановление',
-        'масштабируемый', 'гибкий', 'методология', 'итеративный', 'прототип', 'тестирование', 'валидация'
-      ],
-      sentences: [
-        'Современный бизнес требует инновационных подходов к взаимодействию с клиентами.',
-        'Цифровая трансформация стала критическим фактором успеха организаций.',
-        'Эффективные маркетинговые стратегии обеспечивают устойчивый рост и расширение рынка.',
-        'Технологические решения позволяют компаниям оптимизировать операционные процессы.',
-        'Профессиональные команды сотрудничают для создания качественных продуктов и услуг.',
-        'Анализ данных предоставляет ценные инсайты для принятия обоснованных решений.',
-        'Стратегические партнерства создают новые возможности для развития бизнеса.',
-        'Клиентский опыт остается основой конкурентного преимущества.'
-      ]
-    },
-    ukrainian: {
-      words: [
-        'бізнес', 'розвиток', 'маркетинг', 'стратегія', 'інновації', 'технології', 'рішення', 'продукт',
-        'послуга', 'клієнт', 'замовник', 'ринок', 'зростання', 'успіх', 'команда', 'компанія', 'організація',
-        'проект', 'управління', 'лідерство', 'досвід', 'якість', 'професіонал', 'індустрія', 'сучасний',
-        'цифровий', 'онлайн', 'платформа', 'система', 'процес', 'аналіз', 'дослідження', 'дані',
-        'інформація', 'мережа', 'комунікація', 'співпраця', 'партнерство', 'можливість', 'виклик',
-        'мета', 'завдання', 'результат', 'продуктивність', 'ефективність', 'покращення', 'оптимізація',
-        'підприємство', 'корпорація', 'стартап', 'підприємець', 'інвестиції', 'капітал', 'фінанси',
-        'дохід', 'прибуток', 'бюджет', 'ресурс', 'актив', 'цінність', 'бренд', 'репутація', 'довіра',
-        'конкуренція', 'конкурентний', 'перевага', 'ринковий', 'споживач', 'аудиторія', 'сегмент',
-        'тренд', 'інсайт', 'аналітика', 'метрики', 'показники', 'конверсія', 'воронка', 'ліди',
-        'залучення', 'утримання', 'лояльність', 'задоволеність', 'відгуки', 'зворотний зв\'язок',
-        'контент', 'креатив', 'дизайн', 'візуал', 'брендинг', 'ідентичність', 'повідомлення', 'кампанія',
-        'канал', 'медіа', 'соціальний', 'інфлюенсер', 'вірусний', 'органічний', 'реклама', 'просування',
-        'автоматизація', 'процедура', 'інтеграція', 'хмара', 'програма', 'додаток', 'мобільний', 'веб',
-        'адаптивний', 'користувач', 'інтерфейс', 'досвід', 'подорож', 'взаємодія', 'юзабіліті',
-        'стійкий', 'екологічний', 'соціальний', 'відповідальність', 'етика', 'відповідність', 'ризик',
-        'безпека', 'конфіденційність', 'захист', 'шифрування', 'резервний', 'відновлення',
-        'масштабований', 'гнучкий', 'методологія', 'ітеративний', 'прототип', 'тестування', 'валідація'
-      ],
-      sentences: [
-        'Сучасний бізнес потребує інноваційних підходів до взаємодії з клієнтами.',
-        'Цифрова трансформація стала критичним фактором успіху організацій.',
-        'Ефективні маркетингові стратегії забезпечують стійке зростання та розширення ринку.',
-        'Технологічні рішення дозволяють компаніям оптимізувати операційні процеси.',
-        'Професійні команди співпрацюють для створення якісних продуктів та послуг.',
-        'Аналіз даних надає цінні інсайти для прийняття обґрунтованих рішень.',
-        'Стратегічні партнерства створюють нові можливості для розвитку бізнесу.',
-        'Клієнтський досвід залишається основою конкурентної переваги.'
-      ]
-    }
-  };
 
   // Генерация Lorem Ipsum
   const generateLoremIpsum = (length: number, mode: string): string => {
@@ -186,45 +92,6 @@ const TextGeneratorTool: React.FC = () => {
     }
   };
 
-  // Генерация осмысленного текста
-  const generateMeaningfulText = (lang: string, length: number, mode: string): string => {
-    const dict = textDictionaries[lang as keyof typeof textDictionaries];
-    if (!dict) return '';
-
-    if (mode === 'words') {
-      const words = [];
-      for (let i = 0; i < length; i++) {
-        words.push(dict.words[Math.floor(Math.random() * dict.words.length)]);
-      }
-      return words.join(' ');
-    } else {
-      // По символам - комбинируем предложения и слова
-      let text = '';
-      const useSentences = Math.random() > 0.5;
-      
-      if (useSentences && dict.sentences) {
-        while (text.length < length) {
-          const sentence = dict.sentences[Math.floor(Math.random() * dict.sentences.length)];
-          if (text.length + sentence.length + 1 <= length) {
-            text += (text ? ' ' : '') + sentence;
-          } else {
-            break;
-          }
-        }
-      } else {
-        while (text.length < length) {
-          const word = dict.words[Math.floor(Math.random() * dict.words.length)];
-          if (text.length + word.length + 1 <= length) {
-            text += (text ? ' ' : '') + word;
-          } else {
-            break;
-          }
-        }
-      }
-      return text;
-    }
-  };
-
   // Разбивка на абзацы
   const splitIntoParagraphs = (text: string, paragraphs: number): string => {
     if (paragraphs <= 1) {
@@ -251,24 +118,51 @@ const TextGeneratorTool: React.FC = () => {
     return result.join('\n\n');
   };
 
-  // Основная функция генерации
-  const handleGenerateText = () => {
-    let generatedText = '';
-    const currentLength = countMode === 'characters' ? characterCount : wordCount;
+  // Основная функция генерации с AI
+  const handleGenerateText = async () => {
+    setAiError('');
+    setIsGenerating(true);
     
-    if (language === 'lorem') {
-      generatedText = generateLoremIpsum(currentLength, countMode);
-    } else {
-      generatedText = generateMeaningfulText(language, currentLength, countMode);
+    try {
+      console.log('🤖 Generating text with AI...');
+      console.log('Parameters:', { language, countMode, characterCount, wordCount, paragraphCount });
+      
+      // Для Lorem Ipsum используем старую логику
+      if (language === 'lorem') {
+        let generatedText = '';
+        const currentLength = countMode === 'characters' ? characterCount : wordCount;
+        generatedText = generateLoremIpsum(currentLength, countMode);
+        const finalText = splitIntoParagraphs(generatedText, paragraphCount);
+        setResult(finalText);
+      } else {
+        // Для других языков используем AI
+        const response: TextGenerationResponse = await openaiService.generateText(
+          language,
+          characterCount,
+          wordCount,
+          paragraphCount,
+          countMode as 'characters' | 'words'
+        );
+        
+        if (response.success && response.text) {
+          setResult(response.text);
+          console.log('✅ AI text generated successfully');
+        } else {
+          setAiError(response.error || 'Не удалось сгенерировать текст');
+          console.error('❌ AI generation failed:', response.error);
+        }
+      }
+      
+    } catch (error) {
+      console.error('💥 Error during text generation:', error);
+      setAiError('Произошла ошибка при генерации текста');
+    } finally {
+      setIsGenerating(false);
+      
+      // Обновляем статистику
+      statsService.incrementLaunchCount('text-generator');
+      setLaunchCount(prev => prev + 1);
     }
-    
-    // Разбиваем на абзацы
-    const finalText = splitIntoParagraphs(generatedText, paragraphCount);
-    setResult(finalText);
-    
-    // Обновляем статистику
-    statsService.incrementLaunchCount('text-generator');
-    setLaunchCount(prev => prev + 1);
   };
 
   // Копирование результата
@@ -420,12 +314,24 @@ const TextGeneratorTool: React.FC = () => {
 
         {/* Правая колонка с полем результата */}
         <div className="result-section">
-          <textarea
-            className="result-textarea"
-            value={result}
-            readOnly
-            placeholder="Здесь будет результат"
-          />
+          <div className="result-textarea-container">
+            <textarea
+              className="result-textarea"
+              value={result}
+              readOnly
+              placeholder="Здесь будет результат"
+            />
+            {isGenerating && (
+              <div className="ai-loading-overlay">
+                <div className="loading-spinner"></div>
+                <div className="loading-text">
+                  <p>Генерируем текст с помощью ИИ.</p>
+                  <p>Это может занять до 1 минуты.</p>
+                  <p>Пожалуйста, не закрывайте инструмент.</p>
+                </div>
+              </div>
+            )}
+          </div>
           <div className="result-controls">
             <span className="result-counter">{countLines(result)} стр.</span>
           </div>
@@ -434,12 +340,29 @@ const TextGeneratorTool: React.FC = () => {
 
       {/* Кнопки управления */}
       <div className="control-buttons">
+        {/* Отображение ошибки AI */}
+        {aiError && (
+          <div style={{
+            color: '#d73a49',
+            fontSize: '14px',
+            marginBottom: '12px',
+            padding: '8px',
+            backgroundColor: '#ffeaea',
+            borderRadius: '4px',
+            border: '1px solid #f0b4b4',
+            width: '445px'
+          }}>
+            {aiError}
+          </div>
+        )}
+        
         <button 
           className="action-btn primary" 
           style={{ width: '445px' }} 
           onClick={handleGenerateText}
+          disabled={isGenerating}
         >
-          Показать результат
+          {isGenerating ? 'Генерируем текст...' : 'Показать результат'}
         </button>
         <button 
           className="action-btn secondary icon-left" 
