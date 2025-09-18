@@ -46,7 +46,7 @@ const TextGeneratorTool: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (languageDropdownOpen) {
-        const dropdown = document.querySelector('.language-selector');
+        const dropdown = document.querySelector('.text-generator-language-selector');
         if (dropdown && !dropdown.contains(event.target as Node)) {
           setLanguageDropdownOpen(false);
         }
@@ -213,7 +213,7 @@ const TextGeneratorTool: React.FC = () => {
         <div className="settings-section">
           {/* Первая группа - выбор языка */}
           <div className="settings-group">
-            <div className="language-selector">
+            <div className="text-generator-language-selector">
               <label className="language-label">Язык текста:</label>
               <div className="dropdown-container">
                 <button 
