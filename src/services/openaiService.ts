@@ -562,6 +562,18 @@ ${metricsText}
     try {
       const prompt = this.createTextGenerationPrompt(language, characterCount, wordCount, paragraphCount, countMode);
       console.log('🤖 Generating text with prompt length:', prompt.length);
+      console.log('📝 Full prompt for text generation:');
+      console.log('==================================================');
+      console.log(prompt);
+      console.log('==================================================');
+      console.log('🔧 Generation parameters:', {
+        language,
+        characterCount,
+        wordCount,
+        paragraphCount,
+        countMode,
+        maxTokens: countMode === 'characters' ? Math.min(Math.ceil(characterCount * 1.5), 4000) : Math.min(Math.ceil(wordCount * 2), 4000)
+      });
 
       const response = await this.client!.chat.completions.create({
         model: 'gpt-4o',
@@ -576,6 +588,10 @@ ${metricsText}
       });
 
       const generatedText = response.choices[0]?.message?.content?.trim();
+
+      console.log('📤 API Response received:');
+      console.log('💬 Generated text length:', generatedText?.length || 0);
+      console.log('📄 Generated text preview (first 200 chars):', generatedText?.substring(0, 200) + (generatedText && generatedText.length > 200 ? '...' : ''));
 
       if (!generatedText) {
         return {
