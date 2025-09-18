@@ -1190,12 +1190,14 @@ const AnalyticsTool: React.FC = () => {
                   >
                     Доллары
                   </button>
+                  {/* Временно скрыта кнопка "Рубли"
                   <button 
                     className={`toggle-btn ${currency === 'rub' ? 'active' : ''}`}
                     onClick={() => setCurrency('rub')}
                   >
                     Рубли
                   </button>
+                  */}
                 </div>
               </div>
               
