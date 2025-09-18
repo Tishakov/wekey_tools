@@ -230,11 +230,30 @@
   transform: translateY(0);
 }
 
+/* Один плавный shimmer раз в 10 секунд */
+@keyframes ai-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  20% {
+    background-position: 0% 0; /* плавный проход */
+  }
+  100% {
+    background-position: 0% 0; /* пауза */
+  }
+}
+
 .header-ai-button {
   width: 195px;
   height: 28px;
   border-radius: 55px;
-  background: #1C1D1F;
+  background: linear-gradient(
+    90deg,
+    #1C1D1F 40%,
+    #8B5CF6 50%,
+    #1C1D1F 60%
+  );
+  background-size: 300% 100%;
   color: #BCBBBD;
   border: none;
   padding: 8px 12px;
@@ -248,6 +267,9 @@
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
+
+  /* один проход за 2с + 8с пауза = 10с */
+  animation: ai-shimmer 10s ease-in-out infinite;
 }
 
 .header-ai-button:hover {
