@@ -115,6 +115,11 @@ const AnalyticsTool: React.FC = () => {
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiError, setAiError] = useState<string>('');
   
+  // Состояние для дропдаунов сегментации
+  const [landingType, setLandingType] = useState<'ecommerce' | 'landing' | 'instagram'>('ecommerce');
+  const [businessModel, setBusinessModel] = useState<'product' | 'service'>('product');
+  const [trafficSource, setTrafficSource] = useState<'google-search' | 'google-shopping' | 'meta' | 'tiktok' | 'email'>('google-search');
+  
   // Функция плавного закрытия модального окна
   const closeModal = () => {
     setIsModalClosing(true);
@@ -992,13 +997,59 @@ const AnalyticsTool: React.FC = () => {
                   </button>
                 </div>
                 
+                {/* Дропдауны сегментации */}
+                <div className="segmentation-dropdowns">
+                  {/* Посадка */}
+                  <div className="dropdown-container">
+                    <label className="dropdown-label">Посадка</label>
+                    <select 
+                      value={landingType} 
+                      onChange={(e) => setLandingType(e.target.value as 'ecommerce' | 'landing' | 'instagram')}
+                      className="dropdown-select"
+                    >
+                      <option value="ecommerce">Интернет-магазин</option>
+                      <option value="landing">Лендинг</option>
+                      <option value="instagram">Instagram Direct</option>
+                    </select>
+                  </div>
+                  
+                  {/* Тип бизнеса */}
+                  <div className="dropdown-container">
+                    <label className="dropdown-label">Тип бизнеса</label>
+                    <select 
+                      value={businessModel} 
+                      onChange={(e) => setBusinessModel(e.target.value as 'product' | 'service')}
+                      className="dropdown-select"
+                    >
+                      <option value="product">Продажа товара</option>
+                      <option value="service">Оказание услуг</option>
+                    </select>
+                  </div>
+                  
+                  {/* Источник трафика */}
+                  <div className="dropdown-container">
+                    <label className="dropdown-label">Источник трафика</label>
+                    <select 
+                      value={trafficSource} 
+                      onChange={(e) => setTrafficSource(e.target.value as 'google-search' | 'google-shopping' | 'meta' | 'tiktok' | 'email')}
+                      className="dropdown-select"
+                    >
+                      <option value="google-search">Поиск Google ADS</option>
+                      <option value="google-shopping">Shopping Google ADS</option>
+                      <option value="meta">Meta ADS</option>
+                      <option value="tiktok">Tik-Tok ADS</option>
+                      <option value="email">Email рассылка</option>
+                    </select>
+                  </div>
+                </div>
+                
                 <button 
                   className="header-export-button"
                   onClick={() => setShowExportModal(true)}
                   title="Скачать все результаты в формате Excel"
                 >
                   <img src="/icons/download.svg" alt="Download" width="11" height="11" />
-                  Скачать результат
+                  Скачать
                 </button>
                 
                 <button 
