@@ -277,12 +277,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 15px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 
 .count-slider {
-  width: 270px;
+  width: 100%;
   height: 6px;
   border-radius: 10px;
   border: 1px solid #333335;
@@ -291,7 +291,8 @@
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
-  padding: 0 15px;
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
 }
 
@@ -333,6 +334,37 @@
   justify-content: center;
 }
 
+/* Поле ввода значения слайдера */
+.slider-value-input {
+  background-color: #1C1D1F;
+  border: none;
+  border-left: 1px solid #333335;
+  padding: 5px 10px;
+  flex: 1;
+  text-align: center;
+  color: #BCBBBD;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 0 8px 8px 0;
+  height: 48px;
+  box-sizing: border-box;
+  outline: none;
+  width: 75px;
+  min-width: 75px;
+  max-width: 75px;
+}
+
+.slider-value-input::-webkit-outer-spin-button,
+.slider-value-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.slider-value-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Кнопки управления для генератора */
 .text-generator-tool .control-buttons {
   display: flex;
@@ -353,10 +385,30 @@
   color: #BCBBBD;
   font-size: 15px;
   outline: none;
-  resize: none;
+  resize: vertical;
   box-sizing: border-box;
   font-family: 'Gilroy', sans-serif;
-  min-height: 280px;
+  min-height: 365px;
+}
+
+/* Стилизация resize handle для result-textarea */
+.text-generator-tool .main-workspace .result-textarea::-webkit-resizer {
+  background-color: #28282A;
+  border-radius: 2px;
+  border: none;
+  background-image: 
+    linear-gradient(45deg, transparent 6px, #555 6px, #555 8px, transparent 8px),
+    linear-gradient(45deg, transparent 2px, #555 2px, #555 4px, transparent 4px);
+  background-size: 8px 8px;
+  background-position: bottom right;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.text-generator-tool .main-workspace .result-textarea:hover::-webkit-resizer {
+  opacity: 1;
+  background-color: #333335;
 }
 
 .text-generator-tool .main-workspace .result-textarea::placeholder {

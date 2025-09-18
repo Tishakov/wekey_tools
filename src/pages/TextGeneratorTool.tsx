@@ -9,8 +9,8 @@ const TextGeneratorTool: React.FC = () => {
   // Основные состояния
   const [language, setLanguage] = useState('english');
   const [countMode, setCountMode] = useState('characters'); // 'characters' или 'words'
-  const [characterCount, setCharacterCount] = useState(100);
-  const [wordCount, setWordCount] = useState(50);
+  const [characterCount, setCharacterCount] = useState(800);
+  const [wordCount, setWordCount] = useState(100);
   const [paragraphCount, setParagraphCount] = useState(3);
   const [result, setResult] = useState('');
   const [copied, setCopied] = useState(false);
@@ -29,6 +29,40 @@ const TextGeneratorTool: React.FC = () => {
     lorem: 'Lorem Ipsum'
   };
 
+  // Расчет максимального количества абзацев на основе контента
+  const getMaxParagraphs = () => {
+    const currentCount = countMode === 'characters' ? characterCount : wordCount;
+    
+    if (countMode === 'characters') {
+      // Для символов: минимум 40 символов на абзац
+      const minPerParagraph = 40;
+      return Math.max(1, Math.floor(currentCount / minPerParagraph));
+    } else {
+      // Для слов: более строгие требования
+      if (currentCount >= 250) {
+        return 10; // 250+ слов = максимум 10 абзацев
+      } else {
+        // Пропорциональное уменьшение от 250 слов
+        // 250 слов = 10 абзацев, 125 слов = 5-6 абзацев, 50 слов = 2-3 абзаца
+        const minWordsPerParagraph = 20; // Минимум 20 слов на абзац
+        return Math.max(1, Math.floor(currentCount / minWordsPerParagraph));
+      }
+    }
+  };
+
+  // Обработка переключения режима подсчета с сбросом к дефолтным значениям
+  const handleCountModeChange = (newMode: 'characters' | 'words') => {
+    setCountMode(newMode);
+    
+    // Сбрасываем к дефолтным значениям при переключении
+    if (newMode === 'characters') {
+      setCharacterCount(800);
+    } else {
+      setWordCount(100);
+    }
+    setParagraphCount(3);
+  };
+
   // Загрузка статистики
   useEffect(() => {
     const count = statsService.getLaunchCount('text-generator');
@@ -40,6 +74,28 @@ const TextGeneratorTool: React.FC = () => {
     setResult('');
     setCopied(false);
     setAiError('');
+    
+    // Обновляем поля ввода при смене значений
+    setTimeout(() => {
+      // Поле символов/слов
+      const inputField = document.querySelector('.slider-value-input') as HTMLInputElement;
+      if (inputField) {
+        inputField.value = (countMode === 'characters' ? characterCount : wordCount).toString();
+      }
+
+      // Поле абзацев
+      const paragraphInputs = document.querySelectorAll('.slider-value-input');
+      const paragraphInput = paragraphInputs[1] as HTMLInputElement; // Второе поле - абзацы
+      if (paragraphInput) {
+        paragraphInput.value = paragraphCount.toString();
+      }
+    }, 0);
+
+    // Автоматически корректируем количество абзацев если оно превышает логический максимум
+    const maxParagraphs = Math.min(getMaxParagraphs(), 10);
+    if (paragraphCount > maxParagraphs) {
+      setParagraphCount(maxParagraphs);
+    }
   }, [language, countMode, characterCount, wordCount, paragraphCount]);
 
   // Закрытие dropdown при клике вне его области
@@ -255,7 +311,7 @@ const TextGeneratorTool: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={countMode === 'words'}
-                      onChange={(e) => setCountMode(e.target.checked ? 'words' : 'characters')}
+                      onChange={(e) => handleCountModeChange(e.target.checked ? 'words' : 'characters')}
                     />
                     <span className="toggle-slider"></span>
                   </label>
@@ -267,14 +323,14 @@ const TextGeneratorTool: React.FC = () => {
             {/* Слайдер количества символов/слов */}
             <div className="count-slider-container">
               <label className="slider-label">
-                Количество {countMode === 'characters' ? 'символов' : 'слов'}:
+                Приблизительное количество {countMode === 'characters' ? 'символов' : 'слов'}:
               </label>
               <div className="slider-group">
                 <div className="slider-container">
                   <input
                     type="range"
-                    min={countMode === 'characters' ? 50 : 10}
-                    max={countMode === 'characters' ? 2000 : 500}
+                    min={countMode === 'characters' ? 10 : 3}
+                    max={countMode === 'characters' ? 5000 : 500}
                     value={countMode === 'characters' ? characterCount : wordCount}
                     onChange={(e) => {
                       if (countMode === 'characters') {
@@ -286,9 +342,33 @@ const TextGeneratorTool: React.FC = () => {
                     className="count-slider"
                   />
                 </div>
-                <div className="slider-value">
-                  {countMode === 'characters' ? characterCount : wordCount}
-                </div>
+                <input
+                  type="number"
+                  min={countMode === 'characters' ? 10 : 3}
+                  max={countMode === 'characters' ? 5000 : 500}
+                  defaultValue={countMode === 'characters' ? characterCount : wordCount}
+                  onBlur={(e) => {
+                    const value = parseInt(e.target.value) || 0;
+                    const min = countMode === 'characters' ? 10 : 3;
+                    const max = countMode === 'characters' ? 5000 : 500;
+                    const clampedValue = Math.min(Math.max(value, min), max);
+                    
+                    // Обновляем поле с правильным значением
+                    e.target.value = clampedValue.toString();
+                    
+                    if (countMode === 'characters') {
+                      setCharacterCount(clampedValue);
+                    } else {
+                      setWordCount(clampedValue);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.currentTarget.blur(); // Срабатывает onBlur
+                    }
+                  }}
+                  className="slider-value-input"
+                />
               </div>
             </div>
 
@@ -300,13 +380,33 @@ const TextGeneratorTool: React.FC = () => {
                   <input
                     type="range"
                     min="1"
-                    max="10"
+                    max={Math.min(getMaxParagraphs(), 10)}
                     value={paragraphCount}
                     onChange={(e) => setParagraphCount(parseInt(e.target.value))}
                     className="count-slider"
                   />
                 </div>
-                <div className="slider-value">{paragraphCount}</div>
+                <input
+                  type="number"
+                  min="1"
+                  max={Math.min(getMaxParagraphs(), 10)}
+                  defaultValue={paragraphCount}
+                  onBlur={(e) => {
+                    const value = parseInt(e.target.value) || 1;
+                    const max = Math.min(getMaxParagraphs(), 10);
+                    const clampedValue = Math.min(Math.max(value, 1), max);
+                    
+                    // Обновляем поле с правильным значением
+                    e.target.value = clampedValue.toString();
+                    setParagraphCount(clampedValue);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.currentTarget.blur(); // Срабатывает onBlur
+                    }
+                  }}
+                  className="slider-value-input"
+                />
               </div>
             </div>
           </div>

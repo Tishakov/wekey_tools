@@ -600,11 +600,34 @@ ${metricsText}
         };
       }
 
-      console.log('✅ Text generated successfully, length:', generatedText.length);
+      // Обрезаем текст до нужной длины если он превышает лимит
+      let finalText = generatedText;
+      if (countMode === 'characters') {
+        if (generatedText.length > characterCount) {
+          finalText = this.trimTextToLength(generatedText, characterCount, paragraphCount);
+          console.log('✂️ Text trimmed from', generatedText.length, 'to', finalText.length, 'characters');
+        } else if (generatedText.length < characterCount * 0.8) {
+          // Если текста слишком мало (меньше 80% от нужного), запрашиваем дополнение
+          console.log('📝 Text too short, requesting extension...');
+          finalText = await this.extendText(generatedText, characterCount, paragraphCount, language, 'characters');
+        }
+      } else if (countMode === 'words') {
+        const actualWordCount = generatedText.split(/\s+/).length;
+        if (actualWordCount > wordCount) {
+          finalText = this.trimTextToWords(generatedText, wordCount, paragraphCount);
+          console.log('✂️ Text trimmed to', wordCount, 'words');
+        } else if (actualWordCount < wordCount * 0.8) {
+          // Если слов слишком мало (меньше 80% от нужного), запрашиваем дополнение
+          console.log('📝 Text too short, requesting extension...');
+          finalText = await this.extendText(generatedText, wordCount, paragraphCount, language, 'words');
+        }
+      }
+
+      console.log('✅ Final text length:', finalText.length);
 
       return {
         success: true,
-        text: generatedText
+        text: this.normalizeText(finalText)
       };
 
     } catch (error: any) {
@@ -628,6 +651,178 @@ ${metricsText}
   }
 
   /**
+   * Нормализует текст: исправляет пунктуацию, переносы строк и заглавные буквы
+   */
+  private normalizeText(text: string): string {
+    let normalized = text;
+
+    // 1. Нормализуем пробелы внутри строк, но сохраняем структуру абзацев
+    normalized = normalized.replace(/[ \t]+/g, ' '); // Заменяем множественные пробелы на одиночные
+    
+    // 2. Нормализуем разделители абзацев - заменяем любые варианты на двойной перенос
+    normalized = normalized.replace(/\n\s*\n+/g, '\n\n');
+    
+    // 3. Разбиваем на абзацы
+    const paragraphs = normalized.split('\n\n').filter(p => p.trim());
+    
+    // 4. Обрабатываем каждый абзац отдельно
+    const processedParagraphs = paragraphs.map(paragraph => {
+      let cleaned = paragraph.trim();
+      
+      // Убираем одиночные переносы строк внутри абзаца (склеиваем строки)
+      cleaned = cleaned.replace(/\n+/g, ' ');
+      
+      // Убираем лишние пробелы
+      cleaned = cleaned.replace(/\s+/g, ' ');
+      
+      // Исправляем заглавную букву в начале абзаца
+      if (cleaned.length > 0) {
+        cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+      }
+      
+      // Добавляем точку в конце абзаца, если её нет и абзац не пустой
+      if (cleaned.length > 0 && !/[.!?]$/.test(cleaned)) {
+        cleaned += '.';
+      }
+      
+      return cleaned;
+    }).filter(p => p.length > 0); // Убираем пустые абзацы
+    
+    // 5. Соединяем абзацы обратно
+    return processedParagraphs.join('\n\n');
+  }
+
+  /**
+   * Дополняет короткий текст до нужной длины
+   */
+  private async extendText(
+    originalText: string, 
+    targetCount: number, 
+    targetParagraphs: number, 
+    language: string, 
+    countMode: 'characters' | 'words'
+  ): Promise<string> {
+    try {
+      const currentLength = countMode === 'characters' ? originalText.length : originalText.split(/\s+/).length;
+      const needed = targetCount - currentLength;
+      
+      const extendPrompt = `
+Продолжи этот текст на ${language === 'english' ? 'английском' : language === 'russian' ? 'русском' : 'украинском'} языке.
+
+ИСХОДНЫЙ ТЕКСТ:
+${originalText}
+
+ЗАДАЧА:
+- Добавь еще примерно ${needed} ${countMode === 'characters' ? 'символов' : 'слов'}
+- Продолжи в том же стиле и тематике
+- БЕЗ повторений уже написанного
+- Логично дополни существующие абзацы или добавь новые
+- Сохрани структуру с двойными переносами между абзацами
+
+Продолжи текст:
+`.trim();
+
+      const response = await this.client!.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: extendPrompt }],
+        max_tokens: Math.min(Math.ceil(needed * 2), 1000),
+        temperature: 0.7
+      });
+
+      const extension = response.choices[0]?.message?.content?.trim();
+      if (extension) {
+        const combinedText = originalText + '\n\n' + extension;
+        console.log('📝 Text extended from', currentLength, 'to', countMode === 'characters' ? combinedText.length : combinedText.split(/\s+/).length);
+        
+        // Обрезаем до точной длины если получилось слишком много
+        if (countMode === 'characters' && combinedText.length > targetCount) {
+          return this.trimTextToLength(combinedText, targetCount, targetParagraphs);
+        } else if (countMode === 'words') {
+          const wordCount = combinedText.split(/\s+/).length;
+          if (wordCount > targetCount) {
+            return this.trimTextToWords(combinedText, targetCount, targetParagraphs);
+          }
+        }
+        
+        return combinedText;
+      }
+    } catch (error) {
+      console.error('❌ Error extending text:', error);
+    }
+    
+    // Если дополнение не удалось, возвращаем исходный текст
+    return originalText;
+  }
+
+  /**
+   * Обрезает текст до нужного количества символов с сохранением структуры абзацев
+   */
+  private trimTextToLength(text: string, maxLength: number, targetParagraphs: number): string {
+    const paragraphs = text.split('\n\n');
+    const charsPerParagraph = Math.floor(maxLength / targetParagraphs);
+    
+    const trimmedParagraphs: string[] = [];
+    let remainingChars = maxLength;
+    
+    for (let i = 0; i < Math.min(paragraphs.length, targetParagraphs); i++) {
+      let paragraph = paragraphs[i].trim();
+      
+      if (remainingChars <= 0) break;
+      
+      if (paragraph.length > charsPerParagraph && remainingChars > charsPerParagraph) {
+        // Обрезаем по последнему полному слову
+        paragraph = paragraph.substring(0, charsPerParagraph);
+        const lastSpaceIndex = paragraph.lastIndexOf(' ');
+        if (lastSpaceIndex > 0) {
+          paragraph = paragraph.substring(0, lastSpaceIndex);
+        }
+      } else if (paragraph.length > remainingChars) {
+        // Обрезаем до оставшихся символов
+        paragraph = paragraph.substring(0, remainingChars);
+        const lastSpaceIndex = paragraph.lastIndexOf(' ');
+        if (lastSpaceIndex > 0) {
+          paragraph = paragraph.substring(0, lastSpaceIndex);
+        }
+      }
+      
+      if (paragraph.length > 0) {
+        trimmedParagraphs.push(paragraph);
+        remainingChars -= paragraph.length + 2; // +2 для \n\n
+      }
+    }
+    
+    return trimmedParagraphs.join('\n\n');
+  }
+
+  /**
+   * Обрезает текст до нужного количества слов с сохранением структуры абзацев
+   */
+  private trimTextToWords(text: string, maxWords: number, targetParagraphs: number): string {
+    const paragraphs = text.split('\n\n');
+    const wordsPerParagraph = Math.floor(maxWords / targetParagraphs);
+    
+    const trimmedParagraphs: string[] = [];
+    let remainingWords = maxWords;
+    
+    for (let i = 0; i < Math.min(paragraphs.length, targetParagraphs); i++) {
+      const paragraph = paragraphs[i].trim();
+      const words = paragraph.split(/\s+/);
+      
+      if (remainingWords <= 0) break;
+      
+      const wordsToTake = Math.min(words.length, Math.min(wordsPerParagraph, remainingWords));
+      const trimmedParagraph = words.slice(0, wordsToTake).join(' ');
+      
+      if (trimmedParagraph.length > 0) {
+        trimmedParagraphs.push(trimmedParagraph);
+        remainingWords -= wordsToTake;
+      }
+    }
+    
+    return trimmedParagraphs.join('\n\n');
+  }
+
+  /**
    * Создает промпт для генерации текста
    */
   private createTextGenerationPrompt(
@@ -648,24 +843,23 @@ ${metricsText}
     const countType = countMode === 'characters' ? 'символов' : 'слов';
 
     return `
-Сгенерируй связный и осмысленный текст на ${targetLanguage} языке.
+Сгенерируй текст на ${targetLanguage} языке примерно ${Math.round(targetCount * 1.2)} ${countType}.
 
-Требования:
-- Примерно ${targetCount} ${countType}
+ТРЕБОВАНИЯ:
+- Примерно ${Math.round(targetCount * 1.2)} ${countType} (можно немного больше)
 - ${paragraphCount} абзац${paragraphCount === 1 ? '' : paragraphCount < 5 ? 'а' : 'ев'}
-- ВАЖНО: все абзацы должны быть примерно одинакового размера (±10-15%)
-- БЕЗ заголовков, списков, маркированных списков
-- БЕЗ длинных тире (—), используй только обычные дефисы (-)
-- БЕЗ специального форматирования
-- Простой, сухой информационный стиль
-- Связный текст без разрывов
-- Каждый абзац с новой строки (двойной перенос)
+- Каждый абзац: примерно ${Math.round((targetCount * 1.2) / paragraphCount)} ${countType}
 
-Тематика: бизнес, технологии, маркетинг, или общие информационные темы.
+СТИЛЬ:
+- Информативный, деловой стиль
+- Связный осмысленный текст
+- БЕЗ заголовков, списков, специального форматирования
+- БЕЗ длинных тире, используй дефисы
+- Двойной перенос между абзацами
 
-Стиль: нейтральный, информационный, без эмоциональности.
+Тема: бизнес, технологии, маркетинг.
 
-Начни генерацию текста сразу, без введений и комментариев.
+Генерируй текст:
 `.trim();
   }
 
