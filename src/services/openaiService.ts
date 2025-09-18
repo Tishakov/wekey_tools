@@ -18,6 +18,12 @@ interface AIAnalysisResponse {
   error?: string;
 }
 
+interface SynonymResponse {
+  success: boolean;
+  synonyms?: string[];
+  error?: string;
+}
+
 class OpenAIService {
   private client: OpenAI | null = null;
   private isInitialized = false;
@@ -276,6 +282,113 @@ ${metricsText}
   }
 
   /**
+   * Генерация синонимов для слов и фраз
+   */
+  public async generateSynonyms(inputText: string, language: string = 'russian'): Promise<SynonymResponse> {
+    console.log('🔤 Starting synonym generation...');
+    
+    if (!this.isReady()) {
+      console.error('❌ OpenAI service not initialized');
+      return {
+        success: false,
+        error: 'Сервис OpenAI не инициализирован. Проверьте настройки API ключа.'
+      };
+    }
+
+    if (!inputText.trim()) {
+      return {
+        success: false,
+        error: 'Введите текст для генерации синонимов'
+      };
+    }
+
+    try {
+      console.log('📝 Input text for synonyms:', inputText.slice(0, 100) + '...');
+      
+      const prompt = this.createSynonymPrompt(inputText.trim(), language);
+      console.log('🤖 ChatGPT Prompt:', prompt);
+      
+      const response = await this.client!.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      });
+
+      const content = response.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Пустой ответ от ИИ');
+      }
+
+      console.log('✅ Raw AI response:', content.slice(0, 200) + '...');
+      
+      // Парсим ответ - ожидаем список синонимов, каждый с новой строки
+      const synonyms = content
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(line => line.replace(/^[-•\d\.]\s*/, '')) // Убираем маркеры списков
+        .filter(synonym => synonym.length > 0);
+
+      console.log('📝 Parsed synonyms:', synonyms.slice(0, 10), `(${synonyms.length} total)`);
+
+      return {
+        success: true,
+        synonyms: synonyms
+      };
+
+    } catch (error: any) {
+      console.error('💥 Error generating synonyms:', error);
+      
+      return {
+        success: false,
+        error: `Ошибка при генерации синонимов: ${error.message || 'Неизвестная ошибка'}`
+      };
+    }
+  }
+
+  /**
+   * Создает промпт для генерации синонимов
+   */
+  private createSynonymPrompt(inputText: string, language: string = 'russian'): string {
+    const languageNames = {
+      'russian': 'русском',
+      'ukrainian': 'украинском', 
+      'english': 'английском'
+    };
+    
+    const targetLanguage = languageNames[language as keyof typeof languageNames] || 'русском';
+    
+    return `
+Ты - эксперт по лингвистике и семантике слов. Твоя задача - сгенерировать качественные синонимы для данного текста ИСКЛЮЧИТЕЛЬНО на ${targetLanguage} языке.
+
+ВХОДНОЙ ТЕКСТ: "${inputText}"
+
+ПРАВИЛА:
+1. Если это отдельные слова - дай 5-10 синонимов для каждого слова
+2. Если это фразы или предложения - дай 3-7 альтернативных вариантов формулировки
+3. ВСЕ синонимы должны быть СТРОГО на ${targetLanguage} языке
+4. Синонимы должны быть точными по смыслу и стилистически подходящими
+5. Избегай редких архаизмов, используй современные слова
+6. Для маркетинговых и деловых терминов предлагай профессиональные альтернативы
+
+ФОРМАТ ОТВЕТА:
+- Каждый синоним с новой строки
+- БЕЗ нумерации, маркеров или дополнительных символов
+- Только готовые к использованию варианты
+- НЕ объясняй и НЕ комментируй
+
+Теперь сгенерируй синонимы для: "${inputText}"
+`.trim();
+  }
+
+  /**
    * Тестовый метод для проверки подключения
    */
   public async testConnection(): Promise<boolean> {
@@ -305,4 +418,4 @@ ${metricsText}
 
 // Экспортируем единственный экземпляр сервиса
 export const openaiService = new OpenAIService();
-export type { AnalyticsData, AIAnalysisResponse };
+export type { AnalyticsData, AIAnalysisResponse, SynonymResponse };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { openaiService, type SynonymResponse } from '../services/openaiService';
 
 const SynonymGeneratorTool: React.FC = () => {
   const navigate = useNavigate();
@@ -8,210 +9,69 @@ const SynonymGeneratorTool: React.FC = () => {
   const [result, setResult] = useState('');
   const [copied, setCopied] = useState(false);
   const [launchCount, setLaunchCount] = useState(0);
+  
+  // Состояния для работы с AI API
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState('russian');
 
   // Загружаем статистику при инициализации
   useEffect(() => {
     setLaunchCount(statsService.getLaunchCount('synonym-generator'));
   }, []);
 
-  // Словари синонимов для разных языков
-  const synonymDictionaries = {
-    russian: {
-      'машина': ['автомобиль', 'тачка', 'транспорт', 'авто', 'средство передвижения'],
-      'дом': ['жилище', 'здание', 'строение', 'обитель', 'кров'],
-      'квартира': ['апартаменты', 'жилплощадь', 'жилье', 'помещение', 'резиденция'],
-      'работа': ['труд', 'деятельность', 'занятие', 'профессия', 'служба'],
-      'человек': ['личность', 'индивид', 'особа', 'субъект', 'персона'],
-      'красивый': ['прекрасный', 'привлекательный', 'изящный', 'великолепный', 'восхитительный'],
-      'большой': ['огромный', 'крупный', 'масштабный', 'значительный', 'гигантский'],
-      'маленький': ['небольшой', 'крошечный', 'миниатюрный', 'компактный', 'малый'],
-      'хороший': ['отличный', 'превосходный', 'замечательный', 'прекрасный', 'качественный'],
-      'плохой': ['ужасный', 'негативный', 'скверный', 'неприятный', 'отвратительный'],
-      'быстрый': ['скорый', 'стремительный', 'молниеносный', 'оперативный', 'резвый'],
-      'умный': ['интеллектуальный', 'сообразительный', 'смышленый', 'мудрый', 'разумный'],
-      'глупый': ['неразумный', 'бестолковый', 'недалекий', 'тупой', 'несообразительный'],
-      'старый': ['древний', 'пожилой', 'давний', 'прежний', 'ветхий'],
-      'новый': ['свежий', 'современный', 'недавний', 'последний', 'актуальный'],
-      'богатый': ['состоятельный', 'зажиточный', 'обеспеченный', 'роскошный', 'денежный'],
-      'бедный': ['неимущий', 'нищий', 'малоимущий', 'нуждающийся', 'обездоленный'],
-      'еда': ['пища', 'питание', 'продукты', 'блюдо', 'провиант'],
-      'вода': ['жидкость', 'влага', 'H2O', 'питье', 'жидкость'],
-      'книга': ['том', 'издание', 'произведение', 'публикация', 'фолиант'],
-      'деньги': ['средства', 'капитал', 'финансы', 'наличность', 'валюта'],
-      'друг': ['товарищ', 'приятель', 'компаньон', 'напарник', 'коллега'],
-      'враг': ['противник', 'неприятель', 'соперник', 'оппонент', 'антагонист'],
-      'город': ['населенный пункт', 'мегаполис', 'поселение', 'урбанизация', 'центр'],
-      'село': ['деревня', 'поселок', 'хутор', 'станица', 'аул'],
-      'школа': ['учебное заведение', 'образовательное учреждение', 'институт', 'академия'],
-      'учитель': ['педагог', 'преподаватель', 'наставник', 'воспитатель', 'ментор'],
-      'студент': ['учащийся', 'курсант', 'слушатель', 'ученик', 'обучающийся'],
-      'любовь': ['чувство', 'привязанность', 'страсть', 'симпатия', 'влечение'],
-      'ненависть': ['презрение', 'отвращение', 'злоба', 'неприязнь', 'вражда'],
-      'счастье': ['радость', 'блаженство', 'удовольствие', 'эйфория', 'восторг'],
-      'грусть': ['печаль', 'тоска', 'уныние', 'меланхолия', 'скорбь'],
-      'музыка': ['мелодия', 'композиция', 'произведение', 'звучание', 'гармония'],
-      'картина': ['полотно', 'живопись', 'изображение', 'холст', 'шедевр'],
-      'телефон': ['мобильный', 'смартфон', 'аппарат', 'трубка', 'гаджет'],
-      'компьютер': ['ПК', 'машина', 'устройство', 'система', 'техника']
-    },
-    ukrainian: {
-      'машина': ['автомобіль', 'авто', 'транспорт', 'засіб пересування'],
-      'дім': ['житло', 'будинок', 'оселя', 'будівля'],
-      'квартира': ['апартаменти', 'житло', 'помешкання', 'резиденція'],
-      'робота': ['праця', 'діяльність', 'заняття', 'професія'],
-      'людина': ['особа', 'індивід', 'персона', 'суб\'єкт'],
-      'красивий': ['прекрасний', 'гарний', 'привабливий', 'чудовий'],
-      'великий': ['величезний', 'масштабний', 'значний', 'гігантський'],
-      'маленький': ['невеликий', 'крихітний', 'мініатюрний', 'малий'],
-      'хороший': ['відмінний', 'прекрасний', 'чудовий', 'якісний'],
-      'поганий': ['жахливий', 'негативний', 'неприємний', 'огидний'],
-      'швидкий': ['скорий', 'стрімкий', 'оперативний', 'прудкий'],
-      'розумний': ['інтелектуальний', 'кмітливий', 'мудрий', 'тямущий'],
-      'дурний': ['нерозумний', 'безтямний', 'недалекий', 'тупий'],
-      'старий': ['давній', 'літній', 'древній', 'колишній'],
-      'новий': ['свіжий', 'сучасний', 'недавній', 'останній'],
-      'багатий': ['заможний', 'забезпечений', 'грошовитий', 'розкішний'],
-      'бідний': ['незаможний', 'малозабезпечений', 'нужденний', 'убогий'],
-      'їжа': ['харчування', 'продукти', 'страва', 'поживлення'],
-      'вода': ['рідина', 'вологість', 'питво', 'H2O'],
-      'книга': ['том', 'видання', 'твір', 'публікація'],
-      'гроші': ['кошти', 'капітал', 'фінанси', 'готівка', 'валюта'],
-      'друг': ['товариш', 'приятель', 'компаньйон', 'напарник'],
-      'ворог': ['противник', 'неприятель', 'суперник', 'опонент'],
-      'місто': ['населений пункт', 'мегаполіс', 'поселення', 'центр'],
-      'село': ['деревня', 'селище', 'хутір', 'станиця'],
-      'школа': ['навчальний заклад', 'освітня установа', 'інститут'],
-      'вчитель': ['педагог', 'викладач', 'наставник', 'вихователь'],
-      'студент': ['учень', 'слухач', 'курсант', 'той, хто навчається'],
-      'любов': ['почуття', 'прихильність', 'пристрасть', 'симпатія'],
-      'ненависть': ['презирство', 'огида', 'злоба', 'неприязнь'],
-      'щастя': ['радість', 'блаженство', 'задоволення', 'ейфорія'],
-      'сум': ['печаль', 'туга', 'меланхолія', 'скорбота'],
-      'музика': ['мелодія', 'композиція', 'твір', 'звучання'],
-      'картина': ['полотно', 'живопис', 'зображення', 'холст'],
-      'телефон': ['мобільний', 'смартфон', 'апарат', 'трубка'],
-      'комп\'ютер': ['ПК', 'машина', 'пристрій', 'система', 'техніка']
-    },
-    english: {
-      'dog': ['hound', 'canine', 'pooch', 'pup', 'mutt'],
-      'cat': ['feline', 'kitty', 'kitten', 'tabby', 'tomcat'],
-      'house': ['home', 'dwelling', 'residence', 'abode', 'domicile'],
-      'apartment': ['flat', 'unit', 'condo', 'suite', 'residence'],
-      'car': ['automobile', 'vehicle', 'auto', 'motor', 'ride'],
-      'beautiful': ['gorgeous', 'stunning', 'attractive', 'lovely', 'magnificent'],
-      'big': ['large', 'huge', 'enormous', 'massive', 'gigantic'],
-      'small': ['tiny', 'little', 'miniature', 'compact', 'petite'],
-      'good': ['excellent', 'great', 'wonderful', 'fantastic', 'superb'],
-      'bad': ['terrible', 'awful', 'horrible', 'dreadful', 'atrocious'],
-      'fast': ['quick', 'rapid', 'swift', 'speedy', 'hasty'],
-      'smart': ['intelligent', 'clever', 'brilliant', 'wise', 'sharp'],
-      'stupid': ['dumb', 'foolish', 'idiotic', 'senseless', 'mindless'],
-      'old': ['ancient', 'elderly', 'aged', 'vintage', 'antique'],
-      'new': ['fresh', 'modern', 'recent', 'latest', 'contemporary'],
-      'rich': ['wealthy', 'affluent', 'prosperous', 'well-off', 'loaded'],
-      'poor': ['impoverished', 'needy', 'broke', 'destitute', 'penniless'],
-      'happy': ['joyful', 'cheerful', 'delighted', 'pleased', 'content'],
-      'sad': ['unhappy', 'sorrowful', 'melancholy', 'depressed', 'gloomy'],
-      'food': ['meal', 'cuisine', 'nourishment', 'sustenance', 'provisions'],
-      'water': ['liquid', 'fluid', 'H2O', 'beverage', 'drink'],
-      'book': ['volume', 'publication', 'tome', 'novel', 'manuscript'],
-      'money': ['cash', 'currency', 'funds', 'capital', 'wealth'],
-      'friend': ['buddy', 'companion', 'pal', 'mate', 'colleague'],
-      'enemy': ['foe', 'opponent', 'rival', 'adversary', 'antagonist'],
-      'city': ['town', 'metropolis', 'municipality', 'urban area', 'settlement'],
-      'village': ['hamlet', 'settlement', 'community', 'township', 'locality'],
-      'school': ['institution', 'academy', 'college', 'university', 'educational facility'],
-      'teacher': ['educator', 'instructor', 'professor', 'tutor', 'mentor'],
-      'student': ['pupil', 'learner', 'scholar', 'apprentice', 'disciple'],
-      'love': ['affection', 'devotion', 'passion', 'romance', 'attachment'],
-      'hate': ['loathe', 'despise', 'detest', 'abhor', 'dislike'],
-      'music': ['melody', 'harmony', 'composition', 'tune', 'sound'],
-      'picture': ['image', 'painting', 'photograph', 'illustration', 'artwork'],
-      'phone': ['mobile', 'smartphone', 'device', 'handset', 'gadget'],
-      'computer': ['PC', 'machine', 'device', 'system', 'technology']
-    }
-  };
-
-  // Определение языка слова
-  const detectLanguage = (word: string): 'russian' | 'ukrainian' | 'english' => {
-    // Проверяем наличие кириллических символов
-    const cyrillic = /[а-яё]/i.test(word);
-    const latin = /[a-z]/i.test(word);
-    
-    if (cyrillic) {
-      // Украинские специфические буквы
-      const ukrainianChars = /[іїєґ]/i.test(word);
-      return ukrainianChars ? 'ukrainian' : 'russian';
-    } else if (latin) {
-      return 'english';
-    }
-    
-    // По умолчанию русский для неопределенных случаев
-    return 'russian';
-  };
-
-  // Поиск синонимов для слова
-  const findSynonyms = (word: string): string[] => {
-    const cleanWord = word.toLowerCase().trim();
-    const language = detectLanguage(cleanWord);
-    const dictionary = synonymDictionaries[language] as Record<string, string[]>;
-    
-    return dictionary[cleanWord] || [];
-  };
-
-  // Обработка текста и генерация синонимов
-  const generateSynonyms = () => {
+  // Обработка текста и генерация синонимов через ChatGPT
+  const generateSynonyms = async () => {
     if (!inputText.trim()) {
       setResult('');
       return;
     }
 
-    // Разбиваем текст на слова (по пробелам и переносам строк)
-    const words = inputText
-      .split(/[\s\n]+/)
-      .filter(word => word.trim().length > 0)
-      .map(word => word.replace(/[.,!?;:]/g, '')); // Убираем знаки препинания
-
-    const results: string[] = [];
-
-    words.forEach(word => {
-      const synonyms = findSynonyms(word);
-      if (synonyms.length > 0) {
-        // Добавляем каждый синоним как отдельную строку
-        results.push(...synonyms);
+    setAiError('');
+    setIsGenerating(true);
+    
+    try {
+      console.log('🤖 Generating synonyms with AI for:', inputText);
+      console.log('🌐 Selected language:', selectedLanguage);
+      
+      const response: SynonymResponse = await openaiService.generateSynonyms(inputText, selectedLanguage);
+      
+      if (response.success && response.synonyms) {
+        setResult(response.synonyms.join('\n'));
+        console.log('✅ AI synonyms generated:', response.synonyms.length, 'items');
       } else {
-        // Если синонимов нет, добавляем исходное слово
-        results.push(word);
+        setAiError(response.error || 'Не удалось сгенерировать синонимы');
+        console.error('❌ AI generation failed:', response.error);
       }
-    });
-
-    setResult(results.join('\n'));
+      
+    } catch (error) {
+      console.error('💥 Error during synonym generation:', error);
+      setAiError('Произошла ошибка при генерации синонимов');
+    } finally {
+      setIsGenerating(false);
+    }
     
     // Обновляем статистику
     statsService.incrementLaunchCount('synonym-generator');
     setLaunchCount(prev => prev + 1);
   };
 
-  // Копирование результата
-  const handleCopy = async () => {
+  // Обработка копирования
+  const handleCopy = () => {
     if (result) {
-      try {
-        await navigator.clipboard.writeText(result);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        console.error('Не удалось скопировать текст:', err);
-      }
+      navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  // Вставка из буфера обмена
+  // Обработка нажатия Ctrl+V
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
       setInputText(text);
     } catch (err) {
-      console.error('Не удалось вставить текст:', err);
+      console.error('Failed to read clipboard contents: ', err);
     }
   };
 
@@ -222,44 +82,81 @@ const SynonymGeneratorTool: React.FC = () => {
 
   return (
     <div className="synonym-generator-tool">
+      {/* Header-остров инструмента */}
       <div className="tool-header-island">
         <button 
           className="back-button"
           onClick={() => navigate('/')}
         >
-          <img src="/icons/arrow_left.svg" alt="←" />
+          <img src="/icons/arrow_left.svg" alt="" />
           Все инструменты
         </button>
         <h1 className="tool-title">Генератор синонимов</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn">
-            <img src="/icons/rocket.svg" alt="🚀" />
+            <img src="/icons/rocket.svg" alt="" />
             <span className="counter">{launchCount}</span>
           </button>
           <button className="tool-header-btn icon-only">
-            <img src="/icons/lamp.svg" alt="💡" />
+            <img src="/icons/lamp.svg" alt="" />
           </button>
           <button className="tool-header-btn icon-only">
-            <img src="/icons/camera.svg" alt="📷" />
+            <img src="/icons/camera.svg" alt="" />
           </button>
         </div>
       </div>
 
+      {/* Основная рабочая область */}
       <div className="main-workspace">
         {/* Левая колонка - ввод текста */}
         <div className="input-section">
+          {/* Select языка в правом верхнем углу textarea */}
+          <select 
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              padding: '4px 8px',
+              borderRadius: '8px',
+              border: '1px solid #555',
+              fontSize: '14px',
+              backgroundColor: '#333335',
+              color: '#BCBBBD',
+              outline: 'none',
+              zIndex: 10,
+              fontFamily: 'Gilroy, sans-serif',
+              paddingRight: '24px',
+              height: '35px',
+              width: '110px',
+              backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23BCBBBD' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+              backgroundPosition: 'right 5px center',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '16px',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none'
+            }}
+          >
+            <option value="russian">Русский</option>
+            <option value="ukrainian">Українська</option>
+            <option value="english">English</option>
+          </select>
+          
           <textarea
             className="input-textarea"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Введите ваш текст..."
+            placeholder="Введите слова или фразы..."
+            style={{ position: 'relative' }}
           />
           <div className="input-controls">
             <button 
               className="paste-button"
               onClick={handlePaste}
             >
-              <img src="/icons/button_paste.svg" alt="📋" />
+              <img src="/icons/button_paste.svg" alt="" />
               Вставить
             </button>
             <div className="char-counter">
@@ -286,13 +183,29 @@ const SynonymGeneratorTool: React.FC = () => {
 
       {/* Кнопки управления */}
       <div className="control-buttons">
+        {/* Отображение ошибки AI */}
+        {aiError && (
+          <div style={{
+            color: '#d73a49',
+            fontSize: '14px',
+            marginBottom: '12px',
+            padding: '8px',
+            backgroundColor: '#ffeaea',
+            borderRadius: '4px',
+            border: '1px solid #f0b4b4',
+            width: '445px'
+          }}>
+            {aiError}
+          </div>
+        )}
+        
         <button 
           className="action-btn primary" 
           style={{ width: '445px' }} 
           onClick={generateSynonyms}
-          disabled={!inputText.trim()}
+          disabled={!inputText.trim() || isGenerating}
         >
-          Показать результат
+          {isGenerating ? 'Генерация синонимов...' : 'Показать результат'}
         </button>
         
         <button 
