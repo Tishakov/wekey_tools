@@ -99,14 +99,14 @@
 }
 
 .header-export-button {
-  width: 143px;
+  width: 155px;
   height: 28px;
   border-radius: 55px;
   background: #1C1D1F;
   color: #BCBBBD;
   border: none;
   padding: 8px 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -123,6 +123,35 @@
 }
 
 .header-export-button:active {
+  background: rgba(30, 30, 32, 0.3);
+  transform: translateY(0);
+}
+
+.header-ai-button {
+  width: 195px;
+  height: 28px;
+  border-radius: 55px;
+  background: #1C1D1F;
+  color: #BCBBBD;
+  border: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Gilroy', sans-serif;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.header-ai-button:hover {
+  color: #09CEA7;
+}
+
+.header-ai-button:active {
   background: rgba(30, 30, 32, 0.3);
   transform: translateY(0);
 }
@@ -493,6 +522,300 @@
   }
 }
 
+/* Модальное окно ИИ анализа */
+.ai-modal-content {
+  width: 900px;
+  height: 500px;
+  border-radius: 10px;
+  border: 1px solid #333335;
+  background: #28282A;
+  display: flex;
+  cursor: default;
+  opacity: 0;
+  animation: slideIn 0.3s ease-out forwards;
+  position: relative;
+}
+
+.ai-modal-content.closing {
+  animation: slideOut 0.3s ease-out forwards;
+}
+
+.ai-modal-left {
+  width: 380px;
+  padding: 30px;
+  border-right: 1px solid #333335;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ai-modal-right {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ai-modal-content h3,
+.ai-modal-content h4 {
+  color: #BCBBBD;
+  font-family: Gilroy;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ai-modal-content h4 {
+  font-size: 16px;
+}
+
+/* Тумблер типа бизнеса */
+.business-type-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toggle-label,
+.input-label {
+  color: #BCBBBD;
+  font-family: Gilroy;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.toggle-buttons {
+  display: flex;
+  background: #1C1D1F;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.toggle-btn {
+  flex: 1;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #BCBBBD;
+  font-family: Gilroy;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: #09CEA7;
+  color: #1C1D1F;
+}
+
+.toggle-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Поле ниши */
+.niche-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.niche-field {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #333335;
+  background: #1C1D1F;
+  color: #BCBBBD;
+  font-family: Gilroy;
+  font-size: 14px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.niche-field:focus {
+  outline: none;
+  border-color: #09CEA7;
+  box-shadow: 0 0 0 3px rgba(9, 206, 167, 0.1);
+}
+
+.niche-field::placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+/* Кнопка анализа */
+.ai-analyze-button {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  background: #09CEA7;
+  color: #1C1D1F;
+  border: none;
+  font-family: Gilroy;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.ai-analyze-button:hover:not(:disabled) {
+  background: #08B894;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(9, 206, 167, 0.3);
+}
+
+.ai-analyze-button:active:not(:disabled) {
+  background: #07A085;
+  transform: translateY(0);
+}
+
+.ai-analyze-button:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Область результата */
+.ai-response {
+  flex: 1;
+  border-radius: 8px;
+  border: 1px solid #333335;
+  background: #1C1D1F;
+  padding: 20px;
+  overflow-y: auto;
+  min-height: 300px;
+}
+
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #333335;
+  border-top: 3px solid #09CEA7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ai-loading p {
+  color: #BCBBBD;
+  font-family: Gilroy;
+  font-size: 14px;
+  margin: 0;
+}
+
+.loading-text {
+  text-align: center;
+}
+
+.loading-text p {
+  margin: 4px 0;
+}
+
+.loading-text p:first-child {
+  font-weight: 600;
+}
+
+.ai-error {
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.ai-error p {
+  color: #FCA5A5;
+  font-family: Gilroy;
+  font-size: 14px;
+  margin: 0;
+}
+
+.ai-result {
+  height: 100%;
+}
+
+.ai-text {
+  color: #BCBBBD;
+  font-family: Gilroy;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ai-text p {
+  margin: 0 0 16px 0;
+}
+
+.ai-text p:last-child {
+  margin-bottom: 0;
+}
+
+.ai-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 20px;
+}
+
+.ai-placeholder p {
+  color: #666;
+  font-family: Gilroy;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Кнопка закрытия */
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #333335;
+  color: #BCBBBD;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.close-modal-btn:hover {
+  background: #09CEA7;
+  color: #1C1D1F;
+}
+
 /* Модальное окно экспорта */
 .modal-overlay {
   position: fixed;
@@ -703,4 +1026,74 @@
   width: 90px;
   background: #333335;
   color: #BCBBBD;
+}
+
+/* AI Modal Currency Toggle */
+.ai-modal-currency-toggle {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 15px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.currency-option {
+  background: #2a2a2a;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.currency-option:hover {
+  background: #3a3a3a;
+}
+
+.currency-option.active {
+  background: #09cea7;
+  color: #28282a;
+}
+
+/* AI Result Header and Copy Button */
+.ai-result-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.copy-response-btn {
+  background: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 20px;
+}
+
+.copy-response-btn:hover {
+  background: #3a3a3a;
+  border-color: #666;
+}
+
+.copy-response-btn:active {
+  transform: translateY(1px);
+}
+
+.copy-response-btn.copied {
+  background: #2d4a22;
+  border-color: #4a7c59;
+  color: #90ee90;
 }

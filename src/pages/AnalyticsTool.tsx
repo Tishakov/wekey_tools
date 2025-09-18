@@ -5,6 +5,7 @@ import ColumnIcon from '../assets/icons/column.svg?react';
 import StringIcon from '../assets/icons/string.svg?react';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
+import { openaiService, type AnalyticsData } from '../services/openaiService';
 
 // Типы данных
 interface Metric {
@@ -102,6 +103,18 @@ const AnalyticsTool: React.FC = () => {
   const [exportFormat, setExportFormat] = useState<'vertical' | 'horizontal'>('vertical');
   const [isModalClosing, setIsModalClosing] = useState<boolean>(false);
   
+  // Состояние для попапа ИИ анализа
+  const [showAIModal, setShowAIModal] = useState<boolean>(false);
+  const [isAIModalClosing, setIsAIModalClosing] = useState<boolean>(false);
+  
+  // Состояние для формы ИИ анализа
+  const [businessType, setBusinessType] = useState<'ecommerce' | 'landing'>('ecommerce');
+  const [niche, setNiche] = useState<string>('');
+  const [currency, setCurrency] = useState<'uah' | 'usd' | 'rub'>('uah');
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [aiResponse, setAiResponse] = useState<string>('');
+  const [aiError, setAiError] = useState<string>('');
+  
   // Функция плавного закрытия модального окна
   const closeModal = () => {
     setIsModalClosing(true);
@@ -109,6 +122,78 @@ const AnalyticsTool: React.FC = () => {
       setShowExportModal(false);
       setIsModalClosing(false);
     }, 300); // Совпадает с длительностью анимации
+  };
+  
+  // Функция плавного закрытия ИИ модального окна
+  const closeAIModal = () => {
+    setIsAIModalClosing(true);
+    setTimeout(() => {
+      setShowAIModal(false);
+      setIsAIModalClosing(false);
+      // Сброс состояния формы
+      setNiche('');
+      setAiResponse('');
+      setAiError('');
+      setIsAnalyzing(false);
+    }, 300);
+  };
+  
+  // Функция получения анализа от ИИ
+  const handleAIAnalysis = async () => {
+    console.log('🎯 Starting AI analysis...');
+    
+    if (!niche.trim()) {
+      setAiError('Пожалуйста, укажите нишу бизнеса');
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    setAiError('');
+    setAiResponse('');
+    
+    try {
+      // Подготавливаем данные для анализа
+      const analyticsData: AnalyticsData = {
+        businessType,
+        niche: niche.trim(),
+        metrics,
+        period,
+        currency
+      };
+      
+      console.log('📊 Analytics data prepared:', analyticsData);
+      
+      // Получаем анализ от ИИ
+      const result = await openaiService.getAnalysis(analyticsData);
+      
+      console.log('📈 Analysis result:', result);
+      
+      if (result.success && result.analysis) {
+        setAiResponse(result.analysis);
+        console.log('✅ Analysis set to state');
+      } else {
+        console.error('❌ Analysis failed:', result.error);
+        setAiError(result.error || 'Не удалось получить анализ');
+      }
+    } catch (error) {
+      console.error('💥 Error during AI analysis:', error);
+      setAiError('Произошла ошибка при анализе данных');
+    } finally {
+      setIsAnalyzing(false);
+      console.log('🏁 Analysis completed');
+    }
+  };
+  
+  // Функция копирования ответа ИИ
+  const copyAIResponse = async () => {
+    if (aiResponse) {
+      try {
+        await navigator.clipboard.writeText(aiResponse);
+        // Можно добавить уведомление об успешном копировании
+      } catch (error) {
+        console.error('Failed to copy text:', error);
+      }
+    }
   };
   
   // Состояние для кратности масштабирования слайдеров
@@ -917,6 +1002,15 @@ const AnalyticsTool: React.FC = () => {
                   <img src="/icons/download.svg" alt="Download" width="11" height="11" />
                   Скачать результат
                 </button>
+                
+                <button 
+                  className="header-ai-button"
+                  onClick={() => setShowAIModal(true)}
+                  title="Получить анализ от ИИ"
+                >
+                  <img src="/icons/ai.svg" alt="AI" width="16" height="16" />
+                  Получить анализ от ИИ
+                </button>
               </div>
             </div>
             <div className="column-header values-header">
@@ -1046,6 +1140,156 @@ const AnalyticsTool: React.FC = () => {
           ))}
         </div>
       </main>
+      
+      {/* Модальное окно ИИ анализа */}
+      {showAIModal && (
+        <div 
+          className={`modal-overlay ${isAIModalClosing ? 'closing' : ''}`}
+          onClick={closeAIModal}
+        >
+          <div 
+            className={`ai-modal-content ${isAIModalClosing ? 'closing' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Левая часть - форма */}
+            <div className="ai-modal-left">
+              <h3>Анализ от ИИ</h3>
+              
+              {/* Тумблер тип бизнеса */}
+              <div className="business-type-toggle">
+                <label className="toggle-label">Тип бизнеса:</label>
+                <div className="toggle-buttons">
+                  <button 
+                    className={`toggle-btn ${businessType === 'ecommerce' ? 'active' : ''}`}
+                    onClick={() => setBusinessType('ecommerce')}
+                  >
+                    Интернет-магазин
+                  </button>
+                  <button 
+                    className={`toggle-btn ${businessType === 'landing' ? 'active' : ''}`}
+                    onClick={() => setBusinessType('landing')}
+                  >
+                    Лендинг
+                  </button>
+                </div>
+              </div>
+              
+              {/* Тумблер валюты */}
+              <div className="business-type-toggle">
+                <label className="toggle-label">Валюта:</label>
+                <div className="toggle-buttons currency-toggle">
+                  <button 
+                    className={`toggle-btn ${currency === 'uah' ? 'active' : ''}`}
+                    onClick={() => setCurrency('uah')}
+                  >
+                    Гривны
+                  </button>
+                  <button 
+                    className={`toggle-btn ${currency === 'usd' ? 'active' : ''}`}
+                    onClick={() => setCurrency('usd')}
+                  >
+                    Доллары
+                  </button>
+                  <button 
+                    className={`toggle-btn ${currency === 'rub' ? 'active' : ''}`}
+                    onClick={() => setCurrency('rub')}
+                  >
+                    Рубли
+                  </button>
+                </div>
+              </div>
+              
+              {/* Поле для ниши */}
+              <div className="niche-input">
+                <label className="input-label">Ниша бизнеса:</label>
+                <input
+                  type="text"
+                  placeholder="Например: автосервис, косметика, недвижимость..."
+                  className="niche-field"
+                  value={niche}
+                  onChange={(e) => setNiche(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isAnalyzing && niche.trim()) {
+                      handleAIAnalysis();
+                    }
+                  }}
+                  disabled={isAnalyzing}
+                />
+              </div>
+              
+              {/* Кнопка анализа */}
+              <button 
+                className="ai-analyze-button"
+                onClick={handleAIAnalysis}
+                disabled={isAnalyzing || !niche.trim()}
+              >
+                <img src="/icons/ai.svg" alt="AI" width="16" height="16" />
+                {isAnalyzing ? 'Анализируем...' : 'Получить анализ от ИИ'}
+              </button>
+            </div>
+            
+            {/* Правая часть - результат */}
+            <div className="ai-modal-right">
+              <div className="ai-result-header">
+                <h4>Результат анализа</h4>
+                {aiResponse && !isAnalyzing && (
+                  <button 
+                    className="copy-response-btn"
+                    onClick={copyAIResponse}
+                    title="Скопировать ответ"
+                  >
+                    <img src="/icons/button_copy.svg" alt="Copy" width="14" height="14" />
+                    Скопировать
+                  </button>
+                )}
+              </div>
+              <div className="ai-response">
+                {isAnalyzing && (
+                  <div className="ai-loading">
+                    <div className="loading-spinner"></div>
+                    <div className="loading-text">
+                      <p>Анализируем ваши данные.</p>
+                      <p>Это может занять до 1 минуты.</p>
+                      <p>Пожалуйста, не закрывайте окно.</p>
+                    </div>
+                  </div>
+                )}
+                
+                {aiError && (
+                  <div className="ai-error">
+                    <p>❌ {aiError}</p>
+                  </div>
+                )}
+                
+                {aiResponse && !isAnalyzing && (
+                  <div className="ai-result">
+                    <div className="ai-text">
+                      {aiResponse.split('\n').map((line, index) => (
+                        <p key={index}>{line}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {!isAnalyzing && !aiResponse && !aiError && (
+                  <div className="ai-placeholder">
+                    <p>Заполните форму слева и нажмите "Получить анализ от ИИ" для получения подробных рекомендаций по вашим метрикам.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Кнопка закрытия */}
+            <button 
+              className="close-modal-btn"
+              onClick={closeAIModal}
+              title="Закрыть"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Модальное окно выбора формата экспорта */}
       {showExportModal && (
