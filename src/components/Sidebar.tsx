@@ -22,7 +22,8 @@ const Sidebar: React.FC = () => {
     'word-gluing',           // Склейка слов
     'find-replace',          // Найти и заменить
     'text-generator',        // Генератор текста
-    'synonym-generator'      // Генератор синонимов
+    'synonym-generator',     // Генератор синонимов
+    'word-declension'        // Склонение слов
   ];
   
   // Сортируем инструменты по алфавиту

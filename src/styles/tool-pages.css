@@ -479,6 +479,13 @@
   pointer-events: auto;
 }
 
+/* Левая группа элементов управления */
+.left-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .paste-button {
   background-color: #333335;
   border: 1px solid #404042;
@@ -511,6 +518,41 @@
   font-size: 12px;
   position: relative;
   top: 5px;
+}
+
+/* Селектор языка в input-controls */
+.language-selector {
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid #404042;
+  font-size: 12px;
+  background-color: #333335;
+  color: #BCBBBD;
+  outline: none;
+  font-family: 'Gilroy', sans-serif;
+  font-weight: 500;
+  padding-right: 24px;
+  height: 34px;
+  width: 100px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23BCBBBD' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 5px center;
+  background-repeat: no-repeat;
+  background-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.language-selector:hover {
+  background-color: #404042;
+  border-color: #505052;
+}
+
+.language-selector:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 /* Правая часть - настройки */
@@ -660,5 +702,92 @@
 }
 
 .synonym-generator-tool .loading-text p:first-child {
+  font-weight: 600;
+}
+
+/* ===== СТИЛИ ДЛЯ СКЛОНЕНИЯ СЛОВ ===== */
+
+/* Word Inflection Tool - равные колонки (аналогично Synonym Generator) */
+.word-inflection-tool .input-section,
+.word-inflection-tool .result-section {
+  width: 50%;
+}
+
+.word-inflection-tool .result-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;
+}
+
+.word-inflection-tool .result-textarea {
+  flex: 1;
+  height: auto;
+  min-height: 350px;
+}
+
+/* Состояние отключенной кнопки */
+.word-inflection-tool .action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.word-inflection-tool .action-btn:disabled:hover {
+  background-color: initial;
+  border-color: initial;
+}
+
+/* Анимация загрузки для WordInflectionTool */
+.word-inflection-tool .result-textarea-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.word-inflection-tool .ai-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(40, 40, 42, 0.95);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+}
+
+.word-inflection-tool .loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #333335;
+  border-top: 3px solid #09CEA7;
+  border-radius: 50%;
+  animation: inflectionSpinner 1s linear infinite;
+}
+
+@keyframes inflectionSpinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.word-inflection-tool .loading-text {
+  text-align: center;
+}
+
+.word-inflection-tool .loading-text p {
+  color: #BCBBBD;
+  font-family: Gilroy, sans-serif;
+  font-size: 14px;
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.word-inflection-tool .loading-text p:first-child {
   font-weight: 600;
 }

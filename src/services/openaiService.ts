@@ -24,6 +24,12 @@ interface SynonymResponse {
   error?: string;
 }
 
+interface WordInflectionResponse {
+  success: boolean;
+  inflections?: string[];
+  error?: string;
+}
+
 class OpenAIService {
   private client: OpenAI | null = null;
   private isInitialized = false;
@@ -389,6 +395,148 @@ ${metricsText}
   }
 
   /**
+   * Генерация склонений слов по падежам
+   */
+  public async generateWordInflections(inputText: string, language: string = 'russian'): Promise<WordInflectionResponse> {
+    console.log('📝 Starting word inflection generation...');
+    
+    if (!this.isReady()) {
+      console.error('❌ OpenAI service not initialized');
+      return {
+        success: false,
+        error: 'Сервис OpenAI не инициализирован. Проверьте настройки API ключа.'
+      };
+    }
+
+    if (!inputText.trim()) {
+      return {
+        success: false,
+        error: 'Введите слова для склонения'
+      };
+    }
+
+    try {
+      console.log('📝 Input text for inflections:', inputText.slice(0, 100) + '...');
+      
+      const prompt = this.createInflectionPrompt(inputText.trim(), language);
+      console.log('🤖 ChatGPT Prompt:', prompt);
+      
+      const response = await this.client!.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.3
+      });
+
+      const content = response.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Пустой ответ от ИИ');
+      }
+
+      console.log('✅ Raw AI response:', content.slice(0, 200) + '...');
+      
+      // Парсим ответ - ожидаем склонения, каждое с новой строки
+      const rawInflections = content
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(line => line.replace(/^[-•\d\.]\s*/, '')) // Убираем маркеры списков
+        .filter(inflection => inflection.length > 0);
+
+      // Убираем дубликаты, сохраняя порядок
+      const inflections = rawInflections.filter((item, index) => rawInflections.indexOf(item) === index);
+
+      console.log('📝 Parsed inflections:', inflections.slice(0, 10), `(${inflections.length} total, removed ${rawInflections.length - inflections.length} duplicates)`);
+
+      return {
+        success: true,
+        inflections: inflections
+      };
+
+    } catch (error: any) {
+      console.error('💥 Error generating word inflections:', error);
+      
+      return {
+        success: false,
+        error: `Ошибка при склонении слов: ${error.message || 'Неизвестная ошибка'}`
+      };
+    }
+  }
+
+  /**
+   * Создает промпт для склонения слов
+   */
+  private createInflectionPrompt(inputText: string, language: string = 'russian'): string {
+    const languageNames = {
+      'russian': 'русском',
+      'ukrainian': 'украинском', 
+      'english': 'английском'
+    };
+    
+    const targetLanguage = languageNames[language as keyof typeof languageNames] || 'русском';
+    
+    return `
+Ты - эксперт по склонению слов на ${targetLanguage} языке. Твоя задача - просклонять данные слова по всем падежам и числам.
+
+ВХОДНЫЕ СЛОВА: "${inputText}"
+
+ВАЖНЫЕ ПРАВИЛА:
+1. ВСЕГДА начинай с исходного слова, которое дал пользователь
+2. Если слово не склоняется (как "фото", "кафе", "метро"), напиши только исходное слово и больше ничего
+3. Для прилагательных и наречий склоняй как прилагательное в любом роде
+4. Если дано наречие (например, "дешево"), сначала покажи само наречие, потом все формы соответствующего прилагательного
+5. Для существительных показывай все падежи в единственном и множественном числе
+6. Для глаголов показывай формы времени и лица
+7. НЕ пиши названия падежей, времен или чисел - только сами формы слов
+8. Каждая форма на отдельной строке
+9. НЕ повторяй одинаковые формы - каждая форма должна быть уникальной
+10. ВСЕ формы должны быть на ${targetLanguage} языке
+
+ФОРМАТ ОТВЕТА:
+- Первой строкой - исходное слово как есть (строчными буквами)
+- Затем все УНИКАЛЬНЫЕ формы склонения
+- БЕЗ указания падежей, чисел, времен
+- БЕЗ объяснений и комментариев
+- БЕЗ повторов одинаковых форм
+- Разделяй разные слова пустой строкой
+
+Пример для "дом":
+дом
+дома
+дому
+домом
+доме
+домов
+домам
+домами
+домах
+
+Пример для "фото" (несклоняемое):
+фото
+
+Пример для "дешево" (наречие):
+дешево
+дешевый
+дешевого
+дешевому
+дешевым
+дешевом
+дешевые
+дешевых
+дешевым
+дешевыми
+
+Теперь просклоняй: "${inputText}"
+`.trim();
+  }
+
+  /**
    * Тестовый метод для проверки подключения
    */
   public async testConnection(): Promise<boolean> {
@@ -418,4 +566,4 @@ ${metricsText}
 
 // Экспортируем единственный экземпляр сервиса
 export const openaiService = new OpenAIService();
-export type { AnalyticsData, AIAnalysisResponse, SynonymResponse };
+export type { AnalyticsData, AIAnalysisResponse, SynonymResponse, WordInflectionResponse };

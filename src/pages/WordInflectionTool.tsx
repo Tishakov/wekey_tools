@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
-import { openaiService, type SynonymResponse } from '../services/openaiService';
+import { openaiService, type WordInflectionResponse } from '../services/openaiService';
 
-const SynonymGeneratorTool: React.FC = () => {
+const WordInflectionTool: React.FC = () => {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
@@ -17,11 +17,11 @@ const SynonymGeneratorTool: React.FC = () => {
 
   // Загружаем статистику при инициализации
   useEffect(() => {
-    setLaunchCount(statsService.getLaunchCount('synonym-generator'));
+    setLaunchCount(statsService.getLaunchCount('word-inflection'));
   }, []);
 
-  // Обработка текста и генерация синонимов через ChatGPT
-  const generateSynonyms = async () => {
+  // Обработка текста и генерация склонений через ChatGPT
+  const generateInflections = async () => {
     if (!inputText.trim()) {
       setResult('');
       return;
@@ -31,28 +31,28 @@ const SynonymGeneratorTool: React.FC = () => {
     setIsGenerating(true);
     
     try {
-      console.log('🤖 Generating synonyms with AI for:', inputText);
+      console.log('🤖 Generating word inflections with AI for:', inputText);
       console.log('🌐 Selected language:', selectedLanguage);
       
-      const response: SynonymResponse = await openaiService.generateSynonyms(inputText, selectedLanguage);
+      const response: WordInflectionResponse = await openaiService.generateWordInflections(inputText, selectedLanguage);
       
-      if (response.success && response.synonyms) {
-        setResult(response.synonyms.join('\n'));
-        console.log('✅ AI synonyms generated:', response.synonyms.length, 'items');
+      if (response.success && response.inflections) {
+        setResult(response.inflections.join('\n'));
+        console.log('✅ AI inflections generated:', response.inflections.length, 'items');
       } else {
-        setAiError(response.error || 'Не удалось сгенерировать синонимы');
+        setAiError(response.error || 'Не удалось просклонять слова');
         console.error('❌ AI generation failed:', response.error);
       }
       
     } catch (error) {
-      console.error('💥 Error during synonym generation:', error);
-      setAiError('Произошла ошибка при генерации синонимов');
+      console.error('💥 Error during word inflection generation:', error);
+      setAiError('Произошла ошибка при склонении слов');
     } finally {
       setIsGenerating(false);
     }
     
     // Обновляем статистику
-    statsService.incrementLaunchCount('synonym-generator');
+    statsService.incrementLaunchCount('word-inflection');
     setLaunchCount(prev => prev + 1);
   };
 
@@ -80,8 +80,28 @@ const SynonymGeneratorTool: React.FC = () => {
     return text ? text.split('\n').length : 0;
   };
 
+  // Обработка нажатия клавиш в textarea
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === ' ') {
+      e.preventDefault(); // Предотвращаем ввод пробела
+      
+      // Получаем текущую позицию курсора
+      const textarea = e.currentTarget;
+      const cursorPosition = textarea.selectionStart;
+      
+      // Вставляем перенос строки вместо пробела
+      const newText = inputText.slice(0, cursorPosition) + '\n' + inputText.slice(cursorPosition);
+      setInputText(newText);
+      
+      // Устанавливаем курсор на новую позицию (после переноса строки)
+      setTimeout(() => {
+        textarea.setSelectionRange(cursorPosition + 1, cursorPosition + 1);
+      }, 0);
+    }
+  };
+
   return (
-    <div className="synonym-generator-tool">
+    <div className="word-inflection-tool">
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
         <button 
@@ -91,7 +111,7 @@ const SynonymGeneratorTool: React.FC = () => {
           <img src="/icons/arrow_left.svg" alt="" />
           Все инструменты
         </button>
-        <h1 className="tool-title">Генератор синонимов</h1>
+        <h1 className="tool-title">Склонение слов</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn">
             <img src="/icons/rocket.svg" alt="" />
@@ -114,7 +134,8 @@ const SynonymGeneratorTool: React.FC = () => {
             className="input-textarea"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Введите слова или фразы (каждое с новой строки)..."
+            onKeyDown={handleKeyDown}
+            placeholder="Введите слова для склонения (каждое с новой строки)..."
           />
           <div className="input-controls">
             <div className="left-controls">
@@ -147,14 +168,14 @@ const SynonymGeneratorTool: React.FC = () => {
             <textarea
               className="result-textarea"
               value={result}
-              placeholder="Здесь будет результат"
+              placeholder="Здесь будут склонения слов"
               readOnly
             />
             {isGenerating && (
               <div className="ai-loading-overlay">
                 <div className="loading-spinner"></div>
                 <div className="loading-text">
-                  <p>Генерируем синонимы для ваших слов.</p>
+                  <p>Склоняем ваши слова по падежам.</p>
                   <p>Это может занять до 1 минуты.</p>
                   <p>Пожалуйста, не закрывайте инструмент.</p>
                 </div>
@@ -190,10 +211,10 @@ const SynonymGeneratorTool: React.FC = () => {
         <button 
           className="action-btn primary" 
           style={{ width: '445px' }} 
-          onClick={generateSynonyms}
+          onClick={generateInflections}
           disabled={!inputText.trim() || isGenerating}
         >
-          {isGenerating ? 'Генерация синонимов...' : 'Показать результат'}
+          {isGenerating ? 'Склоняем слова...' : 'Показать результат'}
         </button>
         
         <button 
@@ -210,4 +231,4 @@ const SynonymGeneratorTool: React.FC = () => {
   );
 };
 
-export default SynonymGeneratorTool;
+export default WordInflectionTool;

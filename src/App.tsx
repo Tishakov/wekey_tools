@@ -9,6 +9,7 @@ import DuplicateFinderTool from './pages/DuplicateFinderTool';
 import DuplicateRemovalTool from './pages/DuplicateRemovalTool';
 import TextToHtmlTool from './pages/TextToHtmlTool';
 import SynonymGeneratorTool from './pages/SynonymGeneratorTool';
+import WordInflectionTool from './pages/WordInflectionTool';
 import PasswordGeneratorTool from './pages/PasswordGeneratorTool';
 import TextGeneratorTool from './pages/TextGeneratorTool';
 import NumberGeneratorTool from './pages/NumberGeneratorTool';
@@ -39,6 +40,7 @@ function App() {
           <Route path="/duplicate-removal" element={<DuplicateRemovalTool />} />
           <Route path="/text-to-html" element={<TextToHtmlTool />} />
           <Route path="/synonym-generator" element={<SynonymGeneratorTool />} />
+          <Route path="/word-declension" element={<WordInflectionTool />} />
           <Route path="/password-generator" element={<PasswordGeneratorTool />} />
           <Route path="/text-generator" element={<TextGeneratorTool />} />
           <Route path="/number-generator" element={<NumberGeneratorTool />} />
