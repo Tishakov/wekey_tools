@@ -211,6 +211,14 @@ export const toolsConfig: Tool[] = [
     category: 'text-processing'
   },
   {
+    id: 'match-types',
+    title: 'Типы соответствия',
+    description: 'Обработка текста по типам соответствия (широкое, фразовое, точное)',
+    icon: '/icons/tool_tipy_sootvetstviya.svg',
+    path: '/match-types',
+    category: 'text-processing'
+  },
+  {
     id: 'emoji',
     title: 'Эмодзи',
     description: 'Работа с эмодзи и символами',
