@@ -20,6 +20,7 @@ const Sidebar: React.FC = () => {
     'utm-generator',         // Генератор UTM-меток
     'cross-analytics',       // Сквозная аналитика
     'word-gluing',           // Склейка слов
+    'word-mixer',           // Миксация слов
     'remove-line-breaks',    // Удаление переносов
     'add-symbol',            // Добавление символа
     'find-replace',          // Найти и заменить

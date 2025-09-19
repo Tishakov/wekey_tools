@@ -74,14 +74,6 @@ export const toolsConfig: Tool[] = [
     category: 'text-analysis'
   },
   {
-    id: 'word-mixer',
-    title: 'Миксация слов',
-    description: 'Перемешивание слов в тексте',
-    icon: '/icons/tool_miksaciya_slov.svg',
-    path: '/word-mixer',
-    category: 'text-processing'
-  },
-  {
     id: 'find-replace',
     title: 'Найти и заменить',
     description: 'Поиск и замена текста',
@@ -136,6 +128,14 @@ export const toolsConfig: Tool[] = [
     description: 'Склеивание слов в текте',
     icon: '/icons/tool_sklejka_slov.svg',
     path: '/word-gluing',
+    category: 'text-processing'
+  },
+  {
+    id: 'word-mixer',
+    title: 'Миксация слов',
+    description: 'Создание всех возможных комбинаций слов из списков',
+    icon: '/icons/tool_miksaciya_slov.svg',
+    path: '/word-mixer',
     category: 'text-processing'
   },
   {

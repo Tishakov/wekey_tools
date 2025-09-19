@@ -57,6 +57,7 @@ function App() {
           <Route path="/cross-analytics" element={<AnalyticsTool />} />
           <Route path="/word-gluing" element={<WordGluingTool />} />
           <Route path="/remove-line-breaks" element={<RemoveLineBreaksTool />} />
+          <Route path="/word-mixer" element={<WordMixerTool />} />
         </Routes>
       </Layout>
     </Router>
