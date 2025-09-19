@@ -1,0 +1,107 @@
+export interface EmojiItem {
+    emoji: string;
+    keywords: string[];
+    category: string;
+}
+
+// Базовые emoji из оригинального файла
+export const baseEmoji: EmojiItem[] = [
+    // Сердца и любовь
+    { emoji: '❤️', keywords: ['heart', 'love', 'сердце', 'любов', 'любовь', 'серце', 'кохання'], category: 'hearts' },
+    { emoji: '🧡', keywords: ['orange heart', 'оранжевое сердце', 'помаранчеве серце'], category: 'hearts' },
+    { emoji: '💛', keywords: ['yellow heart', 'желтое сердце', 'жовте серце'], category: 'hearts' },
+    { emoji: '💚', keywords: ['green heart', 'зеленое сердце', 'зелене серце'], category: 'hearts' },
+    { emoji: '💙', keywords: ['blue heart', 'синее сердце', 'синє серце'], category: 'hearts' },
+    { emoji: '💜', keywords: ['purple heart', 'фиолетовое сердце', 'фіолетове серце'], category: 'hearts' },
+    { emoji: '🖤', keywords: ['black heart', 'черное сердце', 'чорне серце'], category: 'hearts' },
+    { emoji: '🤍', keywords: ['white heart', 'белое сердце', 'біле серце'], category: 'hearts' },
+    { emoji: '🤎', keywords: ['brown heart', 'коричневое сердце', 'коричневе серце'], category: 'hearts' },
+    { emoji: '💔', keywords: ['broken heart', 'разбитое сердце', 'розбите серце'], category: 'hearts' },
+    { emoji: '❣️', keywords: ['heart exclamation', 'сердце восклицание', 'серце оклик'], category: 'hearts' },
+    { emoji: '💕', keywords: ['two hearts', 'два сердца', 'два серця'], category: 'hearts' },
+    { emoji: '💞', keywords: ['revolving hearts', 'кружащиеся сердца', 'серця що крутяться'], category: 'hearts' },
+    { emoji: '💓', keywords: ['beating heart', 'бьющееся сердце', 'серце що б\'ється'], category: 'hearts' },
+    { emoji: '💗', keywords: ['growing heart', 'растущее сердце', 'зростаюче серце'], category: 'hearts' },
+    { emoji: '💖', keywords: ['sparkling heart', 'сверкающее сердце', 'блискуче серце'], category: 'hearts' },
+    { emoji: '💘', keywords: ['heart arrow', 'сердце стрела', 'серце стріла'], category: 'hearts' },
+    { emoji: '💝', keywords: ['heart gift', 'подарок сердце', 'подарунок серце'], category: 'hearts' },
+    { emoji: '💟', keywords: ['heart decoration', 'украшение сердце', 'прикраса серце'], category: 'hearts' },
+
+    // Лица - счастливые  
+    { emoji: '😀', keywords: ['grinning', 'улыбка', 'посмішка', 'smile', 'happy', 'радость', 'радість'], category: 'faces' },
+    { emoji: '😃', keywords: ['grinning eyes', 'улыбка глаза', 'посмішка очі', 'smile', 'happy'], category: 'faces' },
+    { emoji: '😄', keywords: ['grinning squinting', 'улыбка прищур', 'посмішка примружені очі'], category: 'faces' },
+    { emoji: '😁', keywords: ['beaming', 'сияющая улыбка', 'сяюча посмішка'], category: 'faces' },
+    { emoji: '😆', keywords: ['squinting', 'прищуренные глаза', 'примружені очі', 'laugh', 'смех', 'сміх'], category: 'faces' },
+    { emoji: '😅', keywords: ['sweat', 'пот', 'піт', 'nervous', 'нервный', 'нервовий'], category: 'faces' },
+    { emoji: '🤣', keywords: ['rolling', 'катается', 'котиться', 'laugh', 'lol', 'лол'], category: 'faces' },
+    { emoji: '😂', keywords: ['tears joy', 'слезы радости', 'сльози радості', 'laugh', 'cry'], category: 'faces' },
+    { emoji: '🙂', keywords: ['slightly smiling', 'слегка улыбается', 'трохи посміхається'], category: 'faces' },
+    { emoji: '🙃', keywords: ['upside down', 'вверх ногами', 'догори ногами'], category: 'faces' },
+    { emoji: '😉', keywords: ['winking', 'подмигивает', 'підморгує', 'wink'], category: 'faces' },
+    { emoji: '😊', keywords: ['smiling eyes', 'улыбающиеся глаза', 'усміхнені очі'], category: 'faces' },
+    { emoji: '😇', keywords: ['angel', 'ангел', 'янгол', 'halo', 'нимб'], category: 'faces' },
+
+    // Лица - влюбленные
+    { emoji: '🥰', keywords: ['love', 'hearts', 'влюбленный', 'закоханий', 'любовь', 'кохання'], category: 'faces' },
+    { emoji: '😍', keywords: ['heart eyes', 'глаза сердечки', 'очі серця', 'love'], category: 'faces' },
+    { emoji: '🤩', keywords: ['star eyes', 'звезды в глазах', 'зірки в очах'], category: 'faces' },
+    { emoji: '😘', keywords: ['kiss', 'поцелуй', 'поцілунок'], category: 'faces' },
+    { emoji: '😗', keywords: ['kissing', 'целует', 'цілує'], category: 'faces' },
+    { emoji: '☺️', keywords: ['smiling', 'улыбается', 'посміхається'], category: 'faces' },
+    { emoji: '😚', keywords: ['kissing closed eyes', 'целует закрытые глаза', 'цілює заплющені очі'], category: 'faces' },
+    { emoji: '😙', keywords: ['kissing smiling', 'целует улыбаясь', 'цілує посміхаючись'], category: 'faces' },
+    { emoji: '🥲', keywords: ['tear joy', 'слеза радости', 'сльоза радості'], category: 'faces' },
+
+    // Животные
+    { emoji: '🐶', keywords: ['dog', 'собака', 'собака', 'пес', 'щенок'], category: 'animals' },
+    { emoji: '🐱', keywords: ['cat', 'кот', 'кіт', 'кошка', 'котенок'], category: 'animals' },
+    { emoji: '🐭', keywords: ['mouse', 'мышь', 'миша'], category: 'animals' },
+    { emoji: '🐹', keywords: ['hamster', 'хомяк', 'хом\'як'], category: 'animals' },
+    { emoji: '🐰', keywords: ['rabbit', 'кролик', 'кролик', 'заяц'], category: 'animals' },
+    { emoji: '🦊', keywords: ['fox', 'лиса', 'лисиця'], category: 'animals' },
+    { emoji: '🐻', keywords: ['bear', 'медведь', 'ведмідь'], category: 'animals' },
+    { emoji: '🐼', keywords: ['panda', 'панда', 'панда'], category: 'animals' },
+    { emoji: '🐯', keywords: ['tiger', 'тигр', 'тигр'], category: 'animals' },
+    { emoji: '🦁', keywords: ['lion', 'лев', 'лев'], category: 'animals' },
+    { emoji: '🐮', keywords: ['cow', 'корова', 'корова'], category: 'animals' },
+    { emoji: '🐷', keywords: ['pig', 'свинья', 'свиня'], category: 'animals' },
+    { emoji: '🐸', keywords: ['frog', 'лягушка', 'жаба'], category: 'animals' },
+    { emoji: '🐙', keywords: ['octopus', 'осьминог', 'восьминіг'], category: 'animals' },
+    { emoji: '🐵', keywords: ['monkey', 'обезьяна', 'мавпа'], category: 'animals' },
+
+    // Еда
+    { emoji: '🍎', keywords: ['apple', 'яблоко', 'яблуко'], category: 'food' },
+    { emoji: '🍌', keywords: ['banana', 'банан', 'банан'], category: 'food' },
+    { emoji: '🍊', keywords: ['orange', 'апельсин', 'апельсин'], category: 'food' },
+    { emoji: '🍋', keywords: ['lemon', 'лимон', 'лимон'], category: 'food' },
+    { emoji: '🍇', keywords: ['grapes', 'виноград', 'виноград'], category: 'food' },
+    { emoji: '🍓', keywords: ['strawberry', 'клубника', 'полуниця'], category: 'food' },
+    { emoji: '🥝', keywords: ['kiwi', 'киви', 'ківі'], category: 'food' },
+    { emoji: '🍅', keywords: ['tomato', 'помидор', 'помідор'], category: 'food' },
+    { emoji: '🥕', keywords: ['carrot', 'морковь', 'морква'], category: 'food' },
+    { emoji: '🌽', keywords: ['corn', 'кукуруза', 'кукурудза'], category: 'food' },
+    { emoji: '🍞', keywords: ['bread', 'хлеб', 'хліб'], category: 'food' },
+    { emoji: '🧀', keywords: ['cheese', 'сыр', 'сир'], category: 'food' },
+    { emoji: '🍕', keywords: ['pizza', 'пицца', 'піца'], category: 'food' },
+    { emoji: '🍔', keywords: ['burger', 'бургер', 'бургер'], category: 'food' },
+    { emoji: '🌭', keywords: ['hot dog', 'хот дог', 'хот дог'], category: 'food' },
+
+    // Природа и символы
+    { emoji: '🌟', keywords: ['star', 'звезда', 'зірка'], category: 'nature' },
+    { emoji: '⭐', keywords: ['star', 'звезда', 'зірка'], category: 'nature' },
+    { emoji: '✨', keywords: ['sparkles', 'блестки', 'блискітки'], category: 'nature' },
+    { emoji: '🌙', keywords: ['moon', 'луна', 'місяць'], category: 'nature' },
+    { emoji: '🌞', keywords: ['sun', 'солнце', 'сонце'], category: 'nature' },
+    { emoji: '🌈', keywords: ['rainbow', 'радуга', 'веселка'], category: 'nature' },
+    { emoji: '🌸', keywords: ['cherry blossom', 'сакура', 'сакура'], category: 'nature' },
+    { emoji: '🌺', keywords: ['flower', 'цветок', 'квітка'], category: 'nature' },
+    { emoji: '🌻', keywords: ['sunflower', 'подсолнух', 'соняшник'], category: 'nature' },
+    { emoji: '🌷', keywords: ['tulip', 'тюльпан', 'тюльпан'], category: 'nature' },
+    { emoji: '🌹', keywords: ['rose', 'роза', 'троянда'], category: 'nature' },
+    { emoji: '🔥', keywords: ['fire', 'огонь', 'вогонь'], category: 'nature' },
+    { emoji: '💧', keywords: ['water', 'вода', 'вода'], category: 'nature' },
+    { emoji: '⚡', keywords: ['lightning', 'молния', 'блискавка'], category: 'nature' },
+    { emoji: '💎', keywords: ['diamond', 'алмаз', 'алмаз'], category: 'objects' },
+    { emoji: '💯', keywords: ['hundred', 'сто', 'сто'], category: 'objects' }
+];
