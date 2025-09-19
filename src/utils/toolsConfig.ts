@@ -171,14 +171,6 @@ export const toolsConfig: Tool[] = [
     category: 'converters'
   },
   {
-    id: 'text-to-columns',
-    title: 'Текст по столбцам',
-    description: 'Разделение текста по столбцам',
-    icon: '/icons/tool_tekst_po_stolbcam.svg',
-    path: '/text-to-columns',
-    category: 'text-processing'
-  },
-  {
     id: 'match-types',
     title: 'Типы соответствия',
     description: 'Определение типов соответствия',

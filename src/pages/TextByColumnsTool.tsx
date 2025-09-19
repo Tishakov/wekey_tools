@@ -102,19 +102,36 @@ const TextByColumnsTool: React.FC = () => {
         const lines = inputText.split('\n').filter(line => line.trim() !== '');
         const newColumns: string[] = ['', '', '', '', '', ''];
 
+        // Получаем список исключений (текст/символы, при наличии которых строка не разделяется)
+        const exceptionList = exceptions
+            .split(/[\n,]/)
+            .map(item => item.trim())
+            .filter(item => item.length > 0);
+
         lines.forEach(line => {
-            const parts = line.split(separatorStr).map(part => part.trim()).filter(part => part !== '');
-            
-            // Распределяем части по колонкам (максимум 6)
-            parts.forEach((part, index) => {
-                if (index < 6) {
-                    if (newColumns[index]) {
-                        newColumns[index] += '\n' + part;
-                    } else {
-                        newColumns[index] = part;
+            // Проверяем, содержит ли строка какое-либо исключение
+            const hasException = exceptionList.some(exception => 
+                line.toLowerCase().includes(exception.toLowerCase())
+            );
+
+            if (hasException) {
+                // Если строка содержит исключение, пропускаем её (не обрабатываем)
+                return;
+            } else {
+                // Если исключений нет, разделяем строку по разделителю
+                const parts = line.split(separatorStr).map(part => part.trim()).filter(part => part !== '');
+                
+                // Распределяем части по колонкам (максимум 6)
+                parts.forEach((part, index) => {
+                    if (index < 6) {
+                        if (newColumns[index]) {
+                            newColumns[index] += '\n' + part;
+                        } else {
+                            newColumns[index] = part;
+                        }
                     }
-                }
-            });
+                });
+            }
         });
 
         setColumns(newColumns);
@@ -268,7 +285,7 @@ const TextByColumnsTool: React.FC = () => {
                             <div className="exceptions-left">
                                 <textarea
                                     className="exceptions-textarea"
-                                    placeholder="Введите исключения - строки которые не нужно разделять на колонки..."
+                                    placeholder="Введите текст или символ, чтобы НЕ разделять строки на колонки, которые будут содержать это"
                                     value={exceptions}
                                     onChange={(e) => setExceptions(e.target.value)}
                                     rows={4}
