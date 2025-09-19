@@ -8,5 +8,15 @@ export const gesturesEmoji: EmojiItem[] = [
     { emoji: '🙌', keywords: ['praise', 'ура', 'ура', 'hands up'], category: 'gestures' },
     { emoji: '👋', keywords: ['wave', 'привет', 'привіт', 'hello'], category: 'gestures' },
     { emoji: '🤝', keywords: ['handshake', 'рукопожатие', 'рукостискання'], category: 'gestures' },
-    { emoji: '✋', keywords: ['stop', 'стоп', 'стоп', 'hand'], category: 'gestures' }
+    { emoji: '✋', keywords: ['stop', 'стоп', 'стоп', 'hand'], category: 'gestures' },
+    { 
+        emoji: '🤟', 
+        keywords: ['love-you gesture', 'рок знак', 'I love you', 'жест любви', 'metal'], 
+        category: 'gestures' 
+    },
+    { 
+        emoji: '🙏', 
+        keywords: ['pray', 'молитва', 'спасибо', 'please', 'thanks', 'молитва'], 
+        category: 'gestures' 
+    }
 ];

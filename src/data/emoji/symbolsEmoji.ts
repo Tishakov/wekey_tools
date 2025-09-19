@@ -8,5 +8,15 @@ export const symbolsEmoji: EmojiItem[] = [
     { emoji: '⚠️', keywords: ['warning', 'предупреждение', 'попередження'], category: 'symbols' },
     { emoji: '❓', keywords: ['question', 'вопрос', 'питання'], category: 'symbols' },
     { emoji: '❗', keywords: ['exclamation', 'восклицание', 'оклик'], category: 'symbols' },
-    { emoji: '💯', keywords: ['hundred', 'сто', 'сто', 'perfect'], category: 'symbols' }
+    { emoji: '💯', keywords: ['hundred', 'сто', 'сто', 'perfect'], category: 'symbols' },
+    { 
+        emoji: '🔥', 
+        keywords: ['fire', 'огонь', 'огонь', 'вогонь', 'hot', 'пожар', 'популярное'], 
+        category: 'symbols' 
+    },
+    { 
+        emoji: '💎', 
+        keywords: ['diamond', 'алмаз', 'бриллиант', 'діамант', 'драгоценный', 'дорогой'], 
+        category: 'symbols' 
+    }
 ];
