@@ -52,6 +52,10 @@ export const baseEmoji: EmojiItem[] = [
     { emoji: '😚', keywords: ['kissing closed eyes', 'целует закрытые глаза', 'цілює заплющені очі'], category: 'faces' },
     { emoji: '😙', keywords: ['kissing smiling', 'целует улыбаясь', 'цілує посміхаючись'], category: 'faces' },
     { emoji: '🥲', keywords: ['tear joy', 'слеза радости', 'сльоза радості'], category: 'faces' },
+    { emoji: '😭', keywords: ['crying', 'плачет', 'плаче', 'sad', 'грусть'], category: 'faces' },
+    { emoji: '😢', keywords: ['sad', 'грустный', 'сумний', 'tear'], category: 'faces' },
+    { emoji: '😠', keywords: ['angry', 'злой', 'злий', 'mad'], category: 'faces' },
+    { emoji: '😡', keywords: ['rage', 'ярость', 'лють', 'furious'], category: 'faces' },
 
     // Животные
     { emoji: '🐶', keywords: ['dog', 'собака', 'собака', 'пес', 'щенок'], category: 'animals' },
@@ -89,6 +93,9 @@ export const baseEmoji: EmojiItem[] = [
     { emoji: '🍕', keywords: ['pizza', 'пицца', 'піца'], category: 'food' },
     { emoji: '🍔', keywords: ['burger', 'бургер', 'бургер'], category: 'food' },
     { emoji: '🌭', keywords: ['hot dog', 'хот дог', 'хот дог'], category: 'food' },
+    { emoji: '🍰', keywords: ['cake', 'торт', 'торт'], category: 'food' },
+    { emoji: '🍦', keywords: ['ice cream', 'мороженое', 'морозиво'], category: 'food' },
+    { emoji: '☕', keywords: ['coffee', 'кофе', 'кава'], category: 'food' },
 
     // Природа и символы
     { emoji: '🌟', keywords: ['star', 'звезда', 'зірка'], category: 'nature' },
@@ -102,6 +109,9 @@ export const baseEmoji: EmojiItem[] = [
     { emoji: '🌻', keywords: ['sunflower', 'подсолнух', 'соняшник'], category: 'nature' },
     { emoji: '🌷', keywords: ['tulip', 'тюльпан', 'тюльпан'], category: 'nature' },
     { emoji: '🌹', keywords: ['rose', 'роза', 'троянда'], category: 'nature' },
+    { emoji: '🌿', keywords: ['leaves', 'листья', 'листя'], category: 'nature' },
+    { emoji: '🌱', keywords: ['sprout', 'росток', 'паросток'], category: 'nature' },
+    { emoji: '🌳', keywords: ['tree', 'дерево', 'дерево'], category: 'nature' },
     { emoji: '🔥', keywords: ['fire', 'огонь', 'вогонь'], category: 'nature' },
     { emoji: '💧', keywords: ['water', 'вода', 'вода'], category: 'nature' },
     { emoji: '⚡', keywords: ['lightning', 'молния', 'блискавка'], category: 'nature' },
