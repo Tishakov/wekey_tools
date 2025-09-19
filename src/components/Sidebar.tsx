@@ -31,7 +31,8 @@ const Sidebar: React.FC = () => {
     'text-by-columns',       // Текст по столбцам
     'char-counter',          // Количество символов
     'match-types',           // Типы соответствия
-    'number-generator'       // Генератор чисел
+    'number-generator',      // Генератор чисел
+    'password-generator'     // Генератор паролей
   ];
   
   // Список инструментов с ИИ интеграцией
