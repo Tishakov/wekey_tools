@@ -184,6 +184,14 @@ const DuplicateFinderTool: React.FC = () => {
                                     <img src="/icons/button_paste.svg" alt="" />
                                     Вставить
                                 </button>
+                                <label className="checkbox-item">
+                                    <input
+                                        type="checkbox"
+                                        checked={caseSensitive}
+                                        onChange={(e) => setCaseSensitive(e.target.checked)}
+                                    />
+                                    <span className="checkbox-text">С учетом регистра</span>
+                                </label>
                                 <span className="char-counter">{inputLines1} стр.</span>
                             </div>
                         </div>
@@ -203,18 +211,6 @@ const DuplicateFinderTool: React.FC = () => {
                                 <span className="char-counter">{inputLines2} стр.</span>
                             </div>
                         </div>
-                    </div>
-                    
-                    {/* Настройки регистра */}
-                    <div className="settings-section">
-                        <label className="checkbox-item">
-                            <input
-                                type="checkbox"
-                                checked={caseSensitive}
-                                onChange={(e) => setCaseSensitive(e.target.checked)}
-                            />
-                            <span className="checkbox-text">С учетом регистра</span>
-                        </label>
                     </div>
                 </div>
             </div>
