@@ -27,7 +27,10 @@ const EmojiTool: React.FC = () => {
         { id: 'flags', name: 'Флаги', icon: '🏁' },
         { id: 'tech', name: 'Технологии', icon: '📱' },
         { id: 'clothes', name: 'Одежда', icon: '👕' },
-        { id: 'jobs', name: 'Профессии', icon: '👩‍💻' }
+        { id: 'jobs', name: 'Профессии', icon: '👩‍💻' },
+        { id: 'symbols', name: 'Символы', icon: '⭐' },
+        { id: 'gestures', name: 'Жесты', icon: '👍' },
+        { id: 'music', name: 'Музыка', icon: '🎵' }
     ];
 
     // Инициализация избранного

@@ -5,6 +5,9 @@ import { flagsEmoji } from './flagsEmoji';
 import { techEmoji } from './techEmoji';
 import { clothesEmoji } from './clothesEmoji';
 import { jobsEmoji } from './jobsEmoji';
+import { symbolsEmoji } from './symbolsEmoji';
+import { gesturesEmoji } from './gesturesEmoji';
+import { musicEmoji } from './musicEmoji';
 
 // Объединяем все emoji в одну базу данных
 export const emojiDatabase = [
@@ -14,7 +17,10 @@ export const emojiDatabase = [
     ...flagsEmoji,
     ...techEmoji,
     ...clothesEmoji,
-    ...jobsEmoji
+    ...jobsEmoji,
+    ...symbolsEmoji,
+    ...gesturesEmoji,
+    ...musicEmoji
 ];
 
 export * from './baseEmoji';
