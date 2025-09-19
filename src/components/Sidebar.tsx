@@ -10,6 +10,7 @@ const Sidebar: React.FC = () => {
   const completedTools = [
     'case-changer',           // Изменения регистра
     'remove-duplicates',      // Удаление дубликатов  
+    'duplicate-finder',       // Поиск дубликатов
     'text-to-html',          // Текст в HTML
     'text-optimizer',        // Оптимизатор текста
     'spaces-to-paragraphs',  // Пробелы на абзацы
