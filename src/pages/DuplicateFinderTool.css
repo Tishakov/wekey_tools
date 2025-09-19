@@ -89,8 +89,8 @@
 
 .duplicate-finder-tool .results-grid {
   display: grid;
-  grid-template-columns: calc(33.333% - 15px) calc(33.333% - 15px) calc(33.333% - 15px);
-  gap: 15px;
+  grid-template-columns: calc(33.333% - 13.33px) calc(33.333% - 13.33px) calc(33.333% - 13.33px);
+  gap: 20px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
