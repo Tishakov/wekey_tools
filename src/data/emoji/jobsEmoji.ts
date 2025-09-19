@@ -7,5 +7,8 @@ export const jobsEmoji: EmojiItem[] = [
     { emoji: '👨‍🚒', keywords: ['firefighter', 'пожарный', 'пожежник'], category: 'jobs' },
     { emoji: '👮‍♂️', keywords: ['police', 'полицейский', 'поліцейський'], category: 'jobs' },
     { emoji: '👨‍🍳', keywords: ['chef', 'повар', 'кухар'], category: 'jobs' },
-    { emoji: '👨‍🎓', keywords: ['student', 'студент', 'выпускник', 'студент'], category: 'jobs' }
+    { emoji: '👨‍🎓', keywords: ['student', 'студент', 'выпускник', 'студент'], category: 'jobs' },
+    { emoji: '👨‍🏫', keywords: ['teacher', 'учитель', 'вчитель'], category: 'jobs' },
+    { emoji: '👩‍✈️', keywords: ['pilot', 'пилот', 'пілот'], category: 'jobs' },
+    { emoji: '👨‍🎤', keywords: ['singer', 'певец', 'співак'], category: 'jobs' }
 ];

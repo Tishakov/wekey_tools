@@ -21,5 +21,8 @@ export const activityEmoji: EmojiItem[] = [
     { emoji: '🏏', keywords: ['cricket', 'крикет', 'крикет'], category: 'activities' },
     { emoji: '🥅', keywords: ['goal', 'ворота', 'ворота'], category: 'activities' },
     { emoji: '⛳', keywords: ['golf', 'гольф', 'гольф'], category: 'activities' },
-    { emoji: '🪁', keywords: ['kite', 'воздушный змей', 'повітряний змій'], category: 'activities' }
+    { emoji: '🪁', keywords: ['kite', 'воздушный змей', 'повітряний змій'], category: 'activities' },
+    { emoji: '🎨', keywords: ['art', 'искусство', 'мистецтво'], category: 'activities' },
+    { emoji: '📚', keywords: ['books', 'книги', 'книги'], category: 'activities' },
+    { emoji: '🎮', keywords: ['video games', 'видеоигры', 'відеоігри'], category: 'activities' }
 ];
