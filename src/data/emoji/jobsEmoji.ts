@@ -1,0 +1,11 @@
+import type { EmojiItem } from './baseEmoji';
+
+// Новые emoji для категории "Профессии"
+export const jobsEmoji: EmojiItem[] = [
+    { emoji: '👩‍💻', keywords: ['programmer', 'программист', 'разработчик', 'програміст'], category: 'jobs' },
+    { emoji: '👨‍⚕️', keywords: ['doctor', 'врач', 'доктор', 'лікар'], category: 'jobs' },
+    { emoji: '👨‍🚒', keywords: ['firefighter', 'пожарный', 'пожежник'], category: 'jobs' },
+    { emoji: '👮‍♂️', keywords: ['police', 'полицейский', 'поліцейський'], category: 'jobs' },
+    { emoji: '👨‍🍳', keywords: ['chef', 'повар', 'кухар'], category: 'jobs' },
+    { emoji: '👨‍🎓', keywords: ['student', 'студент', 'выпускник', 'студент'], category: 'jobs' }
+];
