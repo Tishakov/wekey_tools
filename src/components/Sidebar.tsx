@@ -30,7 +30,8 @@ const Sidebar: React.FC = () => {
     'word-declension',       // Склонение слов
     'text-by-columns',       // Текст по столбцам
     'char-counter',          // Количество символов
-    'match-types'            // Типы соответствия
+    'match-types',           // Типы соответствия
+    'number-generator'       // Генератор чисел
   ];
   
   // Список инструментов с ИИ интеграцией
