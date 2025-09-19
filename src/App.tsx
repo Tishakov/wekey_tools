@@ -25,6 +25,7 @@ import EmojiTool from './pages/EmojiTool';
 import AnalyticsTool from './pages/AnalyticsTool';
 import WordGluingTool from './pages/WordGluingTool';
 import RemoveLineBreaksTool from './pages/RemoveLineBreaksTool';
+import TextByColumnsTool from './pages/TextByColumnsTool';
 import './styles/tool-pages.css';
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
           <Route path="/cross-analytics" element={<AnalyticsTool />} />
           <Route path="/word-gluing" element={<WordGluingTool />} />
           <Route path="/remove-line-breaks" element={<RemoveLineBreaksTool />} />
+          <Route path="/text-by-columns" element={<TextByColumnsTool />} />
           <Route path="/word-mixer" element={<WordMixerTool />} />
         </Routes>
       </Layout>

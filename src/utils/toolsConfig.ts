@@ -211,6 +211,14 @@ export const toolsConfig: Tool[] = [
     category: 'text-processing'
   },
   {
+    id: 'text-by-columns',
+    title: 'Текст по столбцам',
+    description: 'Разделение текста на колонки по разделителю',
+    icon: '/icons/tool_tekst_po_stolbcam.svg',
+    path: '/text-by-columns',
+    category: 'text-processing'
+  },
+  {
     id: 'emoji',
     title: 'Эмодзи',
     description: 'Работа с эмодзи и символами',
