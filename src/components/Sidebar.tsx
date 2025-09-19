@@ -32,7 +32,8 @@ const Sidebar: React.FC = () => {
     'char-counter',          // Количество символов
     'match-types',           // Типы соответствия
     'number-generator',      // Генератор чисел
-    'password-generator'     // Генератор паролей
+    'password-generator',    // Генератор паролей
+    'emoji'                  // Эмодзи
   ];
   
   // Список инструментов с ИИ интеграцией
