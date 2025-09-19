@@ -120,16 +120,15 @@
     color: #BCBBBD;
     font-size: 16px;
     font-weight: 600;
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
 }
 
 /* Навигация по категориям */
 .emoji-categories {
     display: flex;
     gap: 5px;
-    margin-bottom: 20px;
+    margin-top: 20px;
     flex-wrap: wrap;
-    max-height: 200px;
     overflow-y: auto;
 }
 
@@ -171,10 +170,6 @@
     background: #09CEA7;
     color: white;
     border-color: #09CEA7;
-}
-
-.emoji-search-container {
-    margin-top: 10px;
 }
 
 .emoji-search {

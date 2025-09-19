@@ -4,12 +4,11 @@ import '../styles/tool-pages.css';
 import { EmojiImage } from '../utils/emojiUtils';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
-import { emojiDatabase } from '../data/emoji';
+import { emojiDatabase } from '../data/emoji/index';
 
 const EmojiTool: React.FC = () => {
     const [text, setText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [copied, setCopied] = useState(false);
     const [launchCount, setLaunchCount] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -18,21 +17,21 @@ const EmojiTool: React.FC = () => {
         { id: 'all', name: 'Все', icon: '😀' },
         { id: 'activities', name: 'Активности', icon: '⚽' },
         { id: 'animals', name: 'Животные', icon: '🐶' },
-        { id: 'gestures', name: 'Жесты', icon: '�' },
+        { id: 'gestures', name: 'Жесты', icon: '👋' },
         { id: 'food', name: 'Еда', icon: '🍎' },
-        { id: 'faces', name: 'Лица', icon: '😀' },
+        { id: 'faces', name: 'Лица', icon: '😍' },
         { id: 'medicine', name: 'Медицина', icon: '💊' },
         { id: 'music', name: 'Музыка', icon: '🎵' },
-        { id: 'objects', name: 'Объекты', icon: '🎉' },
+        { id: 'objects', name: 'Объекты', icon: '💎' },
         { id: 'clothes', name: 'Одежда', icon: '👕' },
-        { id: 'education', name: 'Образование', icon: '�' },
+        { id: 'education', name: 'Образование', icon: '📚' },
         { id: 'weather', name: 'Погода', icon: '☀️' },
         { id: 'nature', name: 'Природа', icon: '🌟' },
         { id: 'jobs', name: 'Профессии', icon: '👩‍💻' },
         { id: 'travel', name: 'Путешествия', icon: '✈️' },
         { id: 'hearts', name: 'Сердца', icon: '❤️' },
         { id: 'symbols', name: 'Символы', icon: '⭐' },
-        { id: 'tech', name: 'Технологии', icon: '�' },
+        { id: 'tech', name: 'Технологии', icon: '💻' },
         { id: 'transport', name: 'Транспорт', icon: '🚗' },
         { id: 'flags', name: 'Флаги', icon: '🏁' }
     ];
@@ -45,7 +44,7 @@ const EmojiTool: React.FC = () => {
     }, []);
 
     // Фильтрация emoji по поисковому запросу и категории
-    const filteredEmojis = emojiDatabase.filter(item => {
+    const filteredEmojis = emojiDatabase.filter((item: any) => {
         // Фильтр по категории
         if (selectedCategory !== 'all' && item.category !== selectedCategory) {
             return false;
@@ -55,7 +54,7 @@ const EmojiTool: React.FC = () => {
         if (!searchQuery) return true;
         
         const query = searchQuery.toLowerCase();
-        return item.keywords.some(keyword => 
+        return item.keywords.some((keyword: string) => 
             keyword.toLowerCase().includes(query)
         );
     });
@@ -63,29 +62,6 @@ const EmojiTool: React.FC = () => {
     // Функции для работы с текстом
     const insertEmoji = (emoji: string) => {
         setText(prev => prev + emoji);
-    };
-
-    const clearText = () => {
-        setText('');
-    };
-
-    const copyText = async () => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (error) {
-            console.error('Ошибка копирования:', error);
-        }
-    };
-
-    const pasteText = async () => {
-        try {
-            const clipboardText = await navigator.clipboard.readText();
-            setText(clipboardText);
-        } catch (error) {
-            console.error('Ошибка вставки:', error);
-        }
     };
 
     return (
@@ -115,48 +91,17 @@ const EmojiTool: React.FC = () => {
             <div className="main-workspace">
                 {/* Левая панель - редактор текста */}
                 <div className="emoji-text-editor">
-                    <div className="text-editor-header">
-                        <h3>Редактор текста</h3>
-                        <div className="text-editor-actions">
-                            <button 
-                                onClick={copyText} 
-                                className={`action-btn copy ${copied ? 'copied' : ''}`}
-                                title="Копировать текст"
-                            >
-                                {copied ? '✓' : '📋'}
-                            </button>
-                            <button 
-                                onClick={pasteText} 
-                                className="action-btn paste"
-                                title="Вставить из буфера"
-                            >
-                                📄
-                            </button>
-                            <button 
-                                onClick={clearText} 
-                                className="action-btn clear"
-                                title="Очистить текст"
-                            >
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
                     <textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Введите текст или добавьте эмодзи..."
                         className="emoji-textarea"
                     />
-                    <div className="text-stats">
-                        Символов: {text.length}
-                    </div>
                 </div>
 
                 {/* Правая панель - библиотека эмодзи */}
                 <div className="emoji-library">
                     <div className="emoji-library-header">
-                        <h3>Библиотека эмодзи</h3>
-                        
                         {/* Поиск эмодзи */}
                         <div className="emoji-search-container">
                             <input
@@ -188,7 +133,7 @@ const EmojiTool: React.FC = () => {
                     <div className="emoji-all-section">
                         <h4>Все эмодзи ({filteredEmojis.length})</h4>
                         <div className="emoji-grid">
-                            {filteredEmojis.map((item, index) => (
+                            {filteredEmojis.map((item: any, index: number) => (
                                 <div
                                     key={index}
                                     className="emoji-item"

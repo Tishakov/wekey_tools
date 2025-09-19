@@ -9,19 +9,7 @@ export const techEmoji: EmojiItem[] = [
     { emoji: '📷', keywords: ['camera', 'камера', 'фото', 'фотоаппарат'], category: 'tech' },
     { emoji: '🎧', keywords: ['headphones', 'наушники', 'музыка', 'навушники'], category: 'tech' },
     { emoji: '📺', keywords: ['tv', 'телевизор', 'экран', 'телевізор'], category: 'tech' },
-    { 
-        emoji: '�️', 
-        keywords: ['printer', 'принтер', 'печать', 'printing', 'друк', 'документы'], 
-        category: 'tech' 
-    },
-    { 
-        emoji: '💽', 
-        keywords: ['disk', 'диск', 'хранение', 'storage', 'данные', 'компьютер'], 
-        category: 'tech' 
-    },
-    { 
-        emoji: '🔌', 
-        keywords: ['plug', 'розетка', 'электричество', 'power', 'зарядка', 'energy'], 
-        category: 'tech' 
-    }
+    { emoji: '🖨️', keywords: ['printer', 'принтер', 'печать', 'printing', 'друк', 'документы'], category: 'tech' },
+    { emoji: '💽', keywords: ['disk', 'диск', 'хранение', 'storage', 'данные', 'компьютер'], category: 'tech' },
+    { emoji: '🔌', keywords: ['plug', 'розетка', 'электричество', 'power', 'зарядка', 'energy'], category: 'tech' }
 ];
