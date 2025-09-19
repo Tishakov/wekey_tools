@@ -1,0 +1,134 @@
+/* Стили для инструмента Добавление символа */
+.add-symbol-tool {
+  width: 100%;
+  padding: 0;
+}
+
+/* Поле для ввода символа */
+.symbol-input {
+  width: 100%;
+  height: 50px;
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 0 14px;
+  color: #FFFFFF;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.symbol-input::placeholder {
+  color: #888888;
+}
+
+.symbol-input:focus {
+  border-color: #0E7490;
+}
+
+/* Блок исключений */
+.exceptions-block {
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  padding: 30px;
+  width: 445px;
+  height: 280px;
+}
+
+.exceptions-fields {
+  display: flex;
+  gap: 15px;
+  height: 100%;
+}
+
+.exceptions-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.exceptions-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exceptions-textarea {
+  width: 100%;
+  height: 120px;
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 12px;
+  color: #BCBBBD;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  min-height: 120px;
+}
+
+/* Скрываем resize handle для полей исключений */
+.exceptions-textarea::-webkit-resizer {
+  display: none;
+}
+
+/* Левое поле на всю высоту */
+.exceptions-left .exceptions-textarea {
+  height: 100%;
+  flex: 1;
+}
+
+/* Правое поле адаптируется под доступную высоту */
+.exceptions-right .exceptions-textarea {
+  flex: 1;
+  height: auto;
+}
+
+.exceptions-textarea::placeholder {
+  color: #888888;
+}
+
+.exceptions-textarea.preset-words {
+  background-color: #1C1D1F;
+  cursor: default;
+}
+
+.transfer-button {
+  background-color: #252526;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  color: #BCBBBD;
+  padding: 8px 12px;
+  font-size: 15px;
+  height: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.transfer-button img {
+  width: 12px;
+  height: 12px;
+  filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
+}
+
+.transfer-button:hover {
+  background-color: #2a2a2c;
+  border-color: #404042;
+}
+
+/* Адаптивность */
+@media (max-width: 1240px) {
+  .exceptions-block {
+    width: 100%;
+  }
+}

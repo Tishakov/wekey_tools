@@ -21,6 +21,7 @@ const Sidebar: React.FC = () => {
     'cross-analytics',       // Сквозная аналитика
     'word-gluing',           // Склейка слов
     'remove-line-breaks',    // Удаление переносов
+    'add-symbol',            // Добавление символа
     'find-replace',          // Найти и заменить
     'text-generator',        // Генератор текста
     'synonym-generator',     // Генератор синонимов
