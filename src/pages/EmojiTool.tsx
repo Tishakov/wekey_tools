@@ -147,17 +147,6 @@ const EmojiTool: React.FC = () => {
                 {/* Правая панель - библиотека эмодзи */}
                 <div className="emoji-library">
                     <div className="emoji-library-header">
-                        {/* Поиск эмодзи */}
-                        <div className="emoji-search-container">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Поиск эмодзи..."
-                                className="emoji-search"
-                            />
-                        </div>
-                        
                         {/* Навигация по категориям */}
                         <div className="emoji-categories">
                             {categories.map(category => (
@@ -176,7 +165,17 @@ const EmojiTool: React.FC = () => {
 
                     {/* Все эмодзи */}
                     <div className="emoji-all-section">
-                        <h4>Все эмодзи ({filteredEmojis.length})</h4>
+                        {/* Поиск эмодзи */}
+                        <div className="emoji-search-container">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder={`Поиск эмодзи среди ${filteredEmojis.length}...`}
+                                className="emoji-search"
+                            />
+                        </div>
+                        
                         <div className="emoji-grid">
                             {filteredEmojis.map((item: any, index: number) => (
                                 <div

@@ -66,18 +66,18 @@
 
 /* Стили для готовых инструментов */
 .sidebar-link.completed {
-  color: #09CEA7;
+  color: #BCBBBD;
   font-weight: 500;
 }
 
 .sidebar-link.completed:hover {
   background-color: #333335;
-  color: #09CEA7;
+  color: #BCBBBD;
 }
 
 .sidebar-link.completed.active {
   background-color: #333335;
-  color: #09CEA7;
+  color: #BCBBBD;
 }
 
 /* Скролл для sidebar */

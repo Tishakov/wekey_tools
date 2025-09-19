@@ -14,7 +14,7 @@
     display: flex;
     gap: 20px;
     width: 910px;
-    min-height: 670px;
+    min-height: 628px;
     align-items: stretch;
 }
 
@@ -127,7 +127,6 @@
 .emoji-categories {
     display: flex;
     gap: 5px;
-    margin-top: 20px;
     flex-wrap: wrap;
     overflow-y: auto;
 }
@@ -204,11 +203,8 @@
     flex-direction: column;
 }
 
-.emoji-all-section h4 {
-    color: #BCBBBD;
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0 0 15px 0;
+.emoji-all-section .emoji-search-container {
+    margin-bottom: 15px;
 }
 
 /* Сетка эмодзи */
