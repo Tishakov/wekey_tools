@@ -4,10 +4,14 @@ import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './MatchTypesTool.css';
 
+type MatchType = 'broad' | 'phrase' | 'exact';
+type CaseType = 'lowercase' | 'uppercase' | 'capitalize-first' | '';
+
 const MatchTypesTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [outputText, setOutputText] = useState('');
-    const [matchType, setMatchType] = useState('broad'); // По умолчанию "Широкое соответствие"
+    const [matchType, setMatchType] = useState<MatchType>('broad'); // По умолчанию "Широкое соответствие"
+    const [caseType, setCaseType] = useState<CaseType>(''); // По умолчанию без изменения регистра
     const [copied, setCopied] = useState(false);
     const [launchCount, setLaunchCount] = useState(0);
 
@@ -48,25 +52,33 @@ const MatchTypesTool: React.FC = () => {
         
         const processedLines = lines.map(line => {
             let trimmedLine = line.trim();
+            let result = '';
 
             switch (matchType) {
                 case 'broad':
                     // Широкое соответствие - удаляем спецсимволы и знаки пунктуации, оставляем буквы, цифры и пробелы
-                    return trimmedLine.replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
+                    result = trimmedLine.replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
+                    break;
                 
                 case 'phrase':
                     // Фразовое соответствие - удаляем спецсимволы, затем добавляем кавычки
                     const cleanPhrase = trimmedLine.replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
-                    return `"${cleanPhrase}"`;
+                    result = `"${cleanPhrase}"`;
+                    break;
                 
                 case 'exact':
                     // Точное соответствие - удаляем спецсимволы, затем добавляем квадратные скобки
                     const cleanExact = trimmedLine.replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
-                    return `[${cleanExact}]`;
+                    result = `[${cleanExact}]`;
+                    break;
                 
                 default:
-                    return trimmedLine;
+                    result = trimmedLine;
+                    break;
             }
+
+            // Применяем изменение регистра с учетом специальных символов
+            return applyCaseChangeToContent(result, caseType);
         });
 
         setOutputText(processedLines.join('\n'));
@@ -85,9 +97,52 @@ const MatchTypesTool: React.FC = () => {
         }
     };
 
-    // Обработчик радиокнопок БЕЗ возможности снятия выбора
-    const handleRadioChange = (value: string) => {
+    // Обработчик радиокнопок БЕЗ возможности снятия выбора (для типа соответствия)
+    const handleMatchTypeChange = (value: MatchType) => {
         setMatchType(value);
+    };
+
+    // Обработчик радиокнопок С возможностью снятия выбора (для регистра)
+    const handleCaseTypeChange = (value: CaseType) => {
+        setCaseType(currentValue => currentValue === value ? '' : value);
+    };
+
+    // Применение изменения регистра
+    const applyCaseChange = (text: string, caseOption: CaseType): string => {
+        if (!caseOption) return text;
+
+        switch (caseOption) {
+            case 'lowercase':
+                return text.toLowerCase();
+            case 'uppercase':
+                return text.toUpperCase();
+            case 'capitalize-first':
+                return text.length > 0 ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : text;
+            default:
+                return text;
+        }
+    };
+
+    // Применение изменения регистра с учетом специальных символов (скобки, кавычки)
+    const applyCaseChangeToContent = (result: string, caseOption: CaseType): string => {
+        if (!caseOption) return result;
+
+        // Проверяем, есть ли квадратные скобки
+        if (result.startsWith('[') && result.endsWith(']')) {
+            const content = result.slice(1, -1); // Извлекаем содержимое без скобок
+            const processedContent = applyCaseChange(content, caseOption);
+            return `[${processedContent}]`;
+        }
+        
+        // Проверяем, есть ли кавычки
+        if (result.startsWith('"') && result.endsWith('"')) {
+            const content = result.slice(1, -1); // Извлекаем содержимое без кавычек
+            const processedContent = applyCaseChange(content, caseOption);
+            return `"${processedContent}"`;
+        }
+        
+        // Если нет специальных символов, применяем к всему тексту
+        return applyCaseChange(result, caseOption);
     };
 
     // Подсчет строк
@@ -147,7 +202,7 @@ const MatchTypesTool: React.FC = () => {
                                 name="match-type"
                                 value="broad"
                                 checked={matchType === 'broad'}
-                                onChange={() => handleRadioChange('broad')}
+                                onChange={() => handleMatchTypeChange('broad')}
                             />
                             <span className="radio-text">Широкое соответствие</span>
                         </label>
@@ -158,7 +213,7 @@ const MatchTypesTool: React.FC = () => {
                                 name="match-type"
                                 value="phrase"
                                 checked={matchType === 'phrase'}
-                                onChange={() => handleRadioChange('phrase')}
+                                onChange={() => handleMatchTypeChange('phrase')}
                             />
                             <span className="radio-text">Фразовое соответствие</span>
                         </label>
@@ -169,9 +224,45 @@ const MatchTypesTool: React.FC = () => {
                                 name="match-type"
                                 value="exact"
                                 checked={matchType === 'exact'}
-                                onChange={() => handleRadioChange('exact')}
+                                onChange={() => handleMatchTypeChange('exact')}
                             />
                             <span className="radio-text">Точное соответствие</span>
+                        </label>
+                    </div>
+
+                    {/* Вторая группа настроек - регистр */}
+                    <div className="settings-group">
+                        <label className="radio-item">
+                            <input
+                                type="radio"
+                                name="case-type"
+                                value="lowercase"
+                                checked={caseType === 'lowercase'}
+                                onChange={() => handleCaseTypeChange('lowercase')}
+                            />
+                            <span className="radio-text">все строчные</span>
+                        </label>
+
+                        <label className="radio-item">
+                            <input
+                                type="radio"
+                                name="case-type"
+                                value="uppercase"
+                                checked={caseType === 'uppercase'}
+                                onChange={() => handleCaseTypeChange('uppercase')}
+                            />
+                            <span className="radio-text">ВСЕ ПРОПИСНЫЕ</span>
+                        </label>
+
+                        <label className="radio-item">
+                            <input
+                                type="radio"
+                                name="case-type"
+                                value="capitalize-first"
+                                checked={caseType === 'capitalize-first'}
+                                onChange={() => handleCaseTypeChange('capitalize-first')}
+                            />
+                            <span className="radio-text">Первое с заглавной</span>
                         </label>
                     </div>
                 </div>
