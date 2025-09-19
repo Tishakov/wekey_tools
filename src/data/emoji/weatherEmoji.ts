@@ -20,5 +20,15 @@ export const weatherEmoji: EmojiItem[] = [
         emoji: '🌪️', 
         keywords: ['tornado', 'торнадо', 'ураган', 'смерч', 'hurricane', 'wind', 'ветер'], 
         category: 'weather' 
+    },
+    { 
+        emoji: '🌫️', 
+        keywords: ['fog', 'туман', 'туман', 'mist', 'дымка', 'низкая видимость'], 
+        category: 'weather' 
+    },
+    { 
+        emoji: '🧊', 
+        keywords: ['ice', 'лед', 'лід', 'холод', 'cold', 'заморозки', 'гололед'], 
+        category: 'weather' 
     }
 ];

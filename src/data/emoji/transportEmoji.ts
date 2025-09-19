@@ -9,7 +9,7 @@ export const transportEmoji: EmojiItem[] = [
     },
     { 
         emoji: '🚌', 
-        keywords: ['bus', 'автобус', 'ავტობუსი', 'transport', 'public', 'transportation'], 
+        keywords: ['bus', 'автобус', 'ավტობუსი', 'transport', 'public', 'transportation'], 
         category: 'transport' 
     },
     { 
@@ -30,6 +30,16 @@ export const transportEmoji: EmojiItem[] = [
     { 
         emoji: '🛵', 
         keywords: ['scooter', 'скутер', 'мопед', 'kick scooter', 'самокат', 'city transport'], 
+        category: 'transport' 
+    },
+    { 
+        emoji: '✈️', 
+        keywords: ['airplane', 'самолет', 'літак', 'plane', 'flight', 'aviation', 'полет'], 
+        category: 'transport' 
+    },
+    { 
+        emoji: '🚢', 
+        keywords: ['ship', 'корабль', 'судно', 'boat', 'море', 'water transport', 'морской'], 
         category: 'transport' 
     }
 ];

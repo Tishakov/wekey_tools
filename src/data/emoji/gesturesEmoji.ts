@@ -18,5 +18,25 @@ export const gesturesEmoji: EmojiItem[] = [
         emoji: '🙏', 
         keywords: ['pray', 'молитва', 'спасибо', 'please', 'thanks', 'молитва'], 
         category: 'gestures' 
+    },
+    { 
+        emoji: '🫶', 
+        keywords: ['heart hands', 'сердце из рук', 'любовь', 'love', 'серце з рук', 'кохання', 'love gesture'], 
+        category: 'gestures' 
+    },
+    { 
+        emoji: '✌️', 
+        keywords: ['peace', 'победа', 'мир', 'victory', 'перемога', 'два пальца'], 
+        category: 'gestures' 
+    },
+    { 
+        emoji: '🤞', 
+        keywords: ['crossed fingers', 'скрещенные пальцы', 'удача', 'luck', 'hope', 'надежда'], 
+        category: 'gestures' 
+    },
+    { 
+        emoji: '🫵', 
+        keywords: ['pointing finger', 'указательный палец', 'ты', 'you', 'ти', 'указать'], 
+        category: 'gestures' 
     }
 ];

@@ -18,5 +18,15 @@ export const clothesEmoji: EmojiItem[] = [
         emoji: '🧥', 
         keywords: ['coat', 'куртка', 'пальто', 'jacket', 'верхняя одежда', 'куртка'], 
         category: 'clothes' 
+    },
+    { 
+        emoji: '👜', 
+        keywords: ['handbag', 'сумка', 'сумочка', 'bag', 'аксессуар', 'женская сумка'], 
+        category: 'clothes' 
+    },
+    { 
+        emoji: '🧢', 
+        keywords: ['cap', 'кепка', 'бейсболка', 'шапка', 'головной убор', 'hat'], 
+        category: 'clothes' 
     }
 ];

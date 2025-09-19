@@ -26,5 +26,25 @@ export const educationEmoji: EmojiItem[] = [
         emoji: '📝', 
         keywords: ['note', 'заметка', 'записка', 'блокнот', 'нотатка', 'writing', 'notebook', 'exam'], 
         category: 'education' 
+    },
+    { 
+        emoji: '📖', 
+        keywords: ['open book', 'открытая книга', 'чтение', 'reading', 'читання', 'література'], 
+        category: 'education' 
+    },
+    { 
+        emoji: '📓', 
+        keywords: ['notebook', 'тетрадь', 'блокнот', 'зошит', 'записи', 'notes'], 
+        category: 'education' 
+    },
+    { 
+        emoji: '🌍', 
+        keywords: ['globe', 'глобус', 'мир', 'география', 'world', 'география', 'планета'], 
+        category: 'education' 
+    },
+    { 
+        emoji: '🔬', 
+        keywords: ['microscope', 'микроскоп', 'наука', 'science', 'исследование', 'лаборатория'], 
+        category: 'education' 
     }
 ];
