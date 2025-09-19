@@ -9,6 +9,7 @@ import { symbolsEmoji } from './symbolsEmoji';
 import { gesturesEmoji } from './gesturesEmoji';
 import { musicEmoji } from './musicEmoji';
 import { weatherEmoji } from './weatherEmoji';
+import { educationEmoji } from './educationEmoji';
 
 // Объединяем все emoji в одну базу данных
 export const emojiDatabase = [
@@ -22,7 +23,8 @@ export const emojiDatabase = [
     ...symbolsEmoji,
     ...gesturesEmoji,
     ...musicEmoji,
-    ...weatherEmoji
+    ...weatherEmoji,
+    ...educationEmoji
 ];
 
 export * from './baseEmoji';

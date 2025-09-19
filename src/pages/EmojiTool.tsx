@@ -31,7 +31,8 @@ const EmojiTool: React.FC = () => {
         { id: 'symbols', name: 'Символы', icon: '⭐' },
         { id: 'gestures', name: 'Жесты', icon: '👍' },
         { id: 'music', name: 'Музыка', icon: '🎵' },
-        { id: 'weather', name: 'Погода', icon: '☀️' }
+        { id: 'weather', name: 'Погода', icon: '☀️' },
+        { id: 'education', name: 'Образование', icon: '📚' }
     ];
 
     // Инициализация избранного
