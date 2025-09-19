@@ -9,7 +9,6 @@ import { emojiDatabase } from '../data/emoji';
 const EmojiTool: React.FC = () => {
     const [text, setText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [favoriteEmojis, setFavoriteEmojis] = useState<string[]>([]);
     const [copied, setCopied] = useState(false);
     const [launchCount, setLaunchCount] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -37,14 +36,6 @@ const EmojiTool: React.FC = () => {
         { id: 'transport', name: 'Транспорт', icon: '🚗' },
         { id: 'medicine', name: 'Медицина', icon: '💊' }
     ];
-
-    // Инициализация избранного
-    useEffect(() => {
-        const stored = localStorage.getItem('emoji-favorites');
-        if (stored) {
-            setFavoriteEmojis(JSON.parse(stored));
-        }
-    }, []);
 
     // Обновление статистики
     useEffect(() => {
@@ -95,21 +86,6 @@ const EmojiTool: React.FC = () => {
         } catch (error) {
             console.error('Ошибка вставки:', error);
         }
-    };
-
-    // Функции для работы с избранным
-    const toggleFavorite = (emoji: string) => {
-        const newFavorites = favoriteEmojis.includes(emoji)
-            ? favoriteEmojis.filter(e => e !== emoji)
-            : [...favoriteEmojis, emoji];
-        
-        setFavoriteEmojis(newFavorites);
-        localStorage.setItem('emoji-favorites', JSON.stringify(newFavorites));
-    };
-
-    const clearFavorites = () => {
-        setFavoriteEmojis([]);
-        localStorage.removeItem('emoji-favorites');
     };
 
     return (
@@ -207,44 +183,6 @@ const EmojiTool: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Избранные эмодзи */}
-                    {favoriteEmojis.length > 0 && (
-                        <div className="emoji-favorites-section">
-                            <div className="favorites-header">
-                                <h4>Избранные</h4>
-                                <button 
-                                    onClick={clearFavorites}
-                                    className="clear-favorites-btn"
-                                    title="Очистить избранное"
-                                >
-                                    🗑️
-                                </button>
-                            </div>
-                            <div className="emoji-grid favorites-grid">
-                                {favoriteEmojis.map((emoji, index) => (
-                                    <div
-                                        key={`fav-${index}`}
-                                        className="emoji-item favorite"
-                                        onClick={() => insertEmoji(emoji)}
-                                        title={`Добавить ${emoji} в текст`}
-                                    >
-                                        <EmojiImage emoji={emoji} size={24} />
-                                        <button
-                                            className="favorite-btn active"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleFavorite(emoji);
-                                            }}
-                                            title="Убрать из избранного"
-                                        >
-                                            ⭐
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
                     {/* Все эмодзи */}
                     <div className="emoji-all-section">
                         <h4>Все эмодзи ({filteredEmojis.length})</h4>
@@ -257,16 +195,6 @@ const EmojiTool: React.FC = () => {
                                     title={`${item.emoji} - ${item.keywords.slice(0, 3).join(', ')}`}
                                 >
                                     <EmojiImage emoji={item.emoji} size={24} />
-                                    <button
-                                        className={`favorite-btn ${favoriteEmojis.includes(item.emoji) ? 'active' : ''}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleFavorite(item.emoji);
-                                        }}
-                                        title={favoriteEmojis.includes(item.emoji) ? 'Убрать из избранного' : 'Добавить в избранное'}
-                                    >
-                                        {favoriteEmojis.includes(item.emoji) ? '⭐' : '☆'}
-                                    </button>
                                 </div>
                             ))}
                         </div>

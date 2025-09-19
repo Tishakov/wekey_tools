@@ -198,8 +198,7 @@
     color: #666;
 }
 
-/* Секции с эмодзи */
-.emoji-favorites-section,
+/* Секция с эмодзи */
 .emoji-all-section {
     background-color: #28282A;
     border: 1px solid #333335;
@@ -209,34 +208,11 @@
     flex-direction: column;
 }
 
-.favorites-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.favorites-header h4,
 .emoji-all-section h4 {
     color: #BCBBBD;
     font-size: 14px;
     font-weight: 600;
     margin: 0 0 15px 0;
-}
-
-.clear-favorites-btn {
-    background: none;
-    border: none;
-    color: #BCBBBD;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.clear-favorites-btn:hover {
-    background-color: #1C1D1F;
 }
 
 /* Сетка эмодзи */
@@ -262,10 +238,6 @@
     border-radius: 3px;
 }
 
-.favorites-grid {
-    max-height: 150px;
-}
-
 /* Элемент эмодзи */
 .emoji-item {
     background-color: #1C1D1F;
@@ -289,10 +261,6 @@
     transform: translateY(-1px);
 }
 
-.emoji-item.favorite {
-    border-color: #F5A623;
-}
-
 /* Apple emoji стили */
 .apple-emoji-img {
     vertical-align: middle;
@@ -302,31 +270,6 @@
 
 .apple-emoji-fallback {
     vertical-align: middle;
-}
-
-/* Кнопка избранного */
-.favorite-btn {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    padding: 2px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    opacity: 0.7;
-}
-
-.favorite-btn:hover {
-    opacity: 1;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.favorite-btn.active {
-    color: #F5A623;
-    opacity: 1;
 }
 
 /* Сообщение "нет результатов" */
