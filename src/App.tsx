@@ -24,6 +24,7 @@ import EmptyLinesRemovalTool from './pages/EmptyLinesRemovalTool';
 import EmojiTool from './pages/EmojiTool';
 import AnalyticsTool from './pages/AnalyticsTool';
 import WordGluingTool from './pages/WordGluingTool';
+import RemoveLineBreaksTool from './pages/RemoveLineBreaksTool';
 import './styles/tool-pages.css';
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
           <Route path="/emoji" element={<EmojiTool />} />
           <Route path="/cross-analytics" element={<AnalyticsTool />} />
           <Route path="/word-gluing" element={<WordGluingTool />} />
+          <Route path="/remove-line-breaks" element={<RemoveLineBreaksTool />} />
         </Routes>
       </Layout>
     </Router>

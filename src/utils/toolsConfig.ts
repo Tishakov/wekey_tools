@@ -139,6 +139,14 @@ export const toolsConfig: Tool[] = [
     category: 'text-processing'
   },
   {
+    id: 'remove-line-breaks',
+    title: 'Удаление переносов',
+    description: 'Удаление переносов строк в тексте',
+    icon: '/icons/tool_udalenie_perenosov.svg',
+    path: '/remove-line-breaks',
+    category: 'text-processing'
+  },
+  {
     id: 'word-declension',
     title: 'Склонение слов',
     description: 'Склонение слов по падежам',
@@ -192,14 +200,6 @@ export const toolsConfig: Tool[] = [
     description: 'Удаление повторяющихся строк',
     icon: '/icons/tool_udalenie_dublikatov.svg',
     path: '/duplicate-removal',
-    category: 'text-processing'
-  },
-  {
-    id: 'remove-line-breaks',
-    title: 'Удаление переносов',
-    description: 'Удаление переносов строк',
-    icon: '/icons/tool_udalenie_perenosov.svg',
-    path: '/remove-line-breaks',
     category: 'text-processing'
   },
   {

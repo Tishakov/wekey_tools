@@ -20,9 +20,18 @@ const Sidebar: React.FC = () => {
     'utm-generator',         // Генератор UTM-меток
     'cross-analytics',       // Сквозная аналитика
     'word-gluing',           // Склейка слов
+    'remove-line-breaks',    // Удаление переносов
     'find-replace',          // Найти и заменить
     'text-generator',        // Генератор текста
     'synonym-generator',     // Генератор синонимов
+    'word-declension'        // Склонение слов
+  ];
+  
+  // Список инструментов с ИИ интеграцией
+  const aiTools = [
+    'synonym-generator',     // Генератор синонимов
+    'text-generator',        // Генератор текста  
+    'cross-analytics',       // Сквозная аналитика
     'word-declension'        // Склонение слов
   ];
   
@@ -36,6 +45,7 @@ const Sidebar: React.FC = () => {
           {sortedTools.map((tool) => {
             const isCompleted = completedTools.includes(tool.id);
             const isActive = location.pathname === tool.path;
+            const hasAI = aiTools.includes(tool.id);
             
             return (
               <li key={tool.id} className="sidebar-menu-item">
@@ -44,6 +54,14 @@ const Sidebar: React.FC = () => {
                   className={`sidebar-link ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
                 >
                   {tool.title}
+                  {hasAI && (
+                    <img 
+                      src="/icons/ai_star.svg" 
+                      alt="AI" 
+                      className="ai-icon"
+                      title="Инструмент с ИИ интеграцией"
+                    />
+                  )}
                 </Link>
               </li>
             );
