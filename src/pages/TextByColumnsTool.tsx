@@ -47,6 +47,19 @@ const TextByColumnsTool: React.FC = () => {
         }
     };
 
+    // Функция переноса готовых слов в поле исключений
+    const handleTransferWords = () => {
+        const currentExceptions = exceptions.trim();
+        const presetWords = "заголовок\nитого\nвсего\nсумма\nобщий\nфинал\nрезультат\nзаключение";
+        
+        if (currentExceptions === '') {
+            setExceptions(presetWords);
+        } else {
+            // Если уже есть исключения, добавляем новые через перенос строки
+            setExceptions(currentExceptions + '\n' + presetWords);
+        }
+    };
+
     // Функция разбивки текста по столбцам
     const handleShowResult = () => {
         if (!inputText.trim()) {
@@ -249,14 +262,38 @@ const TextByColumnsTool: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Исключения */}
-                    <div className="settings-group">
-                        <textarea
-                            className="exceptions-textarea"
-                            placeholder="Введите исключения..."
-                            value={exceptions}
-                            onChange={(e) => setExceptions(e.target.value)}
-                        />
+                    {/* Блок исключений (вынесен из settings-group) */}
+                    <div className="exceptions-block">
+                        <div className="exceptions-fields">
+                            <div className="exceptions-left">
+                                <textarea
+                                    className="exceptions-textarea"
+                                    placeholder="Введите исключения - строки которые не нужно разделять на колонки..."
+                                    value={exceptions}
+                                    onChange={(e) => setExceptions(e.target.value)}
+                                    rows={4}
+                                />
+                            </div>
+                            <div className="exceptions-right">
+                                <textarea
+                                    className="exceptions-textarea preset-words"
+                                    value={`заголовок
+итого
+всего
+сумма
+общий
+финал
+результат
+заключение`}
+                                    readOnly
+                                    rows={4}
+                                />
+                                <button className="transfer-button" onClick={handleTransferWords}>
+                                    <img src="/icons/arrow_left.svg" alt="" />
+                                    Перенести
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
