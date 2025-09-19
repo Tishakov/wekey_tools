@@ -51,10 +51,8 @@ const MinusWordsTool: React.FC = () => {
                 if (wordsInLine.length > 0) {
                     processedLines.push(wordsInLine.join(' '));
                 }
-            } else {
-                // Пустая строка - добавляем как есть для сохранения структуры
-                processedLines.push('');
             }
+            // Убрали блок else с добавлением пустых строк
         });
         
         setWords(processedLines);

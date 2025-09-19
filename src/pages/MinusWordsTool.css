@@ -212,14 +212,14 @@
 .minus-words-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .minus-word-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #28282A;
+    background-color: #1c1d1f;
     border: 1px solid #333335;
     border-radius: 6px;
     padding: 4px 12px;
