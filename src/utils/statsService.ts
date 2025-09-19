@@ -1,3 +1,5 @@
+import { apiService, ApiError } from '../services/apiService';
+
 // Сервис для работы со статистикой инструментов
 interface ToolStats {
   [toolName: string]: {
@@ -7,70 +9,222 @@ interface ToolStats {
 
 class StatsService {
   private static readonly STORAGE_KEY = 'wekey_tools_stats';
+  private isOnline: boolean = true;
+
+  constructor() {
+    // Проверяем доступность API при инициализации
+    this.checkApiAvailability();
+  }
 
   /**
-   * Получить все статистики из хранилища
+   * Проверка доступности API
    */
-  private getStats(): ToolStats {
+  private async checkApiAvailability(): Promise<void> {
+    try {
+      this.isOnline = await apiService.healthCheck();
+    } catch {
+      this.isOnline = false;
+    }
+  }
+
+  /**
+   * Получить все статистики из localStorage (fallback)
+   */
+  private getLocalStats(): ToolStats {
     try {
       const data = localStorage.getItem(StatsService.STORAGE_KEY);
       return data ? JSON.parse(data) : {};
     } catch (error) {
-      console.error('Ошибка при чтении статистики:', error);
+      console.error('Ошибка при чтении локальной статистики:', error);
       return {};
     }
   }
 
   /**
-   * Сохранить статистики в хранилище
+   * Сохранить статистики в localStorage (fallback)
    */
-  private saveStats(stats: ToolStats): void {
+  private saveLocalStats(stats: ToolStats): void {
     try {
       localStorage.setItem(StatsService.STORAGE_KEY, JSON.stringify(stats));
     } catch (error) {
-      console.error('Ошибка при сохранении статистики:', error);
+      console.error('Ошибка при сохранении локальной статистики:', error);
     }
   }
 
   /**
    * Получить количество запусков для конкретного инструмента
    */
-  getLaunchCount(toolName: string): number {
-    const stats = this.getStats();
-    return stats[toolName]?.launchCount || 0;
+  async getLaunchCount(toolName: string): Promise<number> {
+    // Сначала пытаемся получить данные с сервера
+    if (this.isOnline) {
+      try {
+        const response = await apiService.getToolStats(toolName);
+        return response.data?.totalUsage || 0;
+      } catch (error) {
+        console.warn('Не удалось получить статистику с сервера, используем локальные данные:', error);
+        this.isOnline = false;
+      }
+    }
+
+    // Fallback к локальным данным
+    const localStats = this.getLocalStats();
+    return localStats[toolName]?.launchCount || 0;
   }
 
   /**
    * Увеличить счетчик запусков для инструмента на 1
    */
-  incrementLaunchCount(toolName: string): void {
-    const stats = this.getStats();
+  async incrementLaunchCount(toolName: string, metadata?: {
+    inputLength?: number;
+    outputLength?: number;
+    processingTime?: number;
+  }): Promise<void> {
+    const startTime = Date.now();
+
+    // Локальное обновление для мгновенного отклика UI
+    this.incrementLocalCount(toolName);
+
+    // Отправка в API (если доступен)
+    if (this.isOnline) {
+      try {
+        const processingTime = metadata?.processingTime || (Date.now() - startTime);
+        
+        await apiService.incrementToolUsage(toolName, {
+          inputLength: metadata?.inputLength,
+          outputLength: metadata?.outputLength,
+          processingTime,
+          language: this.getUserLanguage()
+        });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          console.warn('Ошибка при отправке статистики на сервер:', error.message);
+          
+          // Если ошибка авторизации, переключаемся на локальный режим
+          if (error.isUnauthorized() || error.isNetworkError()) {
+            this.isOnline = false;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Локальное увеличение счетчика
+   */
+  private incrementLocalCount(toolName: string): void {
+    const stats = this.getLocalStats();
     
     if (!stats[toolName]) {
       stats[toolName] = { launchCount: 0 };
     }
     
     stats[toolName].launchCount++;
-    this.saveStats(stats);
+    this.saveLocalStats(stats);
   }
 
   /**
-   * Сбросить счетчик для инструмента (для отладки)
+   * Получение языка пользователя
+   */
+  private getUserLanguage(): string {
+    // Проверяем localStorage на предмет сохраненного языка
+    const savedLanguage = localStorage.getItem('userLanguage');
+    if (savedLanguage && ['ru', 'ua', 'en'].includes(savedLanguage)) {
+      return savedLanguage;
+    }
+
+    // Определяем по браузеру
+    const browserLanguage = navigator.language.toLowerCase();
+    if (browserLanguage.startsWith('ru')) return 'ru';
+    if (browserLanguage.startsWith('uk')) return 'ua';
+    return 'en';
+  }
+
+  /**
+   * Сбросить счетчик для инструмента (для отладки, только локально)
    */
   resetLaunchCount(toolName: string): void {
-    const stats = this.getStats();
+    const stats = this.getLocalStats();
     
     if (stats[toolName]) {
       stats[toolName].launchCount = 0;
-      this.saveStats(stats);
+      this.saveLocalStats(stats);
     }
   }
 
   /**
-   * Получить все статистики (для отладки или экспорта)
+   * Получить все локальные статистики (для отладки или backup)
    */
-  getAllStats(): ToolStats {
-    return this.getStats();
+  getAllLocalStats(): ToolStats {
+    return this.getLocalStats();
+  }
+
+  /**
+   * Получить пользовательскую статистику с сервера
+   */
+  async getUserStats(): Promise<any> {
+    if (!this.isOnline) {
+      return {
+        message: 'Статистика недоступна в офлайн режиме',
+        isOffline: true
+      };
+    }
+
+    try {
+      const response = await apiService.getUserStats();
+      return response.data;
+    } catch (error) {
+      console.error('Ошибка при получении пользовательской статистики:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Получить общую статистику с сервера
+   */
+  async getOverviewStats(): Promise<any> {
+    if (!this.isOnline) {
+      return {
+        message: 'Статистика недоступна в офлайн режиме',
+        isOffline: true
+      };
+    }
+
+    try {
+      const response = await apiService.getOverviewStats();
+      return response.data;
+    } catch (error) {
+      console.error('Ошибка при получении общей статистики:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Проверить статус подключения к API
+   */
+  isApiOnline(): boolean {
+    return this.isOnline;
+  }
+
+  /**
+   * Переподключение к API
+   */
+  async reconnect(): Promise<boolean> {
+    this.isOnline = await apiService.healthCheck();
+    return this.isOnline;
+  }
+
+  /**
+   * Синхронизация локальных данных с сервером (для будущего использования)
+   */
+  async syncWithServer(): Promise<void> {
+    if (!this.isOnline) {
+      console.warn('Невозможно синхронизировать: API недоступен');
+      return;
+    }
+
+    // TODO: Реализовать синхронизацию локальных счетчиков с сервером
+    // Это может быть полезно для пользователей, которые работали офлайн
+    console.log('Синхронизация с сервером будет реализована в будущих версиях');
   }
 }
 
