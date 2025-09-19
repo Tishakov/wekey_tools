@@ -171,14 +171,6 @@ export const toolsConfig: Tool[] = [
     category: 'converters'
   },
   {
-    id: 'match-types',
-    title: 'Типы соответствия',
-    description: 'Определение типов соответствия',
-    icon: '/icons/tool_tipy_sootvetstviya.svg',
-    path: '/match-types',
-    category: 'seo'
-  },
-  {
     id: 'transliteration',
     title: 'Транслитерация',
     description: 'Преобразование кириллицы в латиницу и обратно',

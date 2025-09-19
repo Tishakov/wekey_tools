@@ -20,11 +20,11 @@ const MatchTypesTool: React.FC = () => {
         setLaunchCount(statsService.getLaunchCount('match-types'));
     }, []);
 
-    // Очистка результатов при изменении входных данных
+    // Очистка результатов при изменении входных данных или настроек
     useEffect(() => {
         setOutputText('');
         setCopied(false);
-    }, [inputText, matchType]);
+    }, [inputText, matchType, caseType]);
 
     // Вставка из буфера
     const handlePaste = async () => {
@@ -238,7 +238,8 @@ const MatchTypesTool: React.FC = () => {
                                 name="case-type"
                                 value="lowercase"
                                 checked={caseType === 'lowercase'}
-                                onChange={() => handleCaseTypeChange('lowercase')}
+                                onChange={() => {}} // Пустой onChange для валидности
+                                onClick={() => handleCaseTypeChange('lowercase')}
                             />
                             <span className="radio-text">все строчные</span>
                         </label>
@@ -249,7 +250,8 @@ const MatchTypesTool: React.FC = () => {
                                 name="case-type"
                                 value="uppercase"
                                 checked={caseType === 'uppercase'}
-                                onChange={() => handleCaseTypeChange('uppercase')}
+                                onChange={() => {}} // Пустой onChange для валидности
+                                onClick={() => handleCaseTypeChange('uppercase')}
                             />
                             <span className="radio-text">ВСЕ ПРОПИСНЫЕ</span>
                         </label>
@@ -260,7 +262,8 @@ const MatchTypesTool: React.FC = () => {
                                 name="case-type"
                                 value="capitalize-first"
                                 checked={caseType === 'capitalize-first'}
-                                onChange={() => handleCaseTypeChange('capitalize-first')}
+                                onChange={() => {}} // Пустой onChange для валидности
+                                onClick={() => handleCaseTypeChange('capitalize-first')}
                             />
                             <span className="radio-text">Первое с заглавной</span>
                         </label>
