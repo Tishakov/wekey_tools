@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './EmojiTool.css';
 import '../styles/tool-pages.css';
 import { EmojiImage } from '../utils/emojiUtils';
@@ -11,6 +11,8 @@ const EmojiTool: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [launchCount, setLaunchCount] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [copied, setCopied] = useState(false);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Категории с алфавитной сортировкой (кроме "Все")
     const categories = [
@@ -61,7 +63,39 @@ const EmojiTool: React.FC = () => {
 
     // Функции для работы с текстом
     const insertEmoji = (emoji: string) => {
-        setText(prev => prev + emoji);
+        const textarea = textareaRef.current;
+        if (!textarea) {
+            // Fallback: добавляем в конец, если ref недоступен
+            setText(prev => prev + emoji);
+            return;
+        }
+
+        const startPos = textarea.selectionStart;
+        const endPos = textarea.selectionEnd;
+        
+        setText(prev => {
+            const newText = prev.slice(0, startPos) + emoji + prev.slice(endPos);
+            
+            // Устанавливаем курсор после вставленного эмодзи
+            setTimeout(() => {
+                textarea.focus();
+                const newCursorPos = startPos + emoji.length;
+                textarea.setSelectionRange(newCursorPos, newCursorPos);
+            }, 0);
+            
+            return newText;
+        });
+    };
+
+    // Функция копирования результата
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Ошибка копирования:', err);
+        }
     };
 
     return (
@@ -92,11 +126,22 @@ const EmojiTool: React.FC = () => {
                 {/* Левая панель - редактор текста */}
                 <div className="emoji-text-editor">
                     <textarea
+                        ref={textareaRef}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Введите текст или добавьте эмодзи..."
                         className="emoji-textarea"
                     />
+                    
+                    {/* Кнопка копирования */}
+                    <button 
+                        className="action-btn secondary icon-left" 
+                        style={{ width: '445px' }} 
+                        onClick={handleCopy}
+                    >
+                        <img src="/icons/button_copy.svg" alt="" />
+                        {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    </button>
                 </div>
 
                 {/* Правая панель - библиотека эмодзи */}
