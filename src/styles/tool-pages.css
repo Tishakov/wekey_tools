@@ -250,7 +250,7 @@
 /* Общие стили для кнопок действия */
 .action-btn {
   border: 1px solid #333335;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #BCBBBD;
   padding: 12px 24px;
   font-size: 16px;

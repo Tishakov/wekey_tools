@@ -29,6 +29,7 @@ const Sidebar: React.FC = () => {
     'synonym-generator',     // Генератор синонимов
     'word-declension',       // Склонение слов
     'text-by-columns',       // Текст по столбцам
+    'char-counter',          // Количество символов
     'match-types'            // Типы соответствия
   ];
   

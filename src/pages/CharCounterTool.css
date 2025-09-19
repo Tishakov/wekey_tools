@@ -12,7 +12,8 @@
     display: flex;
     gap: 20px;
     width: 100%;
-    align-items: flex-start;
+    align-items: stretch;
+    height: fit-content;
 }
 
 /* Левая секция ввода - 50% ширины */
@@ -21,6 +22,12 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Поле ввода текста - растягивается на всю доступную высоту */
+.char-counter-tool .input-textarea {
+    flex: 1;
+    min-height: 280px;
 }
 
 /* Правая секция настроек - 50% ширины */
@@ -137,14 +144,14 @@
     background-color: #28282A;
     border: 1px solid #333335;
     border-radius: 15px;
-    padding: 20px;
+    padding: 30px;
 }
 
-/* Сетка счетчиков 2x3 */
+/* Сетка счетчиков 2x4 */
 .char-counter-tool .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     gap: 15px;
 }
 
@@ -153,16 +160,16 @@
     background-color: #1C1D1F;
     border: 1px solid #333335;
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 /* Лейбл счетчика */
 .char-counter-tool .stat-label {
-    color: #888888;
+    color: #BCBBBD;
     font-size: 12px;
     font-weight: 400;
     text-transform: uppercase;
@@ -190,7 +197,7 @@
     }
     
     .char-counter-tool .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         grid-template-rows: repeat(2, 1fr);
     }
 }
@@ -199,7 +206,7 @@
 @media (max-width: 768px) {
     .char-counter-tool .stats-grid {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 1fr);
+        grid-template-rows: repeat(8, 1fr);
     }
     
     .char-counter-tool .stat-item {

@@ -11,19 +11,24 @@ interface CountStats {
   numbers: number;
   digits: number;
   specialChars: number;
+  paragraphs: number;
+  sentences: number;
 }
 
 const CharCounterTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [exceptions, setExceptions] = useState('');
     const [launchCount, setLaunchCount] = useState(0);
+    const [useExceptions, setUseExceptions] = useState(false); // Новое состояние для чекбокса
     const [stats, setStats] = useState<CountStats>({
         characters: 0,
         charactersNoSpaces: 0,
         words: 0,
         numbers: 0,
         digits: 0,
-        specialChars: 0
+        specialChars: 0,
+        paragraphs: 0,
+        sentences: 0
     });
 
     // Предустановленный список исключений
@@ -34,10 +39,19 @@ const CharCounterTool: React.FC = () => {
         setLaunchCount(statsService.getLaunchCount('char-counter'));
     }, []);
 
-    // Автоматический подсчет при изменении текста или исключений
+    // Очистка результатов при изменении входных данных или настроек
     useEffect(() => {
-        calculateStats();
-    }, [inputText, exceptions]);
+        setStats({
+            characters: 0,
+            charactersNoSpaces: 0,
+            words: 0,
+            numbers: 0,
+            digits: 0,
+            specialChars: 0,
+            paragraphs: 0,
+            sentences: 0
+        });
+    }, [inputText, exceptions, useExceptions]);
 
     // Функция вставки текста из буфера
     const handlePaste = async () => {
@@ -70,7 +84,9 @@ const CharCounterTool: React.FC = () => {
                 words: 0,
                 numbers: 0,
                 digits: 0,
-                specialChars: 0
+                specialChars: 0,
+                paragraphs: 0,
+                sentences: 0
             });
             return;
         }
@@ -79,16 +95,18 @@ const CharCounterTool: React.FC = () => {
         statsService.incrementLaunchCount('char-counter');
         setLaunchCount(prev => prev + 1);
 
-        // Получаем список исключений
-        const exceptionList = exceptions
-            .toLowerCase()
-            .split('\n')
-            .map(word => word.trim())
-            .filter(word => word.length > 0);
+        // Получаем список исключений (только если включена опция)
+        const exceptionList = useExceptions && exceptions
+            ? exceptions
+                .toLowerCase()
+                .split('\n')
+                .map(word => word.trim())
+                .filter(word => word.length > 0)
+            : [];
 
         let text = inputText;
 
-        // Удаляем исключения из текста для подсчета
+        // Удаляем исключения из текста для подсчета (только если есть исключения)
         if (exceptionList.length > 0) {
             exceptionList.forEach(exception => {
                 const regex = new RegExp(`\\b${exception}\\b`, 'gi');
@@ -115,14 +133,47 @@ const CharCounterTool: React.FC = () => {
         const specialCharMatches = text.match(/[^\p{L}\p{N}\s]/gu);
         const specialChars = specialCharMatches ? specialCharMatches.length : 0;
 
+        // Подсчет абзацев (разделенных двойными переносами или просто переносами)
+        const paragraphs = text.trim() === '' ? 0 : text.trim().split(/\n\s*\n|\n/).filter(para => para.trim().length > 0).length;
+
+        // Подсчет предложений (разделенных точками, восклицательными и вопросительными знаками)
+        const sentenceMatches = text.match(/[.!?]+/g);
+        const sentences = sentenceMatches ? sentenceMatches.length : 0;
+
         setStats({
             characters,
             charactersNoSpaces,
             words,
             numbers,
             digits,
-            specialChars
+            specialChars,
+            paragraphs,
+            sentences
         });
+    };
+
+    // Обработчик кнопки "Показать результат"
+    const handleShowResult = () => {
+        calculateStats();
+    };
+
+    // Обработчик кнопки "Скопировать результат"
+    const handleCopyResult = async () => {
+        const resultsText = `Символов: ${stats.characters}
+Символов без пробелов: ${stats.charactersNoSpaces}
+Слов: ${stats.words}
+Чисел: ${stats.numbers}
+Цифр: ${stats.digits}
+Спецсимволов: ${stats.specialChars}
+Абзацев: ${stats.paragraphs}
+Предложений: ${stats.sentences}`;
+
+        try {
+            await navigator.clipboard.writeText(resultsText);
+            // Здесь можно добавить уведомление об успешном копировании
+        } catch (err) {
+            console.error('Ошибка копирования:', err);
+        }
     };
 
     return (
@@ -169,54 +220,6 @@ const CharCounterTool: React.FC = () => {
 
                 {/* Правая часть - настройки и счетчики */}
                 <div className="settings-section">
-                    {/* Блок исключений */}
-                    <div className="exceptions-block">
-                        <div className="exceptions-fields">
-                            <div className="exceptions-left">
-                                <textarea
-                                    className="exceptions-textarea"
-                                    placeholder="*Введите слова, через новую строку, которые НЕ нужно включать в результат:"
-                                    value={exceptions}
-                                    onChange={(e) => setExceptions(e.target.value)}
-                                />
-                            </div>
-                            <div className="exceptions-right">
-                                <textarea
-                                    className="exceptions-textarea preset-words"
-                                    value={`и
-или
-а
-с
-з
-под
-при
-на
-в
-о
-от
-к
-у
-по
-за
-для
-без
-из
-через
-между
-над
-обо
-перед`}
-                                    readOnly
-                                    rows={4}
-                                />
-                                <button className="transfer-button" onClick={handleTransferExceptions}>
-                                    <img src="/icons/arrow_left.svg" alt="" />
-                                    Перенести
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Группа счетчиков */}
                     <div className="stats-group">
                         <div className="stats-grid">
@@ -244,9 +247,98 @@ const CharCounterTool: React.FC = () => {
                                 <div className="stat-label">Спецсимволов</div>
                                 <div className="stat-value">{stats.specialChars}</div>
                             </div>
+                            <div className="stat-item">
+                                <div className="stat-label">Абзацев</div>
+                                <div className="stat-value">{stats.paragraphs}</div>
+                            </div>
+                            <div className="stat-item">
+                                <div className="stat-label">Предложений</div>
+                                <div className="stat-value">{stats.sentences}</div>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Группа настроек */}
+                    <div className="settings-group">
+                        <label className="checkbox-item">
+                            <input
+                                type="checkbox"
+                                checked={useExceptions}
+                                onChange={(e) => setUseExceptions(e.target.checked)}
+                            />
+                            <span className="checkbox-text">Добавить исключения для подсчета</span>
+                        </label>
+                    </div>
+
+                    {/* Блок исключений (показывается только при активации чекбокса) */}
+                    {useExceptions && (
+                        <div className="exceptions-block">
+                            <div className="exceptions-fields">
+                                <div className="exceptions-left">
+                                    <textarea
+                                        className="exceptions-textarea"
+                                        placeholder="*Введите слова, через новую строку, которые НЕ нужно включать в результат:"
+                                        value={exceptions}
+                                        onChange={(e) => setExceptions(e.target.value)}
+                                    />
+                                </div>
+                                <div className="exceptions-right">
+                                    <textarea
+                                        className="exceptions-textarea preset-words"
+                                        value={`и
+или
+а
+с
+з
+под
+при
+на
+в
+о
+от
+к
+у
+по
+за
+для
+без
+из
+через
+между
+над
+обо
+перед`}
+                                        readOnly
+                                        rows={4}
+                                    />
+                                    <button className="transfer-button" onClick={handleTransferExceptions}>
+                                        <img src="/icons/arrow_left.svg" alt="" />
+                                        Перенести
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
+            </div>
+
+            {/* Кнопки управления */}
+            <div className="control-buttons">
+                <button 
+                    className="action-btn primary"
+                    style={{ width: '445px' }}
+                    onClick={handleShowResult}
+                >
+                    Показать результат
+                </button>
+                <button 
+                    className="action-btn secondary icon-left"
+                    style={{ width: '445px' }}
+                    onClick={handleCopyResult}
+                >
+                    <img src="/icons/button_copy.svg" alt="" />
+                    Скопировать результат
+                </button>
             </div>
         </div>
     );
