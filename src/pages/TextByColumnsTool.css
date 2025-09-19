@@ -250,6 +250,11 @@
   border-color: #404042;
 }
 
+/* Кнопка "Показать результат" - ширина как у поля ввода */
+.text-by-columns-tool .action-btn.primary {
+  width: 50%;
+}
+
 /* Секция результатов - сетка 6 колонок */
 .text-by-columns-tool .results-section {
   margin-top: 24px;
@@ -278,10 +283,12 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative; /* Делаем контейнером для абсолютного позиционирования */
 }
 
 /* Текстареа результата без плашки */
 .text-by-columns-tool .result-textarea {
+  height: 360px;
   min-height: 150px;
   resize: vertical;
   background-color: #2A2B2D;
@@ -306,26 +313,38 @@
   color: #888;
 }
 
-/* Контроллы результата */
+/* Контроллы результата - внутри textarea */
 .text-by-columns-tool .result-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
   display: flex;
   justify-content: flex-end;
+  margin: 0;
+  padding: 0;
+  pointer-events: none; /* Чтобы не мешали взаимодействию с textarea */
 }
 
 .text-by-columns-tool .result-counter {
   font-size: 12px;
   color: #888;
   font-weight: 400;
+  background-color: rgba(40, 40, 42, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #333335;
+  position: static;
+  pointer-events: auto;
 }
 
-/* Кнопки копирования - только иконки */
+/* Кнопки копирования - на всю ширину как textarea */
 .text-by-columns-tool .copy-btn-icon {
-  width: 40px;
+  width: 100%;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #28282A;
+  background-color: #1C1D1F;
   border: 1px solid #333335;
   border-radius: 8px;
   cursor: pointer;
