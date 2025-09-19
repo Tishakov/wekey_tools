@@ -20,8 +20,8 @@ export const gesturesEmoji: EmojiItem[] = [
         category: 'gestures' 
     },
     { 
-        emoji: '🫶', 
-        keywords: ['heart hands', 'сердце из рук', 'любовь', 'love', 'серце з рук', 'кохання', 'love gesture'], 
+        emoji: '💝', 
+        keywords: ['heart gift', 'подарок сердце', 'любовь', 'love', 'серце подарунок', 'кохання', 'love gesture'], 
         category: 'gestures' 
     },
     { 
@@ -35,8 +35,8 @@ export const gesturesEmoji: EmojiItem[] = [
         category: 'gestures' 
     },
     { 
-        emoji: '🫵', 
-        keywords: ['pointing finger', 'указательный палец', 'ты', 'you', 'ти', 'указать'], 
+        emoji: '👉', 
+        keywords: ['pointing finger', 'указательный палец', 'направление', 'direction', 'вказівний палець', 'указать'], 
         category: 'gestures' 
     }
 ];

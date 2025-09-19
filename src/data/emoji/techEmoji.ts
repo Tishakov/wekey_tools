@@ -10,13 +10,13 @@ export const techEmoji: EmojiItem[] = [
     { emoji: '🎧', keywords: ['headphones', 'наушники', 'музыка', 'навушники'], category: 'tech' },
     { emoji: '📺', keywords: ['tv', 'телевизор', 'экран', 'телевізор'], category: 'tech' },
     { 
-        emoji: '🖱️', 
-        keywords: ['mouse', 'мышь', 'мишка', 'computer mouse', 'клик', 'курсор'], 
+        emoji: '�️', 
+        keywords: ['printer', 'принтер', 'печать', 'printing', 'друк', 'документы'], 
         category: 'tech' 
     },
     { 
-        emoji: '⌨️', 
-        keywords: ['keyboard', 'клавиатура', 'печать', 'typing', 'ввод', 'кнопки'], 
+        emoji: '💽', 
+        keywords: ['disk', 'диск', 'хранение', 'storage', 'данные', 'компьютер'], 
         category: 'tech' 
     },
     { 
