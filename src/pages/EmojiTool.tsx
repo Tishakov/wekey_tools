@@ -157,6 +157,17 @@ const EmojiTool: React.FC = () => {
                     <div className="emoji-library-header">
                         <h3>Библиотека эмодзи</h3>
                         
+                        {/* Поиск эмодзи */}
+                        <div className="emoji-search-container">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Поиск эмодзи..."
+                                className="emoji-search"
+                            />
+                        </div>
+                        
                         {/* Навигация по категориям */}
                         <div className="emoji-categories">
                             {categories.map(category => (
@@ -170,16 +181,6 @@ const EmojiTool: React.FC = () => {
                                     <span>{category.name}</span>
                                 </button>
                             ))}
-                        </div>
-                        
-                        <div className="emoji-search-container">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Поиск эмодзи..."
-                                className="emoji-search"
-                            />
                         </div>
                     </div>
 
