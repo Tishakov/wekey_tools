@@ -126,7 +126,7 @@
 /* Навигация по категориям */
 .emoji-categories {
     display: flex;
-    gap: 8px;
+    gap: 5px;
     margin-bottom: 20px;
     flex-wrap: wrap;
     max-height: 200px;

@@ -13,28 +13,28 @@ const EmojiTool: React.FC = () => {
     const [launchCount, setLaunchCount] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-    // Обновим категории чтобы включить новые
+    // Категории с алфавитной сортировкой (кроме "Все")
     const categories = [
         { id: 'all', name: 'Все', icon: '😀' },
-        { id: 'faces', name: 'Лица', icon: '😀' },
-        { id: 'hearts', name: 'Сердца', icon: '❤️' },
-        { id: 'animals', name: 'Животные', icon: '🐶' },
-        { id: 'food', name: 'Еда', icon: '🍎' },
-        { id: 'nature', name: 'Природа', icon: '🌟' },
-        { id: 'objects', name: 'Объекты', icon: '🎉' },
-        { id: 'travel', name: 'Путешествия', icon: '✈️' },
         { id: 'activities', name: 'Активности', icon: '⚽' },
-        { id: 'flags', name: 'Флаги', icon: '🏁' },
-        { id: 'tech', name: 'Технологии', icon: '📱' },
-        { id: 'clothes', name: 'Одежда', icon: '👕' },
-        { id: 'jobs', name: 'Профессии', icon: '👩‍💻' },
-        { id: 'symbols', name: 'Символы', icon: '⭐' },
-        { id: 'gestures', name: 'Жесты', icon: '👍' },
+        { id: 'animals', name: 'Животные', icon: '🐶' },
+        { id: 'gestures', name: 'Жесты', icon: '�' },
+        { id: 'food', name: 'Еда', icon: '🍎' },
+        { id: 'faces', name: 'Лица', icon: '😀' },
+        { id: 'medicine', name: 'Медицина', icon: '💊' },
         { id: 'music', name: 'Музыка', icon: '🎵' },
+        { id: 'objects', name: 'Объекты', icon: '🎉' },
+        { id: 'clothes', name: 'Одежда', icon: '👕' },
+        { id: 'education', name: 'Образование', icon: '�' },
         { id: 'weather', name: 'Погода', icon: '☀️' },
-        { id: 'education', name: 'Образование', icon: '📚' },
+        { id: 'nature', name: 'Природа', icon: '🌟' },
+        { id: 'jobs', name: 'Профессии', icon: '👩‍💻' },
+        { id: 'travel', name: 'Путешествия', icon: '✈️' },
+        { id: 'hearts', name: 'Сердца', icon: '❤️' },
+        { id: 'symbols', name: 'Символы', icon: '⭐' },
+        { id: 'tech', name: 'Технологии', icon: '�' },
         { id: 'transport', name: 'Транспорт', icon: '🚗' },
-        { id: 'medicine', name: 'Медицина', icon: '💊' }
+        { id: 'flags', name: 'Флаги', icon: '🏁' }
     ];
 
     // Обновление статистики
