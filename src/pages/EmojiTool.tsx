@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './EmojiTool.css';
+import '../styles/tool-pages.css';
 import { EmojiImage } from '../utils/emojiUtils';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
@@ -112,20 +113,29 @@ const EmojiTool: React.FC = () => {
     };
 
     return (
-        <div className="tool-page emoji-tool">
-            <div className="tool-header">
-                <div className="tool-header-icon">
-                    <img src="/icons/tool_emoji.svg" alt="Эмодзи" />
-                </div>
-                <div className="tool-header-content">
-                    <h1>Эмодзи</h1>
-                    <p>Библиотека эмодзи для копирования и работы с текстом</p>
-                    <div className="tool-stats">
-                        Запусков: {launchCount}
-                    </div>
+        <div className="emoji-tool">
+            {/* Header-остров инструмента */}
+            <div className="tool-header-island">
+                <Link to="/" className="back-button">
+                    <img src="/icons/arrow_left.svg" alt="" />
+                    Все инструменты
+                </Link>
+                <h1 className="tool-title">Эмодзи</h1>
+                <div className="tool-header-buttons">
+                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                        <img src="/icons/rocket.svg" alt="" />
+                        <span className="counter">{launchCount}</span>
+                    </button>
+                    <button className="tool-header-btn icon-only" title="Подсказки">
+                        <img src="/icons/lamp.svg" alt="" />
+                    </button>
+                    <button className="tool-header-btn icon-only" title="Скриншот">
+                        <img src="/icons/camera.svg" alt="" />
+                    </button>
                 </div>
             </div>
 
+            {/* Основная рабочая область */}
             <div className="main-workspace">
                 {/* Левая панель - редактор текста */}
                 <div className="emoji-text-editor">
@@ -267,19 +277,6 @@ const EmojiTool: React.FC = () => {
                             Эмодзи не найдены. Попробуйте другой поисковый запрос.
                         </div>
                     )}
-                </div>
-            </div>
-
-            <div className="tool-footer">
-                <div className="navigation-hint">
-                    ← Назад к <Link to="/">Главной</Link>
-                </div>
-                <div className="tool-description">
-                    <p>
-                        <strong>Эмодзи</strong> — инструмент для работы с эмодзи. 
-                        Поддерживает поиск на русском, украинском и английском языках, 
-                        избранные эмодзи и редактирование текста.
-                    </p>
                 </div>
             </div>
         </div>

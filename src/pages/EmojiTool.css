@@ -1,5 +1,298 @@
 /* EmojiTool специфичные стили */
 
+/* Основной контейнер */
+.emoji-tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Основная рабочая область */
+.emoji-tool .main-workspace {
+    display: flex;
+    gap: 20px;
+    width: 910px;
+    min-height: 600px;
+}
+
+/* Левая панель - редактор текста */
+.emoji-text-editor {
+    width: 445px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.text-editor-header {
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text-editor-header h3 {
+    color: #BCBBBD;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.text-editor-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    color: #BCBBBD;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.action-btn:hover {
+    background-color: #252526;
+    border-color: #4A4A4A;
+}
+
+.action-btn.copy.copied {
+    background-color: #09CEA7;
+    color: white;
+}
+
+.emoji-textarea {
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 15px;
+    padding: 20px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    min-height: 400px;
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+
+.emoji-textarea::placeholder {
+    color: #666;
+}
+
+.text-stats {
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 15px;
+    padding: 15px 20px;
+    color: #BCBBBD;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Правая панель - библиотека эмодзи */
+.emoji-library {
+    width: 445px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.emoji-library-header {
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.emoji-library-header h3 {
+    color: #BCBBBD;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+}
+
+/* Навигация по категориям */
+.emoji-categories {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.emoji-categories::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emoji-categories::-webkit-scrollbar-track {
+    background: #1C1D1F;
+    border-radius: 3px;
+}
+
+.emoji-categories::-webkit-scrollbar-thumb {
+    background: #4A4A4A;
+    border-radius: 3px;
+}
+
+.category-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    color: #BCBBBD;
+    white-space: nowrap;
+}
+
+.category-btn:hover {
+    background: #252526;
+    border-color: #4A4A4A;
+}
+
+.category-btn.active {
+    background: #09CEA7;
+    color: white;
+    border-color: #09CEA7;
+}
+
+.emoji-search-container {
+    margin-top: 10px;
+}
+
+.emoji-search {
+    width: 100%;
+    height: 40px;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    padding: 0 15px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.emoji-search:focus {
+    border-color: #09CEA7;
+}
+
+.emoji-search::placeholder {
+    color: #666;
+}
+
+/* Секции с эмодзи */
+.emoji-favorites-section,
+.emoji-all-section {
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.favorites-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.favorites-header h4,
+.emoji-all-section h4 {
+    color: #BCBBBD;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+}
+
+.clear-favorites-btn {
+    background: none;
+    border: none;
+    color: #BCBBBD;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.clear-favorites-btn:hover {
+    background-color: #1C1D1F;
+}
+
+/* Сетка эмодзи */
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.emoji-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emoji-grid::-webkit-scrollbar-track {
+    background: #1C1D1F;
+    border-radius: 3px;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb {
+    background: #4A4A4A;
+    border-radius: 3px;
+}
+
+.favorites-grid {
+    max-height: 150px;
+}
+
+/* Элемент эмодзи */
+.emoji-item {
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 50px;
+    box-sizing: border-box;
+}
+
+.emoji-item:hover {
+    background-color: #252526;
+    border-color: #4A4A4A;
+    transform: translateY(-1px);
+}
+
+.emoji-item.favorite {
+    border-color: #F5A623;
+}
+
 /* Apple emoji стили */
 .apple-emoji-img {
     vertical-align: middle;
@@ -11,338 +304,37 @@
     vertical-align: middle;
 }
 
-/* Навигация по категориям */
-.emoji-categories {
-    display: flex;
-    gap: 8px;
-    margin: 15px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #e0e0e0;
-    flex-wrap: wrap;
-}
-
-.category-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    background: #f5f5f5;
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    color: #333;
-}
-
-.category-btn:hover {
-    background: #e8e8e8;
-    border-color: #bbb;
-}
-
-.category-btn.active {
-    background: #007AFF;
-    color: white;
-    border-color: #007AFF;
-}
-
-.category-btn span {
-    font-weight: 500;
-}
-
-/* Адаптация для мобильных */
-@media (max-width: 768px) {
-    .emoji-categories {
-        justify-content: center;
-    }
-    
-    .category-btn {
-        flex-direction: column;
-        padding: 6px 8px;
-        font-size: 12px;
-        min-width: 60px;
-    }
-    
-    .category-btn span {
-        margin-top: 2px;
-    }
-}
-
-.emoji-tool {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-/* Основное рабочее пространство */
-.emoji-tool .main-workspace {
-    display: flex;
-    gap: 20px;
-    margin: 20px 0;
-    width: 910px;
-    margin-left: auto;
-    margin-right: auto;
-    min-height: 600px;
-}
-
-/* Левая секция - текстовое поле */
-.emoji-tool .text-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.emoji-tool .textarea-container {
-    flex: 1;
-    background-color: #28282A;
-    border: 1px solid #333335;
-    border-radius: 8px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.emoji-tool .result-textarea {
-    width: 100%;
-    height: 100%;
-    min-height: 400px;
-    background: transparent;
+/* Кнопка избранного */
+.favorite-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: none;
     border: none;
-    outline: none;
-    color: #FFFFFF;
-    font-size: 16px;
-    font-family: inherit;
-    resize: none;
-    line-height: 1.5;
-}
-
-.emoji-tool .result-textarea::placeholder {
-    color: #666;
-}
-
-/* Кнопки управления текстом */
-.emoji-tool .control-buttons {
-    display: flex;
-    gap: 15px;
-}
-
-.emoji-tool .action-btn {
-    height: 50px;
-    border-radius: 8px;
-    border: 1px solid #333335;
-    background-color: #1C1D1F;
-    color: #BCBBBD;
-    font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
+    font-size: 12px;
+    padding: 2px;
+    border-radius: 4px;
     transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 20px;
-    text-decoration: none;
-    box-sizing: border-box;
+    opacity: 0.7;
 }
 
-.emoji-tool .action-btn:hover {
-    background-color: #252526;
-    border-color: #4A4A4A;
+.favorite-btn:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.emoji-tool .action-btn img {
-    width: 16px;
-    height: 16px;
-}
-
-/* Правая секция - библиотека emoji */
-.emoji-tool .emoji-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* Поиск */
-.emoji-tool .search-container {
-    background-color: #28282A;
-    border: 1px solid #333335;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.emoji-tool .search-input {
-    width: 100%;
-    height: 50px;
-    background-color: #1C1D1F;
-    border: 1px solid #333335;
-    border-radius: 8px;
-    color: #FFFFFF;
-    font-size: 16px;
-    padding: 0 15px;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.emoji-tool .search-input:focus {
-    border-color: #09CEA7;
-}
-
-.emoji-tool .search-input::placeholder {
-    color: #666;
-}
-
-/* Секции emoji */
-.emoji-tool .favorites-section,
-.emoji-tool .all-emojis-section {
-    background-color: #28282A;
-    border: 1px solid #333335;
-    border-radius: 8px;
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.emoji-tool .section-title {
-    color: #BCBBBD;
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0 0 15px 0;
-    border-bottom: 1px solid #333335;
-    padding-bottom: 10px;
-}
-
-/* Сетка emoji */
-.emoji-tool .emoji-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
-    flex: 1;
-    overflow-y: auto;
-    max-height: 400px;
-    padding-right: 5px;
-}
-
-/* Скроллбар для сетки */
-.emoji-tool .emoji-grid::-webkit-scrollbar {
-    width: 6px;
-}
-
-.emoji-tool .emoji-grid::-webkit-scrollbar-track {
-    background: #1C1D1F;
-    border-radius: 3px;
-}
-
-.emoji-tool .emoji-grid::-webkit-scrollbar-thumb {
-    background: #4A4A4A;
-    border-radius: 3px;
-}
-
-.emoji-tool .emoji-grid::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Элемент emoji */
-.emoji-tool .emoji-item {
-    background-color: #1C1D1F;
-    border: 1px solid #333335;
-    border-radius: 8px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.emoji-tool .emoji-item:hover {
-    background-color: #252526;
-    border-color: #4A4A4A;
-    transform: translateY(-1px);
-}
-
-.emoji-tool .emoji-char {
-    font-size: 24px;
-    line-height: 1;
-}
-
-/* Стили для emoji изображений из twemoji */
-.emoji-tool .emoji-image img {
-    width: 24px !important;
-    height: 24px !important;
-    vertical-align: middle;
-    margin: 0;
-    border: none;
-    display: inline-block;
-}
-
-.emoji-tool .emoji-char.emoji-image img {
-    width: 24px !important;
-    height: 24px !important;
-}
-
-/* Действия для emoji */
-.emoji-tool .emoji-actions {
-    display: flex;
-    gap: 5px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.emoji-tool .emoji-item:hover .emoji-actions {
+.favorite-btn.active {
+    color: #F5A623;
     opacity: 1;
 }
 
-.emoji-tool .emoji-btn {
-    width: 24px;
-    height: 24px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    background: transparent;
-}
-
-.emoji-tool .copy-btn {
-    background-color: #4A90E2;
-}
-
-.emoji-tool .copy-btn:hover {
-    background-color: #357ABD;
-}
-
-.emoji-tool .add-btn {
-    background-color: #09CEA7;
-}
-
-.emoji-tool .add-btn:hover {
-    background-color: #08B296;
-}
-
-.emoji-tool .favorite-btn {
-    background-color: #F5A623;
-}
-
-.emoji-tool .favorite-btn:hover {
-    background-color: #E09612;
-}
-
-.emoji-tool .favorite-btn:disabled {
-    background-color: #666;
-    cursor: not-allowed;
-}
-
-.emoji-tool .remove-btn {
-    background-color: #D0021B;
-}
-
-.emoji-tool .remove-btn:hover {
-    background-color: #B30019;
+/* Сообщение "нет результатов" */
+.no-results {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px 20px;
 }
 
 /* Адаптивность */
@@ -350,51 +342,40 @@
     .emoji-tool .main-workspace {
         flex-direction: column;
         width: 100%;
-        margin: 10px;
+        margin: 0 10px;
         gap: 15px;
     }
     
-    .emoji-tool .control-buttons {
-        flex-wrap: wrap;
-        gap: 10px;
+    .emoji-text-editor,
+    .emoji-library {
+        width: 100%;
     }
     
-    .emoji-tool .action-btn {
-        flex: 1;
-        min-width: 120px;
+    .emoji-categories {
+        justify-content: center;
+        max-height: 120px;
     }
     
-    .emoji-tool .emoji-grid {
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    .category-btn {
+        flex-direction: column;
+        padding: 6px 8px;
+        font-size: 10px;
+        min-width: 50px;
+        gap: 2px;
+    }
+    
+    .emoji-grid {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
         gap: 8px;
-        max-height: 300px;
+        max-height: 250px;
     }
     
-    .emoji-tool .emoji-item {
-        padding: 10px;
+    .emoji-item {
+        padding: 6px;
+        min-height: 40px;
     }
     
-    .emoji-tool .emoji-char {
-        font-size: 20px;
+    .emoji-textarea {
+        min-height: 250px;
     }
-}
-
-/* Состояние копирования */
-.emoji-tool .copied-feedback {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #09CEA7;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    z-index: 1000;
-    animation: fadeInOut 1s ease-in-out;
-}
-
-@keyframes fadeInOut {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
 }
