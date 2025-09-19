@@ -11,5 +11,8 @@ export const flagsEmoji: EmojiItem[] = [
     { emoji: '🇯🇵', keywords: ['japan', 'япония', 'японія'], category: 'flags' },
     { emoji: '🇨🇳', keywords: ['china', 'китай', 'китай'], category: 'flags' },
     { emoji: '🇰🇷', keywords: ['south korea', 'южная корея', 'південна корея'], category: 'flags' },
-    { emoji: '🇮🇹', keywords: ['italy', 'италия', 'італія'], category: 'flags' }
+    { emoji: '🇮🇹', keywords: ['italy', 'италия', 'італія'], category: 'flags' },
+    { emoji: '🇪🇸', keywords: ['spain', 'испания', 'іспанія'], category: 'flags' },
+    { emoji: '🇨🇦', keywords: ['canada', 'канада', 'канада'], category: 'flags' },
+    { emoji: '🇧🇷', keywords: ['brazil', 'бразилия', 'бразилія'], category: 'flags' }
 ];

@@ -69,6 +69,9 @@ export const baseEmoji: EmojiItem[] = [
     { emoji: '🐸', keywords: ['frog', 'лягушка', 'жаба'], category: 'animals' },
     { emoji: '🐙', keywords: ['octopus', 'осьминог', 'восьминіг'], category: 'animals' },
     { emoji: '🐵', keywords: ['monkey', 'обезьяна', 'мавпа'], category: 'animals' },
+    { emoji: '🐬', keywords: ['dolphin', 'дельфин', 'дельфін'], category: 'animals' },
+    { emoji: '🦈', keywords: ['shark', 'акула', 'акула'], category: 'animals' },
+    { emoji: '🐠', keywords: ['fish', 'рыба', 'риба'], category: 'animals' },
 
     // Еда
     { emoji: '🍎', keywords: ['apple', 'яблоко', 'яблуко'], category: 'food' },
