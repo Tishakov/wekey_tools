@@ -1,0 +1,79 @@
+/* RemoveLineBreaksTool специфичные стили */
+
+/* Используем те же стили что и в WordGluingTool для правой части */
+.remove-line-breaks-tool .settings-group {
+  position: relative;
+  padding: 20px 20px;
+}
+
+/* Стильная плашка заголовка внутри блока */
+.remove-line-breaks-tool .connector-label {
+  width: 180px;
+  height: 21px;
+  border-radius: 55px;
+  background: #09CEA7;
+  color: #1C1D1F;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Сетка для радио-кнопок - 2 колонки по 4 штуки */
+.remove-line-breaks-tool .connector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+
+/* Специфичные размеры для радио-кнопок в этом инструменте */
+.remove-line-breaks-tool .radio-item {
+  width: 187px;
+  height: 50px;
+}
+
+/* Группа с отдельной радиокнопкой "Другой" и полем справа */
+.remove-line-breaks-tool .custom-connector-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.remove-line-breaks-tool .custom-connector-group .radio-item {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.remove-line-breaks-tool .custom-connector-input {
+  width: 187px;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #333335;
+  background: #1C1D1F;
+  padding: 8px 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.remove-line-breaks-tool .custom-connector-input:focus {
+  outline: none;
+  border-color: #0E7490;
+}
+
+.remove-line-breaks-tool .custom-connector-input::placeholder {
+  color: #666666;
+}
+
+/* Визуально неактивное состояние когда "Другой" не выбран */
+.remove-line-breaks-tool .custom-connector-group .radio-item input[type="radio"]:not(:checked) ~ .custom-connector-input,
+.remove-line-breaks-tool .custom-connector-group:has(input[type="radio"]:not(:checked)) .custom-connector-input {
+  background: #1C1D1F;
+  color: #666666;
+  opacity: 0.7;
+}

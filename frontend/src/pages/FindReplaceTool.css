@@ -1,0 +1,64 @@
+/* FindReplaceTool специфичные стили */
+
+/* Отступы между элементами в группах настроек */
+.find-replace-tool .settings-group {
+    gap: 10px;
+}
+
+/* Стили для полей фильтрации - автоматическая высота без скролла */
+.find-replace-tool .filter-input {
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 15px 10px 10px 14px !important;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    resize: none !important;
+    overflow: hidden !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-family: inherit !important;
+    color: #BCBBBD;
+}
+
+/* Визуально отключенное состояние поля */
+.find-replace-tool .filter-input.visual-disabled {
+    opacity: 0.5;
+    background-color: #2a2b2d !important;
+    color: #6b7280 !important;
+    border-color: #404244 !important;
+}
+
+.find-replace-tool .filter-input.visual-disabled::placeholder {
+    color: #6b7280 !important;
+}
+
+.find-replace-tool .filter-input:focus {
+    color: #BCBBBD;
+    outline: none;
+}
+
+.find-replace-tool .filter-input:focus-visible {
+    outline: none;
+}
+
+.find-replace-tool .filter-input::placeholder {
+    color: #707070;
+}
+
+/* Стили для радио кнопок */
+.find-replace-tool .radio-item {
+    margin: 4px 0;
+}
+
+/* Отключенные состояния для кнопок */
+.find-replace-tool .action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #333 !important;
+}
+
+.find-replace-tool .action-btn.secondary:disabled {
+    background-color: transparent !important;
+    border-color: #333 !important;
+}

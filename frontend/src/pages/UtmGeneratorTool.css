@@ -1,0 +1,687 @@
+/* UtmGeneratorTool специфичные стили */
+
+/* Специальная структура для UTM генератора */
+.utm-generator-page {
+    width: 100%;
+    padding: 20px 0;
+}
+
+.utm-tool-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.utm-row {
+    width: 100%;
+    max-width: 910px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Контейнер URL - первый ряд */
+.url-container {
+    width: 910px;
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+.url-input-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    overflow: visible;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.protocol-selector {
+    position: relative;
+}
+
+.protocol-toggle {
+    width: 100px;
+    background-color: #252526;
+    border: none;
+    border-right: 1px solid #333335;
+    color: #BCBBBD;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 15px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px 0 0 8px;
+    box-sizing: border-box;
+}
+
+.protocol-toggle:hover {
+    background-color: #2a2a2c;
+}
+
+.protocol-arrow {
+    font-size: 10px;
+    margin-left: 5px;
+    transition: transform 0.2s ease;
+}
+
+.protocol-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.protocol-option {
+    padding: 12px 15px;
+    color: #BCBBBD;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.protocol-option:hover {
+    background-color: #252526;
+}
+
+.protocol-option.selected {
+    background-color: #6366F1;
+    color: #ffffff;
+}
+
+.url-input-field {
+    flex: 1;
+    height: 50px;
+    background: transparent;
+    border: none;
+    padding: 0 15px;
+    color: #BCBBBD;
+    font-size: 15px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.url-input-wrapper:focus-within {
+    border-color: #6366F1;
+}
+
+.url-input-field::placeholder {
+    color: #707070;
+}
+
+.checkbox-container {
+    width: 180px;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 15px;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.checkbox-container:hover {
+    background-color: #202123;
+}
+
+/* Кнопки управления */
+.control-buttons {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    max-width: 910px;
+    margin: 0 auto 20px auto;
+}
+
+/* Специфический стиль кнопок управления для UTM генератора */
+.utm-generator-page .control-buttons {
+    margin-bottom: 0;
+}
+
+/* Поле результата */
+.result-section {
+    width: 100%;
+    max-width: 910px;
+    margin: 0 auto;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #BCBBBD;
+    font-size: 14px;
+    user-select: none;
+    padding: 0;
+    margin: 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #09CEA7;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    box-shadow: none;
+    display: inline-block;
+    position: relative;
+    border-radius: 4px;
+    transform: translateY(-1px);
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75%;
+    height: 75%;
+    background: #09CEA7;
+    border-radius: 2px;
+}
+
+.checkbox-label input[type="checkbox"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.checkbox-text {
+    color: #BCBBBD;
+    font-size: 14px;
+}
+
+/* Главный контейнер UTM полей */
+.utm-main-container {
+    width: 910px;
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Контейнер UTM полей */
+.utm-fields-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.utm-fields-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.utm-field {
+    flex: 1;
+}
+
+.utm-field-full {
+    width: 100%;
+}
+
+.utm-field-container {
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.utm-field-label {
+    width: 160px;
+    background-color: #252526;
+    border-right: 1px solid #333335;
+    border-radius: 8px 0 0 8px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #BCBBBD;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 15px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.utm-icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    background-color: #333335;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #BCBBBD;
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.utm-field-input {
+    flex: 1;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 0 15px;
+    color: #BCBBBD;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.utm-field-input:focus {
+    outline: none;
+}
+
+.utm-field-container:focus-within {
+    border-color: #6366F1;
+}
+
+.utm-field-input::placeholder {
+    color: #707070;
+}
+
+/* Чекбокс транслитерации */
+.transliteration-checkbox-container {
+    width: 100%;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 15px;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.transliteration-checkbox-container:hover {
+    background-color: #202123;
+}
+
+.transliteration-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #BCBBBD;
+    font-size: 14px;
+    user-select: none;
+    padding: 0;
+    margin: 0;
+}
+
+.transliteration-checkbox-label input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #09CEA7;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    box-shadow: none;
+    display: inline-block;
+    position: relative;
+    border-radius: 4px;
+    transform: translateY(-1px);
+}
+
+.transliteration-checkbox-label input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75%;
+    height: 75%;
+    background: #09CEA7;
+    border-radius: 2px;
+}
+
+.transliteration-checkbox-label input[type="checkbox"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Ряды workspace */
+.workspace-row {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.row-content {
+    width: 100%;
+}
+
+/* Лейблы полей */
+.field-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: #BCBBBD;
+    margin-bottom: 10px;
+}
+
+/* Секция ввода URL - горизонтальный ряд */
+.url-input-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+}
+
+.url-input {
+    flex: 1;
+    height: 50px;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    padding: 0 15px;
+    color: #BCBBBD;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.url-input:focus {
+    border-color: #6366F1;
+}
+
+.url-input::placeholder {
+    color: #888888;
+}
+
+/* Сетка UTM полей - вертикальные ряды */
+.utm-fields-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.utm-input {
+    width: 100%;
+    height: 50px;
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    padding: 0 15px;
+    color: #BCBBBD;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.utm-input:focus {
+    border-color: #6366F1;
+}
+
+.utm-input::placeholder {
+    color: #888888;
+}
+
+/* Кнопки управления - горизонтальный ряд */
+.control-buttons {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.btn {
+    height: 50px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.btn:focus,
+.btn:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.primary-btn {
+    background-color: #28282A;
+    border: 1px solid #333335;
+    color: #BCBBBD;
+}
+
+.primary-btn:hover {
+    background-color: #2a2a2c;
+    border-color: #404042;
+}
+
+.secondary-btn {
+    background-color: #1C1D1F;
+    border: 1px solid #333335;
+    color: #BCBBBD;
+}
+
+.secondary-btn:hover {
+    background-color: #202123;
+    border-color: #404042;
+}
+
+.secondary-btn img {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
+}
+
+/* Специальный стиль для кнопки с иконкой слева */
+.btn-with-left-icon {
+    position: relative;
+    justify-content: center;
+}
+
+.btn-with-left-icon img {
+    position: absolute;
+    left: 15px;
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
+}
+
+/* Поле результата - полная ширина */
+.result-section {
+    width: 100%;
+}
+
+.result-input {
+    width: 100%;
+    height: 50px;
+    background-color: #28282A;
+    border: 1px solid #333335;
+    border-radius: 8px;
+    padding: 0 15px;
+    color: #BCBBBD;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Gilroy';
+    box-sizing: border-box;
+    resize: none !important;
+    overflow: hidden;
+}
+
+/* Убираем resize handle через псевдоэлементы */
+.result-input::-webkit-resizer {
+    display: none !important;
+}
+
+.result-input::-moz-resizer {
+    display: none !important;
+}
+
+/* Убираем псевдоэлемент ::after который создает resize handle */
+.result-input::after,
+.result-section::after {
+    display: none !important;
+}
+
+.result-input::placeholder {
+    color: #888888;
+    font-family: 'Gilroy';
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .url-input-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .control-buttons {
+        flex-direction: column;
+    }
+    
+    .utm-fields-grid {
+        gap: 8px;
+    }
+}
+
+/* Переключатель "Другие источники" */
+.other-sources-toggle {
+    margin-bottom: 20px;
+    margin-top: -33px;
+}
+
+.other-sources-block {
+    background-color: #28282A;
+    border-radius: 50px;
+    padding: 2px 4px 3px 14px;
+    display: inline-block;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggle-label {
+    color: #BCBBBD;
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1C1D1F;
+    transition: 0.3s;
+    border-radius: 20px;
+    border: 1px solid #333335;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #BCBBBD;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #09CEA7;
+    border-color: #09CEA7;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+    background-color: #ffffff;
+}
+
+.toggle-switch:hover .toggle-slider {
+    background-color: #2a2a2c;
+}
+
+.toggle-switch input:checked:hover + .toggle-slider {
+    background-color: #08b89a;
+}
+
+/* Сетка источников трафика */
+.traffic-sources-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+    max-width: 910px;
+}
+
+/* Переопределение ширины радиокнопок для UTM генератора */
+.traffic-sources-grid .radio-item {
+    width: auto; /* Убираем фиксированную ширину 385px */
+}

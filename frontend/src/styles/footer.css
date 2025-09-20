@@ -1,0 +1,121 @@
+/* Футер */
+.layout-footer {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-shrink: 0;
+}
+
+/* Левая часть футера - кнопка основатель проекта (под сайдбаром) */
+.founder-button {
+  width: 250px;
+  height: 70px;
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.founder-button:hover {
+  background-color: #2a2a2c;
+}
+
+.founder-button img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Правая часть футера (под основным контентом) */
+.footer-content {
+  flex: 1;
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 15px;
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+/* Левая часть контента - made by */
+.footer-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #BCBBBD;
+}
+
+.footer-top a {
+  color: #6730FC;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-top a:hover {
+  text-decoration: underline;
+}
+
+/* Центр - копирайт */
+.footer-copyright {
+  color: #888888;
+  font-size: 12px;
+}
+
+/* Правая часть - ссылки */
+.footer-links {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  align-items: center;
+}
+
+.footer-links span {
+  color: #888888;
+}
+
+.footer-links a {
+  color: #888888;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #BCBBBD;
+  text-decoration: underline;
+}
+
+/* Адаптивность для футера */
+@media (max-width: 1240px) {
+  .layout-footer {
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px;
+  }
+  
+  .founder-button {
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .footer-content {
+    width: 100%;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}
