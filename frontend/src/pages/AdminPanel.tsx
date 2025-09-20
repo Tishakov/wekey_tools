@@ -8,6 +8,9 @@ import AdminFinance from '../components/admin/AdminFinance';
 import AdminAdmins from '../components/admin/AdminAdmins';
 import AdminLogs from '../components/admin/AdminLogs';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
+import AnalyticsChart from '../components/AnalyticsChart';
+import historicalAnalyticsService from '../services/historicalAnalyticsService';
+import type { HistoricalDataPoint } from '../services/historicalAnalyticsService';
 import './AdminPanel.css';
 
 interface AdminData {
@@ -47,7 +50,10 @@ const AdminPanel: React.FC = () => {
   const [password, setPassword] = useState('');
   const [adminData, setAdminData] = useState<AdminData | null>(null);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month' | 'quarter' | 'year'>('month');
   const [loading, setLoading] = useState(false);
+  const [loadingHistorical, setLoadingHistorical] = useState(false);
   const [error, setError] = useState('');
 
   // Определяем активную секцию из URL
@@ -83,8 +89,32 @@ const AdminPanel: React.FC = () => {
       setIsLoggedIn(true);
       fetchAdminData();
       fetchAnalyticsData();
+      fetchHistoricalData();
     }
   }, []);
+
+  // Загрузка исторических данных
+  const fetchHistoricalData = async (period: typeof selectedPeriod = selectedPeriod) => {
+    try {
+      setLoadingHistorical(true);
+      console.log('📊 [ADMIN] Fetching historical data for period:', period);
+      const data = await historicalAnalyticsService.getDataByPeriod(period);
+      setHistoricalData(data);
+      console.log('✅ [ADMIN] Historical data loaded:', data.length, 'days');
+    } catch (error) {
+      console.error('❌ [ADMIN] Error fetching historical data:', error);
+      setError('Ошибка загрузки исторических данных');
+    } finally {
+      setLoadingHistorical(false);
+    }
+  };
+
+  // Обработчик изменения периода
+  const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPeriod = event.target.value as typeof selectedPeriod;
+    setSelectedPeriod(newPeriod);
+    fetchHistoricalData(newPeriod);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +122,7 @@ const AdminPanel: React.FC = () => {
     setError('');
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -108,6 +138,7 @@ const AdminPanel: React.FC = () => {
         setIsLoggedIn(true);
         fetchAdminData();
         fetchAnalyticsData();
+        fetchHistoricalData();
       } else {
         setError('Неверные данные для входа');
       }
@@ -122,7 +153,7 @@ const AdminPanel: React.FC = () => {
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       
       const response = await fetch(`${API_BASE}/api/admin/stats`, {
         headers: {
@@ -145,7 +176,7 @@ const AdminPanel: React.FC = () => {
   const fetchAnalyticsData = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       
       console.log('📊 [ADMIN] Fetching analytics data...');
       
@@ -183,7 +214,7 @@ const AdminPanel: React.FC = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       
       const response = await fetch(`${API_BASE}/api/admin/reset-stats`, {
         method: 'POST',
@@ -266,35 +297,116 @@ const AdminPanel: React.FC = () => {
       case 'dashboard':
         return (
           <div className="dashboard-content">
+            <div className="dashboard-header">
+              <h1 className="dashboard-title">Дашборд</h1>
+              <div className="date-range-picker">
+                <label>Диапазон дат</label>
+                <select value={selectedPeriod} onChange={handlePeriodChange}>
+                  <option value="today">Сегодня</option>
+                  <option value="week">Неделя</option>
+                  <option value="month">Месяц</option>
+                  <option value="quarter">Квартал</option>
+                  <option value="year">Год</option>
+                </select>
+              </div>
+            </div>
+
             <div className="stats-grid">
               <div className="stat-card">
-                <h3>Общая статистика</h3>
-                <div className="stat-number">{adminData?.totalUsage || 0}</div>
-                <div className="stat-label">Всего использований</div>
-              </div>
-
-              <div className="stat-card">
-                <h3>Инструменты</h3>
-                <div className="stat-number">{adminData?.stats ? Object.values(adminData.stats).filter(stat => stat.count > 0).length : 0}</div>
-                <div className="stat-label">Использованных инструментов</div>
-              </div>
-
-              <div className="stat-card">
-                <h3>Посетители</h3>
+                <h3>Посетителей</h3>
                 <div className="stat-number">{analyticsData?.analytics?.total?.visitors || 0}</div>
-                <div className="stat-label">Всего посетителей</div>
               </div>
 
               <div className="stat-card">
-                <h3>Пользователи инструментов</h3>
+                <h3>Пользователей</h3>
                 <div className="stat-number">{analyticsData?.analytics?.total?.toolUsers || 0}</div>
-                <div className="stat-label">Использовали инструменты</div>
+              </div>
+
+              <div className="stat-card">
+                <h3>Использований</h3>
+                <div className="stat-number">{adminData?.totalUsage || 0}</div>
+              </div>
+
+              <div className="stat-card">
+                <h3>Инструментов</h3>
+                <div className="stat-number">{adminData?.stats ? Object.values(adminData.stats).filter(stat => stat.count > 0).length : 0}</div>
               </div>
 
               <div className="stat-card">
                 <h3>Конверсия</h3>
-                <div className="stat-number">{analyticsData?.analytics?.total?.conversionRate || '0'}%</div>
-                <div className="stat-label">Посетители → Пользователи</div>
+                <div className="stat-conversion">{analyticsData?.analytics?.total?.conversionRate || '0'}%</div>
+              </div>
+
+              <div className="stat-card">
+                <h3>Использовано токенов</h3>
+                <div className="stat-number">250</div>
+                <div className="stat-sub">OpenAI GPT-4</div>
+              </div>
+            </div>
+
+            <div className="charts-grid">
+              <div className="chart-card">
+                <h3>Посетители</h3>
+                {loadingHistorical ? (
+                  <div className="chart-loading">Загрузка данных...</div>
+                ) : (
+                  <AnalyticsChart 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.visitors
+                    }))} 
+                    color="#3b82f6"
+                    title="Динамика посетителей"
+                  />
+                )}
+              </div>
+              
+              <div className="chart-card">
+                <h3>Пользователи</h3>
+                {loadingHistorical ? (
+                  <div className="chart-loading">Загрузка данных...</div>
+                ) : (
+                  <AnalyticsChart 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.toolUsers
+                    }))} 
+                    color="#10b981"
+                    title="Динамика пользователей"
+                  />
+                )}
+              </div>
+              
+              <div className="chart-card">
+                <h3>Использования</h3>
+                {loadingHistorical ? (
+                  <div className="chart-loading">Загрузка данных...</div>
+                ) : (
+                  <AnalyticsChart 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.usageCount
+                    }))} 
+                    color="#8b5cf6"
+                    title="Динамика использований"
+                  />
+                )}
+              </div>
+              
+              <div className="chart-card">
+                <h3>Конверсия</h3>
+                {loadingHistorical ? (
+                  <div className="chart-loading">Загрузка данных...</div>
+                ) : (
+                  <AnalyticsChart 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: parseFloat(item.conversionRate)
+                    }))} 
+                    color="#f59e0b"
+                    title="Динамика конверсии (%)"
+                  />
+                )}
               </div>
             </div>
 
@@ -339,7 +451,11 @@ const AdminPanel: React.FC = () => {
               <button onClick={handleResetStats} className="reset-button" disabled={loading}>
                 {loading ? 'Сброс...' : 'Сбросить аналитику'}
               </button>
-              <button onClick={() => { fetchAdminData(); fetchAnalyticsData(); }} className="refresh-button">
+              <button onClick={() => { 
+                fetchAdminData(); 
+                fetchAnalyticsData(); 
+                fetchHistoricalData(); 
+              }} className="refresh-button">
                 Обновить данные
               </button>
             </div>

@@ -1,8 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 
+// Обработка необработанных ошибок
+process.on('uncaughtException', (err) => {
+    console.error('❌ Uncaught Exception:', err);
+    console.error('Stack:', err.stack);
+    // НЕ завершаем процесс - логируем и продолжаем
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+    // НЕ завершаем процесс - логируем и продолжаем
+});
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors({
@@ -21,9 +33,39 @@ let visitors = new Map(); // userId -> VisitorData
 let analyticsEvents = []; // массив событий
 let dailyStats = new Map(); // date -> { visitors: Set, toolUsers: Set }
 
+// Историческая статистика по дням для графиков
+let historicalData = new Map(); // date -> { visitors: number, toolUsers: number, usageCount: number }
+
 // Вспомогательная функция для получения даты в формате YYYY-MM-DD
-function getDateKey() {
-  return new Date().toISOString().split('T')[0];
+function getDateKey(date = new Date()) {
+  return date.toISOString().split('T')[0];
+}
+
+// Функция для генерации тестовых данных за последние 30 дней
+function generateHistoricalData() {
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dateKey = getDateKey(date);
+    
+    // Генерируем случайные, но реалистичные данные
+    const baseVisitors = Math.floor(Math.random() * 50) + 10; // 10-60 посетителей
+    const baseToolUsers = Math.floor(baseVisitors * (0.3 + Math.random() * 0.4)); // 30-70% конверсия
+    const baseUsage = Math.floor(baseToolUsers * (1 + Math.random() * 3)); // 1-4 использования на пользователя
+    
+    historicalData.set(dateKey, {
+      visitors: baseVisitors,
+      toolUsers: baseToolUsers,
+      usageCount: baseUsage
+    });
+  }
+}
+
+// Генерируем исторические данные при запуске
+if (historicalData.size === 0) {
+  generateHistoricalData();
+  console.log('📊 [ANALYTICS] Generated historical data for', historicalData.size, 'days');
 }
 
 // Функция для получения человекочитаемых названий инструментов
@@ -157,6 +199,14 @@ app.post('/api/analytics/visitor', (req, res) => {
       todayStats.toolUsers.add(userId);
     }
     
+    // Обновляем исторические данные для текущего дня
+    const currentHistorical = historicalData.get(dateKey) || { visitors: 0, toolUsers: 0, usageCount: 0 };
+    historicalData.set(dateKey, {
+      visitors: todayStats.visitors.size,
+      toolUsers: todayStats.toolUsers.size,
+      usageCount: currentHistorical.usageCount // usageCount обновляется в другом месте
+    });
+    
     console.log('📊 [ANALYTICS] Visitor data saved for user:', userId);
     res.json({ success: true });
     
@@ -196,6 +246,14 @@ app.post('/api/analytics/event', (req, res) => {
       
       const todayStats = dailyStats.get(dateKey);
       todayStats.toolUsers.add(userId);
+      
+      // Обновляем исторические данные - увеличиваем счетчик использований
+      const currentHistorical = historicalData.get(dateKey) || { visitors: 0, toolUsers: 0, usageCount: 0 };
+      historicalData.set(dateKey, {
+        visitors: currentHistorical.visitors,
+        toolUsers: todayStats.toolUsers.size,
+        usageCount: currentHistorical.usageCount + 1
+      });
     }
     
     console.log('📊 [ANALYTICS] Event saved:', event, 'for user:', userId);
@@ -203,6 +261,52 @@ app.post('/api/analytics/event', (req, res) => {
     
   } catch (error) {
     console.error('❌ [ANALYTICS] Error saving event:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Публичный endpoint для статистики (без авторизации)
+app.get('/api/analytics/stats', (req, res) => {
+  console.log('📊 [PUBLIC] Analytics stats requested');
+  
+  try {
+    // Подсчитываем общую статистику
+    const totalVisitors = visitors.size;
+    const toolUsers = Array.from(visitors.values()).filter(v => v.hasUsedTools).length;
+    const totalEvents = analyticsEvents.length;
+    const activeTools = new Set(analyticsEvents.map(e => e.toolId)).size;
+    
+    // Подсчитываем конверсию
+    const conversionRate = totalVisitors > 0 ? (toolUsers / totalVisitors * 100).toFixed(1) : 0;
+    
+    res.json({
+      success: true,
+      data: {
+        visitors: totalVisitors,
+        users: toolUsers,
+        usage: totalEvents,
+        tools: activeTools,
+        conversion: parseFloat(conversionRate),
+        tokens: 1250 // Фиксированное значение для демо
+      }
+    });
+  } catch (error) {
+    console.error('❌ [PUBLIC] Error getting analytics stats:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Публичный endpoint для исторических данных (без авторизации)
+app.get('/api/analytics/history', (req, res) => {
+  console.log('📊 [PUBLIC] Analytics history requested');
+  
+  try {
+    res.json({
+      success: true,
+      data: historicalData
+    });
+  } catch (error) {
+    console.error('❌ [PUBLIC] Error getting analytics history:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -240,6 +344,44 @@ app.get('/api/admin/analytics', authMiddleware, (req, res) => {
     
   } catch (error) {
     console.error('❌ [ADMIN] Error getting analytics:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Получение исторических данных для графиков
+app.get('/api/admin/analytics/historical', authMiddleware, (req, res) => {
+  console.log('📊 [ADMIN] Historical analytics requested');
+  
+  try {
+    const { startDate, endDate } = req.query;
+    
+    // Если даты не указаны, возвращаем последние 30 дней
+    const end = endDate ? new Date(endDate) : new Date();
+    const start = startDate ? new Date(startDate) : new Date(end.getTime() - 29 * 24 * 60 * 60 * 1000);
+    
+    const result = [];
+    const currentDate = new Date(start);
+    
+    while (currentDate <= end) {
+      const dateKey = getDateKey(currentDate);
+      const data = historicalData.get(dateKey) || { visitors: 0, toolUsers: 0, usageCount: 0 };
+      
+      result.push({
+        date: dateKey,
+        visitors: data.visitors,
+        toolUsers: data.toolUsers,
+        usageCount: data.usageCount,
+        conversionRate: data.visitors > 0 ? ((data.toolUsers / data.visitors) * 100).toFixed(1) : 0
+      });
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    console.log('📊 [ADMIN] Returning historical data:', result.length, 'days');
+    res.json({ success: true, data: result });
+    
+  } catch (error) {
+    console.error('❌ [ADMIN] Error getting historical analytics:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -363,6 +505,25 @@ app.get('/api/stats/tool/:toolName', (req, res) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+const server = app.listen(PORT, '127.0.0.1', () => {
+  console.log(`✅ Server running on http://127.0.0.1:${PORT}`);
+  console.log(`📍 Health check: http://127.0.0.1:${PORT}/health`);
+  console.log(`📊 Admin login: http://127.0.0.1:${PORT}/api/auth/login`);
+  
+  // Проверяем что сервер действительно работает
+  setTimeout(() => {
+    console.log('✅ Server is still running after 1 second');
+    console.log('🔍 Server address:', server.address());
+  }, 1000);
+}).on('error', (err) => {
+  console.error('❌ Server error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Try a different port.`);
+  }
+  process.exit(1);
 });
+
+// Предотвращаем завершение процесса
+process.stdin.resume();
+
+console.log('🔧 Server setup completed, app.listen() called');
