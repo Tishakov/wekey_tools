@@ -10,7 +10,7 @@ const usesSQLite = process.env.DB_DIALECT === 'sqlite';
 
 module.exports = {
   // Сервер
-  PORT: process.env.PORT || 3001,
+  PORT: process.env.PORT || 8880,
   NODE_ENV: process.env.NODE_ENV || 'development',
   
   // База данных

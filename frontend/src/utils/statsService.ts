@@ -1,15 +1,6 @@
 import { apiService, ApiError } from '../services/apiService';
 import analyticsService from '../services/analyticsService';
 
-// Типы для работы со статистикой
-interface ToolStatsResponse {
-  success: boolean;
-  toolName: string;
-  displayName: string;
-  count: number;
-  lastUsed: string | null;
-}
-
 // Сервис для работы со статистикой инструментов
 interface ToolStats {
   [toolName: string]: {
@@ -68,9 +59,17 @@ class StatsService {
     // Сначала пытаемся получить данные с сервера
     if (this.isOnline) {
       try {
-        const response = await apiService.getToolStats(toolName) as ToolStatsResponse;
-        // API возвращает данные напрямую, не в data поле
-        return response.count || 0;
+        console.log(`🔍 [STATS] Getting launch count for: ${toolName}`);
+        const response = await apiService.getToolStats(toolName);
+        
+        // API возвращает данные в поле data.totalUsage
+        if (response.success && response.data && typeof response.data.totalUsage === 'number') {
+          console.log(`📊 [STATS] Server count for ${toolName}: ${response.data.totalUsage}`);
+          return response.data.totalUsage;
+        }
+        
+        console.warn('Неожиданная структура ответа API:', response);
+        return 0;
       } catch (error) {
         console.warn('Не удалось получить статистику с сервера, используем локальные данные:', error);
         this.isOnline = false;
@@ -78,6 +77,7 @@ class StatsService {
     }
 
     // Fallback к локальным данным
+    console.log(`💾 [STATS] Using local count for: ${toolName}`);
     const localStats = this.getLocalStats();
     return localStats[toolName]?.launchCount || 0;
   }
@@ -95,11 +95,54 @@ class StatsService {
     // Отправляем событие в аналитику
     analyticsService.trackToolUsage(toolName);
     
-    // Сначала увеличиваем счетчик
-    await this.incrementLaunchCount(toolName, metadata);
-    
-    // Затем получаем актуальное значение
-    return await this.getLaunchCount(toolName);
+    const startTime = Date.now();
+
+    // Локальное обновление для мгновенного отклика UI
+    this.incrementLocalCount(toolName);
+
+    // Отправка в API (если доступен) и получение нового счетчика
+    if (this.isOnline) {
+      try {
+        const processingTime = metadata?.processingTime || (Date.now() - startTime);
+        
+        console.log('🌐 [STATS] Calling API to increment usage...');
+        const response = await apiService.incrementToolUsage(toolName, {
+          inputLength: metadata?.inputLength,
+          outputLength: metadata?.outputLength,
+          processingTime,
+          language: this.getUserLanguage()
+        });
+        
+        console.log('✅ [STATS] API call successful');
+        
+        // Возвращаем totalUsage из ответа API
+        if (response.data && typeof response.data.totalUsage === 'number') {
+          console.log(`🎯 [STATS] Returning server count: ${response.data.totalUsage}`);
+          return response.data.totalUsage;
+        }
+        
+        // Если в ответе нет totalUsage, делаем запрос на получение
+        return await this.getLaunchCount(toolName);
+        
+      } catch (error) {
+        console.error('❌ [STATS] Error sending stats to server:', error);
+        if (error instanceof ApiError) {
+          console.warn('Ошибка при отправке статистики на сервер:', error.message);
+          
+          // Если ошибка авторизации, переключаемся на локальный режим
+          if (error.isUnauthorized() || error.isNetworkError()) {
+            console.log('🔄 [STATS] Switching to offline mode');
+            this.isOnline = false;
+          }
+        }
+        
+        // В случае ошибки возвращаем локальный счетчик
+        return this.getLocalStats()[toolName]?.launchCount || 1;
+      }
+    } else {
+      console.log('📴 [STATS] Offline mode - returning local count');
+      return this.getLocalStats()[toolName]?.launchCount || 1;
+    }
   }
 
   /**

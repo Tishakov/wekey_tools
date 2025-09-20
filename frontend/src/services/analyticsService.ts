@@ -29,7 +29,7 @@ interface AnalyticsEvent {
 class AnalyticsService {
   private readonly USER_ID_KEY = 'wekey_user_id';
   private readonly VISITOR_DATA_KEY = 'wekey_visitor_data';
-  private readonly API_BASE = 'http://localhost:8080';
+  private readonly API_BASE = 'http://localhost:8880';
   private userId: string;
   private isInitialized = false;
 

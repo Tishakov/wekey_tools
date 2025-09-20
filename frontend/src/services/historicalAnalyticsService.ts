@@ -16,7 +16,7 @@ interface HistoricalResponse {
 }
 
 class HistoricalAnalyticsService {
-  private readonly API_BASE = 'http://localhost:8080';
+  private readonly API_BASE = 'http://localhost:8880';
 
   /**
    * Получает исторические данные за указанный период

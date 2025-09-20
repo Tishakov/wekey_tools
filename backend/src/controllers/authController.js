@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 
 // Секретный ключ для JWT
 const JWT_SECRET = process.env.JWT_SECRET || 'wekey-tools-secret-key-2025';
@@ -109,6 +110,9 @@ exports.register = async (req, res) => {
 
     const { email, password, firstName, lastName } = req.body;
 
+    // Импортируем User только когда нужно
+    const { User } = require('../config/database');
+    
     // Проверка существования пользователя
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -176,7 +180,10 @@ exports.verifyToken = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findByPk(decoded.id);
+    
+    // Импортируем User только когда нужно
+    const { User } = require('../config/database');
+    const user = await User.findByPk(decoded.userId); // Исправлено с decoded.id на decoded.userId
 
     if (!user) {
       return res.status(401).json({

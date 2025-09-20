@@ -9,36 +9,54 @@ import AdminAdmins from '../components/admin/AdminAdmins';
 import AdminLogs from '../components/admin/AdminLogs';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
 import AnalyticsChart from '../components/AnalyticsChart';
+import DateRangePicker from '../components/DateRangePicker';
+import MiniBarChart from '../components/MiniBarChart';
 import historicalAnalyticsService from '../services/historicalAnalyticsService';
 import type { HistoricalDataPoint } from '../services/historicalAnalyticsService';
+import { getToolName } from '../utils/toolsRegistry';
 import './AdminPanel.css';
 
 interface AdminData {
   success: boolean;
   stats: {
-    [displayName: string]: { 
-      count: number; 
-      lastUsed: string;
-      originalKey?: string; // Опциональный оригинальный ключ
+    totalUsage: number;
+    users: {
+      totalUsers: number;
+      activeToday: number;
+      newThisWeek: number;
     };
+    toolUsage: Array<{
+      toolName: string;
+      usageCount: number;
+      lastUsed: string;
+    }>;
   };
-  totalUsage: number;
 }
 
 interface AnalyticsData {
   success: boolean;
-  analytics: {
-    total: {
-      visitors: number;
-      toolUsers: number;
-      conversionRate: string;
+  data: {
+    visitors: {
+      today: number;
+      total: number;
     };
-    today: {
-      visitors: number;
-      toolUsers: number;
-      conversionRate: string;
+    users: {
+      today: number;
+      total: number;
     };
-    events: number;
+    usage: {
+      today: number;
+      total: number;
+    };
+    tools: {
+      count: number;
+      mostUsed: string;
+    };
+    conversionRate: number;
+    revenue: {
+      today: number;
+      total: number;
+    };
   };
 }
 
@@ -52,6 +70,11 @@ const AdminPanel: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month' | 'quarter' | 'year'>('month');
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(new Date().setDate(new Date().getDate() - 29)),
+    endDate: new Date(),
+    label: 'Последние 30 дней'
+  });
   const [loading, setLoading] = useState(false);
   const [loadingHistorical, setLoadingHistorical] = useState(false);
   const [error, setError] = useState('');
@@ -122,7 +145,7 @@ const AdminPanel: React.FC = () => {
     setError('');
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -153,7 +176,7 @@ const AdminPanel: React.FC = () => {
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       
       const response = await fetch(`${API_BASE}/api/admin/stats`, {
         headers: {
@@ -176,7 +199,7 @@ const AdminPanel: React.FC = () => {
   const fetchAnalyticsData = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       
       console.log('📊 [ADMIN] Fetching analytics data...');
       
@@ -214,7 +237,7 @@ const AdminPanel: React.FC = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       
       const response = await fetch(`${API_BASE}/api/admin/reset-stats`, {
         method: 'POST',
@@ -299,42 +322,36 @@ const AdminPanel: React.FC = () => {
           <div className="dashboard-content">
             <div className="dashboard-header">
               <h1 className="dashboard-title">Дашборд</h1>
-              <div className="date-range-picker">
-                <label>Диапазон дат</label>
-                <select value={selectedPeriod} onChange={handlePeriodChange}>
-                  <option value="today">Сегодня</option>
-                  <option value="week">Неделя</option>
-                  <option value="month">Месяц</option>
-                  <option value="quarter">Квартал</option>
-                  <option value="year">Год</option>
-                </select>
-              </div>
+              <DateRangePicker
+                selectedRange={dateRange}
+                onRangeChange={setDateRange}
+              />
             </div>
 
             <div className="stats-grid">
               <div className="stat-card">
                 <h3>Посетителей</h3>
-                <div className="stat-number">{analyticsData?.analytics?.total?.visitors || 0}</div>
+                <div className="stat-number">{analyticsData?.data?.visitors?.total || 0}</div>
               </div>
 
               <div className="stat-card">
                 <h3>Пользователей</h3>
-                <div className="stat-number">{analyticsData?.analytics?.total?.toolUsers || 0}</div>
+                <div className="stat-number">{analyticsData?.data?.users?.total || 0}</div>
               </div>
 
               <div className="stat-card">
                 <h3>Использований</h3>
-                <div className="stat-number">{adminData?.totalUsage || 0}</div>
+                <div className="stat-number">{adminData?.stats?.totalUsage || 0}</div>
               </div>
 
               <div className="stat-card">
                 <h3>Инструментов</h3>
-                <div className="stat-number">{adminData?.stats ? Object.values(adminData.stats).filter(stat => stat.count > 0).length : 0}</div>
+                <div className="stat-number">{adminData?.stats?.toolUsage?.length || 0}</div>
               </div>
 
               <div className="stat-card">
                 <h3>Конверсия</h3>
-                <div className="stat-conversion">{analyticsData?.analytics?.total?.conversionRate || '0'}%</div>
+                <div className="stat-conversion">{analyticsData?.data?.conversionRate ? (analyticsData.data.conversionRate * 100).toFixed(2) : '0'}%</div>
               </div>
 
               <div className="stat-card">
@@ -418,28 +435,34 @@ const AdminPanel: React.FC = () => {
                     <tr>
                       <th>Инструмент</th>
                       <th>Использований</th>
+                      <th>Сравнение</th>
                       <th>Последнее использование</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {adminData?.stats && Object.keys(adminData.stats).length > 0 ? (
-                      Object.entries(adminData.stats)
-                        .filter(([, data]) => data.count > 0)
-                        .map(([displayName, data], index) => (
+                    {adminData?.stats?.toolUsage && adminData.stats.toolUsage.length > 0 ? (() => {
+                      const toolsWithUsage = adminData.stats.toolUsage.filter(tool => tool.usageCount > 0);
+                      const maxUsage = Math.max(...toolsWithUsage.map(tool => tool.usageCount));
+                      
+                      return toolsWithUsage.map((tool, index) => (
                         <tr key={index}>
-                          <td>{displayName}</td>
-                          <td>{data.count}</td>
-                          <td>{new Date(data.lastUsed).toLocaleString('ru-RU')}</td>
+                          <td>{getToolName(tool.toolName)}</td>
+                          <td>{tool.usageCount}</td>
+                          <td>
+                            <MiniBarChart 
+                              value={tool.usageCount}
+                              maxValue={maxUsage}
+                              color="#3b82f6"
+                              width={100}
+                              height={16}
+                            />
+                          </td>
+                          <td>{new Date(tool.lastUsed).toLocaleString('ru-RU')}</td>
                         </tr>
-                      ))
-                    ) : (
+                      ));
+                    })() : (
                       <tr>
-                        <td colSpan={3}>Пока нет данных об использовании</td>
-                      </tr>
-                    )}
-                    {adminData?.stats && Object.entries(adminData.stats).every(([, data]) => data.count === 0) && (
-                      <tr>
-                        <td colSpan={3}>Пока нет данных об использовании</td>
+                        <td colSpan={4}>Пока нет данных об использовании</td>
                       </tr>
                     )}
                   </tbody>

@@ -1,0 +1,59 @@
+.mini-bar-chart {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.mini-bar-background {
+  flex: 1;
+  height: 100%;
+  /* background: linear-gradient(90deg, #5E35F2 0%, #F22987 100%); */
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  opacity: 0.3;
+}
+
+.mini-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #5E35F2 0%, #F22987 100%);
+  transition: width 0.3s ease;
+  min-width: 2px;
+  opacity: 1;
+}
+
+.mini-bar-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #BCBBBD;
+  min-width: 20px;
+  text-align: right;
+}
+
+/* Анимация при загрузке */
+.mini-bar-fill {
+  animation: fillBar 0.8s ease-out;
+}
+
+@keyframes fillBar {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--final-width);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .mini-bar-chart {
+    gap: 6px;
+  }
+  
+  .mini-bar-value {
+    font-size: 11px;
+    min-width: 16px;
+  }
+}

@@ -1,5 +1,5 @@
 // Сервис для работы с backend API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8880';
 
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;

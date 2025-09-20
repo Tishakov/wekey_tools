@@ -76,6 +76,25 @@ app.use((req, res, next) => {
   next();
 });
 
+// Импорт и регистрация роутов
+try {
+  const authRoutes = require('./routes/auth');
+  const adminRoutes = require('./routes/admin');
+  const statsRoutes = require('./routes/stats');
+  const usersRoutes = require('./routes/users');
+  const analyticsRoutes = require('./routes/analytics');
+
+  app.use('/api/auth', authRoutes);
+  app.use('/api/admin', adminRoutes);
+  app.use('/api/stats', statsRoutes);
+  app.use('/api/analytics', analyticsRoutes); // Подключаем User tracking аналитику
+  app.use('/api/users', usersRoutes);
+  
+  console.log('✅ All routes registered successfully');
+} catch (error) {
+  console.error('❌ Failed to register routes:', error);
+}
+
 // Health check БЕЗ зависимости от базы данных
 app.get('/health', (req, res) => {
   console.log('Health check requested');
@@ -291,7 +310,7 @@ app.use((err, req, res, next) => {
 });
 
 // Запуск сервера БЕЗ зависимости от базы данных
-const PORT = config.PORT || 3002;
+const PORT = config.PORT || 8880;
 
 console.log("📡 Готов к запуску сервера на порту", PORT);
 const server = app.listen(PORT, '127.0.0.1', () => {
@@ -301,10 +320,29 @@ const server = app.listen(PORT, '127.0.0.1', () => {
   console.log(`📈 Stats test: curl -X POST http://127.0.0.1:${PORT}/api/stats/increment -H "Content-Type: application/json" -d "{\\"toolName\\":\\"test\\"}"`);
   console.log('🔍 Server listening state:', server.listening);
   console.log('🔍 Server address:', server.address());
+  
+  // КРИТИЧЕСКИ ВАЖНО: добавляем логирование чтобы понять, где падает
+  console.log('✅ Server callback completed - server should be running!');
+  
+  // Проверяем через 1 секунду
+  setTimeout(() => {
+    console.log('🔍 After 1 second - server still running:', server.listening);
+    console.log('🔍 Process still alive:', process.pid);
+  }, 1000);
 });
 
 server.on('error', (err) => {
   console.error('❌ Server error (but not exiting):', err);
+  // НЕ УБИВАЕМ СЕРВЕР: process.exit(1);
+});
+
+// Добавляем обработку необработанных ошибок - НЕ УБИВАЕМ СЕРВЕР
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception (but not exiting):', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection (but not exiting):', reason);
 });
 
 // Graceful shutdown БЕЗ process.exit
