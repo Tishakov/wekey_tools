@@ -1,3 +1,16 @@
+console.log("🚀 Backend: запуск файла app.js начат");
+
+// Добавляем ловушки ошибок в самом начале
+process.on("uncaughtException", (err) => {
+  console.error("❌ Uncaught Exception:", err);
+  console.error("Stack:", err.stack);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Unhandled Rejection:", reason);
+  console.error("Promise:", promise);
+});
+
 const express = require('express');
 const cors = require('cors');
 
@@ -7,8 +20,13 @@ const cors = require('cors');
 // const morgan = require('morgan');
 // const rateLimit = require('express-rate-limit');
 
+console.log("📦 Базовые модули загружены");
+
 const config = require('./config/config');
+console.log("⚙️ Конфиг загружен");
+
 const logger = require('./utils/logger');
+console.log("📝 Логгер загружен");
 
 // УБИРАЕМ process.exit(1) - пусть сервер работает даже при ошибках
 process.on('uncaughtException', (error) => {
@@ -22,6 +40,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Импорт database - БЕЗ process.exit(1)
+console.log("⏳ Подключение к базе данных...");
 let sequelize = null;
 try {
   const db = require('./config/database');
@@ -103,6 +122,150 @@ app.post('/api/stats/increment', (req, res) => {
   }
 });
 
+// Admin login endpoint
+app.post('/api/auth/login', (req, res) => {
+  console.log("Admin login request:", req.body);
+  try {
+    const { email, password } = req.body;
+    
+    // Простая проверка - только для демо
+    if (email === 'admin@wekey.tools' && password === 'admin123') {
+      const response = {
+        success: true,
+        token: 'demo-admin-token-' + Date.now(),
+        user: {
+          id: 1,
+          email: 'admin@wekey.tools',
+          role: 'admin'
+        }
+      };
+      
+      console.log('Admin login successful:', response);
+      res.json(response);
+    } else {
+      console.log('Admin login failed: invalid credentials');
+      res.status(401).json({
+        success: false,
+        message: 'Неверные данные для входа'
+      });
+    }
+  } catch (error) {
+    console.error('❌ Admin login error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message
+    });
+  }
+});
+
+// Admin stats endpoint
+app.get('/api/admin/stats', (req, res) => {
+  console.log("Admin stats request");
+  try {
+    // Проверяем токен (простая проверка для демо)
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer demo-admin-token')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+    
+    // Мок данные для админ-панели
+    const response = {
+      success: true,
+      stats: {
+        totalUsage: 1247,
+        users: {
+          totalUsers: 156,
+          activeToday: 23,
+          newThisWeek: 8
+        },
+        toolUsage: [
+          {
+            toolName: 'Изменение регистра',
+            usageCount: 324,
+            lastUsed: new Date().toISOString()
+          },
+          {
+            toolName: 'Удаление дубликатов',
+            usageCount: 289,
+            lastUsed: new Date(Date.now() - 1000 * 60 * 30).toISOString()
+          },
+          {
+            toolName: 'Транслитерация',
+            usageCount: 201,
+            lastUsed: new Date(Date.now() - 1000 * 60 * 60).toISOString()
+          },
+          {
+            toolName: 'Генератор UTM-меток',
+            usageCount: 187,
+            lastUsed: new Date(Date.now() - 1000 * 60 * 90).toISOString()
+          },
+          {
+            toolName: 'Текст в HTML',
+            usageCount: 156,
+            lastUsed: new Date(Date.now() - 1000 * 60 * 120).toISOString()
+          }
+        ]
+      }
+    };
+    
+    console.log('Admin stats response:', response);
+    res.json(response);
+  } catch (error) {
+    console.error('❌ Admin stats error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message
+    });
+  }
+});
+
+// Admin reset stats endpoint
+app.post('/api/admin/reset-stats', (req, res) => {
+  console.log("Admin reset stats request");
+  try {
+    // Проверяем токен (простая проверка для демо)
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer demo-admin-token')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+    
+    // Здесь должна быть логика сброса реальных данных из БД
+    // Пока что делаем заглушку
+    console.log("🔄 Сброс аналитики (в реальной версии здесь будет очистка БД)");
+    
+    // В реальном приложении здесь было бы:
+    // await db.query('DELETE FROM tool_usage');
+    // await db.query('DELETE FROM user_sessions');
+    // await db.query('DELETE FROM analytics_data');
+    
+    const response = {
+      success: true,
+      message: 'Аналитика успешно сброшена',
+      timestamp: new Date().toISOString(),
+      resetInfo: {
+        toolUsageCleared: true,
+        userStatsCleared: true,
+        analyticsCleared: true
+      }
+    };
+    
+    console.log('Admin reset response:', response);
+    res.json(response);
+  } catch (error) {
+    console.error('❌ Admin reset error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message
+    });
+  }
+});
+
 // Обработка несуществующих роутов
 app.use('*', (req, res) => {
   console.log(`404 - Route not found: ${req.method} ${req.url}`);
@@ -128,8 +291,9 @@ app.use((err, req, res, next) => {
 });
 
 // Запуск сервера БЕЗ зависимости от базы данных
-const PORT = config.PORT || 3001;
+const PORT = config.PORT || 3002;
 
+console.log("📡 Готов к запуску сервера на порту", PORT);
 const server = app.listen(PORT, '127.0.0.1', () => {
   console.log(`🚀 Wekey Tools Backend (Fixed) запущен на порту ${PORT}`);
   console.log(`📊 Режим: ${config.NODE_ENV || 'development'}`);
