@@ -28,7 +28,6 @@ import RemoveLineBreaksTool from './pages/RemoveLineBreaksTool';
 import TextByColumnsTool from './pages/TextByColumnsTool';
 import MatchTypesTool from './pages/MatchTypesTool';
 import AdminPanel from './pages/AdminPanel';
-import AdminPanelDemo from './pages/AdminPanelDemo';
 import './styles/tool-pages.css';
 
 function App() {
@@ -65,7 +64,6 @@ function App() {
           <Route path="/match-types" element={<MatchTypesTool />} />
           <Route path="/word-mixer" element={<WordMixerTool />} />
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/admin-demo" element={<AdminPanelDemo />} />
         </Routes>
       </Layout>
     </Router>

@@ -1,5 +1,5 @@
 // Сервис для работы с backend API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -64,7 +64,7 @@ class ApiService {
 
   // Базовый метод для HTTP запросов
   async request<T = any>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    const url = `${this.baseURL}/api${endpoint}`;
     
     const config: RequestOptions = {
       headers: this.getHeaders(),
@@ -266,7 +266,7 @@ class ApiService {
   // Проверка доступности API
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseURL.replace('/api', '')}/health`);
+      const response = await fetch(`${this.baseURL}/health`);
       return response.ok;
     } catch {
       return false;
