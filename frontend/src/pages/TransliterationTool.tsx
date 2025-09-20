@@ -36,12 +36,19 @@ const TransliterationTool: React.FC = () => {
     }
   };
 
-  const handleShowResult = () => {
+  const handleShowResult = async () => {
     let result = inputText;
     
-    // Увеличиваем счетчик запусков
-    statsService.incrementLaunchCount(TOOL_ID);
-    setLaunchCount(prev => prev + 1);
+    // Увеличиваем счетчик запусков и получаем актуальное значение
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+        inputLength: inputText.length
+      });
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
+    }
     
     // ОСНОВНАЯ ФУНКЦИЯ: Всегда применяем транслитерацию
     result = transliterate(result);

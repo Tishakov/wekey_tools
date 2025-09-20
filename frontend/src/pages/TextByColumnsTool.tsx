@@ -63,15 +63,22 @@ const TextByColumnsTool: React.FC = () => {
     };
 
     // Функция разбивки текста по столбцам
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
         if (!inputText.trim()) {
             setColumns(['', '', '', '', '', '']);
             return;
         }
 
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                inputLength: inputText.length
+            });
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         // Определяем символ разделителя
         let separatorStr = '';

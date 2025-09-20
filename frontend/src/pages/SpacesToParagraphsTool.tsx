@@ -32,7 +32,16 @@ const SpacesToParagraphsTool: React.FC = () => {
     // Отслеживание статистики при показе результата
     useEffect(() => {
         if (result) {
-            statsService.incrementLaunchCount(TOOL_ID);
+            const updateStats = async () => {
+                try {
+                    const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+                    setLaunchCount(newCount);
+                } catch (error) {
+                    console.warn('Failed to update statistics:', error);
+                    setLaunchCount(prev => prev + 1);
+                }
+            };
+            updateStats();
         }
     }, [result]);
 

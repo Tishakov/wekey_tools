@@ -51,7 +51,7 @@ const DuplicateFinderTool: React.FC = () => {
     };
 
     // Функция поиска дубликатов
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
         if (!inputText1.trim() && !inputText2.trim()) {
             setOnlyInFirst('');
             setCommon('');
@@ -59,9 +59,16 @@ const DuplicateFinderTool: React.FC = () => {
             return;
         }
 
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                inputLength: inputText1.length + inputText2.length
+            });
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         // Получаем списки слов, фильтруя пустые строки
         const list1 = inputText1.trim() 

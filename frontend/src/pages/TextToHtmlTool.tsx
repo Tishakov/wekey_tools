@@ -28,7 +28,19 @@ const TextToHtmlTool: React.FC = () => {
     // Отслеживание статистики при показе результата
     useEffect(() => {
         if (result) {
-            statsService.incrementLaunchCount(TOOL_ID);
+            const updateStats = async () => {
+                try {
+                    const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                        inputLength: inputText.length,
+                        outputLength: result.length
+                    });
+                    setLaunchCount(newCount);
+                } catch (error) {
+                    console.error('Failed to update stats:', error);
+                    setLaunchCount(prev => prev + 1);
+                }
+            };
+            updateStats();
         }
     }, [result]);
 

@@ -180,7 +180,10 @@ class ApiService {
       sessionId: this.getSessionId()
     };
 
-    return this.post('/api/stats/increment', data);
+    console.log('🚀 [API] Sending stats increment for:', toolName, data);
+    const result = await this.post('/api/stats/increment', data);
+    console.log('✅ [API] Stats increment response:', result);
+    return result;
   }
 
   async getToolStats(toolName: string): Promise<ApiResponse> {

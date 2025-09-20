@@ -64,7 +64,7 @@ const WordGluingTool: React.FC = () => {
     };
 
     // Функция склейки слов
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
         if (!inputText1.trim() || !inputText2.trim()) {
             setResult('');
             return;
@@ -73,9 +73,16 @@ const WordGluingTool: React.FC = () => {
         const lines1 = inputText1.trim().split('\n').filter(line => line.trim());
         const lines2 = inputText2.trim().split('\n').filter(line => line.trim());
         
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                inputLength: inputText1.length + inputText2.length
+            });
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         // Определяем соединитель
         let connectorStr = '';

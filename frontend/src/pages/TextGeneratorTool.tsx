@@ -220,9 +220,18 @@ const TextGeneratorTool: React.FC = () => {
     } finally {
       setIsGenerating(false);
       
-      // Обновляем статистику
-      statsService.incrementLaunchCount(TOOL_ID);
-      setLaunchCount(prev => prev + 1);
+      // Обновляем статистику и получаем актуальное значение
+      try {
+        const inputLength = countMode === 'characters' ? characterCount : wordCount;
+        const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+          inputLength: inputLength,
+          outputLength: result.length
+        });
+        setLaunchCount(newCount);
+      } catch (error) {
+        console.error('Failed to update stats:', error);
+        setLaunchCount(prev => prev + 1);
+      }
     }
   };
 

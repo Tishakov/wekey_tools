@@ -39,8 +39,16 @@ const DuplicateRemovalTool: React.FC = () => {
     useEffect(() => {
         if (result) {
             const updateStats = async () => {
-                await statsService.incrementLaunchCount(TOOL_ID);
-                setLaunchCount(prev => prev + 1);
+                try {
+                    const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                        inputLength: inputText.length,
+                        outputLength: result.length
+                    });
+                    setLaunchCount(newCount);
+                } catch (error) {
+                    console.error('Failed to update stats:', error);
+                    setLaunchCount(prev => prev + 1);
+                }
             };
             updateStats();
         }

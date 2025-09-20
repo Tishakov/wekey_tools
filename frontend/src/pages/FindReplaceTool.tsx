@@ -97,11 +97,21 @@ const FindReplaceTool: React.FC = () => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   };
 
-  const handleShowResult = () => {
+  const handleShowResult = async () => {
     const processedText = processText(inputText);
     setResult(processedText);
-    statsService.incrementLaunchCount(TOOL_ID);
-    setLaunchCount(prev => prev + 1);
+    
+    // Увеличиваем счетчик запусков и получаем актуальное значение
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+        inputLength: inputText.length,
+        outputLength: processedText.length
+      });
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
+    }
   };
 
   const handleCopy = async () => {

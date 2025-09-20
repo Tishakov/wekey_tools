@@ -113,10 +113,15 @@ const PasswordGeneratorTool: React.FC = () => {
     };
 
     // Основная функция генерации паролей
-    const handleGeneratePasswords = () => {
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+    const handleGeneratePasswords = async () => {
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         const passwords = [];
         for (let i = 0; i < passwordCount; i++) {

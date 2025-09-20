@@ -205,8 +205,8 @@ const AdminPanel: React.FC = () => {
 
             <div className="stat-card">
               <h3>Инструменты</h3>
-              <div className="stat-number">{Object.keys(adminData.stats).length}</div>
-              <div className="stat-label">Доступных инструментов</div>
+              <div className="stat-number">{Object.values(adminData.stats).filter(stat => stat.count > 0).length}</div>
+              <div className="stat-label">Использованных инструментов</div>
             </div>
           </div>
 

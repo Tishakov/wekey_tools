@@ -82,7 +82,7 @@ const WordMixerTool: React.FC = () => {
     };
 
     // Функция миксации слов
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
         // Получаем списки слов, фильтруя пустые строки
         const words1 = inputText1.trim() ? inputText1.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
         const words2 = inputText2.trim() ? inputText2.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
@@ -102,9 +102,17 @@ const WordMixerTool: React.FC = () => {
             return;
         }
 
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const totalInput = [inputText1, inputText2, inputText3, inputText4].join('\n');
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                inputLength: totalInput.length
+            });
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         // Алгоритм миксации: создаем все возможные комбинации и сохраняем промежуточные результаты
         let currentCombinations = nonEmptyLists[0].map(word => [word]);

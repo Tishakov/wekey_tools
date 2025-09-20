@@ -78,7 +78,7 @@ const CharCounterTool: React.FC = () => {
     };
 
     // Основная функция подсчета статистики
-    const calculateStats = () => {
+    const calculateStats = async () => {
         if (!inputText.trim()) {
             setStats({
                 characters: 0,
@@ -93,9 +93,17 @@ const CharCounterTool: React.FC = () => {
             return;
         }
 
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+                inputLength: inputText.length,
+                outputLength: inputText.length
+            });
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         // Получаем список исключений (только если включена опция)
         const exceptionList = useExceptions && exceptions

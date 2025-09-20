@@ -46,10 +46,16 @@ const NumberGeneratorTool: React.FC = () => {
     };
 
     // Основная функция генерации чисел
-    const handleGenerateNumbers = () => {
-        // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        setLaunchCount(prev => prev + 1);
+    const handleGenerateNumbers = async () => {
+        // Увеличиваем счетчик запусков и получаем актуальное значение
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            // Если API недоступен, увеличиваем локально
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
 
         const numbers: number[] = [];
         let availableNumbers = new Set<number>();

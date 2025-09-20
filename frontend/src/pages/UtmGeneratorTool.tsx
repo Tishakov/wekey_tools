@@ -259,8 +259,17 @@ const UtmGeneratorTool: React.FC = () => {
         }
 
         // Увеличиваем счетчик запусков
-        statsService.incrementLaunchCount(TOOL_ID);
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const updateStats = async () => {
+            try {
+                const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+                setLaunchCount(newCount);
+            } catch (error) {
+                console.warn('Failed to update statistics:', error);
+                const count = await statsService.getLaunchCount(TOOL_ID);
+                setLaunchCount(count);
+            }
+        };
+        updateStats();
     };
 
     // Обработчик копирования результата

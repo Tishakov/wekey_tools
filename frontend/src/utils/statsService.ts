@@ -82,6 +82,23 @@ class StatsService {
   }
 
   /**
+   * Увеличить счетчик запусков для инструмента на 1 и вернуть новое значение
+   */
+  async incrementAndGetCount(toolName: string, metadata?: {
+    inputLength?: number;
+    outputLength?: number;
+    processingTime?: number;
+  }): Promise<number> {
+    console.log('📊 [STATS] Incrementing and getting count for:', toolName);
+    
+    // Сначала увеличиваем счетчик
+    await this.incrementLaunchCount(toolName, metadata);
+    
+    // Затем получаем актуальное значение
+    return await this.getLaunchCount(toolName);
+  }
+
+  /**
    * Увеличить счетчик запусков для инструмента на 1
    */
   async incrementLaunchCount(toolName: string, metadata?: {
@@ -89,6 +106,7 @@ class StatsService {
     outputLength?: number;
     processingTime?: number;
   }): Promise<void> {
+    console.log('📊 [STATS] Incrementing launch count for:', toolName);
     const startTime = Date.now();
 
     // Локальное обновление для мгновенного отклика UI
@@ -99,22 +117,28 @@ class StatsService {
       try {
         const processingTime = metadata?.processingTime || (Date.now() - startTime);
         
+        console.log('🌐 [STATS] Calling API to increment usage...');
         await apiService.incrementToolUsage(toolName, {
           inputLength: metadata?.inputLength,
           outputLength: metadata?.outputLength,
           processingTime,
           language: this.getUserLanguage()
         });
+        console.log('✅ [STATS] API call successful');
       } catch (error) {
+        console.error('❌ [STATS] Error sending stats to server:', error);
         if (error instanceof ApiError) {
           console.warn('Ошибка при отправке статистики на сервер:', error.message);
           
           // Если ошибка авторизации, переключаемся на локальный режим
           if (error.isUnauthorized() || error.isNetworkError()) {
+            console.log('🔄 [STATS] Switching to offline mode');
             this.isOnline = false;
           }
         }
       }
+    } else {
+      console.log('📴 [STATS] Offline mode - only local stats updated');
     }
   }
 

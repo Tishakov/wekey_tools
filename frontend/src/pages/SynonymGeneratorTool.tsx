@@ -53,9 +53,17 @@ const SynonymGeneratorTool: React.FC = () => {
       setIsGenerating(false);
     }
     
-    // Обновляем статистику
-    statsService.incrementLaunchCount(TOOL_ID);
-    setLaunchCount(prev => prev + 1);
+    // Обновляем статистику и получаем актуальное значение
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+        inputLength: inputText.length,
+        outputLength: result.length
+      });
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
+    }
   };
 
   // Обработка копирования

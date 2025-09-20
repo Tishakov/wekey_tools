@@ -13,11 +13,8 @@ app.use(cors({
 }));
 
 // Временное хранилище статистики
-let toolStats = {
-  generator: { count: 2, lastUsed: new Date().toISOString() },
-  analyzer: { count: 5, lastUsed: new Date().toISOString() }
-};
-let totalUsage = 7;
+let toolStats = {};
+let totalUsage = 0;
 
 // Функция для получения человекочитаемых названий инструментов
 function getToolDisplayName(toolKey) {
@@ -57,9 +54,7 @@ function getToolDisplayName(toolKey) {
     'tekst_v_html': 'Текст в HTML',
     'probeli_na_abzacy': 'Пробелы на абзацы',
     'utm_generator': 'Генератор UTM-меток',
-    'duplicate-finder': 'Поиск дубликатов',
-    'generator': 'Генератор',
-    'analyzer': 'Анализатор'
+    'duplicate-finder': 'Поиск дубликатов'
   };
   return displayNames[toolKey] || toolKey;
 }
