@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Logo from './Logo';
+import analyticsService from '../services/analyticsService';
 import './Layout.css';
 
 interface LayoutProps {
@@ -9,6 +11,15 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const location = useLocation();
+
+  // Трекинг посещения страниц
+  useEffect(() => {
+    const currentPage = location.pathname;
+    console.log('📊 [ANALYTICS] Page view:', currentPage);
+    analyticsService.trackPageView(currentPage);
+  }, [location.pathname]);
+
   return (
     <div className="layout">
       <div className="layout-container">

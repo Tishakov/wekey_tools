@@ -16,6 +16,16 @@ app.use(cors({
 let toolStats = {};
 let totalUsage = 0;
 
+// Временное хранилище аналитики
+let visitors = new Map(); // userId -> VisitorData
+let analyticsEvents = []; // массив событий
+let dailyStats = new Map(); // date -> { visitors: Set, toolUsers: Set }
+
+// Вспомогательная функция для получения даты в формате YYYY-MM-DD
+function getDateKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
 // Функция для получения человекочитаемых названий инструментов
 function getToolDisplayName(toolKey) {
   const displayNames = {
@@ -113,6 +123,128 @@ function authMiddleware(req, res, next) {
   console.log('✅ [AUTH] Token validation successful');
   next();
 }
+
+// === ANALYTICS API ===
+
+// Обновление данных посетителя
+app.post('/api/analytics/visitor', (req, res) => {
+  console.log('📊 [ANALYTICS] Visitor data received:', req.body);
+  
+  try {
+    const visitorData = req.body;
+    const userId = visitorData.userId;
+    
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'Missing userId' });
+    }
+
+    // Сохраняем данные посетителя
+    visitors.set(userId, visitorData);
+    
+    // Обновляем дневную статистику
+    const dateKey = getDateKey();
+    if (!dailyStats.has(dateKey)) {
+      dailyStats.set(dateKey, {
+        visitors: new Set(),
+        toolUsers: new Set()
+      });
+    }
+    
+    const todayStats = dailyStats.get(dateKey);
+    todayStats.visitors.add(userId);
+    
+    if (visitorData.hasUsedTools) {
+      todayStats.toolUsers.add(userId);
+    }
+    
+    console.log('📊 [ANALYTICS] Visitor data saved for user:', userId);
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error('❌ [ANALYTICS] Error saving visitor data:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Обработка событий аналитики
+app.post('/api/analytics/event', (req, res) => {
+  console.log('📊 [ANALYTICS] Event received:', req.body);
+  
+  try {
+    const eventData = req.body;
+    const { userId, event, data } = eventData;
+    
+    if (!userId || !event || !data) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Сохраняем событие
+    analyticsEvents.push({
+      ...eventData,
+      timestamp: new Date().toISOString()
+    });
+
+    // Если это использование инструмента, обновляем статистику
+    if (event === 'tool_usage' && data.tool) {
+      const dateKey = getDateKey();
+      if (!dailyStats.has(dateKey)) {
+        dailyStats.set(dateKey, {
+          visitors: new Set(),
+          toolUsers: new Set()
+        });
+      }
+      
+      const todayStats = dailyStats.get(dateKey);
+      todayStats.toolUsers.add(userId);
+    }
+    
+    console.log('📊 [ANALYTICS] Event saved:', event, 'for user:', userId);
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error('❌ [ANALYTICS] Error saving event:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Получение аналитики для админ-панели
+app.get('/api/admin/analytics', authMiddleware, (req, res) => {
+  console.log('📊 [ADMIN] Analytics requested');
+  
+  try {
+    // Подсчитываем общую статистику
+    const totalVisitors = visitors.size;
+    const toolUsers = Array.from(visitors.values()).filter(v => v.hasUsedTools).length;
+    
+    // Статистика за сегодня
+    const dateKey = getDateKey();
+    const todayStats = dailyStats.get(dateKey) || { visitors: new Set(), toolUsers: new Set() };
+    
+    const analytics = {
+      total: {
+        visitors: totalVisitors,
+        toolUsers: toolUsers,
+        conversionRate: totalVisitors > 0 ? ((toolUsers / totalVisitors) * 100).toFixed(1) : 0
+      },
+      today: {
+        visitors: todayStats.visitors.size,
+        toolUsers: todayStats.toolUsers.size,
+        conversionRate: todayStats.visitors.size > 0 ? 
+          ((todayStats.toolUsers.size / todayStats.visitors.size) * 100).toFixed(1) : 0
+      },
+      events: analyticsEvents.length
+    };
+    
+    console.log('📊 [ADMIN] Returning analytics:', analytics);
+    res.json({ success: true, analytics });
+    
+  } catch (error) {
+    console.error('❌ [ADMIN] Error getting analytics:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// === EXISTING ENDPOINTS ===
 
 // Admin stats
 app.get('/api/admin/stats', authMiddleware, (req, res) => {

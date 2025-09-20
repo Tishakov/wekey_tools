@@ -1,4 +1,5 @@
 import { apiService, ApiError } from '../services/apiService';
+import analyticsService from '../services/analyticsService';
 
 // Типы для работы со статистикой
 interface ToolStatsResponse {
@@ -90,6 +91,9 @@ class StatsService {
     processingTime?: number;
   }): Promise<number> {
     console.log('📊 [STATS] Incrementing and getting count for:', toolName);
+    
+    // Отправляем событие в аналитику
+    analyticsService.trackToolUsage(toolName);
     
     // Сначала увеличиваем счетчик
     await this.incrementLaunchCount(toolName, metadata);

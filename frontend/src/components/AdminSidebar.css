@@ -1,0 +1,153 @@
+.admin-sidebar {
+  width: 280px;
+  height: 100vh;
+  background: #1a1a1a;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #333;
+}
+
+.admin-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-logo-icon {
+  font-size: 24px;
+  color: #ffd700;
+}
+
+.admin-logo-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.admin-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.admin-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-nav-item {
+  margin: 0;
+}
+
+.admin-nav-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 14px;
+  font-family: inherit;
+  position: relative;
+  text-decoration: none;
+}
+
+.admin-nav-link:hover {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.admin-nav-link.active {
+  background: #ffd700;
+  color: #000;
+}
+
+.admin-nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #ffd700;
+}
+
+.admin-nav-icon {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+.admin-nav-text {
+  font-weight: 500;
+}
+
+.admin-sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid #333;
+  text-align: center;
+}
+
+.admin-version {
+  font-size: 12px;
+  color: #666;
+  background: #2a2a2a;
+  padding: 6px 12px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-nav-link {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+
+  .admin-nav-icon {
+    font-size: 20px;
+  }
+}
+
+/* Dark scrollbar */
+.admin-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-nav::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.admin-nav::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+.admin-nav::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
