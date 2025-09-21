@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface ChartData {
   date: string;
@@ -17,8 +17,25 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
   color = '#3b82f6',
   title = 'Analytics Chart'
 }) => {
-  // Генерируем тестовые данные если данные не переданы
-  const chartData = data.length > 0 ? data : generateMockData();
+  // Если нет данных, показываем сообщение о пустом графике
+  if (data.length === 0) {
+    return (
+      <div className="analytics-chart">
+        <div style={{ 
+          height: 180, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          color: '#6b7280',
+          fontSize: '14px'
+        }}>
+          Нет данных для отображения
+        </div>
+      </div>
+    );
+  }
+  
+  const chartData = data;
   
   // Создаем ID для уникального градиента
   const gradientId = `gradient-${color.replace('#', '')}`;
@@ -57,6 +74,39 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
 
   const gradientColors = getGradientColors(color);
 
+  // Кастомный компонент для tooltip
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0];
+      const date = new Date(label);
+      const formattedDate = date.toLocaleDateString('ru-RU', { 
+        day: 'numeric', 
+        month: 'long',
+        year: 'numeric'
+      });
+      
+      return (
+        <div style={{
+          backgroundColor: '#1e1e1e',
+          border: '1px solid #333',
+          borderRadius: '8px',
+          padding: '12px',
+          color: '#fff',
+          fontSize: '14px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+        }}>
+          <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontSize: '12px' }}>
+            {formattedDate}
+          </p>
+          <p style={{ margin: 0, fontWeight: 'bold', color: data.color }}>
+            {title.replace('Динамика ', '').charAt(0).toUpperCase() + title.replace('Динамика ', '').slice(1)}: {data.value}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="analytics-chart">
       <ResponsiveContainer width="100%" height={180}>
@@ -80,6 +130,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
             }}
           />
           <YAxis hide />
+          <Tooltip content={<CustomTooltip />} />
           <Line 
             type="natural" 
             dataKey="value" 
@@ -95,28 +146,5 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
     </div>
   );
 };
-
-// Генерация мок-данных для демонстрации
-function generateMockData(): ChartData[] {
-  const data: ChartData[] = [];
-  const today = new Date();
-  
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    
-    // Генерируем плавно изменяющиеся данные с некоторой случайностью
-    const baseValue = 30 + Math.sin(i * 0.2) * 15;
-    const randomVariation = (Math.random() - 0.5) * 10;
-    const value = Math.max(5, Math.floor(baseValue + randomVariation));
-    
-    data.push({
-      date: date.toISOString().split('T')[0],
-      value: value
-    });
-  }
-  
-  return data;
-}
 
 export default AnalyticsChart;

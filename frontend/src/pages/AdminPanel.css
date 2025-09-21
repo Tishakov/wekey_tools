@@ -151,6 +151,12 @@
   font-weight: 600;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .admin-content-wrapper {
   flex: 1;
   padding: 40px;
@@ -286,18 +292,20 @@
 }
 
 .logout-button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   background: #dc3545;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .logout-button:hover {
   background: #c82333;
+  transform: translateY(-1px);
 }
 
 .admin-content {
@@ -454,10 +462,10 @@
 
 .tools-table th {
   background: #111;
-  color: #9ca3af;
+  color: #BCBBBD;
   font-weight: 600;
   font-size: 13px;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.5px;
 }
 

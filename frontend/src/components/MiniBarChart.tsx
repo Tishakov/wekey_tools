@@ -13,13 +13,13 @@ const MiniBarChart: React.FC<MiniBarChartProps> = ({
   value,
   maxValue,
   color = '#3b82f6',
-  width = 80,
+  width,
   height = 20
 }) => {
   const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
 
   return (
-    <div className="mini-bar-chart" style={{ width, height }}>
+    <div className="mini-bar-chart" style={{ width: width || '100%', height }}>
       <div className="mini-bar-background">
         <div 
           className="mini-bar-fill"
@@ -29,7 +29,6 @@ const MiniBarChart: React.FC<MiniBarChartProps> = ({
           }}
         />
       </div>
-      <span className="mini-bar-value">{value}</span>
     </div>
   );
 };

@@ -398,18 +398,59 @@ router.get('/analytics/historical', async (req, res, next) => {
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
     
-    // Генерируем тестовые исторические данные
-    const generateHistoricalData = (days = 7) => {
+    // Генерируем реальные исторические данные на основе статистики использования
+    const generateRealHistoricalData = async (days = 7) => {
       const data = [];
+      const { ToolUsage } = require('../models');
+      
       for (let i = days - 1; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        data.push({
-          date: date.toISOString().split('T')[0],
-          visitors: Math.floor(Math.random() * 200) + 50,
-          users: Math.floor(Math.random() * 50) + 10,
-          usage: Math.floor(Math.random() * 300) + 100
-        });
+        const dateStr = date.toISOString().split('T')[0];
+        
+        try {
+          // Получаем реальные данные использования за этот день
+          const dayStart = new Date(date);
+          dayStart.setHours(0, 0, 0, 0);
+          const dayEnd = new Date(date);
+          dayEnd.setHours(23, 59, 59, 999);
+          
+          const dailyUsage = await ToolUsage.count({
+            where: {
+              createdAt: {
+                [require('sequelize').Op.between]: [dayStart, dayEnd]
+              }
+            }
+          });
+          
+          const uniqueUsers = await ToolUsage.count({
+            distinct: true,
+            col: 'sessionId',
+            where: {
+              createdAt: {
+                [require('sequelize').Op.between]: [dayStart, dayEnd]
+              }
+            }
+          });
+          
+          data.push({
+            date: dateStr,
+            visitors: 0, // Пока нет системы отслеживания
+            toolUsers: uniqueUsers || 0,
+            usageCount: dailyUsage || 0,
+            conversionRate: "0.00" // Пока нет данных
+          });
+        } catch (error) {
+          console.error('Error fetching daily stats for', dateStr, ':', error);
+          // Фоллбэк на нули если ошибка
+          data.push({
+            date: dateStr,
+            visitors: 0,
+            toolUsers: 0,
+            usageCount: 0,
+            conversionRate: "0.00"
+          });
+        }
       }
       return data;
     };
@@ -420,7 +461,7 @@ router.get('/analytics/historical', async (req, res, next) => {
     
     const response = {
       success: true,
-      data: generateHistoricalData(daysCount)
+      data: await generateRealHistoricalData(daysCount)
     };
     
     console.log('✅ Historical analytics response:', response);
