@@ -177,6 +177,29 @@
     "linesCount": "Строк:",
     "paragraphsCount": "Абзацев:"
   },
+  "charCounterTool": {
+    "title": "Количество символов",
+    "description": "Подсчет символов, слов и других элементов текста",
+    "inputPlaceholder": "Введите или вставьте текст для анализа...",
+    "stats": {
+      "characters": "Символов",
+      "charactersNoSpaces": "Без пробелов",
+      "words": "Слов",
+      "numbers": "Чисел",
+      "digits": "Цифр",
+      "specialChars": "Спецсимволов",
+      "paragraphs": "Абзацев",
+      "sentences": "Предложений"
+    },
+    "settings": {
+      "useExceptions": "Добавить исключения для подсчета",
+      "exceptionsPlaceholder": "Введите слова или символы для исключения (по одному на строку)"
+    },
+    "copyButton": "Копировать результат",
+    "resetButton": "Очистить",
+    "showResultButton": "Показать результат",
+    "usage": "Использований: {{count}}"
+  },
   "textSortingTool": {
     "title": "Сортировка текста",
     "inputText": "Введите текст:",

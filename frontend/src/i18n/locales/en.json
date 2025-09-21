@@ -177,6 +177,29 @@
     "linesCount": "Lines:",
     "paragraphsCount": "Paragraphs:"
   },
+  "charCounterTool": {
+    "title": "Character Count",
+    "description": "Count characters, words and other text elements",
+    "inputPlaceholder": "Enter or paste text to analyze...",
+    "stats": {
+      "characters": "Characters",
+      "charactersNoSpaces": "No spaces",
+      "words": "Words",
+      "numbers": "Numbers",
+      "digits": "Digits",
+      "specialChars": "Special chars",
+      "paragraphs": "Paragraphs",
+      "sentences": "Sentences"
+    },
+    "settings": {
+      "useExceptions": "Add exceptions for counting",
+      "exceptionsPlaceholder": "Enter words or characters to exclude (one per line)"
+    },
+    "copyButton": "Copy result",
+    "resetButton": "Clear",
+    "showResultButton": "Show result",
+    "usage": "Usage: {{count}}"
+  },
   "textSortingTool": {
     "title": "Text Sorting",
     "inputText": "Enter text:",

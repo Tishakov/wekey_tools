@@ -47,7 +47,7 @@
     gap: 10px;
 }
 
-.action-btn {
+.emoji-tool .action-btn {
     width: 36px;
     height: 36px;
     background-color: #1C1D1F;
@@ -62,12 +62,12 @@
     font-size: 16px;
 }
 
-.action-btn:hover {
+.emoji-tool .action-btn:hover {
     background-color: #252526;
     border-color: #4A4A4A;
 }
 
-.action-btn.copy.copied {
+.emoji-tool .action-btn.copy.copied {
     background-color: #09CEA7;
     color: white;
 }

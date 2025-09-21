@@ -153,6 +153,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4, 1fr);
     gap: 15px;
+    margin-bottom: 0; /* Переопределяем админский margin-bottom */
 }
 
 /* Отдельный элемент счетчика */
@@ -169,10 +170,11 @@
 
 /* Лейбл счетчика */
 .char-counter-tool .stat-label {
+    display: block !important; /* Переопределяем админское display: none */
     color: #BCBBBD;
     font-size: 12px;
     font-weight: 400;
-    text-transform: uppercase;
+    text-transform: none; /* Убираем uppercase */
     letter-spacing: 0.5px;
 }
 

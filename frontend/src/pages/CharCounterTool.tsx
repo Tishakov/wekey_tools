@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './CharCounterTool.css';
@@ -18,6 +19,7 @@ interface CountStats {
 }
 
 const CharCounterTool: React.FC = () => {
+    const { t } = useTranslation();
     const [inputText, setInputText] = useState('');
     const [exceptions, setExceptions] = useState('');
     const [launchCount, setLaunchCount] = useState(0);
@@ -192,9 +194,9 @@ const CharCounterTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to="/" className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('navigation.allTools')}
                 </Link>
-                <h1 className="tool-title">Количество символов</h1>
+                <h1 className="tool-title">{t('charCounterTool.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -215,7 +217,7 @@ const CharCounterTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('charCounterTool.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
@@ -234,35 +236,35 @@ const CharCounterTool: React.FC = () => {
                     <div className="stats-group">
                         <div className="stats-grid">
                             <div className="stat-item">
-                                <div className="stat-label">Символов</div>
+                                <div className="stat-label">{t('charCounterTool.stats.characters')}</div>
                                 <div className="stat-value">{stats.characters}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Без пробелов</div>
+                                <div className="stat-label">{t('charCounterTool.stats.charactersNoSpaces')}</div>
                                 <div className="stat-value">{stats.charactersNoSpaces}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Слов</div>
+                                <div className="stat-label">{t('charCounterTool.stats.words')}</div>
                                 <div className="stat-value">{stats.words}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Чисел</div>
+                                <div className="stat-label">{t('charCounterTool.stats.numbers')}</div>
                                 <div className="stat-value">{stats.numbers}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Цифр</div>
+                                <div className="stat-label">{t('charCounterTool.stats.digits')}</div>
                                 <div className="stat-value">{stats.digits}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Спецсимволов</div>
+                                <div className="stat-label">{t('charCounterTool.stats.specialChars')}</div>
                                 <div className="stat-value">{stats.specialChars}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Абзацев</div>
+                                <div className="stat-label">{t('charCounterTool.stats.paragraphs')}</div>
                                 <div className="stat-value">{stats.paragraphs}</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-label">Предложений</div>
+                                <div className="stat-label">{t('charCounterTool.stats.sentences')}</div>
                                 <div className="stat-value">{stats.sentences}</div>
                             </div>
                         </div>
@@ -276,7 +278,7 @@ const CharCounterTool: React.FC = () => {
                                 checked={useExceptions}
                                 onChange={(e) => setUseExceptions(e.target.checked)}
                             />
-                            <span className="checkbox-text">Добавить исключения для подсчета</span>
+                            <span className="checkbox-text">{t('charCounterTool.settings.useExceptions')}</span>
                         </label>
                     </div>
 
@@ -287,7 +289,7 @@ const CharCounterTool: React.FC = () => {
                                 <div className="exceptions-left">
                                     <textarea
                                         className="exceptions-textarea"
-                                        placeholder="*Введите слова, через новую строку, которые НЕ нужно включать в результат:"
+                                        placeholder={t('charCounterTool.settings.exceptionsPlaceholder')}
                                         value={exceptions}
                                         onChange={(e) => setExceptions(e.target.value)}
                                     />
@@ -339,7 +341,7 @@ const CharCounterTool: React.FC = () => {
                     style={{ width: '445px' }}
                     onClick={handleShowResult}
                 >
-                    Показать результат
+                    {t('charCounterTool.showResultButton')}
                 </button>
                 <button 
                     className="action-btn secondary icon-left"
@@ -347,7 +349,7 @@ const CharCounterTool: React.FC = () => {
                     onClick={handleCopyResult}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    Скопировать результат
+                    {t('charCounterTool.copyButton')}
                 </button>
             </div>
         </div>

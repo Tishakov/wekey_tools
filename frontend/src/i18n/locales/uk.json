@@ -177,6 +177,29 @@
     "linesCount": "Рядків:",
     "paragraphsCount": "Абзаців:"
   },
+  "charCounterTool": {
+    "title": "Кількість символів",
+    "description": "Підрахунок символів, слів та інших елементів тексту",
+    "inputPlaceholder": "Введіть або вставте текст для аналізу...",
+    "stats": {
+      "characters": "Символів",
+      "charactersNoSpaces": "Без пробілів",
+      "words": "Слів",
+      "numbers": "Чисел",
+      "digits": "Цифр",
+      "specialChars": "Спецсимволів",
+      "paragraphs": "Абзаців",
+      "sentences": "Речень"
+    },
+    "settings": {
+      "useExceptions": "Додати винятки для підрахунку",
+      "exceptionsPlaceholder": "Введіть слова або символи для виключення (по одному на рядок)"
+    },
+    "copyButton": "Копіювати результат",
+    "resetButton": "Очистити",
+    "showResultButton": "Показати результат",
+    "usage": "Використань: {{count}}"
+  },
   "textSortingTool": {
     "title": "Сортування тексту",
     "inputText": "Введіть текст:",
