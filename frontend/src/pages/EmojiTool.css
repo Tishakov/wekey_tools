@@ -251,7 +251,6 @@
 .emoji-item:hover {
     background-color: #252526;
     border-color: #4A4A4A;
-    transform: translateY(-1px);
 }
 
 /* Apple emoji стили */

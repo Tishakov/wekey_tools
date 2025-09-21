@@ -794,7 +794,6 @@
 
 .ai-analyze-button:hover:not(:disabled) {
   background: #08B894;
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(9, 206, 167, 0.3);
 }
 

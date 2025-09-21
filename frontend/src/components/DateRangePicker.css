@@ -307,7 +307,6 @@
 
 .apply-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #4c2db8 0%, #d1206e 100%);
-  transform: translateY(-1px);
 }
 
 .apply-button:disabled {

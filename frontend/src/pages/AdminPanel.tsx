@@ -65,6 +65,35 @@ const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [loadingHistorical, setLoadingHistorical] = useState(false);
   const [error, setError] = useState('');
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetModalClosing, setIsResetModalClosing] = useState(false);
+  const [isNotificationClosing, setIsNotificationClosing] = useState(false);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    show: false,
+    message: '',
+    type: 'success'
+  });
+
+  // Функции плавного закрытия модальных окон
+  const closeResetModal = () => {
+    setIsResetModalClosing(true);
+    setTimeout(() => {
+      setShowResetConfirm(false);
+      setIsResetModalClosing(false);
+    }, 300); // Совпадает с длительностью анимации
+  };
+
+  const closeNotification = () => {
+    setIsNotificationClosing(true);
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: 'success' });
+      setIsNotificationClosing(false);
+    }, 300);
+  };
 
   // Определяем активную секцию из URL
   const [activeSection, setActiveSection] = useState(getActiveSectionFromUrl(location.pathname));
@@ -99,6 +128,17 @@ const AdminPanel: React.FC = () => {
       fetchHistoricalData(dateRange.startDate, dateRange.endDate);
     }
   }, [dateRange, isLoggedIn]);
+
+  // Автоматическое закрытие уведомления (только для ошибок)
+  useEffect(() => {
+    if (notification.show && notification.type === 'error') {
+      const timer = setTimeout(() => {
+        setNotification({ show: false, message: '', type: 'success' });
+      }, 5000); // Закрыть через 5 секунд
+
+      return () => clearTimeout(timer);
+    }
+  }, [notification.show, notification.type]);
 
   // Загрузка статистики за выбранный период
   const fetchPeriodStats = async (startDate: Date, endDate: Date) => {
@@ -272,11 +312,12 @@ const AdminPanel: React.FC = () => {
     setPassword('');
   };
 
-  const handleResetStats = async () => {
-    if (!confirm('Вы уверены, что хотите сбросить всю аналитику? Это действие нельзя отменить.')) {
-      return;
-    }
+  const handleResetStats = () => {
+    setShowResetConfirm(true);
+  };
 
+  const confirmResetStats = async () => {
+    setShowResetConfirm(false);
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
@@ -296,19 +337,26 @@ const AdminPanel: React.FC = () => {
 
       const result = await response.json();
       
-      // Обновляем данные после сброса
+      // Обновляем все данные после сброса
       fetchAdminData();
+      fetchHistoricalData(dateRange.startDate, dateRange.endDate);
+      fetchPeriodStats(dateRange.startDate, dateRange.endDate);
+      fetchPeriodTools(dateRange.startDate, dateRange.endDate);
       
       // Показываем результат
-      if (result.message === 'stats already empty') {
-        alert('Статистика уже пуста!');
-      } else {
-        alert('Аналитика успешно сброшена!');
-      }
+      setNotification({
+        show: true,
+        message: `Аналитика успешно сброшена!\nУдалено записей: ${result.deletedRecords || 0}`,
+        type: 'success'
+      });
       
     } catch (error) {
       console.error('Ошибка сброса аналитики:', error);
-      alert('Ошибка при сбросе аналитики: ' + (error instanceof Error ? error.message : 'Неизвестная ошибка'));
+      setNotification({
+        show: true,
+        message: 'Ошибка при сбросе аналитики: ' + (error instanceof Error ? error.message : 'Неизвестная ошибка'),
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }
@@ -633,6 +681,60 @@ const AdminPanel: React.FC = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* Попап подтверждения сброса аналитики */}
+      {showResetConfirm && (
+        <div 
+          className={`admin-modal-overlay ${isResetModalClosing ? 'closing' : ''}`}
+        >
+          <div 
+            className="admin-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Вы уверены, что хотите <br />сбросить аналитику?</h3>
+            <p><strong>Это действие нельзя отменить.</strong></p>
+            <div className="admin-modal-buttons">
+              <button 
+                onClick={confirmResetStats}
+                className="admin-confirm-button"
+                disabled={loading}
+              >
+                {loading ? 'Сброс...' : 'Да'}
+              </button>
+              <button 
+                onClick={closeResetModal}
+                className="admin-cancel-button"
+                disabled={loading}
+              >
+                Нет
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Попап уведомления */}
+      {notification.show && (
+        <div 
+          className={`notification-overlay ${isNotificationClosing ? 'closing' : ''}`}
+          onClick={closeNotification}
+        >
+          <div 
+            className={`notification-content ${notification.type}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="notification-message">
+              {notification.message}
+            </div>
+            <button 
+              onClick={closeNotification}
+              className="notification-close"
+            >
+              ОК
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

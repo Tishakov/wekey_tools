@@ -638,4 +638,35 @@ router.get('/period-stats', async (req, res, next) => {
   }
 });
 
+// POST /api/admin/reset-stats - Сброс аналитики
+router.post('/reset-stats', async (req, res, next) => {
+  try {
+    console.log('🗑️ [ADMIN] Reset stats request');
+    
+    const { ToolUsage } = require('../models');
+    
+    // Удаляем все записи ToolUsage
+    const deletedCount = await ToolUsage.destroy({
+      where: {},
+      truncate: true // Полная очистка таблицы
+    });
+    
+    console.log(`✅ [ADMIN] Deleted ${deletedCount} tool usage records`);
+    
+    res.json({
+      success: true,
+      message: 'Аналитика успешно сброшена',
+      deletedRecords: deletedCount
+    });
+    
+  } catch (error) {
+    console.error('❌ Reset stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при сбросе аналитики',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

@@ -275,7 +275,7 @@
 }
 
 .reset-button:hover {
-  background: #e0a800;
+  background: #404042;
 }
 
 .reset-button:disabled {
@@ -298,7 +298,6 @@
 
 .logout-button:hover {
   background: #c82333;
-  transform: translateY(-1px);
 }
 
 .admin-content {
@@ -491,8 +490,7 @@
 }
 
 .reset-button:hover {
-  background: #d97706;
-  transform: translateY(-1px);
+  background: #404042;
 }
 
 .reset-button:disabled {
@@ -516,7 +514,6 @@
 
 .refresh-button:hover {
   background: #059669;
-  transform: translateY(-1px);
 }
 
 .loading {
@@ -579,5 +576,199 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+}
+
+/* Модальное окно подтверждения */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.admin-modal-overlay.closing {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.admin-modal-content {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.admin-modal-content h3 {
+  color: #fff;
+  margin: 0 0 15px 0;
+  font-size: 20px;
+}
+
+.admin-modal-content p {
+  color: #ccc;
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.admin-modal-content p strong {
+  color: #ff6b6b;
+}
+
+.admin-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.admin-confirm-button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.admin-confirm-button:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.admin-confirm-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.admin-cancel-button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.admin-cancel-button:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+/* Попап уведомления */
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.notification-overlay.closing {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.notification-content {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+}
+
+.notification-content.success {
+  border: none;
+}
+
+.notification-content.error {
+  border: none;
+}
+
+.notification-message {
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  white-space: pre-line;
+}
+
+.notification-content.success .notification-message {
+  color: #BCBBBD;
+}
+
+.notification-content.error .notification-message {
+  color: #dc3545;
+}
+
+.notification-close {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.notification-close:hover {
+  background: #5a6268;
+}
+
+/* Анимации для модальных окон */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  to {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
   }
 }
