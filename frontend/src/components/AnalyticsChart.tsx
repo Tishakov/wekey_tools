@@ -40,35 +40,13 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
   // Создаем ID для уникального градиента
   const gradientId = `gradient-${color.replace('#', '')}`;
   
-  // Предустановленные красивые градиенты
+  // Единый градиент для всех графиков
   const getGradientColors = (baseColor: string) => {
-    const gradients: { [key: string]: { start: string; middle: string; end: string } } = {
-      '#3b82f6': { // Синий
-        start: '#8B5CF6', // Фиолетовый
-        middle: '#3B82F6', // Синий
-        end: '#06B6D4'  // Голубой
-      },
-      '#10b981': { // Зеленый
-        start: '#10B981', // Зеленый
-        middle: '#06B6D4', // Голубой
-        end: '#8B5CF6'  // Фиолетовый
-      },
-      '#f59e0b': { // Желтый/Оранжевый
-        start: '#F59E0B', // Желтый
-        middle: '#EF4444', // Красный
-        end: '#EC4899'  // Розовый
-      },
-      '#ef4444': { // Красный
-        start: '#EC4899', // Розовый
-        middle: '#EF4444', // Красный
-        end: '#F59E0B'  // Желтый
-      }
-    };
-    
-    return gradients[baseColor] || {
-      start: '#8B5CF6',
-      middle: baseColor,
-      end: '#06B6D4'
+    // Всегда используем одинаковый градиент независимо от baseColor
+    return {
+      start: '#5E35F2',
+      middle: '#5E35F2', // Можно оставить средний цвет таким же или сделать промежуточным
+      end: '#F22987'
     };
   };
 
@@ -110,7 +88,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
   return (
     <div className="analytics-chart">
       <ResponsiveContainer width="100%" height={180}>
-        <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
+        <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 35, left: 20 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor={gradientColors.start} />
@@ -122,7 +100,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
             dataKey="date" 
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 11, fill: '#9ca3af' }}
+            tick={{ fontSize: 14, fill: '#9ca3af', dy: 10 }}
             tickFormatter={(value) => {
               // Показываем только день месяца
               const date = new Date(value);
@@ -135,11 +113,12 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
             type="natural" 
             dataKey="value" 
             stroke={`url(#${gradientId})`}
-            strokeWidth={5}
+            strokeWidth={6}
             dot={false}
             activeDot={{ r: 6, fill: gradientColors.middle, strokeWidth: 2, stroke: '#fff' }}
             strokeLinecap="round"
             strokeLinejoin="round"
+            connectNulls={false}
           />
         </LineChart>
       </ResponsiveContainer>

@@ -446,13 +446,22 @@ router.get('/analytics/historical', async (req, res, next) => {
               }
             }
           });
+
+          const { Visitor } = require('../models');
+          const dailyVisitors = await Visitor.count({
+            where: {
+              createdAt: {
+                [require('sequelize').Op.between]: [dayStart, dayEnd]
+              }
+            }
+          });
           
           data.push({
             date: dateStr,
-            visitors: 0, // Пока нет системы отслеживания
+            visitors: dailyVisitors || 0,
             toolUsers: uniqueUsers || 0,
             usageCount: dailyUsage || 0,
-            conversionRate: "0.00" // Пока нет данных
+            conversionRate: dailyVisitors > 0 ? ((uniqueUsers / dailyVisitors) * 100).toFixed(2) : "0.00"
           });
         } catch (error) {
           console.error('Error fetching daily stats for', dateStr, ':', error);
@@ -608,13 +617,23 @@ router.get('/period-stats', async (req, res, next) => {
           }
         }
       });
+
+      const { Visitor } = require('../models');
+      const totalVisitors = await Visitor.count({
+        where: {
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        }
+      });
       
       const response = {
         success: true,
         stats: {
           totalUsage: totalUsage || 0,
           uniqueUsers: uniqueUsers || 0,
-          activeTools: activeTools || 0
+          activeTools: activeTools || 0,
+          totalVisitors: totalVisitors || 0
         }
       };
       
@@ -643,20 +662,29 @@ router.post('/reset-stats', async (req, res, next) => {
   try {
     console.log('🗑️ [ADMIN] Reset stats request');
     
-    const { ToolUsage } = require('../models');
+    const { ToolUsage, Visitor } = require('../models');
     
     // Удаляем все записи ToolUsage
-    const deletedCount = await ToolUsage.destroy({
+    const deletedToolUsage = await ToolUsage.destroy({
+      where: {},
+      truncate: true // Полная очистка таблицы
+    });
+
+    // Удаляем все записи Visitor
+    const deletedVisitors = await Visitor.destroy({
       where: {},
       truncate: true // Полная очистка таблицы
     });
     
-    console.log(`✅ [ADMIN] Deleted ${deletedCount} tool usage records`);
+    console.log(`✅ [ADMIN] Deleted ${deletedToolUsage} tool usage records and ${deletedVisitors} visitor records`);
     
     res.json({
       success: true,
       message: 'Аналитика успешно сброшена',
-      deletedRecords: deletedCount
+      deletedRecords: {
+        toolUsage: deletedToolUsage,
+        visitors: deletedVisitors
+      }
     });
     
   } catch (error) {

@@ -45,6 +45,7 @@ const AdminPanel: React.FC = () => {
     totalUsage: number;
     uniqueUsers: number;
     activeTools: number;
+    totalVisitors: number;
   } | null>(null);
   const [periodToolsData, setPeriodToolsData] = useState<Array<{
     toolName: string;
@@ -54,12 +55,12 @@ const AdminPanel: React.FC = () => {
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
   const [dateRange, setDateRange] = useState(() => {
     const endDate = new Date();
-    const startDate = new Date(new Date().setDate(new Date().getDate() - 6));
-    console.log('🗓️ [ADMIN] Initial dateRange:', { startDate, endDate, label: 'Последние 7 дней' });
+    const startDate = new Date(new Date().setDate(new Date().getDate() - 13));
+    console.log('🗓️ [ADMIN] Initial dateRange:', { startDate, endDate, label: 'Последние 14 дней' });
     return {
       startDate,
       endDate,
-      label: 'Последние 7 дней'
+      label: 'Последние 14 дней'
     };
   });
   const [loading, setLoading] = useState(false);
@@ -143,9 +144,13 @@ const AdminPanel: React.FC = () => {
 
   // Загрузка статистики за выбранный период
   const fetchPeriodStats = async (startDate: Date, endDate: Date) => {
+    console.log('🚀 [ADMIN] Starting fetchPeriodStats...');
     try {
       const token = localStorage.getItem('adminToken');
       const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      
+      console.log('🔧 [ADMIN] API_BASE:', API_BASE);
+      console.log('🔧 [ADMIN] Token exists:', !!token);
       
       const params = new URLSearchParams({
         startDate: startDate.toISOString().split('T')[0],
@@ -177,7 +182,8 @@ const AdminPanel: React.FC = () => {
         setPeriodStats({
           totalUsage: 0,
           uniqueUsers: 0,
-          activeTools: 0
+          activeTools: 0,
+          totalVisitors: 0
         });
       }
     } catch (error) {
@@ -186,7 +192,8 @@ const AdminPanel: React.FC = () => {
       setPeriodStats({
         totalUsage: 0,
         uniqueUsers: 0,
-        activeTools: 0
+        activeTools: 0,
+        totalVisitors: 0
       });
     }
   };
@@ -338,6 +345,13 @@ const AdminPanel: React.FC = () => {
 
       const result = await response.json();
       
+      // Небольшая задержка для гарантии обновления данных
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Очищаем текущие данные перед обновлением
+      setPeriodToolsData([]);
+      setHistoricalData([]);
+      
       // Обновляем все данные после сброса
       fetchAdminData();
       fetchHistoricalData(dateRange.startDate, dateRange.endDate);
@@ -415,7 +429,7 @@ const AdminPanel: React.FC = () => {
             <div className="stats-grid">
               <div className="stat-card">
                 <h3>Посетителей</h3>
-                <div className="stat-number">0</div>
+                <div className="stat-number">{periodStats?.totalVisitors || 0}</div>
               </div>
 
               <div className="stat-card">
@@ -436,7 +450,12 @@ const AdminPanel: React.FC = () => {
 
               <div className="stat-card">
                 <h3>Конверсия</h3>
-                <div className="stat-conversion">0%</div>
+                <div className="stat-conversion">
+                  {periodStats?.totalVisitors && periodStats.totalVisitors > 0 
+                    ? `${((periodStats.uniqueUsers / periodStats.totalVisitors) * 100).toFixed(1)}%`
+                    : '0%'
+                  }
+                </div>
               </div>
 
               <div className="stat-card">
@@ -452,7 +471,10 @@ const AdminPanel: React.FC = () => {
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
                   <AnalyticsChart 
-                    data={[]} 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.visitors
+                    }))} 
                     color="#3b82f6"
                     title="Динамика посетителей"
                   />
@@ -465,7 +487,10 @@ const AdminPanel: React.FC = () => {
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
                   <AnalyticsChart 
-                    data={[]} 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.toolUsers
+                    }))} 
                     color="#10b981"
                     title="Динамика пользователей"
                   />
@@ -550,7 +575,10 @@ const AdminPanel: React.FC = () => {
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
                   <AnalyticsChart 
-                    data={[]} 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.visitors > 0 ? parseFloat(((item.toolUsers / item.visitors) * 100).toFixed(1)) : 0
+                    }))} 
                     color="#ef4444"
                     title="Динамика конверсии (%)"
                   />
@@ -564,7 +592,7 @@ const AdminPanel: React.FC = () => {
                 ) : (
                   <AnalyticsChart 
                     data={[]} 
-                    color="#8b5cf6"
+                    color="#06b6d4"
                     title="Динамика использования токенов"
                   />
                 )}
@@ -658,6 +686,7 @@ const AdminPanel: React.FC = () => {
                     await fetchAdminData(); 
                     await fetchHistoricalData(dateRange.startDate, dateRange.endDate);
                     await fetchPeriodStats(dateRange.startDate, dateRange.endDate); 
+                    await fetchPeriodTools(dateRange.startDate, dateRange.endDate);
                   } finally {
                     setRefreshing(false);
                   }
