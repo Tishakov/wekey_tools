@@ -1,18 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const { Tool } = require('../models');
+const { Tool, ToolUsage } = require('../models');
 const { protect } = require('../middleware/auth');
+const { Sequelize } = require('sequelize');
 
 // Получить все инструменты (только для админов)
 router.get('/tools', protect, async (req, res) => {
   try {
-    const tools = await Tool.findAll({
-      order: [['order', 'ASC'], ['name', 'ASC']]
-    });
+    const tools = await Tool.findAll();
 
-    res.json({
-      success: true,
-      tools: tools.map(tool => ({
+    // Получаем статистику использования для каждого инструмента
+    const toolsWithStats = await Promise.all(tools.map(async (tool) => {
+      const usageCount = await ToolUsage.count({
+        where: { toolName: tool.toolId }
+      });
+
+      const lastUsed = await ToolUsage.findOne({
+        where: { toolName: tool.toolId },
+        order: [['createdAt', 'DESC']],
+        attributes: ['createdAt']
+      });
+
+      return {
         id: tool.id,
         toolId: tool.toolId,
         name: tool.name,
@@ -23,8 +32,15 @@ router.get('/tools', protect, async (req, res) => {
         isActive: tool.isActive,
         order: tool.order,
         createdAt: tool.createdAt,
-        updatedAt: tool.updatedAt
-      }))
+        updatedAt: tool.updatedAt,
+        usageCount: usageCount,
+        lastUsed: lastUsed ? lastUsed.createdAt : null
+      };
+    }));
+
+    res.json({
+      success: true,
+      tools: toolsWithStats
     });
   } catch (error) {
     console.error('Ошибка при получении списка инструментов:', error);
