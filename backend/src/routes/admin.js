@@ -397,17 +397,24 @@ router.get('/analytics/historical', async (req, res, next) => {
     const period = req.query.period || 'week';
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
+    const timezone = req.query.timezone || 'UTC';
+    
+    console.log('🕐 Using timezone:', timezone);
     
     // Генерируем реальные исторические данные на основе статистики использования
-    const generateRealHistoricalData = async (startDateStr, endDateStr) => {
+    const generateRealHistoricalData = async (startDateStr, endDateStr, timezone = 'UTC') => {
       const data = [];
       const { ToolUsage } = require('../models');
       
-      // Определяем диапазон дат
+      // Определяем диапазон дат с учетом часового пояса
       let start, end;
       if (startDateStr && endDateStr) {
-        start = new Date(startDateStr);
-        end = new Date(endDateStr);
+        // Просто создаем даты из строк без сложных конвертаций
+        start = new Date(startDateStr + 'T00:00:00.000Z');
+        end = new Date(endDateStr + 'T23:59:59.999Z');
+        
+        console.log('🕐 Using dates:', startDateStr, 'to', endDateStr);
+        console.log('🕐 Date objects:', start.toISOString(), 'to', end.toISOString());
       } else {
         // По умолчанию последние 30 дней
         end = new Date();
@@ -418,16 +425,21 @@ router.get('/analytics/historical', async (req, res, next) => {
       console.log('📅 Generating data from', start.toISOString().split('T')[0], 'to', end.toISOString().split('T')[0]);
       
       // Генерируем данные для каждого дня в диапазоне
-      const currentDate = new Date(start);
-      while (currentDate <= end) {
+      // Начинаем точно с указанной стартовой даты
+      const currentDate = new Date(startDateStr + 'T00:00:00.000Z');
+      const endDateForLoop = new Date(endDateStr + 'T00:00:00.000Z');
+      
+      while (currentDate <= endDateForLoop) {
         const dateStr = currentDate.toISOString().split('T')[0];
+        
+        console.log('📅 Processing date:', dateStr, 'from currentDate:', currentDate.toISOString());
         
         try {
           // Получаем реальные данные использования за этот день
           const dayStart = new Date(currentDate);
-          dayStart.setHours(0, 0, 0, 0);
+          dayStart.setUTCHours(0, 0, 0, 0);
           const dayEnd = new Date(currentDate);
-          dayEnd.setHours(23, 59, 59, 999);
+          dayEnd.setUTCHours(23, 59, 59, 999);
           
           const dailyUsage = await ToolUsage.count({
             where: {
@@ -475,15 +487,15 @@ router.get('/analytics/historical', async (req, res, next) => {
           });
         }
         
-        // Переходим к следующему дню
-        currentDate.setDate(currentDate.getDate() + 1);
+        // Переходим к следующему дню в UTC
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
       }
       return data;
     };
     
     const response = {
       success: true,
-      data: await generateRealHistoricalData(startDate, endDate)
+      data: await generateRealHistoricalData(startDate, endDate, timezone)
     };
     
     console.log('✅ Historical analytics response:', response);

@@ -336,12 +336,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   return (
     <div className="date-range-picker" ref={dropdownRef}>
       <button 
-        className="date-range-trigger"
+        className={`date-range-trigger ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <img src="/icons/calendar_mini.svg" alt="Calendar" className="date-range-icon" />
         <span className="date-range-text">{selectedRange.label}</span>
-        <span className="date-range-arrow">{isOpen ? '▲' : '▼'}</span>
+        <span className="date-range-arrow"></span>
       </button>
 
       {isOpen && (

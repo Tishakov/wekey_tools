@@ -21,7 +21,7 @@ class HistoricalAnalyticsService {
   /**
    * Получает исторические данные за указанный период
    */
-  async getHistoricalData(startDate?: string, endDate?: string): Promise<HistoricalDataPoint[]> {
+  async getHistoricalData(startDate?: string, endDate?: string, timezone?: string): Promise<HistoricalDataPoint[]> {
     try {
       const token = localStorage.getItem('adminToken');
       if (!token) {
@@ -32,6 +32,7 @@ class HistoricalAnalyticsService {
       const params = new URLSearchParams();
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
+      if (timezone) params.append('timezone', timezone);
       
       const url = `${this.API_BASE}/api/admin/analytics/historical${params.toString() ? '?' + params.toString() : ''}`;
       

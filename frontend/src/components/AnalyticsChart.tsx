@@ -26,7 +26,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          color: '#6b7280',
+          color: '#BCBBBD',
           fontSize: '14px'
         }}>
           Нет данных для отображения
@@ -36,6 +36,29 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
   }
   
   const chartData = data;
+  
+  // Умная логика для интервала подписей в зависимости от количества дней
+  const getTickSettings = () => {
+    const dataLength = data.length;
+    
+    if (dataLength <= 31) {
+      // До месяца - показываем дни
+      return { 
+        interval: dataLength <= 14 ? 0 : Math.floor(dataLength / 8), 
+        minTickGap: 15,
+        showDays: true
+      };
+    } else {
+      // Больше месяца - показываем месяцы
+      return { 
+        interval: Math.floor(dataLength / 6), 
+        minTickGap: 40,
+        showDays: false
+      };
+    }
+  };
+
+  const tickSettings = getTickSettings();
   
   // Создаем ID для уникального градиента
   const gradientId = `gradient-${color.replace('#', '')}`;
@@ -88,7 +111,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
   return (
     <div className="analytics-chart">
       <ResponsiveContainer width="100%" height={180}>
-        <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 35, left: 20 }}>
+        <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 35, left: 30 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor={gradientColors.start} />
@@ -101,10 +124,20 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 14, fill: '#9ca3af', dy: 10 }}
+            interval={tickSettings.interval}
+            minTickGap={tickSettings.minTickGap}
             tickFormatter={(value) => {
-              // Показываем только день месяца
               const date = new Date(value);
-              return date.getDate().toString();
+              if (tickSettings.showDays) {
+                // Для коротких периодов показываем дни
+                return date.getDate().toString();
+              } else {
+                // Для длинных периодов - "день мес."
+                return date.toLocaleDateString('ru-RU', { 
+                  day: 'numeric', 
+                  month: 'short' 
+                });
+              }
             }}
           />
           <YAxis hide />

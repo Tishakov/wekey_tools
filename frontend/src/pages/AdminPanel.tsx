@@ -79,6 +79,11 @@ const AdminPanel: React.FC = () => {
     message: '',
     type: 'success'
   });
+  
+  // Состояние для часового пояса
+  const [timezone, setTimezone] = useState(() => {
+    return localStorage.getItem('adminTimezone') || 'Europe/Kiev';
+  });
 
   // Функции плавного закрытия модальных окон
   const closeResetModal = () => {
@@ -153,11 +158,14 @@ const AdminPanel: React.FC = () => {
       console.log('🔧 [ADMIN] Token exists:', !!token);
       
       const params = new URLSearchParams({
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0]
+        startDate: `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`,
+        endDate: `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`
       });
       
-      console.log('📊 [ADMIN] Fetching period stats for:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+      const startDateStr = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+      const endDateStr = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+      
+      console.log('📊 [ADMIN] Fetching period stats for:', startDateStr, 'to', endDateStr);
       console.log('🔑 [ADMIN] Using token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
       console.log('🔗 [ADMIN] Request URL:', `${API_BASE}/api/admin/period-stats?${params}`);
       
@@ -204,9 +212,12 @@ const AdminPanel: React.FC = () => {
       const token = localStorage.getItem('adminToken');
       const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       
-      console.log('🛠️ [ADMIN] Fetching period tools data:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+      const startDateStr = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+      const endDateStr = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
       
-      const response = await fetch(`${API_BASE}/api/admin/period-tools?startDate=${startDate.toISOString().split('T')[0]}&endDate=${endDate.toISOString().split('T')[0]}`, {
+      console.log('🛠️ [ADMIN] Fetching period tools data:', startDateStr, 'to', endDateStr);
+      
+      const response = await fetch(`${API_BASE}/api/admin/period-tools?startDate=${startDateStr}&endDate=${endDateStr}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -233,11 +244,18 @@ const AdminPanel: React.FC = () => {
       
       let data;
       if (startDate && endDate) {
-        // Используем конкретные даты
-        console.log('📊 [ADMIN] Fetching historical data for range:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+        // Логируем исходные даты
+        console.log('📊 [ADMIN] Raw dates received:', { startDate, endDate });
+        
+        // Используем локальную дату без UTC конвертации
+        const startDateStr = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+        const endDateStr = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+        
+        console.log('📊 [ADMIN] Fetching historical data for range:', startDateStr, 'to', endDateStr, 'timezone:', timezone);
         data = await historicalAnalyticsService.getHistoricalData(
-          startDate.toISOString().split('T')[0],
-          endDate.toISOString().split('T')[0]
+          startDateStr,
+          endDateStr,
+          timezone
         );
       } else {
         // Используем период по умолчанию (последние 30 дней)
@@ -466,7 +484,7 @@ const AdminPanel: React.FC = () => {
 
             <div className="charts-grid">
               <div className="chart-card">
-                <h3>Посетители</h3>
+                <h3>Посетителей</h3>
                 {loadingHistorical ? (
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
@@ -482,7 +500,7 @@ const AdminPanel: React.FC = () => {
               </div>
               
               <div className="chart-card">
-                <h3>Пользователи</h3>
+                <h3>Пользователей</h3>
                 {loadingHistorical ? (
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
@@ -498,7 +516,7 @@ const AdminPanel: React.FC = () => {
               </div>
               
               <div className="chart-card">
-                <h3>Использования</h3>
+                <h3>Использований</h3>
                 {loadingHistorical ? (
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
@@ -514,7 +532,7 @@ const AdminPanel: React.FC = () => {
               </div>
               
               <div className="chart-card">
-                <h3>Инструменты</h3>
+                <h3>Инструментов</h3>
                 {loadingHistorical ? (
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
@@ -677,6 +695,24 @@ const AdminPanel: React.FC = () => {
           <div className="header-buttons">
             {activeSection === 'dashboard' && (
               <>
+                <select 
+                  value={timezone} 
+                  onChange={(e) => {
+                    setTimezone(e.target.value);
+                    localStorage.setItem('adminTimezone', e.target.value);
+                    // Перезагружаем все данные с новым часовым поясом
+                    fetchHistoricalData(dateRange.startDate, dateRange.endDate);
+                    fetchPeriodStats(dateRange.startDate, dateRange.endDate);
+                    fetchPeriodTools(dateRange.startDate, dateRange.endDate);
+                  }}
+                  className="timezone-selector"
+                >
+                  <option value="Europe/Kiev">GMT+3 (EEST)</option>
+                  <option value="UTC">GMT+0 (UTC)</option>
+                  <option value="Europe/London">GMT+1 (LON)</option>
+                  <option value="America/New_York">GMT-4 (NYC)</option>
+                  <option value="Asia/Tokyo">GMT+9 (TOK)</option>
+                </select>
                 <button onClick={handleResetStats} className="reset-button" disabled={loading}>
                   {loading ? 'Сброс...' : 'Сбросить аналитику'}
                 </button>
