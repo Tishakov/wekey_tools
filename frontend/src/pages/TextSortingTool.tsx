@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './TextSortingTool.css';
 
 
-const TOOL_ID = 'text_sorting_tool';
+const TOOL_ID = 'text-sorting';
 const TextSortingTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');

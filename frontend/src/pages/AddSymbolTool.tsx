@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './AddSymbolTool.css';
 
 
-const TOOL_ID = 'add_symbol_tool';
+const TOOL_ID = 'add-symbol';
 const AddSymbolTool: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');

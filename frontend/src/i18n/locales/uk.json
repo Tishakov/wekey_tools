@@ -1,0 +1,206 @@
+{
+  "header": {
+    "title": "WEKey Tools"
+  },
+  "navigation": {
+    "allTools": "Всі інструменти",
+    "aiTool": "Інструмент з ІІ інтеграцією"
+  },
+  "tools": {
+    "names": {
+      "case-changer": "Зміна регістру",
+      "remove-duplicates": "Видалення дублікатів",
+      "emoji": "Емодзі",
+      "encode-decode": "Кодувальник/декодувальник",
+      "find-replace": "Знайти та замінити",
+      "char-counter": "Кількість символів",
+      "line-operations": "Операції з рядками",
+      "list-randomizer": "Перемішування списку",
+      "case-counter": "Лічильник регістру",
+      "number-generator": "Генератор чисел",
+      "number-list": "Список номерів",
+      "password-generator": "Генератор паролів",
+      "replace-symbols": "Заміна символів",
+      "spaces-to-paragraphs": "Пробіли на абзаци",
+      "string-matcher": "Зіставлення рядків",
+      "tag-remover": "Видалення тегів",
+      "text-by-columns": "Текст по колонках",
+      "text-generator": "Генератор тексту",
+      "text-optimizer": "Оптимізатор тексту",
+      "text-sorting": "Сортування слів та рядків",
+      "text-to-html": "Текст в HTML",
+      "transliteration": "Транслітерація",
+      "utm-generator": "Генератор UTM-міток",
+      "word-gluing": "Склеювання слів",
+      "word-declension": "Відмінювання слів",
+      "word-mixer": "Міксування слів",
+      "synonym-generator": "Генератор синонімів",
+      "remove-line-breaks": "Видалення переносів",
+      "remove-empty-lines": "Видалення порожніх рядків",
+      "minus-words": "Обробка мінус-слів",
+      "match-types": "Типи відповідностей",
+      "add-symbol": "Додавання символу",
+      "duplicate-finder": "Пошук дублікатів",
+      "cross-analytics": "Наскрізна аналітика"
+    },
+    "descriptions": {
+      "case-changer": "Інструмент для зміни регістру тексту",
+      "remove-duplicates": "Видалення дублюючих рядків з тексту",
+      "emoji": "Додавання емодзі в текст",
+      "encode-decode": "Кодування та декодування тексту",
+      "find-replace": "Пошук та заміна тексту в документі",
+      "char-counter": "Підрахунок символів у тексті",
+      "line-operations": "Різні операції з рядками тексту",
+      "list-randomizer": "Випадкове перемішування елементів списку",
+      "case-counter": "Підрахунок символів верхнього та нижнього регістру",
+      "number-generator": "Генерація випадкових чисел",
+      "number-list": "Створення списків номерів",
+      "password-generator": "Створення безпечних паролів",
+      "replace-symbols": "Заміна символів у тексті",
+      "spaces-to-paragraphs": "Перетворення пробілів в абзаци",
+      "string-matcher": "Зіставлення та пошук рядків",
+      "tag-remover": "Видалення HTML/XML тегів",
+      "text-by-columns": "Розділення тексту по стовпцях",
+      "text-generator": "Генерація випадкового тексту",
+      "text-optimizer": "Оптимізація та очищення тексту",
+      "text-sorting": "Сортування рядків тексту",
+      "text-to-html": "Перетворення тексту в HTML",
+      "transliteration": "Транслітерація тексту",
+      "utm-generator": "Створення UTM-міток для аналітики",
+      "word-gluing": "Об'єднання слів у рядки",
+      "word-declension": "Відмінювання слів та фраз",
+      "word-mixer": "Перемішування слів у тексті",
+      "synonym-generator": "Пошук синонімів для слів",
+      "remove-line-breaks": "Видалення переносів рядків",
+      "remove-empty-lines": "Видалення порожніх рядків",
+      "minus-words": "Робота з мінус-словами",
+      "match-types": "Визначення типів відповідностей",
+      "add-symbol": "Додавання символів до тексту",
+      "duplicate-finder": "Пошук дублюючого контенту",
+      "cross-analytics": "Наскрізна аналітика"
+    }
+  },
+  "common": {
+    "generate": "Генерувати",
+    "copy": "Копіювати",
+    "copied": "Скопійовано!",
+    "reset": "Скинути",
+    "download": "Завантажити",
+    "enter_text": "Введіть текст...",
+    "result": "Результат",
+    "settings": "Налаштування",
+    "length": "Довжина",
+    "count": "Кількість",
+    "backToTools": "Всі інструменти",
+    "launchCounter": "Лічильник запусків",
+    "hints": "Підказки",
+    "screenshot": "Скріншот",
+    "lines": "рядків",
+    "characters": "символів",
+    "words": "слів",
+    "save": "Зберегти",
+    "cancel": "Скасування",
+    "clear": "Очистити",
+    "paste": "Вставити",
+    "upload": "Завантажити",
+    "loading": "Завантаження...",
+    "error": "Помилка",
+    "success": "Успішно"
+  },
+  "passwordGenerator": {
+    "title": "Генератор паролів",
+    "passwordLength": "Довжина паролю:",
+    "passwordLanguage": "Мова паролю:",
+    "languages": {
+      "english": "Англійська",
+      "russian": "Російська",
+      "ukrainian": "Українська"
+    },
+    "includeLowercase": "Малі літери",
+    "includeUppercase": "Великі літери",
+    "includeNumbers": "Цифри",
+    "includeSymbols": "Знаки та символи",
+    "passwordCount": "Кількість паролів:",
+    "copyError": "Помилка копіювання:"
+  },
+  "textGenerator": {
+    "title": "Генератор тексту",
+    "textLength": "Довжина тексту:",
+    "textType": "Тип тексту:",
+    "types": {
+      "lorem": "Lorem ipsum",
+      "random": "Випадковий текст",
+      "fish": "Риба текст"
+    },
+    "paragraphCount": "Кількість абзаців:",
+    "inputText": "Введіть вихідний текст:"
+  },
+  "emojiTool": {
+    "title": "Додавання емодзі",
+    "inputText": "Введіть текст:",
+    "emojiPosition": "Позиція емодзі:",
+    "positions": {
+      "before": "Перед словом",
+      "after": "Після слова",
+      "random": "Випадково"
+    },
+    "emojiCount": "Кількість емодзі на слово:",
+    "selectEmoji": "Оберіть емодзі:"
+  },
+  "caseChangerTool": {
+    "title": "Зміна регістру",
+    "inputText": "Введіть текст:",
+    "options": {
+      "lowercase": "Нижній регістр",
+      "uppercase": "Верхній регістр",
+      "titleCase": "Великі літери у словах",
+      "sentenceCase": "Великі літери у реченнях",
+      "alternateCase": "Змінний регістр",
+      "inverseCase": "Обернений регістр"
+    }
+  },
+  "findReplaceTool": {
+    "title": "Знайти та замінити",
+    "inputText": "Введіть текст:",
+    "findText": "Знайти:",
+    "replaceText": "Замінити на:",
+    "caseSensitive": "Враховувати регістр",
+    "replaceAll": "Замінити все",
+    "matchCount": "Знайдено збігів:"
+  },
+  "letterCounterTool": {
+    "title": "Лічильник символів",
+    "inputText": "Введіть текст:",
+    "charactersWithSpaces": "Символів з пробілами:",
+    "charactersWithoutSpaces": "Символів без пробілів:",
+    "wordsCount": "Слів:",
+    "linesCount": "Рядків:",
+    "paragraphsCount": "Абзаців:"
+  },
+  "textSortingTool": {
+    "title": "Сортування тексту",
+    "inputText": "Введіть текст:",
+    "sortType": "Тип сортування:",
+    "sortOptions": {
+      "alphabetical": "За алфавітом",
+      "reverse": "Зворотна",
+      "length": "За довжиною",
+      "random": "Випадкова"
+    }
+  },
+  "duplicateRemoverTool": {
+    "title": "Видалення дублікатів",
+    "inputText": "Введіть текст:",
+    "duplicatesFound": "Знайдено дублікатів:",
+    "duplicatesRemoved": "Дублікати видалено"
+  },
+  "footer": {
+    "copyright": "© 2024 WEKey Tools. Всі права захищені.",
+    "developer": "Розроблено",
+    "developedBy": "Розроблено",
+    "allRightsReserved": "Всі права захищені",
+    "founder": "Засновник проекту",
+    "publicOffer": "Публічна оферта",
+    "privacyPolicy": "Політика конфіденційності"
+  }
+}

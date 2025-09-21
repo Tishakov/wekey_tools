@@ -1,0 +1,206 @@
+{
+  "header": {
+    "title": "WEKey Tools"
+  },
+  "navigation": {
+    "allTools": "All Tools",
+    "aiTool": "AI-powered tool"
+  },
+  "tools": {
+    "names": {
+      "case-changer": "Case Changer",
+      "remove-duplicates": "Remove Duplicates",
+      "emoji": "Emoji",
+      "encode-decode": "Encoder/Decoder",
+      "find-replace": "Find & Replace",
+      "char-counter": "Character Counter",
+      "line-operations": "Line Operations",
+      "list-randomizer": "List Randomizer",
+      "case-counter": "Case Counter",
+      "number-generator": "Number Generator",
+      "number-list": "Number List",
+      "password-generator": "Password Generator",
+      "replace-symbols": "Replace Symbols",
+      "spaces-to-paragraphs": "Spaces to Paragraphs",
+      "string-matcher": "String Matcher",
+      "tag-remover": "Tag Remover",
+      "text-by-columns": "Text by Columns",
+      "text-generator": "Text Generator",
+      "text-optimizer": "Text Optimizer",
+      "text-sorting": "Text Sorting",
+      "text-to-html": "Text to HTML",
+      "transliteration": "Transliteration",
+      "utm-generator": "UTM Generator",
+      "word-gluing": "Word Gluing",
+      "word-declension": "Word Declension",
+      "word-mixer": "Word Mixer",
+      "synonym-generator": "Synonym Generator",
+      "remove-line-breaks": "Remove Line Breaks",
+      "remove-empty-lines": "Remove Empty Lines",
+      "minus-words": "Minus Words",
+      "match-types": "Match Types",
+      "add-symbol": "Add Symbol",
+      "duplicate-finder": "Duplicate Finder",
+      "cross-analytics": "Cross Analytics"
+    },
+    "descriptions": {
+      "case-changer": "Tool for changing text case",
+      "remove-duplicates": "Remove duplicate lines from text",
+      "emoji": "Add emoji to text",
+      "encode-decode": "Encode and decode text",
+      "find-replace": "Find and replace text in document",
+      "char-counter": "Count characters in text",
+      "line-operations": "Various operations with text lines",
+      "list-randomizer": "Random shuffling of list elements",
+      "case-counter": "Count uppercase and lowercase characters",
+      "number-generator": "Generate random numbers",
+      "number-list": "Create number lists",
+      "password-generator": "Create secure passwords",
+      "replace-symbols": "Replace symbols in text",
+      "spaces-to-paragraphs": "Convert spaces to paragraphs",
+      "string-matcher": "Match and search strings",
+      "tag-remover": "Remove HTML/XML tags",
+      "text-by-columns": "Split text by columns",
+      "text-generator": "Generate random text",
+      "text-optimizer": "Optimize and clean text",
+      "text-sorting": "Sort text lines",
+      "text-to-html": "Convert text to HTML",
+      "transliteration": "Transliterate text",
+      "utm-generator": "Create UTM tags for analytics",
+      "word-gluing": "Join words into lines",
+      "word-declension": "Decline words and phrases",
+      "word-mixer": "Mix words in text",
+      "synonym-generator": "Find synonyms for words",
+      "remove-line-breaks": "Remove line breaks",
+      "remove-empty-lines": "Remove empty lines",
+      "minus-words": "Work with minus words",
+      "match-types": "Determine match types",
+      "add-symbol": "Add symbols to text",
+      "duplicate-finder": "Find duplicate content",
+      "cross-analytics": "Cross-platform analytics"
+    }
+  },
+  "common": {
+    "generate": "Generate",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "reset": "Reset",
+    "download": "Download",
+    "enter_text": "Enter text...",
+    "result": "Result",
+    "settings": "Settings",
+    "length": "Length",
+    "count": "Count",
+    "backToTools": "All Tools",
+    "launchCounter": "Launch Counter",
+    "hints": "Hints",
+    "screenshot": "Screenshot",
+    "lines": "lines",
+    "characters": "characters",
+    "words": "words",
+    "save": "Save",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "paste": "Paste",
+    "upload": "Upload",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "passwordGenerator": {
+    "title": "Password Generator",
+    "passwordLength": "Password Length:",
+    "passwordLanguage": "Password Language:",
+    "languages": {
+      "english": "English",
+      "russian": "Russian",
+      "ukrainian": "Ukrainian"
+    },
+    "includeLowercase": "Lowercase letters",
+    "includeUppercase": "Uppercase letters",
+    "includeNumbers": "Numbers",
+    "includeSymbols": "Symbols",
+    "passwordCount": "Number of passwords:",
+    "copyError": "Copy error:"
+  },
+  "textGenerator": {
+    "title": "Text Generator",
+    "textLength": "Text Length:",
+    "textType": "Text Type:",
+    "types": {
+      "lorem": "Lorem ipsum",
+      "random": "Random text",
+      "fish": "Fish text"
+    },
+    "paragraphCount": "Number of paragraphs:",
+    "inputText": "Enter source text:"
+  },
+  "emojiTool": {
+    "title": "Add Emoji",
+    "inputText": "Enter text:",
+    "emojiPosition": "Emoji Position:",
+    "positions": {
+      "before": "Before word",
+      "after": "After word",
+      "random": "Random"
+    },
+    "emojiCount": "Emojis per word:",
+    "selectEmoji": "Select emoji:"
+  },
+  "caseChangerTool": {
+    "title": "Case Changer",
+    "inputText": "Enter text:",
+    "options": {
+      "lowercase": "Lowercase",
+      "uppercase": "Uppercase",
+      "titleCase": "Title Case",
+      "sentenceCase": "Sentence Case",
+      "alternateCase": "Alternate Case",
+      "inverseCase": "Inverse Case"
+    }
+  },
+  "findReplaceTool": {
+    "title": "Find & Replace",
+    "inputText": "Enter text:",
+    "findText": "Find:",
+    "replaceText": "Replace with:",
+    "caseSensitive": "Case sensitive",
+    "replaceAll": "Replace all",
+    "matchCount": "Matches found:"
+  },
+  "letterCounterTool": {
+    "title": "Character Counter",
+    "inputText": "Enter text:",
+    "charactersWithSpaces": "Characters with spaces:",
+    "charactersWithoutSpaces": "Characters without spaces:",
+    "wordsCount": "Words:",
+    "linesCount": "Lines:",
+    "paragraphsCount": "Paragraphs:"
+  },
+  "textSortingTool": {
+    "title": "Text Sorting",
+    "inputText": "Enter text:",
+    "sortType": "Sort Type:",
+    "sortOptions": {
+      "alphabetical": "Alphabetical",
+      "reverse": "Reverse",
+      "length": "By length",
+      "random": "Random"
+    }
+  },
+  "duplicateRemoverTool": {
+    "title": "Remove Duplicates",
+    "inputText": "Enter text:",
+    "duplicatesFound": "Duplicates found:",
+    "duplicatesRemoved": "Duplicates removed"
+  },
+  "footer": {
+    "copyright": "© 2024 WEKey Tools. All rights reserved.",
+    "developer": "Developed by",
+    "developedBy": "Developed by",
+    "allRightsReserved": "All rights reserved",
+    "founder": "Project Founder",
+    "publicOffer": "Public Offer",
+    "privacyPolicy": "Privacy Policy"
+  }
+}

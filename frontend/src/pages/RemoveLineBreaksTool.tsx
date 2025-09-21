@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './RemoveLineBreaksTool.css';
 
 
-const TOOL_ID = 'remove_line_breaks_tool';
+const TOOL_ID = 'remove-line-breaks';
 const RemoveLineBreaksTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');

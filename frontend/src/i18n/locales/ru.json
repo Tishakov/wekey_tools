@@ -1,0 +1,206 @@
+{
+  "header": {
+    "title": "WEKey Tools"
+  },
+  "navigation": {
+    "allTools": "Все инструменты",
+    "aiTool": "Инструмент с ИИ интеграцией"
+  },
+  "tools": {
+    "names": {
+      "case-changer": "Изменения регистра",
+      "remove-duplicates": "Удаление дубликатов",
+      "emoji": "Эмодзи",
+      "encode-decode": "Кодировщик/декодировщик",
+      "find-replace": "Найти и заменить",
+      "char-counter": "Количество символов",
+      "line-operations": "Операции со строками",
+      "list-randomizer": "Перемешивание списка",
+      "case-counter": "Счетчик регистра",
+      "number-generator": "Генератор чисел",
+      "number-list": "Список номеров",
+      "password-generator": "Генератор паролей",
+      "replace-symbols": "Замена символов",
+      "spaces-to-paragraphs": "Пробелы на абзацы",
+      "string-matcher": "Сопоставление строк",
+      "tag-remover": "Удаление тегов",
+      "text-by-columns": "Текст по столбцам",
+      "text-generator": "Генератор текста",
+      "text-optimizer": "Оптимизатор текста",
+      "text-sorting": "Сортировка слов и строк",
+      "text-to-html": "Текст в HTML",
+      "transliteration": "Транслитерация",
+      "utm-generator": "Генератор UTM-меток",
+      "word-gluing": "Склейка слов",
+      "word-declension": "Склонение слов",
+      "word-mixer": "Миксация слов",
+      "synonym-generator": "Генератор синонимов",
+      "remove-line-breaks": "Удаление переносов",
+      "remove-empty-lines": "Удаление пустых строк",
+      "minus-words": "Обработка минус-слов",
+      "match-types": "Типы соответствия",
+      "add-symbol": "Добавление символа",
+      "duplicate-finder": "Поиск дубликатов",
+      "cross-analytics": "Сквозная аналитика"
+    },
+    "descriptions": {
+      "case-changer": "Инструмент для изменения регистра текста",
+      "remove-duplicates": "Удаление дублирующихся строк из текста",
+      "emoji": "Добавление эмодзи в текст",
+      "encode-decode": "Кодирование и декодирование текста",
+      "find-replace": "Поиск и замена текста в документе",
+      "char-counter": "Подсчет символов в тексте",
+      "line-operations": "Различные операции со строками текста",
+      "list-randomizer": "Случайное перемешивание элементов списка",
+      "case-counter": "Подсчет символов верхнего и нижнего регистра",
+      "number-generator": "Генерация случайных чисел",
+      "number-list": "Создание списков номеров",
+      "password-generator": "Создание безопасных паролей",
+      "replace-symbols": "Замена символов в тексте",
+      "spaces-to-paragraphs": "Преобразование пробелов в абзацы",
+      "string-matcher": "Сопоставление и поиск строк",
+      "tag-remover": "Удаление HTML/XML тегов",
+      "text-by-columns": "Разделение текста по столбцам",
+      "text-generator": "Генерация случайного текста",
+      "text-optimizer": "Оптимизация и очистка текста",
+      "text-sorting": "Сортировка строк текста",
+      "text-to-html": "Преобразование текста в HTML",
+      "transliteration": "Транслитерация текста",
+      "utm-generator": "Создание UTM-меток для аналитики",
+      "word-gluing": "Объединение слов в строки",
+      "word-declension": "Склонение слов и фраз",
+      "word-mixer": "Перемешивание слов в тексте",
+      "synonym-generator": "Поиск синонимов для слов",
+      "remove-line-breaks": "Удаление переносов строк",
+      "remove-empty-lines": "Удаление пустых строк",
+      "minus-words": "Работа с минус-словами",
+      "match-types": "Определение типов соответствий",
+      "add-symbol": "Добавление символов к тексту",
+      "duplicate-finder": "Поиск дублирующего контента",
+      "cross-analytics": "Сквозная аналитика"
+    }
+  },
+  "common": {
+    "generate": "Генерировать",
+    "copy": "Копировать",
+    "copied": "Скопировано!",
+    "reset": "Сбросить",
+    "download": "Скачать",
+    "enter_text": "Введите текст...",
+    "result": "Результат",
+    "settings": "Настройки",
+    "length": "Длина",
+    "count": "Количество",
+    "backToTools": "Все инструменты",
+    "launchCounter": "Счетчик запусков",
+    "hints": "Подсказки",
+    "screenshot": "Скриншот",
+    "lines": "строк",
+    "characters": "символов",
+    "words": "слов",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "clear": "Очистить",
+    "paste": "Вставить",
+    "upload": "Загрузить",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно"
+  },
+  "passwordGenerator": {
+    "title": "Генератор паролей",
+    "passwordLength": "Длина пароля:",
+    "passwordLanguage": "Язык пароля:",
+    "languages": {
+      "english": "Английский",
+      "russian": "Русский",
+      "ukrainian": "Украинский"
+    },
+    "includeLowercase": "Маленькие буквы",
+    "includeUppercase": "Заглавные буквы",
+    "includeNumbers": "Цифры",
+    "includeSymbols": "Знаки и символы",
+    "passwordCount": "Количество паролей:",
+    "copyError": "Ошибка копирования:"
+  },
+  "textGenerator": {
+    "title": "Генератор текста",
+    "textLength": "Длина текста:",
+    "textType": "Тип текста:",
+    "types": {
+      "lorem": "Lorem ipsum",
+      "random": "Случайный текст",
+      "fish": "Рыба текст"
+    },
+    "paragraphCount": "Количество абзацев:",
+    "inputText": "Введите исходный текст:"
+  },
+  "emojiTool": {
+    "title": "Добавление эмодзи",
+    "inputText": "Введите текст:",
+    "emojiPosition": "Позиция эмодзи:",
+    "positions": {
+      "before": "Перед словом",
+      "after": "После слова",
+      "random": "Случайно"
+    },
+    "emojiCount": "Количество эмодзи на слово:",
+    "selectEmoji": "Выберите эмодзи:"
+  },
+  "caseChangerTool": {
+    "title": "Изменение регистра",
+    "inputText": "Введите текст:",
+    "options": {
+      "lowercase": "Нижний регистр",
+      "uppercase": "Верхний регистр",
+      "titleCase": "Заглавные буквы в словах",
+      "sentenceCase": "Заглавные буквы в предложениях",
+      "alternateCase": "Переменный регистр",
+      "inverseCase": "Обратный регистр"
+    }
+  },
+  "findReplaceTool": {
+    "title": "Найти и заменить",
+    "inputText": "Введите текст:",
+    "findText": "Найти:",
+    "replaceText": "Заменить на:",
+    "caseSensitive": "Учитывать регистр",
+    "replaceAll": "Заменить все",
+    "matchCount": "Найдено совпадений:"
+  },
+  "letterCounterTool": {
+    "title": "Счетчик символов",
+    "inputText": "Введите текст:",
+    "charactersWithSpaces": "Символов с пробелами:",
+    "charactersWithoutSpaces": "Символов без пробелов:",
+    "wordsCount": "Слов:",
+    "linesCount": "Строк:",
+    "paragraphsCount": "Абзацев:"
+  },
+  "textSortingTool": {
+    "title": "Сортировка текста",
+    "inputText": "Введите текст:",
+    "sortType": "Тип сортировки:",
+    "sortOptions": {
+      "alphabetical": "По алфавиту",
+      "reverse": "Обратная",
+      "length": "По длине",
+      "random": "Случайная"
+    }
+  },
+  "duplicateRemoverTool": {
+    "title": "Удаление дубликатов",
+    "inputText": "Введите текст:",
+    "duplicatesFound": "Найдено дубликатов:",
+    "duplicatesRemoved": "Дубликаты удалены"
+  },
+  "footer": {
+    "copyright": "© 2024 WEKey Tools. Все права защищены.",
+    "developer": "Разработано",
+    "developedBy": "Разработано",
+    "allRightsReserved": "Все права защищены",
+    "founder": "Основатель проекта",
+    "publicOffer": "Публичная оферта",
+    "privacyPolicy": "Политика конфиденциальности"
+  }
+}

@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
 import { openaiService, type TextGenerationResponse } from '../services/openaiService';
+import { useToolTranslation } from '../i18n/useToolTranslation';
 import '../styles/tool-pages.css';
 import './TextGeneratorTool.css';
 
 
-const TOOL_ID = 'text_generator_tool';
+const TOOL_ID = 'text-generator';
 const TextGeneratorTool: React.FC = () => {
+  const { common, textGenerator } = useToolTranslation();
+  
   // Основные состояния
   const [language, setLanguage] = useState('english');
   const [countMode, setCountMode] = useState('characters'); // 'characters' или 'words'
@@ -262,7 +265,7 @@ const TextGeneratorTool: React.FC = () => {
           <img src="/icons/arrow_left.svg" alt="" />
           Все инструменты
         </Link>
-        <h1 className="tool-title">Генератор текста</h1>
+        <h1 className="tool-title">{textGenerator.title()}</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn" title="Счетчик запусков">
             <img src="/icons/rocket.svg" alt="" />

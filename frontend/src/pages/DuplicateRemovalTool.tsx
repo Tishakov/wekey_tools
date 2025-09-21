@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './DuplicateRemovalTool.css';
 
 
-const TOOL_ID = 'duplicate_removal_tool';
+const TOOL_ID = 'remove-duplicates';
 type DuplicateMode = 'remove-duplicates' | 'remove-all-duplicates' | 'remove-unique';
 
 const DuplicateRemovalTool: React.FC = () => {

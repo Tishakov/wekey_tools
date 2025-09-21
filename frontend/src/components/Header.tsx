@@ -1,10 +1,19 @@
 import React from 'react';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Header.css';
 
 const Header: React.FC = () => {
   return (
     <header className="header">
-      {/* Пока пустой, в будущем здесь будет поиск и кнопки */}
+      <div className="header-content">
+        <div className="header-left">
+          <LanguageSwitcher />
+        </div>
+        
+        <div className="header-right">
+          {/* Здесь можно добавить другие элементы */}
+        </div>
+      </div>
     </header>
   );
 };

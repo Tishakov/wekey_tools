@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { useToolTranslation } from '../i18n/useToolTranslation';
 import '../styles/tool-pages.css';
 import './PasswordGeneratorTool.css';
 
 
-const TOOL_ID = 'password_generator_tool';
+const TOOL_ID = 'password-generator';
 const PasswordGeneratorTool: React.FC = () => {
+    const { common, passwordGenerator } = useToolTranslation();
+    
     // Основные состояния
     const [passwordLength, setPasswordLength] = useState(12);
     const [language, setLanguage] = useState('Английский');
@@ -139,7 +142,7 @@ const PasswordGeneratorTool: React.FC = () => {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
             } catch (err) {
-                console.error('Ошибка копирования: ', err);
+                console.error(passwordGenerator.copyError(), err);
             }
         }
     };
@@ -162,18 +165,18 @@ const PasswordGeneratorTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to="/" className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {common.backToTools()}
                 </Link>
-                <h1 className="tool-title">Генератор паролей</h1>
+                <h1 className="tool-title">{passwordGenerator.title()}</h1>
                 <div className="tool-header-buttons">
-                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                    <button className="tool-header-btn counter-btn" title={common.launchCounter()}>
                         <img src="/icons/rocket.svg" alt="" />
                         <span className="counter">{launchCount}</span>
                     </button>
-                    <button className="tool-header-btn icon-only" title="Подсказки">
+                    <button className="tool-header-btn icon-only" title={common.hints()}>
                         <img src="/icons/lamp.svg" alt="" />
                     </button>
-                    <button className="tool-header-btn icon-only" title="Скриншот">
+                    <button className="tool-header-btn icon-only" title={common.screenshot()}>
                         <img src="/icons/camera.svg" alt="" />
                     </button>
                 </div>
@@ -186,7 +189,7 @@ const PasswordGeneratorTool: React.FC = () => {
                     {/* Группа 1: Длина пароля */}
                     <div className="settings-group">
                         <div className="count-slider-container">
-                            <label className="slider-label">Длина пароля:</label>
+                            <label className="slider-label">{passwordGenerator.passwordLength()}</label>
                             <div className="slider-group">
                                 <div className="slider-container">
                                     <input
@@ -224,30 +227,37 @@ const PasswordGeneratorTool: React.FC = () => {
                     {/* Группа 2: Язык пароля */}
                     <div className="settings-group">
                         <div className="password-generator-language-selector">
-                            <label className="dropdown-label">Язык пароля:</label>
+                            <label className="dropdown-label">{passwordGenerator.passwordLanguage()}</label>
                             <div className="dropdown-container">
                                 <button 
                                     className="dropdown-toggle"
                                     onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
                                     type="button"
                                 >
-                                    <span>{language}</span>
+                                    <span>
+                                        {language === 'Английский' ? passwordGenerator.languages.english() :
+                                         language === 'Русский' ? passwordGenerator.languages.russian() :
+                                         language === 'Украинский' ? passwordGenerator.languages.ukrainian() : language}
+                                    </span>
                                     <span className="dropdown-arrow">▼</span>
                                 </button>
                                 {languageDropdownOpen && (
                                     <div className="dropdown-menu">
-                                        {['Английский', 'Русский', 'Украинский'].map((lang) => (
-                                            <div 
-                                                key={lang}
-                                                className={`dropdown-option ${language === lang ? 'selected' : ''}`}
-                                                onClick={() => {
-                                                    setLanguage(lang);
-                                                    setLanguageDropdownOpen(false);
-                                                }}
-                                            >
-                                                {lang}
-                                            </div>
-                                        ))}
+                                        {[passwordGenerator.languages.english(), passwordGenerator.languages.russian(), passwordGenerator.languages.ukrainian()].map((lang, index) => {
+                                            const langKeys = ['Английский', 'Русский', 'Украинский'];
+                                            return (
+                                                <div 
+                                                    key={langKeys[index]}
+                                                    className={`dropdown-option ${language === langKeys[index] ? 'selected' : ''}`}
+                                                    onClick={() => {
+                                                        setLanguage(langKeys[index]);
+                                                        setLanguageDropdownOpen(false);
+                                                    }}
+                                                >
+                                                    {lang}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -263,7 +273,7 @@ const PasswordGeneratorTool: React.FC = () => {
                                     checked={includeLowercase}
                                     onChange={(e) => setIncludeLowercase(e.target.checked)}
                                 />
-                                <span className="checkbox-text">Маленькие буквы</span>
+                                <span className="checkbox-text">{passwordGenerator.includeLowercase()}</span>
                             </label>
 
                             <label className="checkbox-item">
@@ -272,7 +282,7 @@ const PasswordGeneratorTool: React.FC = () => {
                                     checked={includeUppercase}
                                     onChange={(e) => setIncludeUppercase(e.target.checked)}
                                 />
-                                <span className="checkbox-text">Заглавные буквы</span>
+                                <span className="checkbox-text">{passwordGenerator.includeUppercase()}</span>
                             </label>
 
                             <label className="checkbox-item">
@@ -281,7 +291,7 @@ const PasswordGeneratorTool: React.FC = () => {
                                     checked={includeNumbers}
                                     onChange={(e) => setIncludeNumbers(e.target.checked)}
                                 />
-                                <span className="checkbox-text">Цифры</span>
+                                <span className="checkbox-text">{passwordGenerator.includeNumbers()}</span>
                             </label>
 
                             <label className="checkbox-item">
@@ -290,7 +300,7 @@ const PasswordGeneratorTool: React.FC = () => {
                                     checked={includeSymbols}
                                     onChange={(e) => setIncludeSymbols(e.target.checked)}
                                 />
-                                <span className="checkbox-text">Знаки и символы</span>
+                                <span className="checkbox-text">{passwordGenerator.includeSymbols()}</span>
                             </label>
                         </div>
                     </div>
@@ -298,7 +308,7 @@ const PasswordGeneratorTool: React.FC = () => {
                     {/* Группа 4: Количество паролей */}
                     <div className="settings-group">
                         <div className="count-slider-container">
-                            <label className="slider-label">Количество паролей:</label>
+                            <label className="slider-label">{passwordGenerator.passwordCount()}</label>
                             <div className="slider-group">
                                 <div className="slider-container">
                                     <input
@@ -340,10 +350,10 @@ const PasswordGeneratorTool: React.FC = () => {
                         className="result-textarea"
                         value={result}
                         readOnly
-                        placeholder="Здесь будут результаты"
+                        placeholder={common.result()}
                     />
                     <div className="result-controls">
-                        <span className="result-counter">{countLines(result)} стр.</span>
+                        <span className="result-counter">{countLines(result)} {common.lines()}</span>
                     </div>
                 </div>
             </div>
@@ -354,7 +364,7 @@ const PasswordGeneratorTool: React.FC = () => {
                     className="action-btn primary" 
                     onClick={handleGeneratePasswords}
                 >
-                    Показать результат
+                    {common.generate()}
                 </button>
                 
                 <div className="result-buttons">
@@ -364,7 +374,7 @@ const PasswordGeneratorTool: React.FC = () => {
                         disabled={!result}
                     >
                         <img src="/icons/button_copy.svg" alt="" />
-                        {copied ? 'Скопировано!' : 'Скопировать'}
+                        {copied ? common.copied() : common.copy()}
                     </button>
 
                     <button 
@@ -372,7 +382,7 @@ const PasswordGeneratorTool: React.FC = () => {
                         onClick={handleReset}
                     >
                         <img src="/icons/reset.svg" alt="" />
-                        Сбросить
+                        {common.reset()}
                     </button>
                 </div>
             </div>

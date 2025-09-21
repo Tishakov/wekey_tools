@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './EmptyLinesRemovalTool.css';
 
 
-const TOOL_ID = 'empty_lines_removal_tool';
+const TOOL_ID = 'remove-empty-lines';
 const EmptyLinesRemovalTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');

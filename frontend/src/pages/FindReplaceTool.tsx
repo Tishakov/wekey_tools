@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './FindReplaceTool.css';
 
 
-const TOOL_ID = 'find_replace_tool';
+const TOOL_ID = 'find-replace';
 const FindReplaceTool: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [searchText, setSearchText] = useState('');

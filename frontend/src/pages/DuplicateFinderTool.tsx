@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './DuplicateFinderTool.css';
 
 
-const TOOL_ID = 'duplicate_finder_tool';
+const TOOL_ID = 'duplicate-finder';
 const DuplicateFinderTool: React.FC = () => {
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');

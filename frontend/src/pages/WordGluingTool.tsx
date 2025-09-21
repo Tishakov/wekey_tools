@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './WordGluingTool.css';
 
 
-const TOOL_ID = 'word_gluing_tool';
+const TOOL_ID = 'word-gluing';
 const WordGluingTool: React.FC = () => {
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');

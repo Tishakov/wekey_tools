@@ -4,7 +4,7 @@ import { statsService } from '../utils/statsService';
 import { openaiService, type WordInflectionResponse } from '../services/openaiService';
 
 
-const TOOL_ID = 'word_inflection_tool';
+const TOOL_ID = 'word-declension';
 const WordInflectionTool: React.FC = () => {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');

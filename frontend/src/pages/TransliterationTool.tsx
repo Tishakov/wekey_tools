@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './TransliterationTool.css';
 
 
-const TOOL_ID = 'transliteration_tool';
+const TOOL_ID = 'transliteration';
 const TransliterationTool: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');

@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import TransliterationTool from './pages/TransliterationTool';
@@ -32,55 +33,55 @@ import './styles/tool-pages.css';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Админ-панель - отдельные роуты без Layout */}
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/admin/dashboard" element={<AdminPanel />} />
-        <Route path="/admin/tools" element={<AdminPanel />} />
-        <Route path="/admin/users" element={<AdminPanel />} />
-        <Route path="/admin/finance" element={<AdminPanel />} />
-        <Route path="/admin/admins" element={<AdminPanel />} />
-        <Route path="/admin/logs" element={<AdminPanel />} />
-        <Route path="/admin/integrations" element={<AdminPanel />} />
-        
-        {/* Основные страницы с Layout */}
-        <Route path="/*" element={
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/transliteration" element={<TransliterationTool />} />
-              <Route path="/utm-generator" element={<UtmGeneratorTool />} />
-              <Route path="/char-counter" element={<CharCounterTool />} />
-              <Route path="/text-optimizer" element={<TextOptimizerTool />} />
-              <Route path="/duplicate-finder" element={<DuplicateFinderTool />} />
-              <Route path="/duplicate-removal" element={<DuplicateRemovalTool />} />
-              <Route path="/text-to-html" element={<TextToHtmlTool />} />
-              <Route path="/synonym-generator" element={<SynonymGeneratorTool />} />
-              <Route path="/word-declension" element={<WordInflectionTool />} />
-              <Route path="/password-generator" element={<PasswordGeneratorTool />} />
-              <Route path="/text-generator" element={<TextGeneratorTool />} />
-              <Route path="/number-generator" element={<NumberGeneratorTool />} />
-              <Route path="/add-symbol" element={<AddSymbolTool />} />
-              <Route path="/case-changer" element={<CaseChangerTool />} />
-              <Route path="/word-mixer" element={<WordMixerTool />} />
-              <Route path="/find-replace" element={<FindReplaceTool />} />
-              <Route path="/minus-words" element={<MinusWordsTool />} />
-              <Route path="/spaces-to-paragraphs" element={<SpacesToParagraphsTool />} />
-              <Route path="/text-sorting" element={<TextSortingTool />} />
-              <Route path="/remove-empty-lines" element={<EmptyLinesRemovalTool />} />
-              <Route path="/emoji" element={<EmojiTool />} />
-              <Route path="/cross-analytics" element={<AnalyticsTool />} />
-              <Route path="/word-gluing" element={<WordGluingTool />} />
-              <Route path="/remove-line-breaks" element={<RemoveLineBreaksTool />} />
-              <Route path="/text-by-columns" element={<TextByColumnsTool />} />
-              <Route path="/match-types" element={<MatchTypesTool />} />
-              <Route path="/word-mixer" element={<WordMixerTool />} />
-            </Routes>
-          </Layout>
-        } />
-      </Routes>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <Routes>
+          {/* Редирект с корня на русский язык */}
+          <Route path="/" element={<Navigate to="/ru" replace />} />
+          
+          {/* Админ-панель - отдельные роуты без Layout */}
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/dashboard" element={<AdminPanel />} />
+          <Route path="/admin/tools" element={<AdminPanel />} />
+          <Route path="/admin/users" element={<AdminPanel />} />
+          <Route path="/admin/finance" element={<AdminPanel />} />
+          <Route path="/admin/admins" element={<AdminPanel />} />
+          <Route path="/admin/logs" element={<AdminPanel />} />
+          <Route path="/admin/integrations" element={<AdminPanel />} />
+          
+          {/* Многоязычные роуты */}
+          <Route path="/:lang" element={<Layout><Outlet /></Layout>}>
+            <Route index element={<Home />} />
+            <Route path="transliteration" element={<TransliterationTool />} />
+            <Route path="utm-generator" element={<UtmGeneratorTool />} />
+            <Route path="char-counter" element={<CharCounterTool />} />
+            <Route path="text-optimizer" element={<TextOptimizerTool />} />
+            <Route path="duplicate-finder" element={<DuplicateFinderTool />} />
+            <Route path="duplicate-removal" element={<DuplicateRemovalTool />} />
+            <Route path="text-to-html" element={<TextToHtmlTool />} />
+            <Route path="synonym-generator" element={<SynonymGeneratorTool />} />
+            <Route path="word-declension" element={<WordInflectionTool />} />
+            <Route path="password-generator" element={<PasswordGeneratorTool />} />
+            <Route path="text-generator" element={<TextGeneratorTool />} />
+            <Route path="number-generator" element={<NumberGeneratorTool />} />
+            <Route path="add-symbol" element={<AddSymbolTool />} />
+            <Route path="case-changer" element={<CaseChangerTool />} />
+            <Route path="word-mixer" element={<WordMixerTool />} />
+            <Route path="find-replace" element={<FindReplaceTool />} />
+            <Route path="minus-words" element={<MinusWordsTool />} />
+            <Route path="spaces-to-paragraphs" element={<SpacesToParagraphsTool />} />
+            <Route path="text-sorting" element={<TextSortingTool />} />
+            <Route path="remove-empty-lines" element={<EmptyLinesRemovalTool />} />
+            <Route path="emoji" element={<EmojiTool />} />
+            <Route path="cross-analytics" element={<AnalyticsTool />} />
+            <Route path="word-gluing" element={<WordGluingTool />} />
+            <Route path="remove-line-breaks" element={<RemoveLineBreaksTool />} />
+            <Route path="text-by-columns" element={<TextByColumnsTool />} />
+            <Route path="match-types" element={<MatchTypesTool />} />
+          </Route>
+        </Routes>
+      </Router>
+    </HelmetProvider>
   );
 }
 

@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './NumberGeneratorTool.css';
 
 
-const TOOL_ID = 'number_generator_tool';
+const TOOL_ID = 'number-generator';
 const NumberGeneratorTool: React.FC = () => {
     // Основные состояния
     const [fromNumber, setFromNumber] = useState(1);

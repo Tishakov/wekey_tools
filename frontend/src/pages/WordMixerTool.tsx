@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './WordMixerTool.css';
 
 
-const TOOL_ID = 'word_mixer_tool';
+const TOOL_ID = 'word-mixer';
 const WordMixerTool: React.FC = () => {
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');

@@ -5,7 +5,7 @@ import './MinusWordsTool.css';
 import { statsService } from '../utils/statsService';
 
 
-const TOOL_ID = 'minus_words_tool';
+const TOOL_ID = 'minus-words';
 const MinusWordsTool: React.FC = () => {
     // Состояния компонента
     const [inputText, setInputText] = useState('');

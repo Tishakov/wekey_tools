@@ -4,7 +4,7 @@ import { statsService } from '../utils/statsService';
 import { openaiService, type SynonymResponse } from '../services/openaiService';
 
 
-const TOOL_ID = 'synonym_generator_tool';
+const TOOL_ID = 'synonym-generator';
 const SynonymGeneratorTool: React.FC = () => {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');

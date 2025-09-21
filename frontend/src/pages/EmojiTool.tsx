@@ -7,7 +7,7 @@ import { statsService } from '../utils/statsService';
 import { emojiDatabase } from '../data/emoji/index';
 
 
-const TOOL_ID = 'emoji_tool';
+const TOOL_ID = 'emoji';
 const EmojiTool: React.FC = () => {
     const [text, setText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');

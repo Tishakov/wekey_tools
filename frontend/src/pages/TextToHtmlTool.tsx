@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './TextToHtmlTool.css';
 
 
-const TOOL_ID = 'text_to_html_tool';
+const TOOL_ID = 'text-to-html';
 type HtmlMode = 'paragraph' | 'line-break' | 'mixed';
 
 const TextToHtmlTool: React.FC = () => {

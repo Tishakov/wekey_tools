@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './MatchTypesTool.css';
 
 
-const TOOL_ID = 'match_types_tool';
+const TOOL_ID = 'match-types';
 type MatchType = 'broad' | 'phrase' | 'exact';
 type CaseType = 'lowercase' | 'uppercase' | 'capitalize-first' | '';
 

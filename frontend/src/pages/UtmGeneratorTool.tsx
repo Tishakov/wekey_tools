@@ -5,7 +5,7 @@ import './UtmGeneratorTool.css';
 import { statsService } from '../utils/statsService';
 
 
-const TOOL_ID = 'utm_generator_tool';
+const TOOL_ID = 'utm-generator';
 const UtmGeneratorTool: React.FC = () => {
     // Состояния компонента
     const [baseUrl, setBaseUrl] = useState('');

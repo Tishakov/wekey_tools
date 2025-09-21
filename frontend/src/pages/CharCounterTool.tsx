@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './CharCounterTool.css';
 
 
-const TOOL_ID = 'char_counter_tool';
+const TOOL_ID = 'char-counter';
 interface CountStats {
   characters: number;
   charactersNoSpaces: number;

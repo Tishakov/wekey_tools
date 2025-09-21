@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './TextOptimizerTool.css';
 
 
-const TOOL_ID = 'text_optimizer_tool';
+const TOOL_ID = 'text-optimizer';
 const TextOptimizerTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');

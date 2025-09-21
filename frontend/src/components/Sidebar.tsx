@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { toolsService } from '../services/toolsService';
 import type { Tool } from '../utils/toolsConfig';
 import './Sidebar.css';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
   const [tools, setTools] = useState<Tool[]>([]);
+  
+  // Функция для получения переведенного названия инструмента
+  const getToolName = (toolId: string, fallbackTitle: string) => {
+    const translationKey = `tools.names.${toolId}`;
+    const translated = t(translationKey);
+    console.log('🔧 [Sidebar] Tool translation:', { toolId, translationKey, translated, fallbackTitle });
+    // Если перевод не найден, возвращаем fallback
+    return translated !== translationKey ? translated : fallbackTitle;
+  };
   
   // Список готовых инструментов (которые мы уже разработали)
   const completedTools = [
@@ -57,10 +70,14 @@ const Sidebar: React.FC = () => {
     };
 
     loadTools();
-  }, []);
+  }, [t]); // Добавляем t в зависимости, чтобы обновлялось при смене языка
   
-  // Сортируем инструменты по алфавиту
-  const sortedTools = [...tools].sort((a, b) => a.title.localeCompare(b.title));
+  // Сортируем инструменты по переведенным названиям
+  const sortedTools = [...tools].sort((a, b) => {
+    const nameA = getToolName(a.id, a.title);
+    const nameB = getToolName(b.id, b.title);
+    return nameA.localeCompare(nameB);
+  });
   
   return (
     <aside className="sidebar">
@@ -74,16 +91,16 @@ const Sidebar: React.FC = () => {
             return (
               <li key={tool.id} className="sidebar-menu-item">
                 <Link 
-                  to={tool.path} 
+                  to={createLink(tool.path)} 
                   className={`sidebar-link ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
                 >
-                  {tool.title}
+                  {getToolName(tool.id, tool.title)}
                   {hasAI && (
                     <img 
                       src="/icons/ai_star.svg" 
                       alt="AI" 
                       className="ai-icon"
-                      title="Инструмент с ИИ интеграцией"
+                      title={t('navigation.aiTool')}
                     />
                   )}
                 </Link>

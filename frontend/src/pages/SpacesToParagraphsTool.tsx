@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './SpacesToParagraphsTool.css';
 
 
-const TOOL_ID = 'spaces_to_paragraphs_tool';
+const TOOL_ID = 'spaces-to-paragraphs';
 const SpacesToParagraphsTool: React.FC = () => {
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');

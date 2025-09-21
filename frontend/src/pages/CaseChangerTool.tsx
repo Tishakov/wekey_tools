@@ -5,7 +5,7 @@ import '../styles/tool-pages.css';
 import './CaseChangerTool.css';
 
 
-const TOOL_ID = 'case_changer_tool';
+const TOOL_ID = 'case-changer';
 const CaseChangerTool: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
