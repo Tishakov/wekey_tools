@@ -64,6 +64,7 @@ const AdminPanel: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [loadingHistorical, setLoadingHistorical] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetModalClosing, setIsResetModalClosing] = useState(false);
@@ -411,19 +412,6 @@ const AdminPanel: React.FC = () => {
       case 'dashboard':
         return (
           <div className="dashboard-content">
-            <div className="dashboard-header">
-              <DateRangePicker
-                selectedRange={dateRange}
-                onRangeChange={(newRange: { startDate: Date; endDate: Date; label: string }) => {
-                  console.log('🗓️ DateRangePicker onChange:', newRange);
-                  setDateRange(newRange);
-                  fetchHistoricalData(newRange.startDate, newRange.endDate);
-                  fetchPeriodStats(newRange.startDate, newRange.endDate);
-                  fetchPeriodTools(newRange.startDate, newRange.endDate);
-                }}
-              />
-            </div>
-
             <div className="stats-grid">
               <div className="stat-card">
                 <h3>Посетителей</h3>
@@ -649,7 +637,11 @@ const AdminPanel: React.FC = () => {
 
   return (
     <div className="admin-panel">
-      <AdminSidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
+      <AdminSidebar 
+        activeSection={activeSection} 
+        onSectionChange={handleSectionChange}
+        onLogout={handleLogout}
+      />
       
       <div className="admin-main">
         <header className="admin-header">
@@ -660,18 +652,30 @@ const AdminPanel: React.FC = () => {
                 <button onClick={handleResetStats} className="reset-button" disabled={loading}>
                   {loading ? 'Сброс...' : 'Сбросить аналитику'}
                 </button>
-                <button onClick={() => { 
-                  fetchAdminData(); 
-                  fetchHistoricalData(dateRange.startDate, dateRange.endDate);
-                  fetchPeriodStats(dateRange.startDate, dateRange.endDate); 
-                }} className="refresh-button">
-                  Обновить данные
+                <button onClick={async () => { 
+                  setRefreshing(true);
+                  try {
+                    await fetchAdminData(); 
+                    await fetchHistoricalData(dateRange.startDate, dateRange.endDate);
+                    await fetchPeriodStats(dateRange.startDate, dateRange.endDate); 
+                  } finally {
+                    setRefreshing(false);
+                  }
+                }} className={`refresh-button ${refreshing ? 'refreshing' : ''}`} disabled={refreshing}>
+                  <img src="/icons/reset.svg" alt="Обновить данные" />
                 </button>
+                <DateRangePicker
+                  selectedRange={dateRange}
+                  onRangeChange={(newRange: { startDate: Date; endDate: Date; label: string }) => {
+                    console.log('🗓️ DateRangePicker onChange:', newRange);
+                    setDateRange(newRange);
+                    fetchHistoricalData(newRange.startDate, newRange.endDate);
+                    fetchPeriodStats(newRange.startDate, newRange.endDate);
+                    fetchPeriodTools(newRange.startDate, newRange.endDate);
+                  }}
+                />
               </>
             )}
-            <button onClick={handleLogout} className="logout-button">
-              Выйти
-            </button>
           </div>
         </header>
 

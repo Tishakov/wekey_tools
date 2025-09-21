@@ -7,18 +7,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: #1e1e1e;
+  padding: 3px 10px;
+  background: #28282A;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   color: #BCBBBD;
-  transition: all 0.2s ease;
-}
-
-.date-range-trigger:hover {
-  background: #2a2a2a;
 }
 
 .date-range-icon {
@@ -47,7 +42,7 @@
   background: #1C1D1F;
   border: 1px solid #333335;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
   min-width: 720px;
 }
 
@@ -60,7 +55,7 @@
   flex: 0 0 200px;
   padding: 16px;
   border-right: 1px solid #333335;
-  background: #1e1e1e;
+  background: #28282A;
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
 }
@@ -169,8 +164,8 @@
   text-align: center;
   font-size: 12px;
   font-weight: 500;
-  color: #808085;
-  background: #1e1e1e;
+  color: #BCBBBD;
+  background: #1C1D1F;
 }
 
 .calendar-grid {
@@ -186,7 +181,7 @@
   justify-content: center;
   font-size: 14px;
   color: #BCBBBD;
-  background: #1e1e1e;
+  background: #28282A;
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -261,11 +256,11 @@
 .calendar-day.disabled {
   color: #404044;
   cursor: not-allowed;
-  background: #1a1a1a;
+  background: #1C1D1F;
 }
 
 .calendar-day.disabled:hover {
-  background: #1a1a1a;
+  background: #1C1D1F;
   color: #404044;
 }
 

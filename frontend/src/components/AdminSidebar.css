@@ -1,8 +1,8 @@
 .admin-sidebar {
   width: 280px;
   height: 100vh;
-  background: #1a1a1a;
-  border-right: 1px solid #333;
+  background: #28282A;
+  border-right: 1px solid #333335;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -13,30 +13,34 @@
 
 .admin-sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid #333;
+  min-height: 85px;
+  align-content: center;
 }
 
 .admin-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-start;
+  padding-left: 18px;
 }
 
-.admin-logo-icon {
-  font-size: 24px;
-  color: #ffd700;
+.admin-logo img {
+  width: 160px;
+  height: auto;
 }
 
-.admin-logo-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: #fff;
+.admin-sidebar-divider {
+  height: 1px;
+  background: #333335;
+  margin: 0 20px;
 }
 
 .admin-nav {
   flex: 1;
-  padding: 20px 0;
+  padding: 20px 20px 0 20px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-nav-list {
@@ -54,43 +58,34 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
+  padding: 12px 12px;
   background: none;
   border: none;
-  color: #ccc;
+  border-radius: 10px;
+  color: #BCBBBD;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
-  font-size: 14px;
+  font-size: 16px;
   font-family: inherit;
   position: relative;
   text-decoration: none;
 }
 
 .admin-nav-link:hover {
-  background: #2a2a2a;
-  color: #fff;
-}
-
-.admin-nav-link.active {
-  background: #1e1e1e;
+  background: #333335;
   color: #BCBBBD;
 }
 
-.admin-nav-link.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: #09cea7;
+.admin-nav-link.active {
+  background: #1C1D1F;
+  color: #BCBBBD;
 }
 
 .admin-nav-icon {
-  font-size: 18px;
-  width: 20px;
-  text-align: center;
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) saturate(100%) invert(74%) sepia(8%) saturate(278%) hue-rotate(233deg) brightness(94%) contrast(87%);
 }
 
 .admin-nav-text {
@@ -150,4 +145,37 @@
 
 .admin-nav::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.admin-logout-section {
+  margin-top: auto;
+  padding: 20px 0;
+}
+
+.admin-logout-button {
+  width: 100%;
+  padding: 12px 12px;
+  background: none;
+  color: #BCBBBD;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.admin-logout-icon {
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) saturate(100%) invert(74%) sepia(8%) saturate(278%) hue-rotate(233deg) brightness(94%) contrast(87%);
+}
+
+.admin-logout-button:hover {
+  background: #333335;
+  color: #BCBBBD;
 }
