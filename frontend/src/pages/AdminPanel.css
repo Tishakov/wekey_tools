@@ -135,6 +135,7 @@
 .admin-header {
   background: #28282A;
   border-bottom: 1px solid #333335;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 20px 55px 20px 40px;
   display: flex;
   justify-content: space-between;
@@ -576,6 +577,7 @@
 @media (max-width: 768px) {
   .admin-header {
     padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     flex-direction: column;
     gap: 15px;
     text-align: center;
