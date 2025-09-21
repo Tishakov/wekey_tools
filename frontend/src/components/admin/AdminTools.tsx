@@ -13,6 +13,8 @@ interface Tool {
   order: number;
   createdAt: string;
   updatedAt: string;
+  usageCount?: number;
+  lastUsed?: string | null;
 }
 
 interface ToolsStats {
@@ -184,7 +186,7 @@ const AdminTools: React.FC = () => {
     const categoryMatch = categoryFilter === 'all' || tool.category === categoryFilter;
     
     return statusMatch && categoryMatch;
-  }) : [];
+  }).sort((a, b) => a.name.localeCompare(b.name)) : [];
 
   // Получение списка категорий
   const categories = Array.isArray(tools) ? Array.from(new Set(tools.map((tool: Tool) => tool.category))) : [];
@@ -316,6 +318,17 @@ const AdminTools: React.FC = () => {
                     <p className={`tools-item-description ${tool.isActive ? 'active' : 'inactive'}`}>
                       {tool.description} • {getCategoryName(tool.category)}
                     </p>
+                    <div className={`tools-item-stats ${tool.isActive ? 'active' : 'inactive'}`}>
+                      Запусков: <span className="tools-item-stats-count">{tool.usageCount || 0}</span>
+                      {tool.lastUsed && (
+                        <span className="tools-item-stats-separator"> • </span>
+                      )}
+                      {tool.lastUsed && (
+                        <span className="tools-item-stats-last">
+                          Последний: {new Date(tool.lastUsed).toLocaleString('ru-RU')}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

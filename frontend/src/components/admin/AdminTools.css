@@ -153,6 +153,33 @@
   opacity: 0.6;
 }
 
+.tools-item-stats {
+  margin: 5px 0 0 0;
+  font-size: 12px;
+  color: #888;
+}
+
+.tools-item-stats.active {
+  opacity: 1;
+}
+
+.tools-item-stats.inactive {
+  opacity: 0.6;
+}
+
+.tools-item-stats-count {
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+.tools-item-stats-separator {
+  color: #666;
+}
+
+.tools-item-stats-last {
+  color: #999;
+}
+
 .tools-item-controls {
   display: flex;
   align-items: center;
