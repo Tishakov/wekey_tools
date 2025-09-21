@@ -9,6 +9,7 @@ import AdminAdmins from '../components/admin/AdminAdmins';
 import AdminLogs from '../components/admin/AdminLogs';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
 import AnalyticsChart from '../components/AnalyticsChart';
+import { getSectionTitle, getActiveSectionFromUrl } from '../utils/adminSections';
 import DateRangePicker from '../components/DateRangePicker';
 import MiniBarChart from '../components/MiniBarChart';
 import historicalAnalyticsService from '../services/historicalAnalyticsService';
@@ -40,34 +41,37 @@ const AdminPanel: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [adminData, setAdminData] = useState<AdminData | null>(null);
+  const [periodStats, setPeriodStats] = useState<{
+    totalUsage: number;
+    uniqueUsers: number;
+    activeTools: number;
+  } | null>(null);
+  const [periodToolsData, setPeriodToolsData] = useState<Array<{
+    toolName: string;
+    usageCount: number;
+    lastUsed: string;
+  }> | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().setDate(new Date().getDate() - 29)),
-    endDate: new Date(),
-    label: 'Последние 30 дней'
+  const [dateRange, setDateRange] = useState(() => {
+    const endDate = new Date();
+    const startDate = new Date(new Date().setDate(new Date().getDate() - 6));
+    console.log('🗓️ [ADMIN] Initial dateRange:', { startDate, endDate, label: 'Последние 7 дней' });
+    return {
+      startDate,
+      endDate,
+      label: 'Последние 7 дней'
+    };
   });
   const [loading, setLoading] = useState(false);
   const [loadingHistorical, setLoadingHistorical] = useState(false);
   const [error, setError] = useState('');
 
   // Определяем активную секцию из URL
-  const getActiveSectionFromUrl = () => {
-    const path = location.pathname;
-    if (path === '/admin' || path === '/admin/dashboard') return 'dashboard';
-    if (path === '/admin/tools') return 'tools';
-    if (path === '/admin/users') return 'users';
-    if (path === '/admin/finance') return 'finance';
-    if (path === '/admin/admins') return 'admins';
-    if (path === '/admin/logs') return 'logs';
-    if (path === '/admin/integrations') return 'integrations';
-    return 'dashboard';
-  };
-
-  const [activeSection, setActiveSection] = useState(getActiveSectionFromUrl());
+  const [activeSection, setActiveSection] = useState(getActiveSectionFromUrl(location.pathname));
 
   // Обновляем активную секцию при изменении URL
   useEffect(() => {
-    setActiveSection(getActiveSectionFromUrl());
+    setActiveSection(getActiveSectionFromUrl(location.pathname));
   }, [location.pathname]);
 
   // Функция для смены секции с обновлением URL
@@ -82,16 +86,117 @@ const AdminPanel: React.FC = () => {
     if (token) {
       setIsLoggedIn(true);
       fetchAdminData();
-      fetchHistoricalData();
+      // Данные для периода загружаются в отдельном useEffect
     }
   }, []);
 
+  // Загружаем данные для периода при изменении dateRange
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log('🔄 [ADMIN] DateRange changed, loading data for:', dateRange);
+      fetchPeriodStats(dateRange.startDate, dateRange.endDate);
+      fetchPeriodTools(dateRange.startDate, dateRange.endDate);
+      fetchHistoricalData(dateRange.startDate, dateRange.endDate);
+    }
+  }, [dateRange, isLoggedIn]);
+
+  // Загрузка статистики за выбранный период
+  const fetchPeriodStats = async (startDate: Date, endDate: Date) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      
+      const params = new URLSearchParams({
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0]
+      });
+      
+      console.log('📊 [ADMIN] Fetching period stats for:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+      console.log('🔑 [ADMIN] Using token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
+      console.log('🔗 [ADMIN] Request URL:', `${API_BASE}/api/admin/period-stats?${params}`);
+      
+      const response = await fetch(`${API_BASE}/api/admin/period-stats?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      console.log('📡 [ADMIN] Response status:', response.status, response.statusText);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ [ADMIN] Period stats received:', data);
+        console.log('🔄 [ADMIN] Setting periodStats to:', data.stats);
+        setPeriodStats(data.stats);
+      } else {
+        console.warn('❌ [ADMIN] Error fetching period stats:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.warn('❌ [ADMIN] Error details:', errorText);
+        // Фоллбэк на нули
+        setPeriodStats({
+          totalUsage: 0,
+          uniqueUsers: 0,
+          activeTools: 0
+        });
+      }
+    } catch (error) {
+      console.error('❌ [ADMIN] Error fetching period stats:', error);
+      // Фоллбэк на нули
+      setPeriodStats({
+        totalUsage: 0,
+        uniqueUsers: 0,
+        activeTools: 0
+      });
+    }
+  };
+
+  // Загрузка статистики инструментов за период
+  const fetchPeriodTools = async (startDate: Date, endDate: Date) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      
+      console.log('🛠️ [ADMIN] Fetching period tools data:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+      
+      const response = await fetch(`${API_BASE}/api/admin/period-tools?startDate=${startDate.toISOString().split('T')[0]}&endDate=${endDate.toISOString().split('T')[0]}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ [ADMIN] Period tools received:', data);
+        setPeriodToolsData(data.toolUsage);
+      } else {
+        console.warn('❌ [ADMIN] Error fetching period tools:', response.status, response.statusText);
+        setPeriodToolsData([]);
+      }
+    } catch (error) {
+      console.error('❌ [ADMIN] Error fetching period tools:', error);
+      setPeriodToolsData([]);
+    }
+  };
+
   // Загрузка исторических данных
-  const fetchHistoricalData = async (period: 'today' | 'week' | 'month' | 'quarter' | 'year' = 'month') => {
+  const fetchHistoricalData = async (startDate?: Date, endDate?: Date) => {
     try {
       setLoadingHistorical(true);
-      console.log('📊 [ADMIN] Fetching historical data for period:', period);
-      const data = await historicalAnalyticsService.getDataByPeriod(period);
+      
+      let data;
+      if (startDate && endDate) {
+        // Используем конкретные даты
+        console.log('📊 [ADMIN] Fetching historical data for range:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+        data = await historicalAnalyticsService.getHistoricalData(
+          startDate.toISOString().split('T')[0],
+          endDate.toISOString().split('T')[0]
+        );
+      } else {
+        // Используем период по умолчанию (последние 30 дней)
+        console.log('📊 [ADMIN] Fetching historical data for default period');
+        data = await historicalAnalyticsService.getDataByPeriod('month');
+      }
+      
       setHistoricalData(data);
       console.log('✅ [ADMIN] Historical data loaded:', data.length, 'days');
     } catch (error) {
@@ -124,6 +229,7 @@ const AdminPanel: React.FC = () => {
         setIsLoggedIn(true);
         fetchAdminData();
         fetchHistoricalData();
+        fetchPeriodStats(dateRange.startDate, dateRange.endDate);
       } else {
         setError('Неверные данные для входа');
       }
@@ -258,10 +364,15 @@ const AdminPanel: React.FC = () => {
         return (
           <div className="dashboard-content">
             <div className="dashboard-header">
-              <h1 className="dashboard-title">Дашборд</h1>
               <DateRangePicker
                 selectedRange={dateRange}
-                onRangeChange={setDateRange}
+                onRangeChange={(newRange: { startDate: Date; endDate: Date; label: string }) => {
+                  console.log('🗓️ DateRangePicker onChange:', newRange);
+                  setDateRange(newRange);
+                  fetchHistoricalData(newRange.startDate, newRange.endDate);
+                  fetchPeriodStats(newRange.startDate, newRange.endDate);
+                  fetchPeriodTools(newRange.startDate, newRange.endDate);
+                }}
               />
             </div>
 
@@ -273,17 +384,18 @@ const AdminPanel: React.FC = () => {
 
               <div className="stat-card">
                 <h3>Пользователей</h3>
-                <div className="stat-number">0</div>
+                <div className="stat-number">{periodStats?.uniqueUsers || 0}</div>
+                {/* Debug: {JSON.stringify(periodStats)} */}
               </div>
 
               <div className="stat-card">
                 <h3>Использований</h3>
-                <div className="stat-number">{adminData?.stats?.totalUsage || 0}</div>
+                <div className="stat-number">{periodStats?.totalUsage || 0}</div>
               </div>
 
               <div className="stat-card">
                 <h3>Инструментов</h3>
-                <div className="stat-number">{adminData?.stats?.toolUsage?.length || 0}</div>
+                <div className="stat-number">{periodStats?.activeTools || 0}</div>
               </div>
 
               <div className="stat-card">
@@ -346,19 +458,50 @@ const AdminPanel: React.FC = () => {
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
                   <AnalyticsChart 
-                    data={historicalData.map((item, index) => {
-                      // Генерируем реалистичные данные по активным инструментам
-                      const currentActiveTools = adminData?.stats?.toolUsage?.filter(tool => tool.usageCount > 0).length || 0;
-                      // Постепенный рост количества активных инструментов от начала к концу периода
-                      const progressRatio = index / Math.max(1, historicalData.length - 1);
-                      const minTools = Math.max(1, Math.floor(currentActiveTools * 0.3));
-                      const toolsCount = Math.floor(minTools + (currentActiveTools - minTools) * progressRatio);
+                    data={(() => {
+                      // Используем реальные данные из periodToolsData для текущего количества активных инструментов
+                      const currentActiveTools = periodToolsData?.length || 0;
                       
-                      return {
-                        date: item.date,
-                        value: toolsCount
-                      };
-                    })} 
+                      // Если нет инструментов за период, показываем все нули
+                      if (currentActiveTools === 0 || historicalData.length === 0) {
+                        return historicalData.map(item => ({
+                          date: item.date,
+                          value: 0
+                        }));
+                      }
+                      
+                      // Если есть данные об использовании инструментов, то показываем рост
+                      // Но только если есть реальные использования (usageCount > 0)
+                      const hasRealUsage = historicalData.some(item => item.usageCount > 0);
+                      
+                      if (!hasRealUsage) {
+                        return historicalData.map(item => ({
+                          date: item.date,
+                          value: 0
+                        }));
+                      }
+                      
+                      // Показываем рост инструментов только в те дни, когда были использования
+                      return historicalData.map((item, index) => {
+                        // Если в этот день не было использований, показываем 0
+                        if (item.usageCount === 0) {
+                          return {
+                            date: item.date,
+                            value: 0
+                          };
+                        }
+                        
+                        // Постепенный рост количества активных инструментов
+                        const progressRatio = index / Math.max(1, historicalData.length - 1);
+                        const minTools = Math.max(1, Math.floor(currentActiveTools * 0.5));
+                        const toolsCount = Math.floor(minTools + (currentActiveTools - minTools) * progressRatio);
+                        
+                        return {
+                          date: item.date,
+                          value: toolsCount
+                        };
+                      });
+                    })()}
                     color="#f59e0b"
                     title="Динамика активных инструментов"
                   />
@@ -405,8 +548,8 @@ const AdminPanel: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {adminData?.stats?.toolUsage && adminData.stats.toolUsage.length > 0 ? (() => {
-                      const toolsWithUsage = adminData.stats.toolUsage.filter(tool => tool.usageCount > 0);
+                    {periodToolsData && periodToolsData.length > 0 ? (() => {
+                      const toolsWithUsage = periodToolsData.filter(tool => tool.usageCount > 0);
                       const maxUsage = Math.max(...toolsWithUsage.map(tool => tool.usageCount));
                       
                       return toolsWithUsage.map((tool, index) => (
@@ -419,14 +562,14 @@ const AdminPanel: React.FC = () => {
                               value={tool.usageCount}
                               maxValue={maxUsage}
                               color="#3b82f6"
-                              height={16}
+                              height={10}
                             />
                           </td>
                         </tr>
                       ));
                     })() : (
                       <tr>
-                        <td colSpan={4}>Пока нет данных об использовании</td>
+                        <td colSpan={4}>Пока нет данных об использовании за выбранный период</td>
                       </tr>
                     )}
                   </tbody>
@@ -462,7 +605,7 @@ const AdminPanel: React.FC = () => {
       
       <div className="admin-main">
         <header className="admin-header">
-          <h1>Админ-панель Wekey Tools</h1>
+          <div className="admin-title">{getSectionTitle(activeSection)}</div>
           <div className="header-buttons">
             {activeSection === 'dashboard' && (
               <>
@@ -471,7 +614,8 @@ const AdminPanel: React.FC = () => {
                 </button>
                 <button onClick={() => { 
                   fetchAdminData(); 
-                  fetchHistoricalData(); 
+                  fetchHistoricalData(dateRange.startDate, dateRange.endDate);
+                  fetchPeriodStats(dateRange.startDate, dateRange.endDate); 
                 }} className="refresh-button">
                   Обновить данные
                 </button>

@@ -14,7 +14,7 @@ const MiniBarChart: React.FC<MiniBarChartProps> = ({
   maxValue,
   color = '#3b82f6',
   width,
-  height = 20
+  height = 10
 }) => {
   const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
 

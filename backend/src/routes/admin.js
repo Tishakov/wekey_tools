@@ -399,20 +399,34 @@ router.get('/analytics/historical', async (req, res, next) => {
     const endDate = req.query.endDate;
     
     // Генерируем реальные исторические данные на основе статистики использования
-    const generateRealHistoricalData = async (days = 7) => {
+    const generateRealHistoricalData = async (startDateStr, endDateStr) => {
       const data = [];
       const { ToolUsage } = require('../models');
       
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
+      // Определяем диапазон дат
+      let start, end;
+      if (startDateStr && endDateStr) {
+        start = new Date(startDateStr);
+        end = new Date(endDateStr);
+      } else {
+        // По умолчанию последние 30 дней
+        end = new Date();
+        start = new Date();
+        start.setDate(end.getDate() - 29);
+      }
+      
+      console.log('📅 Generating data from', start.toISOString().split('T')[0], 'to', end.toISOString().split('T')[0]);
+      
+      // Генерируем данные для каждого дня в диапазоне
+      const currentDate = new Date(start);
+      while (currentDate <= end) {
+        const dateStr = currentDate.toISOString().split('T')[0];
         
         try {
           // Получаем реальные данные использования за этот день
-          const dayStart = new Date(date);
+          const dayStart = new Date(currentDate);
           dayStart.setHours(0, 0, 0, 0);
-          const dayEnd = new Date(date);
+          const dayEnd = new Date(currentDate);
           dayEnd.setHours(23, 59, 59, 999);
           
           const dailyUsage = await ToolUsage.count({
@@ -451,23 +465,175 @@ router.get('/analytics/historical', async (req, res, next) => {
             conversionRate: "0.00"
           });
         }
+        
+        // Переходим к следующему дню
+        currentDate.setDate(currentDate.getDate() + 1);
       }
       return data;
     };
     
-    let daysCount = 7;
-    if (period === 'month') daysCount = 30;
-    if (period === 'year') daysCount = 365;
-    
     const response = {
       success: true,
-      data: await generateRealHistoricalData(daysCount)
+      data: await generateRealHistoricalData(startDate, endDate)
     };
     
     console.log('✅ Historical analytics response:', response);
     res.json(response);
   } catch (error) {
     console.error('❌ Historical analytics error:', error);
+    next(error);
+  }
+});
+
+// GET /api/admin/period-tools - Статистика инструментов за выбранный период
+router.get('/period-tools', async (req, res, next) => {
+  try {
+    console.log('🛠️ Period tools requested:', req.query);
+    
+    const startDateStr = req.query.startDate;
+    const endDateStr = req.query.endDate;
+    const { ToolUsage } = require('../models');
+    
+    if (!startDateStr || !endDateStr) {
+      return res.status(400).json({
+        success: false,
+        error: 'startDate and endDate are required'
+      });
+    }
+    
+    // Определяем диапазон дат
+    const startDate = new Date(startDateStr);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(endDateStr);
+    endDate.setHours(23, 59, 59, 999);
+    
+    console.log('📅 Calculating tools stats from', startDate, 'to', endDate);
+    
+    try {
+      // Получаем статистику инструментов за период
+      const toolsData = await ToolUsage.findAll({
+        attributes: [
+          'toolName',
+          [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'usageCount'],
+          [require('sequelize').fn('MAX', require('sequelize').col('createdAt')), 'lastUsed']
+        ],
+        where: {
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        },
+        group: ['toolName'],
+        order: [[require('sequelize').literal('usageCount'), 'DESC']],
+        limit: 20,
+        raw: true
+      });
+      
+      const formattedToolsData = toolsData.map(tool => ({
+        toolName: tool.toolName,
+        usageCount: parseInt(tool.usageCount) || 0,
+        lastUsed: tool.lastUsed || new Date().toISOString()
+      }));
+      
+      const response = {
+        success: true,
+        toolUsage: formattedToolsData
+      };
+      
+      console.log('✅ Period tools response:', response);
+      res.json(response);
+    } catch (dbError) {
+      console.error('❌ Database error in period tools:', dbError);
+      // Фоллбэк на пустой массив
+      res.json({
+        success: true,
+        toolUsage: []
+      });
+    }
+  } catch (error) {
+    console.error('❌ Period tools error:', error);
+    next(error);
+  }
+});
+
+// GET /api/admin/period-stats - Статистика за выбранный период
+router.get('/period-stats', async (req, res, next) => {
+  try {
+    console.log('📊 Period stats requested:', req.query);
+    
+    const startDateStr = req.query.startDate;
+    const endDateStr = req.query.endDate;
+    const { ToolUsage } = require('../models');
+    
+    if (!startDateStr || !endDateStr) {
+      return res.status(400).json({
+        success: false,
+        error: 'startDate and endDate are required'
+      });
+    }
+    
+    // Определяем диапазон дат
+    const startDate = new Date(startDateStr);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(endDateStr);
+    endDate.setHours(23, 59, 59, 999);
+    
+    console.log('📅 Calculating stats from', startDate, 'to', endDate);
+    
+    try {
+      // Получаем статистику за период
+      const totalUsage = await ToolUsage.count({
+        where: {
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        }
+      });
+      
+      const uniqueUsers = await ToolUsage.count({
+        distinct: true,
+        col: 'sessionId',
+        where: {
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        }
+      });
+      
+      const activeTools = await ToolUsage.count({
+        distinct: true,
+        col: 'toolName',
+        where: {
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        }
+      });
+      
+      const response = {
+        success: true,
+        stats: {
+          totalUsage: totalUsage || 0,
+          uniqueUsers: uniqueUsers || 0,
+          activeTools: activeTools || 0
+        }
+      };
+      
+      console.log('✅ Period stats response:', response);
+      res.json(response);
+    } catch (dbError) {
+      console.error('❌ Database error in period stats:', dbError);
+      // Фоллбэк на нули
+      res.json({
+        success: true,
+        stats: {
+          totalUsage: 0,
+          uniqueUsers: 0,
+          activeTools: 0
+        }
+      });
+    }
+  } catch (error) {
+    console.error('❌ Period stats error:', error);
     next(error);
   }
 });

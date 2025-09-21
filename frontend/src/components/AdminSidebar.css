@@ -73,8 +73,8 @@
 }
 
 .admin-nav-link.active {
-  background: #ffd700;
-  color: #000;
+  background: #1e1e1e;
+  color: #BCBBBD;
 }
 
 .admin-nav-link.active::before {
@@ -84,7 +84,7 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: #ffd700;
+  background: #09cea7;
 }
 
 .admin-nav-icon {
