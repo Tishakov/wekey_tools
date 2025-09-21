@@ -15,6 +15,7 @@ const Subscription = require('./Subscription')(sequelize);
 const Payment = require('./Payment')(sequelize);
 const Visitor = require('./Visitor')(sequelize);
 const AnalyticsEvent = require('./AnalyticsEvent')(sequelize);
+const Tool = require('./Tool')(sequelize);
 
 // Определение ассоциаций
 User.hasMany(ToolUsage, { foreignKey: 'userId', as: 'toolUsages' });
@@ -40,5 +41,6 @@ module.exports = {
   Subscription,
   Payment,
   Visitor,
-  AnalyticsEvent
+  AnalyticsEvent,
+  Tool
 };

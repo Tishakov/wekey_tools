@@ -85,6 +85,10 @@ const AdminPanel: React.FC = () => {
     return localStorage.getItem('adminTimezone') || 'Europe/Kiev';
   });
 
+  // Состояние для управления инструментами
+  const [tools, setTools] = useState<any[]>([]);
+  const [toolsLoading, setToolsLoading] = useState(false);
+
   // Функции плавного закрытия модальных окон
   const closeResetModal = () => {
     setIsResetModalClosing(true);
@@ -109,6 +113,13 @@ const AdminPanel: React.FC = () => {
   useEffect(() => {
     setActiveSection(getActiveSectionFromUrl(location.pathname));
   }, [location.pathname]);
+
+  // Загружаем данные при смене секции
+  useEffect(() => {
+    if (activeSection === 'tools' && isLoggedIn) {
+      fetchTools();
+    }
+  }, [activeSection, isLoggedIn]);
 
   // Функция для смены секции с обновлением URL
   const handleSectionChange = (section: string) => {
@@ -234,6 +245,76 @@ const AdminPanel: React.FC = () => {
     } catch (error) {
       console.error('❌ [ADMIN] Error fetching period tools:', error);
       setPeriodToolsData([]);
+    }
+  };
+
+  // Загрузка инструментов
+  const fetchTools = async () => {
+    try {
+      setToolsLoading(true);
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('Токен авторизации не найден');
+      }
+
+      const response = await fetch('http://localhost:8880/api/tools', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка сервера: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setTools(Array.isArray(data) ? data : (data.tools || []));
+    } catch (error) {
+      console.error('Error loading tools:', error);
+      setTools([]);
+    } finally {
+      setToolsLoading(false);
+    }
+  };
+
+  // Массовое переключение инструментов
+  const toggleAllTools = async () => {
+    try {
+      setToolsLoading(true);
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('Токен авторизации не найден');
+      }
+
+      // Определяем, нужно ли включить или отключить все
+      const hasActiveTools = Array.isArray(tools) && tools.some(tool => tool.isActive);
+      
+      // Переключаем все инструменты
+      const togglePromises = tools.map(tool => 
+        fetch(`http://localhost:8880/api/tools/${tool.id}/toggle`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+      );
+
+      await Promise.all(togglePromises);
+      
+      // Перезагружаем список инструментов
+      await fetchTools();
+      
+      // Уведомляем компонент AdminTools об обновлении
+      window.dispatchEvent(new CustomEvent('toolsUpdated'));
+      
+    } catch (error) {
+      console.error('Error toggling all tools:', error);
+    } finally {
+      setToolsLoading(false);
     }
   };
 
@@ -739,6 +820,22 @@ const AdminPanel: React.FC = () => {
                     fetchPeriodTools(newRange.startDate, newRange.endDate);
                   }}
                 />
+              </>
+            )}
+            {activeSection === 'tools' && (
+              <>
+                <div className="tools-header-controls">
+                  <span className="tools-toggle-label">
+                    {Array.isArray(tools) && tools.some(tool => tool.isActive) ? 'Отключить все' : 'Включить все'}
+                  </span>
+                  <button
+                    onClick={toggleAllTools}
+                    className={`tools-header-toggle ${Array.isArray(tools) && tools.some(tool => tool.isActive) ? 'active' : 'inactive'}`}
+                    disabled={toolsLoading}
+                  >
+                    <div className={`tools-header-toggle-slider ${Array.isArray(tools) && tools.some(tool => tool.isActive) ? 'active' : 'inactive'}`} />
+                  </button>
+                </div>
               </>
             )}
           </div>

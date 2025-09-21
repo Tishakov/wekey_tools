@@ -143,6 +143,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  min-height: 85px;
 }
 
 .admin-title {
@@ -323,7 +324,6 @@
 }
 
 .admin-content {
-  padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -822,4 +822,60 @@
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
   }
+}
+
+/* Стили для тумблера инструментов в заголовке */
+.tools-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.tools-toggle-label {
+  font-size: 14px;
+  color: #BCBBBD;
+  font-weight: 500;
+}
+
+.tools-header-toggle {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  border-radius: 13px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  outline: none;
+}
+
+.tools-header-toggle.active {
+  background: #4CAF50;
+}
+
+.tools-header-toggle.inactive {
+  background: #ccc;
+}
+
+.tools-header-toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tools-header-toggle-slider {
+  position: absolute;
+  top: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.tools-header-toggle-slider.active {
+  left: 26px;
+}
+
+.tools-header-toggle-slider.inactive {
+  left: 2px;
 }

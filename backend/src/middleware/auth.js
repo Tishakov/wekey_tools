@@ -36,15 +36,20 @@ const createSendToken = (user, statusCode, res, message = 'Успешная ав
 
 const protect = async (req, res, next) => {
   try {
+    console.log('🔐 Auth middleware: проверка токена для', req.method, req.path);
+    
     // 1) Получение токена
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
+      console.log('📱 Токен из Authorization header:', token.substring(0, 20) + '...');
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;
+      console.log('🍪 Токен из cookies:', token.substring(0, 20) + '...');
     }
 
     if (!token) {
+      console.log('❌ Токен не найден');
       return next(new AppError('Вы не авторизованы! Пожалуйста, войдите в систему.', 401));
     }
 

@@ -57,7 +57,7 @@ const app = express();
 const corsOptions = {
   origin: true, // Разрешаем все источники
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 };
 
@@ -83,12 +83,14 @@ try {
   const statsRoutes = require('./routes/stats');
   const usersRoutes = require('./routes/users');
   const analyticsRoutes = require('./routes/analytics');
+  const toolsRoutes = require('./routes/tools');
 
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/stats', statsRoutes);
   app.use('/api/analytics', analyticsRoutes); // Подключаем User tracking аналитику
   app.use('/api/users', usersRoutes);
+  app.use('/api', toolsRoutes); // Подключаем управление инструментами
   
   console.log('✅ All routes registered successfully');
 } catch (error) {

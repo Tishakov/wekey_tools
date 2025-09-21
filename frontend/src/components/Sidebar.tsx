@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { toolsConfig } from '../utils/toolsConfig';
+import { toolsService } from '../services/toolsService';
+import type { Tool } from '../utils/toolsConfig';
 import './Sidebar.css';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const [tools, setTools] = useState<Tool[]>([]);
   
   // Список готовых инструментов (которые мы уже разработали)
   const completedTools = [
@@ -43,9 +45,22 @@ const Sidebar: React.FC = () => {
     'cross-analytics',       // Сквозная аналитика
     'word-declension'        // Склонение слов
   ];
+
+  useEffect(() => {
+    const loadTools = async () => {
+      try {
+        const activeTools = await toolsService.getActiveTools();
+        setTools(activeTools);
+      } catch (error) {
+        console.error('Ошибка загрузки инструментов в сайдбаре:', error);
+      }
+    };
+
+    loadTools();
+  }, []);
   
   // Сортируем инструменты по алфавиту
-  const sortedTools = [...toolsConfig].sort((a, b) => a.title.localeCompare(b.title));
+  const sortedTools = [...tools].sort((a, b) => a.title.localeCompare(b.title));
   
   return (
     <aside className="sidebar">
