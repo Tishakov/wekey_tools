@@ -1555,66 +1555,113 @@
     "success": {
       "loginSuccess": "Вхід виконано успішно",
       "registerSuccess": "Реєстрацію виконано успішно"
-    }
-  },
-  "profile": {
-    "title": "Профіль",
-    "notLoggedIn": "Ви не авторизовані",
-    "edit": "Редагувати",
-    "cancel": "Скасувати", 
-    "save": "Зберегти",
-    "updateSuccess": "Профіль успішно оновлено",
-    "updateError": "Помилка оновлення профілю",
-    "tabs": {
-      "personalInfo": "Особиста інформація",
-      "password": "Пароль",
-      "settings": "Налаштування"
     },
-    "personalInfo": {
-      "title": "Особиста інформація"
-    },
-    "firstName": "Ім'я",
-    "lastName": "Прізвище",
-    "email": "Email",
-    "firstNamePlaceholder": "Введіть ім'я",
-    "lastNamePlaceholder": "Введіть прізвище",
-    "emailPlaceholder": "Введіть email",
-    "password": {
-      "title": "Зміна пароля"
-    },
-    "currentPassword": "Поточний пароль",
-    "newPassword": "Новий пароль",
-    "confirmPassword": "Підтвердити пароль",
-    "currentPasswordPlaceholder": "Введіть поточний пароль",
-    "newPasswordPlaceholder": "Введіть новий пароль",
-    "confirmPasswordPlaceholder": "Підтвердіть новий пароль",
-    "changePassword": "Змінити пароль",
-    "passwordMismatch": "Паролі не співпадають",
-    "passwordTooShort": "Пароль повинен містити мінімум 8 символів",
-    "passwordChanged": "Пароль успішно змінено",
-    "passwordChangeError": "Помилка зміни пароля",
-    "settings": {
-      "title": "Налаштування аккаунту"
-    },
-    "defaultLanguage": "Мова за замовчуванням",
-    "emailNotifications": "Email сповіщення",
-    "theme": "Тема інтерфейсу",
-    "languages": {
-      "ru": "Русский",
-      "en": "English",
-      "uk": "Українська"
-    },
-    "themes": {
-      "light": "Світла",
-      "dark": "Темна"
-    },
-    "saveSettings": "Зберегти налаштування",
-    "settingsUpdated": "Налаштування успішно оновлено",
-    "settingsUpdateError": "Помилка оновлення налаштувань",
-    "role": {
-      "user": "Користувач",
-      "premium": "Преміум",
-      "admin": "Адміністратор"
+    "profile": {
+      "tabs": {
+        "personalInfo": "Особиста інформація",
+        "password": "Пароль",
+        "settings": "Налаштування"
+      },
+      "personalInfo": {
+        "title": "Особиста інформація",
+        "edit": "Редагувати",
+        "save": "Зберегти",
+        "cancel": "Скасувати",
+        "name": "Повне ім'я",
+        "email": "Електронна пошта",
+        "role": "Тип аккаунту",
+        "createdAt": "Учасник з",
+        "editMode": "Режим редагування",
+        "fields": {
+          "name": {
+            "label": "Повне ім'я",
+            "placeholder": "Введіть ваше повне ім'я"
+          },
+          "email": {
+            "label": "Електронна пошта",
+            "placeholder": "Введіть адресу електронної пошти"
+          }
+        },
+        "roles": {
+          "user": "Користувач",
+          "admin": "Адміністратор",
+          "premium": "Преміум користувач"
+        },
+        "messages": {
+          "updateSuccess": "Профіль оновлено успішно",
+          "updateError": "Помилка оновлення профілю",
+          "nameRequired": "Ім'я обов'язкове",
+          "emailRequired": "Електронна пошта обов'язкова",
+          "emailInvalid": "Введіть дійсну адресу електронної пошти"
+        }
+      },
+      "password": {
+        "title": "Зміна пароля",
+        "currentPassword": "Поточний пароль",
+        "newPassword": "Новий пароль",
+        "confirmPassword": "Підтвердити новий пароль",
+        "changePassword": "Змінити пароль",
+        "fields": {
+          "currentPassword": {
+            "label": "Поточний пароль",
+            "placeholder": "Введіть поточний пароль"
+          },
+          "newPassword": {
+            "label": "Новий пароль",
+            "placeholder": "Введіть новий пароль"
+          },
+          "confirmPassword": {
+            "label": "Підтвердити новий пароль",
+            "placeholder": "Підтвердіть новий пароль"
+          }
+        },
+        "messages": {
+          "changeSuccess": "Пароль змінено успішно",
+          "changeError": "Помилка зміни пароля",
+          "currentPasswordRequired": "Поточний пароль обов'язковий",
+          "newPasswordRequired": "Новий пароль обов'язковий",
+          "confirmPasswordRequired": "Підтвердіть новий пароль",
+          "passwordMismatch": "Паролі не співпадають",
+          "passwordMinLength": "Пароль повинен містити не менше 6 символів",
+          "incorrectCurrentPassword": "Поточний пароль неправильний"
+        }
+      },
+      "settings": {
+        "title": "Налаштування аккаунту",
+        "language": "Мова",
+        "theme": "Тема",
+        "notifications": "Сповіщення",
+        "saveSettings": "Зберегти налаштування",
+        "fields": {
+          "language": {
+            "label": "Мова інтерфейсу",
+            "options": {
+              "ru": "Русский",
+              "en": "English",
+              "uk": "Українська"
+            }
+          },
+          "theme": {
+            "label": "Тема",
+            "options": {
+              "dark": "Темна",
+              "light": "Світла",
+              "auto": "Авто"
+            }
+          },
+          "notifications": {
+            "label": "Сповіщення на пошту",
+            "options": {
+              "enabled": "Увімкнено",
+              "disabled": "Вимкнено"
+            }
+          }
+        },
+        "messages": {
+          "saveSuccess": "Налаштування збережено успішно",
+          "saveError": "Помилка збереження налаштувань"
+        }
+      }
     }
   }
 }
