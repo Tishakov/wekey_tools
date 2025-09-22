@@ -1,19 +1,17 @@
 /* UserProfile.css - Стили для страницы профиля пользователя */
 
 .profile-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 20px;
   font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #FFFFFF;
-  min-height: calc(100vh - 100px);
 }
 
 .profile-header {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   padding: 30px;
   background: #28282A;
   border: 1px solid #333335;
@@ -84,48 +82,23 @@
 }
 
 .profile-content {
+  display: block;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.profile-main-content {
   background: #28282A;
   border: 1px solid #333335;
   border-radius: 16px;
-  overflow: hidden;
-}
-
-.profile-tabs {
-  display: flex;
-  border-bottom: 1px solid #333335;
-}
-
-.profile-tab {
-  flex: 1;
-  padding: 20px;
-  background: none;
-  border: none;
-  color: #999;
-  font-size: 16px;
-  font-weight: 500;
-  font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-bottom: 2px solid transparent;
-}
-
-.profile-tab:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.profile-tab.active {
-  color: #FFFFFF;
-  border-bottom-color: #5E35F2;
-  background: rgba(94, 53, 242, 0.1);
-}
-
-.profile-tab-content {
   padding: 30px;
 }
 
 .profile-section {
-  max-width: 600px;
+  background: transparent;
+  max-width: none;
 }
 
 .section-header {
@@ -350,21 +323,12 @@
     font-size: 24px;
   }
   
-  .profile-tabs {
+  .profile-content {
     flex-direction: column;
+    gap: 15px;
   }
   
-  .profile-tab {
-    border-bottom: 1px solid #333335;
-    border-right: none;
-  }
-  
-  .profile-tab.active {
-    border-bottom-color: #333335;
-    border-left: 2px solid #5E35F2;
-  }
-  
-  .profile-tab-content {
+  .profile-main-content {
     padding: 20px;
   }
   

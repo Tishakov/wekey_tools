@@ -15,12 +15,13 @@ interface PasswordChangeData {
   confirmPassword: string;
 }
 
-const UserProfile: React.FC = () => {
+interface UserProfileProps {
+  activeSection: 'personalInfo' | 'password' | 'settings';
+}
+
+const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const { user, updateProfile } = useAuth();
   const { t, i18n } = useTranslation();
-  
-  // State for active tab
-  const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'settings'>('profile');
   
   // State for profile editing
   const [isEditing, setIsEditing] = useState(false);
@@ -196,35 +197,14 @@ const UserProfile: React.FC = () => {
       </div>
       
       <div className="profile-content">
-        <nav className="profile-tabs">
-          <button 
-            className={`profile-tab ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-          >
-            {t('profile.tabs.personalInfo')}
-          </button>
-          <button 
-            className={`profile-tab ${activeTab === 'password' ? 'active' : ''}`}
-            onClick={() => setActiveTab('password')}
-          >
-            {t('profile.tabs.password')}
-          </button>
-          <button 
-            className={`profile-tab ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            {t('profile.tabs.settings')}
-          </button>
-        </nav>
-        
-        <div className="profile-tab-content">
+        <div className="profile-main-content">
           {message && (
             <div className={`profile-message ${message.type}`}>
               {message.text}
             </div>
           )}
           
-          {activeTab === 'profile' && (
+          {activeSection === 'personalInfo' && (
             <div className="profile-section">
               <div className="section-header">
                 <h2>{t('profile.personalInfo.title')}</h2>
@@ -305,7 +285,7 @@ const UserProfile: React.FC = () => {
             </div>
           )}
           
-          {activeTab === 'password' && (
+          {activeSection === 'password' && (
             <div className="profile-section">
               <h2>{t('profile.password.title')}</h2>
               <form onSubmit={handlePasswordSubmit} className="profile-form">
@@ -359,7 +339,7 @@ const UserProfile: React.FC = () => {
             </div>
           )}
           
-          {activeTab === 'settings' && (
+          {activeSection === 'settings' && (
             <div className="profile-section">
               <h2>{t('profile.settings.title')}</h2>
               <form onSubmit={handleSettingsSubmit} className="profile-form">

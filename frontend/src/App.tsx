@@ -3,7 +3,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import UserProfile from './pages/UserProfile';
+import ProfilePage from './pages/ProfilePage';
 import TransliterationTool from './pages/TransliterationTool';
 import UtmGeneratorTool from './pages/UtmGeneratorTool';
 import CharCounterTool from './pages/CharCounterTool';
@@ -52,10 +52,12 @@ function App() {
           <Route path="/admin/logs" element={<AdminPanel />} />
           <Route path="/admin/integrations" element={<AdminPanel />} />
           
+          {/* Профиль пользователя - отдельный layout */}
+          <Route path="/:lang/profile" element={<ProfilePage />} />
+          
           {/* Многоязычные роуты */}
           <Route path="/:lang" element={<Layout><Outlet /></Layout>}>
             <Route index element={<Home />} />
-            <Route path="profile" element={<UserProfile />} />
             <Route path="transliteration" element={<TransliterationTool />} />
             <Route path="utm-generator" element={<UtmGeneratorTool />} />
             <Route path="char-counter" element={<CharCounterTool />} />

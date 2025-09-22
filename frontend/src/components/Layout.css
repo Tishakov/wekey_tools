@@ -28,7 +28,7 @@
 }
 
 .main-content {
-  width: 910px;
+  width: 100%;
   padding: 0;
 }
 
@@ -56,4 +56,19 @@
   .main-content {
     width: 100%;
   }
+}
+
+/* Profile Layout Styles */
+.profile-layout-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  padding: 20px 0;
+}
+
+.profile-main-content {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0;
 }

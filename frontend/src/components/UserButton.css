@@ -38,7 +38,7 @@
   gap: 10px;
   padding: 8px 12px;
   background: #28282A;
-  border: 1px solid #333335;
+  border: none;
   border-radius: 12px;
   color: #FFFFFF;
   font-size: 14px;
@@ -74,7 +74,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100px;
+  max-width: 150px;
 }
 
 .user-arrow {

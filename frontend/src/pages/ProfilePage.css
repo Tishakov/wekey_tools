@@ -1,0 +1,24 @@
+/* ProfilePage.css - Стили для обертки страницы профиля */
+
+.profile-page-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.profile-page-content {
+  flex: 1;
+  min-width: 0; /* Позволяет контенту сжиматься */
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .profile-page-container {
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+  }
+}
