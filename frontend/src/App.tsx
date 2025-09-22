@@ -3,6 +3,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import UserProfile from './pages/UserProfile';
 import TransliterationTool from './pages/TransliterationTool';
 import UtmGeneratorTool from './pages/UtmGeneratorTool';
 import CharCounterTool from './pages/CharCounterTool';
@@ -54,6 +55,7 @@ function App() {
           {/* Многоязычные роуты */}
           <Route path="/:lang" element={<Layout><Outlet /></Layout>}>
             <Route index element={<Home />} />
+            <Route path="profile" element={<UserProfile />} />
             <Route path="transliteration" element={<TransliterationTool />} />
             <Route path="utm-generator" element={<UtmGeneratorTool />} />
             <Route path="char-counter" element={<CharCounterTool />} />

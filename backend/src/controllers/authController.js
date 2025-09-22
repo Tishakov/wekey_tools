@@ -434,3 +434,139 @@ exports.adminLogin = async (req, res) => {
     });
   }
 };
+
+// Смена пароля
+exports.changePassword = async (req, res) => {
+  try {
+    console.log('🔐 Change password request for user:', req.user.id);
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Текущий и новый пароли обязательны'
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Новый пароль должен содержать минимум 8 символов'
+      });
+    }
+
+    const { User } = require('../config/database');
+    const bcrypt = require('bcryptjs');
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Проверяем текущий пароль
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Неверный текущий пароль'
+      });
+    }
+
+    // Хешируем новый пароль
+    const saltRounds = 12;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Обновляем пароль
+    await user.update({ password: hashedNewPassword });
+
+    console.log('✅ Password changed successfully for user:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Пароль успешно изменен'
+    });
+
+  } catch (error) {
+    console.error('❌ Change password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+// Обновление настроек пользователя
+exports.updateSettings = async (req, res) => {
+  try {
+    console.log('⚙️ Update settings request for user:', req.user.id);
+    console.log('⚙️ Settings data:', req.body);
+
+    const { defaultLanguage, emailNotifications, theme } = req.body;
+
+    const { User } = require('../config/database');
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Обновляем настройки
+    const updateData = {};
+    
+    if (defaultLanguage && ['ru', 'en', 'uk'].includes(defaultLanguage)) {
+      updateData.language = defaultLanguage;
+    }
+    
+    if (theme && ['light', 'dark'].includes(theme)) {
+      updateData.theme = theme;
+    }
+
+    // Добавляем другие настройки в поле settings как JSON
+    const currentSettings = user.settings ? JSON.parse(user.settings) : {};
+    const newSettings = {
+      ...currentSettings,
+      emailNotifications: emailNotifications !== undefined ? emailNotifications : currentSettings.emailNotifications
+    };
+    
+    updateData.settings = JSON.stringify(newSettings);
+
+    await user.update(updateData);
+
+    console.log('✅ Settings updated successfully for user:', user.email);
+
+    // Возвращаем обновленные данные пользователя
+    const updatedUser = await User.findByPk(req.user.id);
+    const userResponse = {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      role: updatedUser.role,
+      language: updatedUser.language,
+      theme: updatedUser.theme,
+      settings: updatedUser.settings ? JSON.parse(updatedUser.settings) : {}
+    };
+
+    res.json({
+      success: true,
+      message: 'Настройки успешно обновлены',
+      user: userResponse
+    });
+
+  } catch (error) {
+    console.error('❌ Update settings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};

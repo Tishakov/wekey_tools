@@ -95,4 +95,36 @@ router.put('/profile',
   authController.updateProfile
 );
 
+// POST /api/auth/change-password - Смена пароля
+router.post('/change-password',
+  [
+    body('currentPassword')
+      .notEmpty()
+      .withMessage('Введите текущий пароль'),
+    body('newPassword')
+      .isLength({ min: 8 })
+      .withMessage('Новый пароль должен содержать минимум 8 символов')
+  ],
+  authController.changePassword
+);
+
+// POST /api/auth/update-settings - Обновление настроек
+router.post('/update-settings',
+  [
+    body('defaultLanguage')
+      .optional()
+      .isIn(['ru', 'en', 'uk'])
+      .withMessage('Поддерживаемые языки: ru, en, uk'),
+    body('theme')
+      .optional()
+      .isIn(['light', 'dark'])
+      .withMessage('Поддерживаемые темы: light, dark'),
+    body('emailNotifications')
+      .optional()
+      .isBoolean()
+      .withMessage('emailNotifications должно быть boolean значением')
+  ],
+  authController.updateSettings
+);
+
 module.exports = router;

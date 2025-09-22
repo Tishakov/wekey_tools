@@ -1535,7 +1535,7 @@
     "registerButton": "Create Account",
     "registerLink": "Create Account",
     "logout": "Sign Out",
-    "profile": "Profile",
+    "profilePage": "Profile",
     "subscription": "Subscription",
     "userMenu": "User menu",
     "user": "User",
@@ -1564,6 +1564,113 @@
     "success": {
       "loginSuccess": "Successfully signed in",
       "registerSuccess": "Successfully registered"
+    },
+    "profile": {
+      "tabs": {
+        "personalInfo": "Personal Information",
+        "password": "Password",
+        "settings": "Settings"
+      },
+      "personalInfo": {
+        "title": "Personal Information",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "name": "Full Name",
+        "email": "Email Address",
+        "role": "Account Type",
+        "createdAt": "Member Since",
+        "editMode": "Edit Mode",
+        "fields": {
+          "name": {
+            "label": "Full Name",
+            "placeholder": "Enter your full name"
+          },
+          "email": {
+            "label": "Email Address",
+            "placeholder": "Enter your email address"
+          }
+        },
+        "roles": {
+          "user": "User",
+          "admin": "Administrator",
+          "premium": "Premium User"
+        },
+        "messages": {
+          "updateSuccess": "Profile updated successfully",
+          "updateError": "Error updating profile",
+          "nameRequired": "Name is required",
+          "emailRequired": "Email is required",
+          "emailInvalid": "Please enter a valid email address"
+        }
+      },
+      "password": {
+        "title": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "changePassword": "Change Password",
+        "fields": {
+          "currentPassword": {
+            "label": "Current Password",
+            "placeholder": "Enter your current password"
+          },
+          "newPassword": {
+            "label": "New Password",
+            "placeholder": "Enter new password"
+          },
+          "confirmPassword": {
+            "label": "Confirm New Password",
+            "placeholder": "Confirm new password"
+          }
+        },
+        "messages": {
+          "changeSuccess": "Password changed successfully",
+          "changeError": "Error changing password",
+          "currentPasswordRequired": "Current password is required",
+          "newPasswordRequired": "New password is required",
+          "confirmPasswordRequired": "Please confirm new password",
+          "passwordMismatch": "Passwords do not match",
+          "passwordMinLength": "Password must be at least 6 characters",
+          "incorrectCurrentPassword": "Current password is incorrect"
+        }
+      },
+      "settings": {
+        "title": "Account Settings",
+        "language": "Language",
+        "theme": "Theme",
+        "notifications": "Notifications",
+        "saveSettings": "Save Settings",
+        "fields": {
+          "language": {
+            "label": "Interface Language",
+            "options": {
+              "ru": "Русский",
+              "en": "English",
+              "uk": "Українська"
+            }
+          },
+          "theme": {
+            "label": "Theme",
+            "options": {
+              "dark": "Dark",
+              "light": "Light",
+              "auto": "Auto"
+            }
+          },
+          "notifications": {
+            "label": "Email Notifications",
+            "options": {
+              "enabled": "Enabled",
+              "disabled": "Disabled"
+            }
+          }
+        },
+        "messages": {
+          "saveSuccess": "Settings saved successfully",
+          "saveError": "Error saving settings"
+        }
+      }
     }
   }
 }

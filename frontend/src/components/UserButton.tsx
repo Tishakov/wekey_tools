@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 import './UserButton.css';
 
 const UserButton: React.FC = () => {
   const { t } = useTranslation();
+  const { lang } = useParams<{ lang: string }>();
   const { user, isAuthenticated, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -77,13 +79,17 @@ const UserButton: React.FC = () => {
                 
                 <div className="user-dropdown-divider"></div>
                 
-                <button className="user-dropdown-item">
+                <Link 
+                  to={`/${lang}/profile`} 
+                  className="user-dropdown-item"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
                   <svg width="16" height="16" viewBox="0 0 16 16">
                     <path d="M8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8Z" fill="currentColor"/>
                     <path d="M14 13C14 11.3431 11.3137 10 8 10C4.68629 10 2 11.3431 2 13V14H14V13Z" fill="currentColor"/>
                   </svg>
-                  {t('auth.profile')}
-                </button>
+                  {t('auth.profilePage')}
+                </Link>
                 
                 <button className="user-dropdown-item">
                   <svg width="16" height="16" viewBox="0 0 16 16">

@@ -1535,7 +1535,7 @@
     "registerButton": "Создать аккаунт",
     "registerLink": "Создать аккаунт",
     "logout": "Выйти",
-    "profile": "Профиль",
+    "profilePage": "Профиль",
     "subscription": "Подписка",
     "userMenu": "Меню пользователя",
     "user": "Пользователь",
@@ -1564,6 +1564,66 @@
     "success": {
       "loginSuccess": "Вход выполнен успешно",
       "registerSuccess": "Регистрация выполнена успешно"
+    }
+  },
+  "profile": {
+    "title": "Профиль",
+    "notLoggedIn": "Вы не авторизованы",
+    "edit": "Редактировать",
+    "cancel": "Отмена", 
+    "save": "Сохранить",
+    "updateSuccess": "Профиль успешно обновлен",
+    "updateError": "Ошибка обновления профиля",
+    "tabs": {
+      "personalInfo": "Личные данные",
+      "password": "Пароль",
+      "settings": "Настройки"
+    },
+    "personalInfo": {
+      "title": "Личная информация"
+    },
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "email": "Email",
+    "firstNamePlaceholder": "Введите имя",
+    "lastNamePlaceholder": "Введите фамилию",
+    "emailPlaceholder": "Введите email",
+    "password": {
+      "title": "Смена пароля"
+    },
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "currentPasswordPlaceholder": "Введите текущий пароль",
+    "newPasswordPlaceholder": "Введите новый пароль",
+    "confirmPasswordPlaceholder": "Подтвердите новый пароль",
+    "changePassword": "Изменить пароль",
+    "passwordMismatch": "Пароли не совпадают",
+    "passwordTooShort": "Пароль должен содержать минимум 8 символов",
+    "passwordChanged": "Пароль успешно изменен",
+    "passwordChangeError": "Ошибка смены пароля",
+    "settings": {
+      "title": "Настройки аккаунта"
+    },
+    "defaultLanguage": "Язык по умолчанию",
+    "emailNotifications": "Email уведомления",
+    "theme": "Тема интерфейса",
+    "languages": {
+      "ru": "Русский",
+      "en": "English",
+      "uk": "Українська"
+    },
+    "themes": {
+      "light": "Светлая",
+      "dark": "Темная"
+    },
+    "saveSettings": "Сохранить настройки",
+    "settingsUpdated": "Настройки успешно обновлены",
+    "settingsUpdateError": "Ошибка обновления настроек",
+    "role": {
+      "user": "Пользователь",
+      "premium": "Премиум",
+      "admin": "Администратор"
     }
   }
 }
