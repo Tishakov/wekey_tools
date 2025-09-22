@@ -40,6 +40,17 @@ const AdminUsers: React.FC = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Состояние для удаления пользователя
+  const [deleteModal, setDeleteModal] = useState<{
+    show: boolean;
+    user: User | null;
+    loading: boolean;
+  }>({
+    show: false,
+    user: null,
+    loading: false
+  });
+  
   // Состояние для сортировки
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -103,6 +114,76 @@ const AdminUsers: React.FC = () => {
 
   const handleRefresh = () => {
     fetchUsers(currentPage);
+  };
+
+  // Функции для удаления пользователей
+  const handleDeleteUser = (user: User) => {
+    setDeleteModal({
+      show: true,
+      user,
+      loading: false
+    });
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deleteModal.user) return;
+
+    try {
+      setDeleteModal(prev => ({ ...prev, loading: true }));
+      
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        throw new Error('Токен авторизации не найден');
+      }
+
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      const response = await fetch(`${API_BASE}/api/admin/users/${deleteModal.user.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка сервера: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Обновляем список пользователей
+        setUsers(prev => prev.filter(u => u.id !== deleteModal.user!.id));
+        setTotalUsers(prev => prev - 1);
+        
+        // Закрываем модальное окно
+        setDeleteModal({
+          show: false,
+          user: null,
+          loading: false
+        });
+        
+        // Показываем успешное сообщение (можно добавить toast уведомление)
+        console.log('✅ Пользователь успешно удален:', data.data.deletedUser.email);
+      } else {
+        throw new Error('Ошибка удаления пользователя');
+      }
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка при удалении');
+      
+      // Сбрасываем состояние загрузки, но оставляем модальное окно открытым
+      setDeleteModal(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const cancelDeleteUser = () => {
+    setDeleteModal({
+      show: false,
+      user: null,
+      loading: false
+    });
   };
 
   // Функция для обработки сортировки
@@ -467,9 +548,21 @@ const AdminUsers: React.FC = () => {
                   </td>
                   <td>
                     <div className="user-actions">
-                      <button className="user-action-btn">
-                        Детальнее
+                      <button 
+                        className="user-action-btn view-btn"
+                        title="Детальная информация"
+                      >
+                        👁️
                       </button>
+                      {user.role !== 'admin' && (
+                        <button 
+                          className="user-action-btn delete-btn"
+                          onClick={() => handleDeleteUser(user)}
+                          title="Удалить пользователя"
+                        >
+                          🗑️
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -498,6 +591,73 @@ const AdminUsers: React.FC = () => {
           >
             Вперед →
           </button>
+        </div>
+      )}
+
+      {/* Модальное окно подтверждения удаления */}
+      {deleteModal.show && deleteModal.user && (
+        <div className="delete-modal-overlay">
+          <div className="delete-modal-content">
+            <div className="delete-modal-header">
+              <h3>Удаление пользователя</h3>
+            </div>
+            
+            <div className="delete-modal-body">
+              <p>Вы точно уверены, что хотите удалить этого пользователя?</p>
+              
+              <div className="user-info-delete">
+                <div className="user-avatar-delete">
+                  {deleteModal.user.avatar ? (
+                    <img 
+                      src={deleteModal.user.avatar.startsWith('http') ? deleteModal.user.avatar : `http://localhost:8880${deleteModal.user.avatar}`} 
+                      alt="User avatar" 
+                    />
+                  ) : (
+                    getInitials(deleteModal.user.firstName, deleteModal.user.lastName)
+                  )}
+                </div>
+                <div className="user-details-delete">
+                  <div className="user-name-delete">
+                    {deleteModal.user.firstName && deleteModal.user.lastName 
+                      ? `${deleteModal.user.firstName} ${deleteModal.user.lastName}`
+                      : deleteModal.user.firstName || deleteModal.user.lastName || 'Без имени'
+                    }
+                  </div>
+                  <div className="user-email-delete">{deleteModal.user.email}</div>
+                  <div className="user-role-delete">
+                    {getRoleLabel(deleteModal.user.role)}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="delete-warning">
+                <strong>⚠️ Это действие нельзя отменить!</strong>
+                <p>Будут удалены все данные пользователя:</p>
+                <ul>
+                  <li>Профиль и настройки</li>
+                  <li>История использования инструментов</li>
+                  <li>Аналитические данные</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="delete-modal-footer">
+              <button 
+                onClick={cancelDeleteUser}
+                className="delete-modal-btn cancel-btn"
+                disabled={deleteModal.loading}
+              >
+                Отмена
+              </button>
+              <button 
+                onClick={confirmDeleteUser}
+                className="delete-modal-btn confirm-btn"
+                disabled={deleteModal.loading}
+              >
+                {deleteModal.loading ? 'Удаление...' : 'Да, удалить'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

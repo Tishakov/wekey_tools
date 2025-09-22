@@ -1,7 +1,7 @@
 const express = require('express');
 // const { protect, restrictTo } = require('../middleware/auth');
 // const { AppError } = require('../middleware/errorHandler');
-const db = require('../config/database');
+const db = require('../models');
 
 const router = express.Router();
 
@@ -314,6 +314,79 @@ router.put('/users/:userId/status', async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+});
+
+// DELETE /api/admin/users/:userId - Удалить пользователя
+router.delete('/users/:userId', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    // Проверяем существование пользователя
+    const user = await db.User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Запрещаем удаление админов (для безопасности)
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Нельзя удалить администратора'
+      });
+    }
+
+    // Запрещаем админу удалить самого себя (если middleware включен)
+    if (req.user && user.id === req.user.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Нельзя удалить самого себя'
+      });
+    }
+
+    console.log(`🗑️ Deleting user: ${user.email} (ID: ${user.id})`);
+
+    // Удаляем связанные данные пользователя
+    await db.sequelize.transaction(async (transaction) => {
+      // Удаляем записи использования инструментов
+      await db.ToolUsage.destroy({
+        where: { userId: user.id },
+        transaction
+      });
+
+      // Удаляем аналитические события
+      await db.AnalyticsEvent.destroy({
+        where: { userId: user.id },
+        transaction
+      });
+
+      // Удаляем самого пользователя
+      await user.destroy({ transaction });
+    });
+
+    console.log(`✅ User deleted successfully: ${user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Пользователь успешно удален',
+      data: {
+        deletedUser: {
+          id: user.id,
+          email: user.email,
+          name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim()
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error deleting user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при удалении пользователя',
+      error: error.message
+    });
   }
 });
 
