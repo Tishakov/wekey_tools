@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear User Data</title>
+</head>
+<body>
+    <h1>Clear Wekey Tools User Data</h1>
+    <button onclick="clearData()">Clear All Data</button>
+    <div id="status"></div>
+    
+    <script>
+        function clearData() {
+            // Очищаем localStorage
+            localStorage.removeItem('wekey_user_id');
+            localStorage.removeItem('wekey_visitor_data');
+            
+            // Очищаем sessionStorage тоже на всякий случай
+            sessionStorage.clear();
+            
+            document.getElementById('status').innerHTML = '<p style="color: green;">✅ All user data cleared! Refresh the page to generate new clean data.</p>';
+            
+            console.log('🧹 User data cleared from localStorage');
+        }
+        
+        // Показываем текущие данные
+        window.onload = function() {
+            const userId = localStorage.getItem('wekey_user_id');
+            const visitorData = localStorage.getItem('wekey_visitor_data');
+            
+            if (userId || visitorData) {
+                document.getElementById('status').innerHTML = '<p style="color: orange;">⚠️ Found user data in localStorage. Click button to clear.</p>';
+                
+                if (visitorData) {
+                    const data = JSON.parse(visitorData);
+                    console.log('Current visitor data:', data);
+                    console.log('Sessions count:', data.sessionsCount);
+                    console.log('Pages viewed:', data.pagesViewed?.length || 0);
+                }
+            } else {
+                document.getElementById('status').innerHTML = '<p style="color: green;">✅ No user data found in localStorage.</p>';
+            }
+        };
+    </script>
+</body>
+</html>

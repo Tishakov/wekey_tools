@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './AddSymbolTool.css';
@@ -7,6 +10,8 @@ import './AddSymbolTool.css';
 
 const TOOL_ID = 'add-symbol';
 const AddSymbolTool: React.FC = () => {
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [launchCount, setLaunchCount] = useState(0);
@@ -155,13 +160,20 @@ const AddSymbolTool: React.FC = () => {
 
   return (
     <div className="add-symbol-tool">
+      <SEOHead 
+        title={t('addSymbolTool.seo.title')}
+        description={t('addSymbolTool.seo.description')}
+        keywords={t('addSymbolTool.seo.keywords')}
+        ogTitle={t('addSymbolTool.seo.ogTitle')}
+        ogDescription={t('addSymbolTool.seo.ogDescription')}
+      />
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
-        <Link to="/" className="back-button">
+        <Link to={createLink('')} className="back-button">
           <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
+          {t('navigation.allTools')}
         </Link>
-        <h1 className="tool-title">Добавление символа</h1>
+        <h1 className="tool-title">{t('addSymbolTool.title')}</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn" title="Счетчик запусков">
             <img src="/icons/rocket.svg" alt="" />
@@ -184,14 +196,14 @@ const AddSymbolTool: React.FC = () => {
             className="input-textarea"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Введите или вставьте ваш текст здесь..."
+            placeholder={t('addSymbolTool.inputPlaceholder')}
           />
           <div className="input-controls">
             <button className="paste-button" onClick={handlePasteText}>
               <img src="/icons/button_paste.svg" alt="" />
-              Вставить
+              {t('addSymbolTool.buttons.paste')}
             </button>
-            <span className="info">{countLines(inputText)} стр.</span>
+            <span className="info">{countLines(inputText)} {t('addSymbolTool.lineCount')}</span>
           </div>
         </div>
 
@@ -204,7 +216,7 @@ const AddSymbolTool: React.FC = () => {
               className="symbol-input"
               value={symbolToAdd}
               onChange={(e) => setSymbolToAdd(e.target.value)}
-              placeholder="Введите ваш символ перед каждым словом..."
+              placeholder={t('addSymbolTool.symbolPlaceholder')}
             />
           </div>
 
@@ -219,7 +231,7 @@ const AddSymbolTool: React.FC = () => {
                 onClick={() => handleRadioClick(additionMode, setAdditionMode, 'start')}
                 onChange={() => {}}
               />
-              Только в начало строки
+              {t('addSymbolTool.options.addToStart')}
             </label>
             <label className="radio-item">
               <input
@@ -230,7 +242,7 @@ const AddSymbolTool: React.FC = () => {
                 onClick={() => handleRadioClick(additionMode, setAdditionMode, 'end')}
                 onChange={() => {}}
               />
-              Только в конец строки
+              {t('addSymbolTool.options.addToEnd')}
             </label>
             <label className="radio-item">
               <input
@@ -241,7 +253,7 @@ const AddSymbolTool: React.FC = () => {
                 onClick={() => handleRadioClick(additionMode, setAdditionMode, 'both')}
                 onChange={() => {}}
               />
-              И в начало, и в конец строки
+              {t('addSymbolTool.options.addToBoth')}
             </label>
           </div>
 
@@ -253,7 +265,7 @@ const AddSymbolTool: React.FC = () => {
                   className="exceptions-textarea"
                   value={exceptions}
                   onChange={(e) => setExceptions(e.target.value)}
-                  placeholder="Введите слова через новую строку или запятую, к которым НЕ нужно добавлять этот символ"
+                  placeholder={t('addSymbolTool.exceptionsPlaceholder')}
                   rows={4}
                 />
               </div>
@@ -266,7 +278,7 @@ const AddSymbolTool: React.FC = () => {
                 />
                 <button className="transfer-button" onClick={handleTransferWords}>
                   <img src="/icons/arrow_left.svg" alt="" />
-                  Перенести
+                  {t('addSymbolTool.buttons.transfer')}
                 </button>
               </div>
             </div>
@@ -282,7 +294,7 @@ const AddSymbolTool: React.FC = () => {
           onClick={handleShowResult}
           disabled={!inputText.trim() || !symbolToAdd.trim()}
         >
-          Показать результат
+          {t('addSymbolTool.buttons.showResult')}
         </button>
         <button 
           className="action-btn secondary icon-left" 
@@ -291,7 +303,7 @@ const AddSymbolTool: React.FC = () => {
           disabled={!outputText}
         >
           <img src="/icons/button_copy.svg" alt="" />
-          {copied ? 'Скопировано!' : 'Скопировать результат'}
+          {copied ? t('addSymbolTool.buttons.copied') : t('addSymbolTool.buttons.copyResult')}
         </button>
       </div>
 
@@ -301,11 +313,32 @@ const AddSymbolTool: React.FC = () => {
           className="result-textarea"
           value={outputText}
           readOnly
-          placeholder="Здесь будет результат"
+          placeholder={t('addSymbolTool.resultPlaceholder')}
         />
         <div className="result-controls">
-          <span className="result-counter">{countLines(outputText)} стр.</span>
+          <span className="result-counter">{countLines(outputText)} {t('addSymbolTool.lineCount')}</span>
         </div>
+      </div>
+
+      {/* SEO блок */}
+      <div className="seo-section">
+        <h3>{t('addSymbolTool.seo.whatIsSymbolAdding.title')}</h3>
+        <p>{t('addSymbolTool.seo.whatIsSymbolAdding.text')}</p>
+
+        <h3>{t('addSymbolTool.seo.whyNeeded.title')}</h3>
+        <p>{t('addSymbolTool.seo.whyNeeded.text')}</p>
+
+        <h3>{t('addSymbolTool.seo.howItWorks.title')}</h3>
+        <p>{t('addSymbolTool.seo.howItWorks.text')}</p>
+
+        <h3>{t('addSymbolTool.seo.whatCanProcess.title')}</h3>
+        <p>{t('addSymbolTool.seo.whatCanProcess.text')}</p>
+
+        <h3>{t('addSymbolTool.seo.forSpecialists.title')}</h3>
+        <p>{t('addSymbolTool.seo.forSpecialists.text')}</p>
+
+        <h3>{t('addSymbolTool.seo.howToUse.title')}</h3>
+        <p>{t('addSymbolTool.seo.howToUse.text')}</p>
       </div>
     </div>
   );

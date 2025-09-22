@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import './EmojiTool.css';
 import '../styles/tool-pages.css';
 import { EmojiImage } from '../utils/emojiUtils';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
 import { emojiDatabase } from '../data/emoji/index';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 
 
 const TOOL_ID = 'emoji';
 const EmojiTool: React.FC = () => {
+    const { t } = useTranslation();
+    const { createLink } = useLocalizedLink();
     const [text, setText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [launchCount, setLaunchCount] = useState(0);
@@ -18,26 +23,26 @@ const EmojiTool: React.FC = () => {
 
     // Категории с алфавитной сортировкой (кроме "Все")
     const categories = [
-        { id: 'all', name: 'Все', icon: '😀' },
-        { id: 'activities', name: 'Активности', icon: '⚽' },
-        { id: 'animals', name: 'Животные', icon: '🐶' },
-        { id: 'gestures', name: 'Жесты', icon: '👋' },
-        { id: 'food', name: 'Еда', icon: '🍎' },
-        { id: 'faces', name: 'Лица', icon: '😍' },
-        { id: 'medicine', name: 'Медицина', icon: '💊' },
-        { id: 'music', name: 'Музыка', icon: '🎵' },
-        { id: 'objects', name: 'Объекты', icon: '💎' },
-        { id: 'clothes', name: 'Одежда', icon: '👕' },
-        { id: 'education', name: 'Образование', icon: '📚' },
-        { id: 'weather', name: 'Погода', icon: '☀️' },
-        { id: 'nature', name: 'Природа', icon: '🌟' },
-        { id: 'jobs', name: 'Профессии', icon: '👩‍💻' },
-        { id: 'travel', name: 'Путешествия', icon: '✈️' },
-        { id: 'hearts', name: 'Сердца', icon: '❤️' },
-        { id: 'symbols', name: 'Символы', icon: '⭐' },
-        { id: 'tech', name: 'Технологии', icon: '💻' },
-        { id: 'transport', name: 'Транспорт', icon: '🚗' },
-        { id: 'flags', name: 'Флаги', icon: '🏁' }
+        { id: 'all', name: t('emojiTool.categories.all'), icon: '😀' },
+        { id: 'activities', name: t('emojiTool.categories.activities'), icon: '⚽' },
+        { id: 'animals', name: t('emojiTool.categories.animals'), icon: '🐶' },
+        { id: 'gestures', name: t('emojiTool.categories.gestures'), icon: '👋' },
+        { id: 'food', name: t('emojiTool.categories.food'), icon: '🍎' },
+        { id: 'faces', name: t('emojiTool.categories.faces'), icon: '😍' },
+        { id: 'medicine', name: t('emojiTool.categories.medicine'), icon: '💊' },
+        { id: 'music', name: t('emojiTool.categories.music'), icon: '🎵' },
+        { id: 'objects', name: t('emojiTool.categories.objects'), icon: '💎' },
+        { id: 'clothes', name: t('emojiTool.categories.clothes'), icon: '👕' },
+        { id: 'education', name: t('emojiTool.categories.education'), icon: '📚' },
+        { id: 'weather', name: t('emojiTool.categories.weather'), icon: '☀️' },
+        { id: 'nature', name: t('emojiTool.categories.nature'), icon: '🌟' },
+        { id: 'jobs', name: t('emojiTool.categories.jobs'), icon: '👩‍💻' },
+        { id: 'travel', name: t('emojiTool.categories.travel'), icon: '✈️' },
+        { id: 'hearts', name: t('emojiTool.categories.hearts'), icon: '❤️' },
+        { id: 'symbols', name: t('emojiTool.categories.symbols'), icon: '⭐' },
+        { id: 'tech', name: t('emojiTool.categories.tech'), icon: '💻' },
+        { id: 'transport', name: t('emojiTool.categories.transport'), icon: '🚗' },
+        { id: 'flags', name: t('emojiTool.categories.flags'), icon: '🏁' }
     ];
 
     // Обновление статистики
@@ -110,22 +115,27 @@ const EmojiTool: React.FC = () => {
 
     return (
         <div className="emoji-tool">
+            <SEOHead 
+                title={t('emojiTool.title')}
+                description={t('emojiTool.description')}
+                keywords={t('emojiTool.keywords')}
+            />
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('navigation.allTools')}
                 </Link>
-                <h1 className="tool-title">Эмодзи</h1>
+                <h1 className="tool-title">{t('emojiTool.title')}</h1>
                 <div className="tool-header-buttons">
-                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                    <button className="tool-header-btn counter-btn" title={t('common.launchCounter')}>
                         <img src="/icons/rocket.svg" alt="" />
                         <span className="counter">{launchCount}</span>
                     </button>
-                    <button className="tool-header-btn icon-only" title="Подсказки">
+                    <button className="tool-header-btn icon-only" title={t('common.hints')}>
                         <img src="/icons/lamp.svg" alt="" />
                     </button>
-                    <button className="tool-header-btn icon-only" title="Скриншот">
+                    <button className="tool-header-btn icon-only" title={t('common.screenshot')}>
                         <img src="/icons/camera.svg" alt="" />
                     </button>
                 </div>
@@ -139,7 +149,7 @@ const EmojiTool: React.FC = () => {
                         ref={textareaRef}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder="Введите текст или добавьте эмодзи..."
+                        placeholder={t('emojiTool.inputPlaceholder')}
                         className="emoji-textarea"
                     />
                     
@@ -150,7 +160,7 @@ const EmojiTool: React.FC = () => {
                         onClick={handleCopy}
                     >
                         <img src="/icons/button_copy.svg" alt="" />
-                        {copied ? 'Скопировано!' : 'Скопировать результат'}
+                        {copied ? t('common.copied') : t('emojiTool.buttons.copyResult')}
                     </button>
                 </div>
 
@@ -181,7 +191,7 @@ const EmojiTool: React.FC = () => {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder={`Поиск эмодзи среди ${filteredEmojis.length}...`}
+                                placeholder={t('emojiTool.searchPlaceholder', { count: filteredEmojis.length })}
                                 className="emoji-search"
                             />
                         </div>

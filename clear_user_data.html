@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear User Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Clear User Data Utility</h1>
+    
+    <div id="status"></div>
+    
+    <button onclick="clearAllData()">Clear All localStorage</button>
+    <button onclick="checkData()">Check Current Data</button>
+    
+    <script>
+        function clearAllData() {
+            const status = document.getElementById('status');
+            
+            try {
+                // Clear all localStorage
+                localStorage.clear();
+                
+                // Also clear sessionStorage
+                sessionStorage.clear();
+                
+                status.innerHTML = '<p class="success">✅ All localStorage and sessionStorage cleared!</p>';
+                
+                // Log the specific user ID we're cleaning
+                console.log('Cleared data for problematic user: 48adc040-147d-46cd-a1c7-fd44897125bf');
+                
+                setTimeout(() => {
+                    window.location.href = 'http://localhost:5173/ru/';
+                }, 2000);
+                
+            } catch (error) {
+                status.innerHTML = '<p class="error">❌ Error clearing data: ' + error.message + '</p>';
+            }
+        }
+        
+        function checkData() {
+            const status = document.getElementById('status');
+            
+            const keys = Object.keys(localStorage);
+            const sessionKeys = Object.keys(sessionStorage);
+            
+            status.innerHTML = `
+                <div class="info">
+                    <h3>Current Data:</h3>
+                    <p>localStorage keys (${keys.length}): ${keys.join(', ') || 'none'}</p>
+                    <p>sessionStorage keys (${sessionKeys.length}): ${sessionKeys.join(', ') || 'none'}</p>
+                </div>
+            `;
+        }
+        
+        // Auto-check on load
+        window.onload = checkData;
+    </script>
+</body>
+</html>

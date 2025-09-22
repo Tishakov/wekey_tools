@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
+import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './FindReplaceTool.css';
 
 
 const TOOL_ID = 'find-replace';
 const FindReplaceTool: React.FC = () => {
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [searchText, setSearchText] = useState('');
   const [replaceText, setReplaceText] = useState('');
@@ -159,13 +164,17 @@ const FindReplaceTool: React.FC = () => {
 
   return (
     <div className="find-replace-tool">
+      <SEOHead 
+        title={t('findReplaceTool.title')}
+        description={t('findReplaceTool.description')}
+      />
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
-        <Link to="/" className="back-button">
+        <Link to={createLink('')} className="back-button">
           <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
+          {t('navigation.allTools')}
         </Link>
-        <h1 className="tool-title">Найти и заменить</h1>
+        <h1 className="tool-title">{t('findReplaceTool.title')}</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn" title="Счетчик запусков">
             <img src="/icons/rocket.svg" alt="" />
@@ -191,12 +200,12 @@ const FindReplaceTool: React.FC = () => {
               setInputText(e.target.value);
               handleTextareaResize(e.target);
             }}
-            placeholder="Введите или вставьте ваш текст здесь..."
+            placeholder={t('findReplaceTool.inputPlaceholder')}
           />
           <div className="input-controls">
             <button className="paste-button" onClick={handlePaste}>
               <img src="/icons/button_paste.svg" alt="" />
-              Вставить
+              {t('findReplaceTool.buttons.paste')}
             </button>
             <span className="info">{countLines(inputText)} стр.</span>
           </div>
@@ -213,7 +222,7 @@ const FindReplaceTool: React.FC = () => {
                 setSearchText(e.target.value);
                 handleTextareaResize(e.target);
               }}
-              placeholder="Что заменить... (несколько с новой строки)"
+              placeholder={t('findReplaceTool.searchPlaceholder')}
             />
           </div>
 
@@ -233,7 +242,7 @@ const FindReplaceTool: React.FC = () => {
                   setReplaceMode('custom');
                 }
               }}
-              placeholder="На что заменить..."
+              placeholder={t('findReplaceTool.replacePlaceholder')}
             />
           </div>
 
@@ -245,7 +254,7 @@ const FindReplaceTool: React.FC = () => {
                 checked={caseSensitive}
                 onChange={(e) => setCaseSensitive(e.target.checked)}
               />
-              С учётом регистра
+              {t('findReplaceTool.caseSensitive')}
             </label>
           </div>
 
@@ -260,7 +269,7 @@ const FindReplaceTool: React.FC = () => {
                 onClick={() => handleRadioClick('empty')}
                 onChange={() => {}}
               />
-              Заменить на пустоту
+              {t('findReplaceTool.modes.empty')}
             </label>
             
             <label className="radio-item">
@@ -272,7 +281,7 @@ const FindReplaceTool: React.FC = () => {
                 onClick={() => handleRadioClick('paragraph')}
                 onChange={() => {}}
               />
-              Заменить на абзац
+              {t('findReplaceTool.modes.paragraph')}
             </label>
           </div>
         </div>
@@ -286,7 +295,7 @@ const FindReplaceTool: React.FC = () => {
           onClick={handleShowResult}
           disabled={!inputText.trim() || !searchText.trim()}
         >
-          Заменить
+          {t('findReplaceTool.buttons.replace')}
         </button>
         <button 
           className="action-btn secondary icon-left" 
@@ -295,7 +304,7 @@ const FindReplaceTool: React.FC = () => {
           disabled={!result}
         >
           <img src="/icons/button_copy.svg" alt="" />
-          {copied ? 'Скопировано!' : 'Скопировать результат'}
+          {copied ? t('findReplaceTool.buttons.copied') : t('findReplaceTool.buttons.copy')}
         </button>
       </div>
 
@@ -305,7 +314,7 @@ const FindReplaceTool: React.FC = () => {
           className="result-textarea"
           value={result}
           readOnly
-          placeholder="Здесь будет результат"
+          placeholder={t('findReplaceTool.resultPlaceholder')}
         />
         <div className="result-controls">
           <span className="result-counter">{countLines(result)} стр.</span>

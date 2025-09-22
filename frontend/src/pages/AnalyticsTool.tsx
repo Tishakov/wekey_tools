@@ -6,6 +6,9 @@ import StringIcon from '../assets/icons/string.svg?react';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
 import { openaiService, type AnalyticsData } from '../services/openaiService';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 
 // Типы данных
 interface Metric {
@@ -25,76 +28,78 @@ interface Group {
   metrics: Metric[];
 }
 
-// Конфигурация групп и параметров
-const metricsConfig: Group[] = [
-  {
-    title: 'Трафик',
-    color: '#6B7280', // серый
-    metrics: [
-      { id: 'clicks', name: 'Клики', tooltip: 'Количество кликов по рекламе', isPercentage: false, defaultValue: 300, hasPeriod: true, sliderRange: { min: 0, max: 500 } },
-      { id: 'impressions', name: 'Показы', tooltip: 'Количество показов рекламы', isPercentage: false, defaultValue: 8000, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
-      { id: 'ctr', name: 'CTR %', tooltip: 'Click Through Rate - отношение кликов к показам', isPercentage: true, defaultValue: 3.75, hasPeriod: false },
-    ]
-  },
-  {
-    title: 'Расходы',
-    color: '#EF4444', // красный
-    metrics: [
-      { id: 'cpc', name: 'CPC (Стоимость клика)', tooltip: 'Cost Per Click - стоимость одного клика', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
-      { id: 'adCost', name: 'Затраты на рекламу', tooltip: 'Общие затраты на рекламную кампанию', isPercentage: false, defaultValue: 3600, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
-    ]
-  },
-  {
-    title: 'Сайт',
-    color: '#F59E0B', // жёлтый
-    metrics: [
-      { id: 'cr1', name: 'CR1 (Конверсия сайта %)', tooltip: 'Conversion Rate 1 - процент посетителей, ставших лидами', isPercentage: true, defaultValue: 4.0, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
-      { id: 'leads', name: 'Лидов, продаж', tooltip: 'Количество полученных лидов', isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: true, sliderRange: { min: 0, max: 200 } },
-      { id: 'cpl', name: 'CPL (Стоимость лида)', tooltip: 'Cost Per Lead - стоимость получения одного лида', isPercentage: false, defaultValue: 300, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
-    ]
-  },
-  {
-    title: 'Отдел продаж',
-    color: '#3B82F6', // синий
-    metrics: [
-      { id: 'cr2', name: 'CR2 (Из лида в продажу %)', tooltip: 'Conversion Rate 2 - процент лидов, ставших продажами', isPercentage: true, defaultValue: 75.0, hasPeriod: false },
-      { id: 'sales', name: 'Сделок, продаж', tooltip: 'Количество заключенных сделок', isPercentage: false, isDecimal: true, defaultValue: 9, hasPeriod: true, sliderRange: { min: 0, max: 100 } },
-      { id: 'cpo', name: 'CPO (Цена сделки, продажи)', tooltip: 'Cost Per Order - стоимость получения одной сделки', isPercentage: false, defaultValue: 400, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
-    ]
-  },
-  {
-    title: 'Ценообразование',
-    color: '#8B5CF6', // фиолетовый
-    metrics: [
-      { id: 'aov', name: 'AOV (Средний чек одной)', tooltip: 'Average Order Value - средняя стоимость одного заказа', isPercentage: false, defaultValue: 3000, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
-      { id: 'revenue', name: 'Валовой доход', tooltip: 'Общий доход от продаж', isPercentage: false, defaultValue: 27000, hasPeriod: true, sliderRange: { min: 0, max: 100000 } },
-      { id: 'marginPercent', name: 'Маржинальность %', tooltip: 'Процент маржи от дохода', isPercentage: true, defaultValue: 50, hasPeriod: false },
-      { id: 'marginPerUnit', name: 'Маржа с одной', tooltip: 'Маржа с одной единицы товара', isPercentage: false, defaultValue: 1500, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
-      { id: 'totalMargin', name: 'Общая маржа (Прибыль)', tooltip: 'Общая маржа от всех продаж', isPercentage: false, defaultValue: 13500, hasPeriod: false, sliderRange: { min: 0, max: 50000 } },
-    ]
-  },
-  {
-    title: 'Доходы',
-    color: '#10B981', // зелёный
-    metrics: [
-      { id: 'netProfit', name: 'Чистая прибыль', tooltip: 'Чистая прибыль после всех расходов', isPercentage: false, defaultValue: 9900, hasPeriod: true, sliderRange: { min: 0, max: 50000 } },
-      { id: 'netProfitPerUnit', name: 'Чистая прибыль с одной', tooltip: 'Чистая прибыль с одной единицы', isPercentage: false, defaultValue: 1100, hasPeriod: true, sliderRange: { min: 0, max: 5000 } },
-      { id: 'romi', name: 'ROMI %', tooltip: 'Return on Marketing Investment - возврат инвестиций в маркетинг', isPercentage: true, defaultValue: 275, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
-      { id: 'roas', name: 'ROAS', tooltip: 'Return on Advertising Spend - возврат рекламных инвестиций', isPercentage: false, defaultValue: 7.5, hasPeriod: false, sliderRange: { min: 0, max: 10 } },
-    ]
-  },
-  {
-    title: 'Формулы',
-    color: '#6B7280', // серый
-    metrics: [
-      { id: 'drr', name: 'ДРР %', tooltip: 'Доля рекламных расходов', isPercentage: true, isDecimal: true, defaultValue: 13.33, hasPeriod: false },
-      { id: 'iccr', name: 'ICCR %', tooltip: 'Index of Customer Conversion Rate', isPercentage: true, isDecimal: true, defaultValue: 26.67, hasPeriod: false },
-      { id: 'cpm', name: 'CPM', tooltip: 'Cost Per Mille - стоимость тысячи показов', isPercentage: false, defaultValue: 450, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
-    ]
-  }
-];
-
 const AnalyticsTool: React.FC = () => {
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
+
+  const metricsConfig: Group[] = [
+    {
+      title: t('analyticsTool.groups.traffic'),
+      color: '#6B7280', // серый
+      metrics: [
+        { id: 'clicks', name: t('analyticsTool.metrics.clicks.name'), tooltip: t('analyticsTool.metrics.clicks.tooltip'), isPercentage: false, defaultValue: 300, hasPeriod: true, sliderRange: { min: 0, max: 500 } },
+        { id: 'impressions', name: t('analyticsTool.metrics.impressions.name'), tooltip: t('analyticsTool.metrics.impressions.tooltip'), isPercentage: false, defaultValue: 8000, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
+        { id: 'ctr', name: t('analyticsTool.metrics.ctr.name'), tooltip: t('analyticsTool.metrics.ctr.tooltip'), isPercentage: true, defaultValue: 3.75, hasPeriod: false },
+      ]
+    },
+    {
+      title: t('analyticsTool.groups.costs'),
+      color: '#EF4444', // красный
+      metrics: [
+        { id: 'cpc', name: t('analyticsTool.metrics.cpc.name'), tooltip: t('analyticsTool.metrics.cpc.tooltip'), isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
+        { id: 'adCost', name: t('analyticsTool.metrics.adCost.name'), tooltip: t('analyticsTool.metrics.adCost.tooltip'), isPercentage: false, defaultValue: 3600, hasPeriod: true, sliderRange: { min: 0, max: 10000 } },
+      ]
+    },
+    {
+      title: t('analyticsTool.groups.website'),
+      color: '#F59E0B', // жёлтый
+      metrics: [
+        { id: 'cr1', name: t('analyticsTool.metrics.cr1.name'), tooltip: t('analyticsTool.metrics.cr1.tooltip'), isPercentage: true, defaultValue: 4.0, hasPeriod: false, sliderRange: { min: 0, max: 50 } },
+        { id: 'leads', name: t('analyticsTool.metrics.leads.name'), tooltip: t('analyticsTool.metrics.leads.tooltip'), isPercentage: false, isDecimal: true, defaultValue: 12, hasPeriod: true, sliderRange: { min: 0, max: 200 } },
+        { id: 'cpl', name: t('analyticsTool.metrics.cpl.name'), tooltip: t('analyticsTool.metrics.cpl.tooltip'), isPercentage: false, defaultValue: 300, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+      ]
+    },
+    {
+      title: t('analyticsTool.groups.sales'),
+      color: '#3B82F6', // синий
+      metrics: [
+        { id: 'cr2', name: t('analyticsTool.metrics.cr2.name'), tooltip: t('analyticsTool.metrics.cr2.tooltip'), isPercentage: true, defaultValue: 75.0, hasPeriod: false },
+        { id: 'sales', name: t('analyticsTool.metrics.sales.name'), tooltip: t('analyticsTool.metrics.sales.tooltip'), isPercentage: false, isDecimal: true, defaultValue: 9, hasPeriod: true, sliderRange: { min: 0, max: 100 } },
+        { id: 'cpo', name: t('analyticsTool.metrics.cpo.name'), tooltip: t('analyticsTool.metrics.cpo.tooltip'), isPercentage: false, defaultValue: 400, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+      ]
+    },
+    {
+      title: t('analyticsTool.groups.pricing'),
+      color: '#8B5CF6', // фиолетовый
+      metrics: [
+        { id: 'aov', name: t('analyticsTool.metrics.aov.name'), tooltip: t('analyticsTool.metrics.aov.tooltip'), isPercentage: false, defaultValue: 3000, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
+        { id: 'revenue', name: t('analyticsTool.metrics.revenue.name'), tooltip: t('analyticsTool.metrics.revenue.tooltip'), isPercentage: false, defaultValue: 27000, hasPeriod: true, sliderRange: { min: 0, max: 100000 } },
+        { id: 'marginPercent', name: t('analyticsTool.metrics.marginPercent.name'), tooltip: t('analyticsTool.metrics.marginPercent.tooltip'), isPercentage: true, defaultValue: 50, hasPeriod: false },
+        { id: 'marginPerUnit', name: t('analyticsTool.metrics.marginPerUnit.name'), tooltip: t('analyticsTool.metrics.marginPerUnit.tooltip'), isPercentage: false, defaultValue: 1500, hasPeriod: false, sliderRange: { min: 0, max: 5000 } },
+        { id: 'totalMargin', name: t('analyticsTool.metrics.totalMargin.name'), tooltip: t('analyticsTool.metrics.totalMargin.tooltip'), isPercentage: false, defaultValue: 13500, hasPeriod: false, sliderRange: { min: 0, max: 50000 } },
+      ]
+    },
+    {
+      title: t('analyticsTool.groups.revenue'),
+      color: '#10B981', // зелёный
+      metrics: [
+        { id: 'netProfit', name: t('analyticsTool.metrics.netProfit.name'), tooltip: t('analyticsTool.metrics.netProfit.tooltip'), isPercentage: false, defaultValue: 9900, hasPeriod: true, sliderRange: { min: 0, max: 50000 } },
+        { id: 'netProfitPerUnit', name: t('analyticsTool.metrics.netProfitPerUnit.name'), tooltip: t('analyticsTool.metrics.netProfitPerUnit.tooltip'), isPercentage: false, defaultValue: 1100, hasPeriod: true, sliderRange: { min: 0, max: 5000 } },
+        { id: 'romi', name: t('analyticsTool.metrics.romi.name'), tooltip: t('analyticsTool.metrics.romi.tooltip'), isPercentage: true, defaultValue: 275, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+        { id: 'roas', name: t('analyticsTool.metrics.roas.name'), tooltip: t('analyticsTool.metrics.roas.tooltip'), isPercentage: false, defaultValue: 7.5, hasPeriod: false, sliderRange: { min: 0, max: 10 } },
+      ]
+    },
+    {
+      title: t('analyticsTool.groups.formulas'),
+      color: '#6B7280', // серый
+      metrics: [
+        { id: 'drr', name: t('analyticsTool.metrics.drr.name'), tooltip: t('analyticsTool.metrics.drr.tooltip'), isPercentage: true, isDecimal: true, defaultValue: 13.33, hasPeriod: false },
+        { id: 'iccr', name: t('analyticsTool.metrics.iccr.name'), tooltip: t('analyticsTool.metrics.iccr.tooltip'), isPercentage: true, isDecimal: true, defaultValue: 26.67, hasPeriod: false },
+        { id: 'cpm', name: t('analyticsTool.metrics.cpm.name'), tooltip: t('analyticsTool.metrics.cpm.tooltip'), isPercentage: false, defaultValue: 450, hasPeriod: false, sliderRange: { min: 0, max: 1000 } },
+      ]
+    }
+  ];
+
   // Состояние для периода (по умолчанию 30 дней)
   const [period, setPeriod] = useState<number>(30);
   
@@ -118,90 +123,6 @@ const AnalyticsTool: React.FC = () => {
   const [landingType, setLandingType] = useState<'ecommerce' | 'landing' | 'instagram'>('ecommerce');
   const [businessModel, setBusinessModel] = useState<'product' | 'service'>('product');
   const [trafficSource, setTrafficSource] = useState<'google-search' | 'google-shopping' | 'meta' | 'tiktok' | 'email'>('google-search');
-  
-  // Функция плавного закрытия модального окна
-  const closeModal = () => {
-    setIsModalClosing(true);
-    setTimeout(() => {
-      setShowExportModal(false);
-      setIsModalClosing(false);
-    }, 300); // Совпадает с длительностью анимации
-  };
-  
-  // Функция плавного закрытия ИИ модального окна
-  const closeAIModal = () => {
-    setIsAIModalClosing(true);
-    setTimeout(() => {
-      setShowAIModal(false);
-      setIsAIModalClosing(false);
-      // Сброс состояния формы
-      setNiche('');
-      setAiResponse('');
-      setAiError('');
-      setIsAnalyzing(false);
-    }, 300);
-  };
-  
-  // Функция получения анализа от ИИ
-  const handleAIAnalysis = async () => {
-    console.log('🎯 Starting AI analysis...');
-    
-    if (!niche.trim()) {
-      setAiError('Пожалуйста, укажите нишу бизнеса');
-      return;
-    }
-    
-    setIsAnalyzing(true);
-    setAiError('');
-    setAiResponse('');
-    
-    try {
-      // Подготавливаем данные для анализа
-      const analyticsData: AnalyticsData = {
-        businessType: landingType, // используем landingType как businessType для совместимости
-        landingType,
-        businessModel,
-        trafficSource,
-        niche: niche.trim(),
-        metrics,
-        period,
-        currency
-      };
-      
-      console.log('📊 Analytics data prepared:', analyticsData);
-      
-      // Получаем анализ от ИИ
-      const result = await openaiService.getAnalysis(analyticsData);
-      
-      console.log('📈 Analysis result:', result);
-      
-      if (result.success && result.analysis) {
-        setAiResponse(result.analysis);
-        console.log('✅ Analysis set to state');
-      } else {
-        console.error('❌ Analysis failed:', result.error);
-        setAiError(result.error || 'Не удалось получить анализ');
-      }
-    } catch (error) {
-      console.error('💥 Error during AI analysis:', error);
-      setAiError('Произошла ошибка при анализе данных');
-    } finally {
-      setIsAnalyzing(false);
-      console.log('🏁 Analysis completed');
-    }
-  };
-  
-  // Функция копирования ответа ИИ
-  const copyAIResponse = async () => {
-    if (aiResponse) {
-      try {
-        await navigator.clipboard.writeText(aiResponse);
-        // Можно добавить уведомление об успешном копировании
-      } catch (error) {
-        console.error('Failed to copy text:', error);
-      }
-    }
-  };
   
   // Состояние для кратности масштабирования слайдеров
   const [scaleFactor, setScaleFactor] = useState<number>(1);
@@ -266,6 +187,90 @@ const AnalyticsTool: React.FC = () => {
       }));
     }
   }, []); // Запускаем только один раз при монтировании
+
+  // Функция плавного закрытия модального окна
+  const closeModal = () => {
+    setIsModalClosing(true);
+    setTimeout(() => {
+      setShowExportModal(false);
+      setIsModalClosing(false);
+    }, 300); // Совпадает с длительностью анимации
+  };
+  
+  // Функция плавного закрытия ИИ модального окна
+  const closeAIModal = () => {
+    setIsAIModalClosing(true);
+    setTimeout(() => {
+      setShowAIModal(false);
+      setIsAIModalClosing(false);
+      // Сброс состояния формы
+      setNiche('');
+      setAiResponse('');
+      setAiError('');
+      setIsAnalyzing(false);
+    }, 300);
+  };
+  
+  // Функция получения анализа от ИИ
+  const handleAIAnalysis = async () => {
+    console.log('🎯 Starting AI analysis...');
+    
+    if (!niche.trim()) {
+      setAiError(t('analyticsTool.aiAnalysis.nicheRequired'));
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    setAiError('');
+    setAiResponse('');
+    
+    try {
+      // Подготавливаем данные для анализа
+      const analyticsData: AnalyticsData = {
+        businessType: landingType, // используем landingType как businessType для совместимости
+        landingType,
+        businessModel,
+        trafficSource,
+        niche: niche.trim(),
+        metrics,
+        period,
+        currency
+      };
+      
+      console.log('📊 Analytics data prepared:', analyticsData);
+      
+      // Получаем анализ от ИИ
+      const result = await openaiService.getAnalysis(analyticsData);
+      
+      console.log('📈 Analysis result:', result);
+      
+      if (result.success && result.analysis) {
+        setAiResponse(result.analysis);
+        console.log('✅ Analysis set to state');
+      } else {
+        console.error('❌ Analysis failed:', result.error);
+        setAiError(result.error || t('analyticsTool.aiAnalysis.error'));
+      }
+    } catch (error) {
+      console.error('💥 Error during AI analysis:', error);
+      setAiError(t('analyticsTool.aiAnalysis.error'));
+    } finally {
+      setIsAnalyzing(false);
+      console.log('🏁 Analysis completed');
+    }
+  };
+  
+  // Функция копирования ответа ИИ
+  const copyAIResponse = async () => {
+    if (aiResponse) {
+      try {
+        await navigator.clipboard.writeText(aiResponse);
+        // Можно добавить уведомление об успешном копировании
+      } catch (error) {
+        console.error('Failed to copy text:', error);
+      }
+    }
+  };
 
   // Проверка, должно ли поле быть readonly
   const isReadonlyField = (metricId: string): boolean => {
@@ -710,7 +715,7 @@ const AnalyticsTool: React.FC = () => {
     return 0;
   };
 
-  // Функция экспорта в Excel
+  // Функция экспорта в Excel из оригинала
   const exportToExcel = (format: 'vertical' | 'horizontal' = 'vertical') => {
     try {
       let exportData;
@@ -838,90 +843,6 @@ const AnalyticsTool: React.FC = () => {
         };
       });
       
-      // Адаптивная высота строки заголовков на основе содержимого
-      let maxLines = 1;
-      headerRow.eachCell((cell, colNumber) => {
-        if (cell.value) {
-          const text = cell.value.toString();
-          const columnWidth = colNumber <= worksheet.columns.length ? 
-            (worksheet.getColumn(colNumber).width || 15) : 15;
-          
-          // Приблизительный расчет количества строк на основе длины текста и ширины столбца
-          // Средняя ширина символа ~1.2, учитываем padding
-          const charsPerLine = Math.floor((columnWidth - 2) / 1.2);
-          const lines = Math.ceil(text.length / charsPerLine);
-          maxLines = Math.max(maxLines, lines);
-        }
-      });
-      
-      // Устанавливаем высоту с минимумом 25 и максимумом 60
-      let adaptiveHeight = Math.max(25, Math.min(60, maxLines * 15 + 10));
-      
-      // Добавляем дополнительные 10 пикселей для горизонтального формата
-      if (format === 'horizontal') {
-        adaptiveHeight += 10;
-      }
-      
-      headerRow.height = adaptiveHeight;
-      
-      // Добавляем обводку для всех ячеек с содержимым (начиная со 2-й строки)
-      for (let rowIndex = 2; rowIndex <= worksheet.rowCount; rowIndex++) {
-        const dataRow = worksheet.getRow(rowIndex);
-        dataRow.eachCell((cell, colNumber) => {
-          if (cell.value) {
-            cell.border = {
-              top: { style: 'thin' },
-              left: { style: 'thin' },
-              bottom: { style: 'thin' },
-              right: { style: 'thin' }
-            };
-            // Выравнивание: первый столбец - по левому краю, остальные - по центру
-            if (colNumber === 1) {
-              cell.alignment = { 
-                horizontal: 'left', 
-                vertical: 'middle' 
-              };
-            } else {
-              cell.alignment = { 
-                horizontal: 'center', 
-                vertical: 'middle' 
-              };
-            }
-          }
-        });
-      }
-      
-      // Автоширина столбцов на основе содержимого данных (начиная со 2-й строки)
-      worksheet.columns.forEach((column, index) => {
-        let maxLength = 8; // Минимальная ширина
-        
-        // Проходим по всем строкам данных (начиная со второй)
-        for (let rowIndex = 2; rowIndex <= worksheet.rowCount; rowIndex++) {
-          const cell = worksheet.getCell(rowIndex, index + 1);
-          if (cell.value) {
-            const cellText = cell.value.toString();
-            maxLength = Math.max(maxLength, cellText.length);
-          }
-        }
-        
-        // Устанавливаем ширину с разумными ограничениями
-        if (format === 'vertical') {
-          // Для вертикального формата
-          if (index === 0) {
-            column.width = Math.min(Math.max(maxLength + 2, 15), 35); // Параметр: мин 15, макс 35
-          } else {
-            column.width = Math.min(Math.max(maxLength + 2, 10), 20); // Данные: мин 10, макс 20
-          }
-        } else {
-          // Для горизонтального формата
-          if (index === 0) {
-            column.width = Math.min(Math.max(maxLength + 2, 12), 25); // Период: мин 12, макс 25
-          } else {
-            column.width = Math.min(Math.max(maxLength + 2, 8), 18); // Параметры: мин 8, макс 18
-          }
-        }
-      });
-      
       // Генерируем имя файла
       const today = new Date();
       const dateStr = today.toISOString().split('T')[0];
@@ -947,445 +868,450 @@ const AnalyticsTool: React.FC = () => {
   };
 
   return (
-    <div className="tool-container">
-      {/* Заголовок */}
-      <header className="tool-header-island">
-        <Link to="/" className="back-button">
-          <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
-        </Link>
-        
-        <h1 className="tool-title">Сквозная аналитика</h1>
-        
-        <div className="tool-header-buttons">
-          <button className="tool-header-btn counter-btn" title="Счетчик запусков">
-            <img src="/icons/rocket.svg" alt="" />
-            <span className="counter">0</span>
-          </button>
-          <button className="tool-header-btn icon-only" title="Подсказки">
-            <img src="/icons/lamp.svg" alt="" />
-          </button>
-          <button className="tool-header-btn icon-only" title="Скриншот">
-            <img src="/icons/camera.svg" alt="" />
-          </button>
-        </div>
-      </header>
+    <>
+      <SEOHead 
+        title={t('analyticsTool.title')}
+        description={t('analyticsTool.description')}
+        keywords={t('analyticsTool.keywords')}
+      />
+      <div className="tool-container">
+        {/* Заголовок */}
+        <header className="tool-header-island">
+          <Link to={createLink('')} className="back-button">
+            <img src="/icons/arrow_left.svg" alt="" />
+            {t('common.backToTools')}
+          </Link>
+          
+          <h1 className="tool-title">{t('analyticsTool.title')}</h1>
+          
+          <div className="tool-header-buttons">
+            <button className="tool-header-btn counter-btn" title={t('common.usageCount')}>
+              <img src="/icons/rocket.svg" alt="" />
+              <span className="counter">0</span>
+            </button>
+            <button className="tool-header-btn icon-only" title={t('common.tips')}>
+              <img src="/icons/lamp.svg" alt="" />
+            </button>
+            <button className="tool-header-btn icon-only" title={t('common.screenshot')}>
+              <img src="/icons/camera.svg" alt="" />
+            </button>
+          </div>
+        </header>
 
-      {/* Основная область */}
-      <main className="main-workspace">
-        <div className="analytics-container">
-          {/* Заголовки таблицы */}
-          <div className="table-header">
-            <div className="column-header param-header">
-              <div className="param-header-content">
-                {/* Блок управления кратностью */}
-                <div className="scale-controls">
-                  <button 
-                    className="scale-button"
-                    onClick={decreaseScale}
-                    disabled={scaleFactor <= 1}
-                    title="Уменьшить масштаб слайдеров"
-                  >
-                    –
-                  </button>
-                  <span className="scale-value">×{scaleFactor}</span>
-                  <button 
-                    className="scale-button"
-                    onClick={increaseScale}
-                    disabled={scaleFactor >= 20}
-                    title="Увеличить масштаб слайдеров"
-                  >
-                    +
-                  </button>
-                </div>
-                
-                {/* Дропдауны сегментации */}
-                <div className="segmentation-dropdowns">
-                  {/* Точка входа */}
-                  <div className="dropdown-container">
-                    <label className="dropdown-label">Точка входа</label>
-                    <select 
-                      value={landingType} 
-                      onChange={(e) => setLandingType(e.target.value as 'ecommerce' | 'landing' | 'instagram')}
-                      className="dropdown-select"
+        {/* Основная область */}
+        <main className="main-workspace">
+          <div className="analytics-container">
+            {/* Заголовки таблицы */}
+            <div className="table-header">
+              <div className="column-header param-header">
+                <div className="param-header-content">
+                  {/* Блок управления кратностью */}
+                  <div className="scale-controls">
+                    <button 
+                      className="scale-button"
+                      onClick={decreaseScale}
+                      disabled={scaleFactor <= 1}
+                      title={t('analyticsTool.scale.decrease')}
                     >
-                      <option value="ecommerce">Интернет-магазин</option>
-                      <option value="landing">Лендинг</option>
-                      <option value="instagram">Instagram Direct</option>
-                    </select>
+                      –
+                    </button>
+                    <span className="scale-value">×{scaleFactor}</span>
+                    <button 
+                      className="scale-button"
+                      onClick={increaseScale}
+                      disabled={scaleFactor >= 20}
+                      title={t('analyticsTool.scale.increase')}
+                    >
+                      +
+                    </button>
                   </div>
                   
-                  {/* Тип бизнеса */}
-                  <div className="dropdown-container">
-                    <label className="dropdown-label">Тип бизнеса</label>
-                    <select 
-                      value={businessModel} 
-                      onChange={(e) => setBusinessModel(e.target.value as 'product' | 'service')}
-                      className="dropdown-select"
-                    >
-                      <option value="product">Продажа товара</option>
-                      <option value="service">Оказание услуг</option>
-                    </select>
-                  </div>
-                  
-                  {/* Источник трафика */}
-                  <div className="dropdown-container">
-                    <label className="dropdown-label">Источник трафика</label>
-                    <select 
-                      value={trafficSource} 
-                      onChange={(e) => setTrafficSource(e.target.value as 'google-search' | 'google-shopping' | 'meta' | 'tiktok' | 'email')}
-                      className="dropdown-select"
-                    >
-                      <option value="google-search">Поиск Google ADS</option>
-                      <option value="google-shopping">Shopping Google ADS</option>
-                      <option value="meta">Meta ADS</option>
-                      <option value="tiktok">Tik-Tok ADS</option>
-                      <option value="email">Email рассылка</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <button 
-                  className="header-export-button"
-                  onClick={() => setShowExportModal(true)}
-                  title="Скачать все результаты в формате Excel"
-                >
-                  <img src="/icons/download.svg" alt="Download" width="11" height="11" />
-                  Скачать
-                </button>
-                
-                <button 
-                  className="header-ai-button"
-                  onClick={() => setShowAIModal(true)}
-                  title="Получить анализ от ИИ"
-                >
-                  <img src="/icons/ai.svg" alt="AI" width="16" height="16" />
-                  Получить анализ от ИИ
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Второй заголовок таблицы */}
-          <div className="table-header secondary-header">
-            <div className="column-header param-header-secondary">
-              <span>Параметр</span>
-            </div>
-            <div className="column-header values-header">
-              <div className="dual-header">
-                <span className="day-header">День</span>
-                <div className="period-input-container">
-                  <input
-                    type="number"
-                    value={period}
-                    onChange={(e) => setPeriod(Number(e.target.value) || 1)}
-                    className="period-input"
-                    min="1"
-                    max="365"
-                  />
-                  <span className="period-label">Дней</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Группы параметров */}
-          {metricsConfig.map((group) => (
-            <div 
-              key={group.title} 
-              className="metrics-group"
-              style={{ '--group-color': group.color } as React.CSSProperties}
-            >
-              {/* Заголовок группы - вертикальный слева */}
-              <div className="group-title-vertical" style={{ color: group.color }}>
-                <span className="group-text">{group.title}</span>
-              </div>
-
-              {/* Метрики группы */}
-              <div className="group-metrics">
-                {group.metrics.map((metric) => (
-                  <div key={metric.id} className="metric-row">
-                    {/* Название параметра */}
-                    <div className="metric-name">
-                      <button 
-                        className="help-button" 
-                        title={metric.tooltip}
-                        style={{ backgroundColor: group.color }}
+                  {/* Дропдауны сегментации */}
+                  <div className="segmentation-dropdowns">
+                    {/* Точка входа */}
+                    <div className="dropdown-container">
+                      <label className="dropdown-label">{t('analyticsTool.businessType')}</label>
+                      <select 
+                        value={landingType} 
+                        onChange={(e) => setLandingType(e.target.value as 'ecommerce' | 'landing' | 'instagram')}
+                        className="dropdown-select"
                       >
-                        ?
-                      </button>
-                      <span>{metric.name}</span>
+                        <option value="ecommerce">{t('analyticsTool.businessTypes.ecommerce')}</option>
+                        <option value="landing">{t('analyticsTool.businessTypes.landing')}</option>
+                        <option value="instagram">{t('analyticsTool.businessTypes.instagram')}</option>
+                      </select>
                     </div>
-
-                    {/* Слайдер */}
-                    <div className="metric-slider">
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={getSliderValue(metric.id, metric)}
-                        onChange={(e) => !isSliderDisabled(metric.id) && handleSliderChange(metric.id, parseInt(e.target.value), metric)}
-                        className={`slider ${isSliderDisabled(metric.id) ? 'slider-disabled' : ''}`}
-                        style={{
-                          '--thumb-color': group.color
-                        } as React.CSSProperties}
-                      />
+                    
+                    {/* Тип бизнеса */}
+                    <div className="dropdown-container">
+                      <label className="dropdown-label">{t('analyticsTool.businessModel')}</label>
+                      <select 
+                        value={businessModel} 
+                        onChange={(e) => setBusinessModel(e.target.value as 'product' | 'service')}
+                        className="dropdown-select"
+                      >
+                        <option value="product">{t('analyticsTool.businessModels.product')}</option>
+                        <option value="service">{t('analyticsTool.businessModels.service')}</option>
+                      </select>
                     </div>
+                    
+                    {/* Источник трафика */}
+                    <div className="dropdown-container">
+                      <label className="dropdown-label">{t('analyticsTool.trafficSource')}</label>
+                      <select 
+                        value={trafficSource} 
+                        onChange={(e) => setTrafficSource(e.target.value as 'google-search' | 'google-shopping' | 'meta' | 'tiktok' | 'email')}
+                        className="dropdown-select"
+                      >
+                        <option value="google-search">{t('analyticsTool.trafficSources.googleSearch')}</option>
+                        <option value="google-shopping">{t('analyticsTool.trafficSources.googleShopping')}</option>
+                        <option value="meta">{t('analyticsTool.trafficSources.meta')}</option>
+                        <option value="tiktok">{t('analyticsTool.trafficSources.tiktok')}</option>
+                        <option value="email">{t('analyticsTool.trafficSources.email')}</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    className="header-export-button"
+                    onClick={() => setShowExportModal(true)}
+                    title={t('analyticsTool.buttons.export')}
+                  >
+                    <img src="/icons/download.svg" alt="Download" width="11" height="11" />
+                    {t('analyticsTool.buttons.export')}
+                  </button>
+                  
+                  <button 
+                    className="header-ai-button"
+                    onClick={() => setShowAIModal(true)}
+                    title={t('analyticsTool.buttons.aiAnalysis')}
+                  >
+                    <img src="/icons/ai.svg" alt="AI" width="16" height="16" />
+                    {t('analyticsTool.buttons.aiAnalysis')}
+                  </button>
+                </div>
+              </div>
+            </div>
 
-                    {/* Поля ввода */}
-                    <div className="metric-values">
-                      {/* Первое поле - с процентами или без */}
-                      {metric.isPercentage && !metric.hasPeriod ? (
-                        // Процентное поле без периода - оборачиваем в контейнер
-                        <div className="percentage-input-container">
+            {/* Второй заголовок таблицы */}
+            <div className="table-header secondary-header">
+              <div className="column-header param-header-secondary">
+                <span>{t('analyticsTool.headers.parameter')}</span>
+              </div>
+              <div className="column-header values-header">
+                <div className="dual-header">
+                  <span className="day-header">{t('analyticsTool.headers.day')}</span>
+                  <div className="period-input-container">
+                    <input
+                      type="number"
+                      value={period}
+                      onChange={(e) => setPeriod(Number(e.target.value) || 1)}
+                      className="period-input"
+                      min="1"
+                      max="365"
+                    />
+                    <span className="period-label">{t('analyticsTool.headers.days')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Группы параметров */}
+            {metricsConfig.map((group) => (
+              <div 
+                key={group.title} 
+                className="metrics-group"
+                style={{ '--group-color': group.color } as React.CSSProperties}
+              >
+                {/* Заголовок группы - вертикальный слева */}
+                <div className="group-title-vertical" style={{ color: group.color }}>
+                  <span className="group-text">{group.title}</span>
+                </div>
+
+                {/* Метрики группы */}
+                <div className="group-metrics">
+                  {group.metrics.map((metric) => (
+                    <div key={metric.id} className="metric-row">
+                      {/* Название параметра */}
+                      <div className="metric-name">
+                        <button 
+                          className="help-button" 
+                          title={metric.tooltip}
+                          style={{ backgroundColor: group.color }}
+                        >
+                          ?
+                        </button>
+                        <span>{metric.name}</span>
+                      </div>
+
+                      {/* Слайдер */}
+                      <div className="metric-slider">
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={getSliderValue(metric.id, metric)}
+                          onChange={(e) => !isSliderDisabled(metric.id) && handleSliderChange(metric.id, parseInt(e.target.value), metric)}
+                          className={`slider ${isSliderDisabled(metric.id) ? 'slider-disabled' : ''}`}
+                          style={{
+                            '--thumb-color': group.color
+                          } as React.CSSProperties}
+                        />
+                      </div>
+
+                      {/* Поля ввода */}
+                      <div className="metric-values">
+                        {/* Первое поле - с процентами или без */}
+                        {metric.isPercentage && !metric.hasPeriod ? (
+                          // Процентное поле без периода - оборачиваем в контейнер
+                          <div className="percentage-input-container">
+                            <input
+                              type="number"
+                              value={metrics[metric.id]}
+                              onFocus={() => handleInputFocus(metric.id)}
+                              onBlur={(e) => handleInputBlur(metric.id, true, e.target.value, false)}
+                              onChange={(e) => handleInputChange(metric.id, e.target.value, true, false)}
+                              onKeyDown={handleKeyDown}
+                              className={`value-input percentage-field ${isReadonlyField(metric.id) ? 'readonly' : ''}`}
+                              placeholder="0.0"
+                              step="0.1"
+                              readOnly={isReadonlyField(metric.id)}
+                            />
+                            <span className="percentage-symbol">%</span>
+                          </div>
+                        ) : (
+                          // Обычное поле
                           <input
                             type="number"
                             value={metrics[metric.id]}
                             onFocus={() => handleInputFocus(metric.id)}
-                            onBlur={(e) => handleInputBlur(metric.id, true, e.target.value, false)}
-                            onChange={(e) => handleInputChange(metric.id, e.target.value, true, false)}
+                            onBlur={(e) => handleInputBlur(metric.id, metric.isPercentage, e.target.value, metric.isDecimal)}
+                            onChange={(e) => handleInputChange(metric.id, e.target.value, metric.isPercentage, metric.isDecimal)}
                             onKeyDown={handleKeyDown}
-                            className={`value-input percentage-field ${isReadonlyField(metric.id) ? 'readonly' : ''}`}
-                            placeholder="0.0"
-                            step="0.1"
+                            className={`value-input ${!metric.isPercentage && !metric.hasPeriod ? 'single-field' : ''} ${isReadonlyField(metric.id) ? 'readonly' : ''}`}
+                            placeholder={metric.isPercentage || metric.isDecimal ? "0.0" : "0"}
+                            step={metric.isPercentage || metric.isDecimal ? "0.1" : "1"}
                             readOnly={isReadonlyField(metric.id)}
                           />
-                          <span className="percentage-symbol">%</span>
-                        </div>
-                      ) : (
-                        // Обычное поле
-                        <input
-                          type="number"
-                          value={metrics[metric.id]}
-                          onFocus={() => handleInputFocus(metric.id)}
-                          onBlur={(e) => handleInputBlur(metric.id, metric.isPercentage, e.target.value, metric.isDecimal)}
-                          onChange={(e) => handleInputChange(metric.id, e.target.value, metric.isPercentage, metric.isDecimal)}
-                          onKeyDown={handleKeyDown}
-                          className={`value-input ${!metric.isPercentage && !metric.hasPeriod ? 'single-field' : ''} ${isReadonlyField(metric.id) ? 'readonly' : ''}`}
-                          placeholder={metric.isPercentage || metric.isDecimal ? "0.0" : "0"}
-                          step={metric.isPercentage || metric.isDecimal ? "0.1" : "1"}
-                          readOnly={isReadonlyField(metric.id)}
-                        />
-                      )}
-                      
-                      {/* Второе поле - только если hasPeriod = true */}
-                      {metric.hasPeriod && (
-                        <input
-                          type="number"
-                          value={metric.isPercentage ? 
-                            (typeof metrics[metric.id] === 'string' ? 
-                              parseFloat(metrics[metric.id] as string) || 0 : 
-                              parseFloat((metrics[metric.id] as number).toFixed(1))
-                            ) : 
-                            Math.round(typeof metrics[metric.id] === 'string' ? 
-                              (parseFloat(metrics[metric.id] as string) || 0) * period : 
-                              (metrics[metric.id] as number) * period
-                            )
-                          }
-                          readOnly
-                          className="value-input readonly"
-                          placeholder="0"
-                        />
-                      )}
-                      
-                      {/* Процентный символ для полей с периодом */}
-                      {metric.isPercentage && metric.hasPeriod && <span className="percentage-symbol">%</span>}
+                        )}
+                        
+                        {/* Второе поле - только если hasPeriod = true */}
+                        {metric.hasPeriod && (
+                          <input
+                            type="number"
+                            value={metric.isPercentage ? 
+                              (typeof metrics[metric.id] === 'string' ? 
+                                parseFloat(metrics[metric.id] as string) || 0 : 
+                                parseFloat((metrics[metric.id] as number).toFixed(1))
+                              ) : 
+                              Math.round(typeof metrics[metric.id] === 'string' ? 
+                                (parseFloat(metrics[metric.id] as string) || 0) * period : 
+                                (metrics[metric.id] as number) * period
+                              )
+                            }
+                            readOnly
+                            className="value-input readonly"
+                            placeholder="0"
+                          />
+                        )}
+                        
+                        {/* Процентный символ для полей с периодом */}
+                        {metric.isPercentage && metric.hasPeriod && <span className="percentage-symbol">%</span>}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-      
-      {/* Модальное окно ИИ анализа */}
-      {showAIModal && (
-        <div 
-          className={`modal-overlay ${isAIModalClosing ? 'closing' : ''}`}
-          onClick={closeAIModal}
-        >
-          <div 
-            className={`ai-modal-content ${isAIModalClosing ? 'closing' : ''}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Левая часть - форма */}
-            <div className="ai-modal-left">
-              <h3>Анализ от ИИ</h3>
-              
-              {/* Тумблер валюты */}
-              <div className="business-type-toggle">
-                <label className="toggle-label">Валюта:</label>
-                <div className="toggle-buttons currency-toggle">
-                  <button 
-                    className={`toggle-btn ${currency === 'uah' ? 'active' : ''}`}
-                    onClick={() => setCurrency('uah')}
-                  >
-                    Гривны
-                  </button>
-                  <button 
-                    className={`toggle-btn ${currency === 'usd' ? 'active' : ''}`}
-                    onClick={() => setCurrency('usd')}
-                  >
-                    Доллары
-                  </button>
-                  {/* Временно скрыта кнопка "Рубли"
-                  <button 
-                    className={`toggle-btn ${currency === 'rub' ? 'active' : ''}`}
-                    onClick={() => setCurrency('rub')}
-                  >
-                    Рубли
-                  </button>
-                  */}
+                  ))}
                 </div>
               </div>
-              
-              {/* Поле для ниши */}
-              <div className="niche-input">
-                <label className="input-label">Ниша бизнеса:</label>
-                <input
-                  type="text"
-                  placeholder="Например: автосервис, косметика, недвижимость..."
-                  className="niche-field"
-                  value={niche}
-                  onChange={(e) => setNiche(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !isAnalyzing && niche.trim()) {
-                      handleAIAnalysis();
-                    }
-                  }}
-                  disabled={isAnalyzing}
-                />
-              </div>
-              
-              {/* Кнопка анализа */}
-              <button 
-                className="ai-analyze-button"
-                onClick={handleAIAnalysis}
-                disabled={isAnalyzing || !niche.trim()}
-              >
-                <img src="/icons/ai.svg" alt="AI" width="16" height="16" />
-                {isAnalyzing ? 'Анализируем...' : 'Получить анализ от ИИ'}
-              </button>
-            </div>
-            
-            {/* Правая часть - результат */}
-            <div className="ai-modal-right">
-              <div className="ai-result-header">
-                <h4>Результат анализа</h4>
-                {aiResponse && !isAnalyzing && (
-                  <button 
-                    className="copy-response-btn"
-                    onClick={copyAIResponse}
-                    title="Скопировать ответ"
-                  >
-                    <img src="/icons/button_copy.svg" alt="Copy" width="14" height="14" />
-                    Скопировать
-                  </button>
-                )}
-              </div>
-              <div className="ai-response">
-                {isAnalyzing && (
-                  <div className="ai-loading">
-                    <div className="loading-spinner"></div>
-                    <div className="loading-text">
-                      <p>Анализируем ваши данные.</p>
-                      <p>Это может занять до 1 минуты.</p>
-                      <p>Пожалуйста, не закрывайте окно.</p>
-                    </div>
-                  </div>
-                )}
-                
-                {aiError && (
-                  <div className="ai-error">
-                    <p>❌ {aiError}</p>
-                  </div>
-                )}
-                
-                {aiResponse && !isAnalyzing && (
-                  <div className="ai-result">
-                    <div className="ai-text">
-                      {aiResponse.split('\n').map((line, index) => (
-                        <p key={index}>{line}</p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {!isAnalyzing && !aiResponse && !aiError && (
-                  <div className="ai-placeholder">
-                    <p>Заполните форму слева и нажмите "Получить анализ от ИИ" для получения подробных рекомендаций по вашим метрикам.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Кнопка закрытия */}
-            <button 
-              className="close-modal-btn"
-              onClick={closeAIModal}
-              title="Закрыть"
+            ))}
+          </div>
+        </main>
+        
+        {/* Модальное окно ИИ анализа */}
+        {showAIModal && (
+          <div 
+            className={`modal-overlay ${isAIModalClosing ? 'closing' : ''}`}
+            onClick={closeAIModal}
+          >
+            <div 
+              className={`ai-modal-content ${isAIModalClosing ? 'closing' : ''}`}
+              onClick={(e) => e.stopPropagation()}
             >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Модальное окно выбора формата экспорта */}
-      {showExportModal && (
-        <div 
-          className={`modal-overlay ${isModalClosing ? 'closing' : ''}`}
-          onClick={closeModal}
-        >
-          <div 
-            className={`modal-content ${isModalClosing ? 'closing' : ''}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>Выберите формат отображения</h3>
-            <div className="export-options">
-              <div 
-                className={`radio-option ${exportFormat === 'vertical' ? 'active' : ''}`}
-                onClick={() => setExportFormat('vertical')}
-              >
-                <ColumnIcon className="option-icon" />
-                <div className="option-details">
-                  <strong>Вертикальный формат</strong>
+              {/* Левая часть - форма */}
+              <div className="ai-modal-left">
+                <h3>{t('analyticsTool.aiAnalysis.title')}</h3>
+                
+                {/* Тумблер валюты */}
+                <div className="business-type-toggle">
+                  <label className="toggle-label">{t('analyticsTool.currency')}:</label>
+                  <div className="toggle-buttons currency-toggle">
+                    <button 
+                      className={`toggle-btn ${currency === 'uah' ? 'active' : ''}`}
+                      onClick={() => setCurrency('uah')}
+                    >
+                      UAH
+                    </button>
+                    <button 
+                      className={`toggle-btn ${currency === 'usd' ? 'active' : ''}`}
+                      onClick={() => setCurrency('usd')}
+                    >
+                      USD
+                    </button>
+                    <button 
+                      className={`toggle-btn ${currency === 'rub' ? 'active' : ''}`}
+                      onClick={() => setCurrency('rub')}
+                    >
+                      RUB
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Поле для ниши */}
+                <div className="niche-input">
+                  <label className="input-label">{t('analyticsTool.niche')}:</label>
+                  <input
+                    type="text"
+                    placeholder={t('analyticsTool.nichePlaceholder')}
+                    className="niche-field"
+                    value={niche}
+                    onChange={(e) => setNiche(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !isAnalyzing && niche.trim()) {
+                        handleAIAnalysis();
+                      }
+                    }}
+                    disabled={isAnalyzing}
+                  />
+                </div>
+                
+                {/* Кнопка анализа */}
+                <button 
+                  className="ai-analyze-button"
+                  onClick={handleAIAnalysis}
+                  disabled={isAnalyzing || !niche.trim()}
+                >
+                  <img src="/icons/ai.svg" alt="AI" width="16" height="16" />
+                  {isAnalyzing ? t('analyticsTool.buttons.analyzing') : t('analyticsTool.buttons.analyze')}
+                </button>
+              </div>
+              
+              {/* Правая часть - результат */}
+              <div className="ai-modal-right">
+                <div className="ai-result-header">
+                  <h4>{t('analyticsTool.aiAnalysis.resultTitle')}</h4>
+                  {aiResponse && !isAnalyzing && (
+                    <button 
+                      className="copy-response-btn"
+                      onClick={copyAIResponse}
+                      title={t('analyticsTool.buttons.copy')}
+                    >
+                      <img src="/icons/button_copy.svg" alt="Copy" width="14" height="14" />
+                      {t('analyticsTool.buttons.copy')}
+                    </button>
+                  )}
+                </div>
+                <div className="ai-response">
+                  {isAnalyzing && (
+                    <div className="ai-loading">
+                      <div className="loading-spinner"></div>
+                      <div className="loading-text">
+                        <p>{t('analyticsTool.aiAnalysis.loading.analyzing')}</p>
+                        <p>{t('analyticsTool.aiAnalysis.loading.timeWarning')}</p>
+                        <p>{t('analyticsTool.aiAnalysis.loading.doNotClose')}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {aiError && (
+                    <div className="ai-error">
+                      <p>❌ {aiError}</p>
+                    </div>
+                  )}
+                  
+                  {aiResponse && !isAnalyzing && (
+                    <div className="ai-result">
+                      <div className="ai-text">
+                        {aiResponse.split('\n').map((line, index) => (
+                          <p key={index}>{line}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {!isAnalyzing && !aiResponse && !aiError && (
+                    <div className="ai-placeholder">
+                      <p>{t('analyticsTool.aiAnalysis.placeholder')}</p>
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div 
-                className={`radio-option ${exportFormat === 'horizontal' ? 'active' : ''}`}
-                onClick={() => setExportFormat('horizontal')}
+              {/* Кнопка закрытия */}
+              <button 
+                className="close-modal-btn"
+                onClick={closeAIModal}
+                title={t('analyticsTool.buttons.cancel')}
               >
-                <StringIcon className="option-icon" />
-                <div className="option-details">
-                  <strong>Горизонтальный формат</strong>
-                </div>
-              </div>
-            </div>
-            
-            <div className="modal-buttons">
-              <button
-                onClick={() => {
-                  exportToExcel(exportFormat);
-                  closeModal();
-                }}
-                className="analytics-button export-button"
-              >
-                Скачать таблицу
-              </button>
-              <button
-                onClick={closeModal}
-                className="analytics-button clear-button"
-              >
-                Отмена
+                ×
               </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        
+        {/* Модальное окно выбора формата экспорта */}
+        {showExportModal && (
+          <div 
+            className={`modal-overlay ${isModalClosing ? 'closing' : ''}`}
+            onClick={closeModal}
+          >
+            <div 
+              className={`modal-content ${isModalClosing ? 'closing' : ''}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>{t('analyticsTool.export.formatTitle')}</h3>
+              <div className="export-options">
+                <div 
+                  className={`radio-option ${exportFormat === 'vertical' ? 'active' : ''}`}
+                  onClick={() => setExportFormat('vertical')}
+                >
+                  <ColumnIcon className="option-icon" />
+                  <div className="option-details">
+                    <strong>{t('analyticsTool.export.formats.vertical')}</strong>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`radio-option ${exportFormat === 'horizontal' ? 'active' : ''}`}
+                  onClick={() => setExportFormat('horizontal')}
+                >
+                  <StringIcon className="option-icon" />
+                  <div className="option-details">
+                    <strong>{t('analyticsTool.export.formats.horizontal')}</strong>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="modal-buttons">
+                <button
+                  onClick={() => {
+                    exportToExcel(exportFormat);
+                    closeModal();
+                  }}
+                  className="analytics-button export-button"
+                >
+                  {t('analyticsTool.buttons.downloadTable')}
+                </button>
+                <button
+                  onClick={closeModal}
+                  className="analytics-button clear-button"
+                >
+                  {t('analyticsTool.buttons.cancel')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

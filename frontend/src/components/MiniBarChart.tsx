@@ -4,7 +4,6 @@ import './MiniBarChart.css';
 interface MiniBarChartProps {
   value: number;
   maxValue: number;
-  color?: string;
   width?: number;
   height?: number;
 }
@@ -12,7 +11,6 @@ interface MiniBarChartProps {
 const MiniBarChart: React.FC<MiniBarChartProps> = ({
   value,
   maxValue,
-  color = '#3b82f6',
   width,
   height = 10
 }) => {

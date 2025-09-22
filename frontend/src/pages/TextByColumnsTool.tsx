@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './TextByColumnsTool.css';
 
 
 const TOOL_ID = 'text-by-columns';
 const TextByColumnsTool: React.FC = () => {
+    const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [copied, setCopied] = useState<boolean[]>([false, false, false, false, false, false]);
     const [launchCount, setLaunchCount] = useState(0);
@@ -177,7 +179,7 @@ const TextByColumnsTool: React.FC = () => {
         <div className="text-by-columns-tool">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     Все инструменты
                 </Link>

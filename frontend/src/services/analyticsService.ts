@@ -32,6 +32,9 @@ class AnalyticsService {
   private readonly API_BASE = 'http://localhost:8880';
   private userId: string;
   private isInitialized = false;
+  private lastPageViewTime = 0;
+  private lastPageViewPage = '';
+  private readonly DUPLICATE_THRESHOLD_MS = 1000; // Защита от дублирования в течение 1 секунды
 
   constructor() {
     this.userId = this.getOrCreateUserId();
@@ -102,6 +105,17 @@ class AnalyticsService {
    */
   public trackPageView(page: string): void {
     if (!this.isInitialized) return;
+
+    // Защита от дублирования в React StrictMode
+    const now = Date.now();
+    if (this.lastPageViewPage === page && 
+        (now - this.lastPageViewTime) < this.DUPLICATE_THRESHOLD_MS) {
+      console.log('🚫 [ANALYTICS] Duplicate page view prevented:', page);
+      return;
+    }
+
+    this.lastPageViewTime = now;
+    this.lastPageViewPage = page;
 
     const visitorData = this.getVisitorData();
     if (!visitorData.pagesViewed.includes(page)) {

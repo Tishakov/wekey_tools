@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
 import { openaiService, type TextGenerationResponse } from '../services/openaiService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './TextGeneratorTool.css';
 
 
 const TOOL_ID = 'text-generator';
 const TextGeneratorTool: React.FC = () => {
-  const { common, textGenerator } = useToolTranslation();
+  const { textGenerator } = useToolTranslation();
+  const { createLink } = useLocalizedLink();
   
   // Основные состояния
   const [language, setLanguage] = useState('english');
@@ -261,7 +263,7 @@ const TextGeneratorTool: React.FC = () => {
     <div className="text-generator-tool">
       {/* Шапка инструмента */}
       <div className="tool-header-island">
-        <Link to="/" className="back-button">
+        <Link to={createLink('')} className="back-button">
           <img src="/icons/arrow_left.svg" alt="" />
           Все инструменты
         </Link>

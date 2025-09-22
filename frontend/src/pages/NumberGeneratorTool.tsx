@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
+import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './NumberGeneratorTool.css';
 
 
 const TOOL_ID = 'number-generator';
 const NumberGeneratorTool: React.FC = () => {
+    // Хуки
+    const { t } = useTranslation();
+    const { createLink } = useLocalizedLink();
+    
     // Основные состояния
     const [fromNumber, setFromNumber] = useState(1);
     const [toNumber, setToNumber] = useState(100);
@@ -73,7 +80,7 @@ const NumberGeneratorTool: React.FC = () => {
 
             // Проверяем, достаточно ли уникальных чисел
             if (availableNumbers.size < resultCount) {
-                setResult(`Закончились уникальные числа в диапазоне от ${fromNumber} до ${toNumber}.\nИспользуйте кнопку "Сбросить", чтобы начать сначала.`);
+                setResult(`${t('numberGeneratorTool.errors.noMoreUniqueNumbers', { from: fromNumber, to: toNumber })}\n${t('numberGeneratorTool.errors.useResetButton')}`);
                 return;
             }
         }
@@ -112,7 +119,7 @@ const NumberGeneratorTool: React.FC = () => {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
             } catch (err) {
-                console.error('Ошибка копирования:', err);
+                console.error(t('numberGeneratorTool.errors.copyError'), err);
             }
         }
     };
@@ -144,22 +151,30 @@ const NumberGeneratorTool: React.FC = () => {
 
     return (
         <div className="number-generator-tool">
+            <SEOHead
+                title={t('numberGeneratorTool.seo.title')}
+                description={t('numberGeneratorTool.seo.description')}
+                keywords={t('numberGeneratorTool.seo.keywords')}
+                ogTitle={t('numberGeneratorTool.seo.ogTitle')}
+                ogDescription={t('numberGeneratorTool.seo.ogDescription')}
+            />
+            
             {/* Header инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('numberGeneratorTool.navigation.allTools')}
                 </Link>
-                <h1 className="tool-title">Генератор чисел</h1>
+                <h1 className="tool-title">{t('numberGeneratorTool.title')}</h1>
                 <div className="tool-header-buttons">
-                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                    <button className="tool-header-btn counter-btn" title={t('numberGeneratorTool.tooltips.launchCounter')}>
                         <img src="/icons/rocket.svg" alt="" />
                         <span className="counter">{launchCount}</span>
                     </button>
-                    <button className="tool-header-btn icon-only" title="Подсказки">
+                    <button className="tool-header-btn icon-only" title={t('numberGeneratorTool.tooltips.hint')}>
                         <img src="/icons/lamp.svg" alt="" />
                     </button>
-                    <button className="tool-header-btn icon-only" title="Скриншот">
+                    <button className="tool-header-btn icon-only" title={t('numberGeneratorTool.tooltips.screenshot')}>
                         <img src="/icons/camera.svg" alt="" />
                     </button>
                 </div>
@@ -172,7 +187,7 @@ const NumberGeneratorTool: React.FC = () => {
                     {/* Первая группа: Диапазон чисел */}
                     <div className="settings-group">
                         <div className="count-slider-container">
-                            <label className="slider-label">Выберите число ОТ:</label>
+                            <label className="slider-label">{t('numberGeneratorTool.settings.fromLabel')}</label>
                             <div className="slider-group">
                                 <div className="slider-container">
                                     <input
@@ -219,7 +234,7 @@ const NumberGeneratorTool: React.FC = () => {
                         </div>
 
                         <div className="count-slider-container">
-                            <label className="slider-label">Выберите число ДО:</label>
+                            <label className="slider-label">{t('numberGeneratorTool.settings.toLabel')}</label>
                             <div className="slider-group">
                                 <div className="slider-container">
                                     <input
@@ -269,7 +284,7 @@ const NumberGeneratorTool: React.FC = () => {
                     {/* Вторая группа: Количество чисел в результате */}
                     <div className="settings-group">
                         <div className="count-slider-container">
-                            <label className="slider-label">Количество чисел в результате:</label>
+                            <label className="slider-label">{t('numberGeneratorTool.settings.countLabel')}</label>
                             <div className="slider-group">
                                 <div className="slider-container">
                                     <input
@@ -311,7 +326,7 @@ const NumberGeneratorTool: React.FC = () => {
                                     checked={noRepeats}
                                     onChange={(e) => setNoRepeats(e.target.checked)}
                                 />
-                                <span className="checkbox-text">Без повторов</span>
+                                <span className="checkbox-text">{t('numberGeneratorTool.settings.noRepeats')}</span>
                             </label>
                             <div className="current-time">
                                 {formatTime(currentTime)}
@@ -326,10 +341,10 @@ const NumberGeneratorTool: React.FC = () => {
                         className="result-textarea"
                         value={result}
                         readOnly
-                        placeholder="Здесь будет результат"
+                        placeholder={t('numberGeneratorTool.result.placeholder')}
                     />
                     <div className="result-controls">
-                        <span className="result-counter">{countLines(result)} стр.</span>
+                        <span className="result-counter">{countLines(result)} {t('numberGeneratorTool.result.linesCount')}</span>
                     </div>
                 </div>
             </div>
@@ -340,7 +355,7 @@ const NumberGeneratorTool: React.FC = () => {
                     className="action-btn primary" 
                     onClick={handleGenerateNumbers}
                 >
-                    Показать результат
+                    {t('numberGeneratorTool.buttons.showResult')}
                 </button>
                 
                 <div className="result-buttons">
@@ -350,7 +365,7 @@ const NumberGeneratorTool: React.FC = () => {
                         disabled={!result}
                     >
                         <img src="/icons/button_copy.svg" alt="" />
-                        {copied ? 'Скопировано!' : 'Скопировать'}
+                        {copied ? t('numberGeneratorTool.buttons.copied') : t('numberGeneratorTool.buttons.copy')}
                     </button>
 
                     <button 
@@ -358,7 +373,7 @@ const NumberGeneratorTool: React.FC = () => {
                         onClick={handleReset}
                     >
                         <img src="/icons/reset.svg" alt="" />
-                        Сбросить
+                        {t('numberGeneratorTool.buttons.reset')}
                     </button>
                 </div>
             </div>

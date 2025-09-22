@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './MatchTypesTool.css';
 
@@ -10,6 +11,7 @@ type MatchType = 'broad' | 'phrase' | 'exact';
 type CaseType = 'lowercase' | 'uppercase' | 'capitalize-first' | '';
 
 const MatchTypesTool: React.FC = () => {
+    const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [outputText, setOutputText] = useState('');
     const [matchType, setMatchType] = useState<MatchType>('broad'); // По умолчанию "Широкое соответствие"
@@ -164,7 +166,7 @@ const MatchTypesTool: React.FC = () => {
         <div className="match-types-tool">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     Все инструменты
                 </Link>

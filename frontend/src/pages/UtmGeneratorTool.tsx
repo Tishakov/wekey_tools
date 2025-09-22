@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLanguageFromUrl, useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './UtmGeneratorTool.css';
 import { statsService } from '../utils/statsService';
@@ -7,6 +10,11 @@ import { statsService } from '../utils/statsService';
 
 const TOOL_ID = 'utm-generator';
 const UtmGeneratorTool: React.FC = () => {
+    // Хуки
+    const { t } = useTranslation();
+    const { createLink } = useLocalizedLink();
+    useLanguageFromUrl();
+    
     // Состояния компонента
     const [baseUrl, setBaseUrl] = useState('');
     const [protocol, setProtocol] = useState('https://');
@@ -24,10 +32,10 @@ const UtmGeneratorTool: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const [launchCount, setLaunchCount] = useState(0);
 
-    // Структура источников трафика
-    const trafficSources = {
+    // Структура источников трафика с переводами
+    const getTrafficSources = () => ({
         custom: {
-            name: 'Свои значения',
+            name: t('utmGeneratorTool.sources.names.custom', 'Свои значения'),
             utm_source: '',
             utm_medium: '',
             utm_campaign: '',
@@ -35,7 +43,7 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: ''
         },
         google_ads: {
-            name: 'Google ADS',
+            name: t('utmGeneratorTool.sources.names.googleAds'),
             utm_source: 'google',
             utm_medium: 'cpc',
             utm_campaign: 'google_ads_campaign',
@@ -43,7 +51,7 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: 'keyword'
         },
         esputnik_email: {
-            name: 'eSputnik Email',
+            name: t('utmGeneratorTool.sources.names.esputnikEmail'),
             utm_source: 'esputnik',
             utm_medium: 'email',
             utm_campaign: 'email_campaign',
@@ -51,7 +59,7 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: ''
         },
         tiktok: {
-            name: 'Tik-Tok',
+            name: t('utmGeneratorTool.sources.names.tiktok'),
             utm_source: 'tiktok',
             utm_medium: 'social',
             utm_campaign: 'tiktok_campaign',
@@ -59,7 +67,7 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: ''
         },
         facebook: {
-            name: 'Facebook',
+            name: t('utmGeneratorTool.sources.names.facebook'),
             utm_source: 'facebook',
             utm_medium: 'social',
             utm_campaign: 'facebook_campaign',
@@ -67,7 +75,7 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: ''
         },
         instagram: {
-            name: 'Instagram',
+            name: t('utmGeneratorTool.sources.names.instagram'),
             utm_source: 'instagram',
             utm_medium: 'social',
             utm_campaign: 'instagram_campaign',
@@ -75,7 +83,7 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: ''
         },
         telegram: {
-            name: 'Telegram',
+            name: t('utmGeneratorTool.sources.names.telegram'),
             utm_source: 'telegram',
             utm_medium: 'messenger',
             utm_campaign: 'telegram_campaign',
@@ -83,14 +91,14 @@ const UtmGeneratorTool: React.FC = () => {
             utm_term: ''
         },
         viber: {
-            name: 'Viber',
+            name: t('utmGeneratorTool.sources.names.viber'),
             utm_source: 'viber',
             utm_medium: 'messenger',
             utm_campaign: 'viber_campaign',
             utm_content: 'message',
             utm_term: ''
         }
-    };
+    });
 
     // Загрузка статистики при монтировании компонента
     useEffect(() => {
@@ -188,6 +196,7 @@ const UtmGeneratorTool: React.FC = () => {
             setUtmTerm('');
         } else {
             // Заполняем UTM поля значениями из выбранного источника
+            const trafficSources = getTrafficSources();
             const sourceData = trafficSources[sourceKey as keyof typeof trafficSources];
             setUtmSource(sourceData.utm_source);
             setUtmMedium(sourceData.utm_medium);
@@ -286,23 +295,31 @@ const UtmGeneratorTool: React.FC = () => {
     };
 
     return (
-        <div className="tool-page utm-generator-page">
+        <>
+            <SEOHead 
+                title={t('utmGeneratorTool.seo.title')}
+                description={t('utmGeneratorTool.seo.description')}
+                keywords={t('utmGeneratorTool.seo.keywords')}
+                ogTitle={t('utmGeneratorTool.seo.ogTitle')}
+                ogDescription={t('utmGeneratorTool.seo.ogDescription')}
+            />
+            <div className="tool-page utm-generator-page">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('utmGeneratorTool.navigation.allTools')}
                 </Link>
-                <h1 className="tool-title">Генератор UTM-меток</h1>
+                <h1 className="tool-title">{t('utmGeneratorTool.title')}</h1>
                 <div className="tool-header-buttons">
-                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                    <button className="tool-header-btn counter-btn" title={t('utmGeneratorTool.tooltips.launchCounter')}>
                         <img src="/icons/rocket.svg" alt="" />
                         <span className="counter">{launchCount}</span>
                     </button>
-                    <button className="tool-header-btn icon-only" title="Подсказка">
+                    <button className="tool-header-btn icon-only" title={t('utmGeneratorTool.tooltips.hint')}>
                         <img src="/icons/lamp.svg" alt="" />
                     </button>
-                    <button className="tool-header-btn icon-only" title="Скриншот">
+                    <button className="tool-header-btn icon-only" title={t('utmGeneratorTool.tooltips.screenshot')}>
                         <img src="/icons/camera.svg" alt="" />
                     </button>
                 </div>
@@ -343,7 +360,7 @@ const UtmGeneratorTool: React.FC = () => {
                             <input
                                 type="text"
                                 className="url-input-field"
-                                placeholder="example.com"
+                                placeholder={t('utmGeneratorTool.url.placeholder')}
                                 value={baseUrl}
                                 onChange={(e) => handleUrlChange(e.target.value)}
                             />
@@ -355,7 +372,7 @@ const UtmGeneratorTool: React.FC = () => {
                                     checked={noBaseUrl}
                                     onChange={(e) => setNoBaseUrl(e.target.checked)}
                                 />
-                                <span className="checkbox-text">Без ссылки</span>
+                                <span className="checkbox-text">{t('utmGeneratorTool.url.noBaseUrl')}</span>
                             </label>
                         </div>
                     </div>
@@ -368,7 +385,7 @@ const UtmGeneratorTool: React.FC = () => {
                         <div className="other-sources-toggle">
                             <div className="other-sources-block">
                                 <div className="toggle-container">
-                                    <span className="toggle-label">Другие источники</span>
+                                    <span className="toggle-label">{t('utmGeneratorTool.sources.toggle')}</span>
                                     <label className="toggle-switch">
                                         <input
                                             type="checkbox"
@@ -384,7 +401,7 @@ const UtmGeneratorTool: React.FC = () => {
                         {/* Радиокнопки источников трафика */}
                         {otherSources && (
                             <div className="traffic-sources-grid">
-                                {Object.entries(trafficSources).map(([key, source]) => (
+                                {Object.entries(getTrafficSources()).map(([key, source]) => (
                                     <label key={key} className="radio-item">
                                         <input
                                             type="radio"
@@ -411,7 +428,7 @@ const UtmGeneratorTool: React.FC = () => {
                                         <input
                                             type="text"
                                             className="utm-field-input"
-                                            placeholder="google, instagram, facebook..."
+                                            placeholder={t('utmGeneratorTool.fields.utmSource.placeholder')}
                                             value={utmSource}
                                             onChange={(e) => setUtmSource(e.target.value)}
                                         />
@@ -426,7 +443,7 @@ const UtmGeneratorTool: React.FC = () => {
                                         <input
                                             type="text"
                                             className="utm-field-input"
-                                            placeholder="red, white, dark, big, small..."
+                                            placeholder={t('utmGeneratorTool.fields.utmContent.placeholder')}
                                             value={utmContent}
                                             onChange={(e) => setUtmContent(e.target.value)}
                                         />
@@ -445,7 +462,7 @@ const UtmGeneratorTool: React.FC = () => {
                                         <input
                                             type="text"
                                             className="utm-field-input"
-                                            placeholder="cpc, email, social..."
+                                            placeholder={t('utmGeneratorTool.fields.utmMedium.placeholder')}
                                             value={utmMedium}
                                             onChange={(e) => setUtmMedium(e.target.value)}
                                         />
@@ -460,7 +477,7 @@ const UtmGeneratorTool: React.FC = () => {
                                         <input
                                             type="text"
                                             className="utm-field-input"
-                                            placeholder="discount, free, webinar..."
+                                            placeholder={t('utmGeneratorTool.fields.utmTerm.placeholder')}
                                             value={utmTerm}
                                             onChange={(e) => setUtmTerm(e.target.value)}
                                         />
@@ -479,7 +496,7 @@ const UtmGeneratorTool: React.FC = () => {
                                         <input
                                             type="text"
                                             className="utm-field-input"
-                                            placeholder="sale, top, product..."
+                                            placeholder={t('utmGeneratorTool.fields.utmCampaign.placeholder')}
                                             value={utmCampaign}
                                             onChange={(e) => setUtmCampaign(e.target.value)}
                                         />
@@ -493,7 +510,7 @@ const UtmGeneratorTool: React.FC = () => {
                                                 checked={transliterate}
                                                 onChange={(e) => setTransliterate(e.target.checked)}
                                             />
-                                            <span className="checkbox-text">Транслитерация и оптимизация результата</span>
+                                            <span className="checkbox-text">{t('utmGeneratorTool.options.transliteration')}</span>
                                         </label>
                                     </div>
                                 </div>
@@ -506,11 +523,11 @@ const UtmGeneratorTool: React.FC = () => {
                 <div className="utm-row">
                     <div className="control-buttons">
                         <button className="btn primary-btn" onClick={handleShowResult}>
-                            Показать результат
+                            {t('utmGeneratorTool.buttons.showResult')}
                         </button>
                         <button className="btn secondary-btn btn-with-left-icon" onClick={handleCopyResult}>
                             <img src="/icons/button_copy.svg" alt="" />
-                            {copied ? 'Скопировано!' : 'Скопировать результат'}
+                            {copied ? t('utmGeneratorTool.buttons.copied') : t('utmGeneratorTool.buttons.copyResult')}
                         </button>
                     </div>
                 </div>
@@ -521,14 +538,36 @@ const UtmGeneratorTool: React.FC = () => {
                         <input
                             type="text"
                             className="result-input"
-                            placeholder="Здесь будет результат"
+                            placeholder={t('utmGeneratorTool.result.placeholder')}
                             value={result}
                             readOnly
                         />
                     </div>
                 </div>
             </div>
+            
+            {/* SEO-блок с описанием возможностей инструмента */}
+            <div className="seo-section">
+                <h2>{t('utmGeneratorTool.seo.whatIsUtm.title')}</h2>
+                <p>{t('utmGeneratorTool.seo.whatIsUtm.text')}</p>
+                
+                <h3>{t('utmGeneratorTool.seo.whenToUse.title')}</h3>
+                <p>{t('utmGeneratorTool.seo.whenToUse.text')}</p>
+                
+                <h3>{t('utmGeneratorTool.seo.howItWorks.title')}</h3>
+                <p>{t('utmGeneratorTool.seo.howItWorks.text')}</p>
+                
+                <h3>{t('utmGeneratorTool.seo.benefits.title')}</h3>
+                <p>{t('utmGeneratorTool.seo.benefits.text')}</p>
+                
+                <h3>{t('utmGeneratorTool.seo.forSpecialists.title')}</h3>
+                <p>{t('utmGeneratorTool.seo.forSpecialists.text')}</p>
+                
+                <h3>{t('utmGeneratorTool.seo.howToUse.title')}</h3>
+                <p>{t('utmGeneratorTool.seo.howToUse.text')}</p>
+            </div>
         </div>
+        </>
     );
 };
 

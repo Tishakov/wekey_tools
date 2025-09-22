@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './SpacesToParagraphsTool.css';
 
 
 const TOOL_ID = 'spaces-to-paragraphs';
 const SpacesToParagraphsTool: React.FC = () => {
+    const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -132,7 +134,7 @@ const SpacesToParagraphsTool: React.FC = () => {
         <div className="spaces-to-paragraphs-tool">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     Все инструменты
                 </Link>

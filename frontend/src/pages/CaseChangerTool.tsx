@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './CaseChangerTool.css';
 
 
 const TOOL_ID = 'case-changer';
 const CaseChangerTool: React.FC = () => {
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [launchCount, setLaunchCount] = useState(0);
@@ -144,13 +149,17 @@ const CaseChangerTool: React.FC = () => {
 
   return (
     <div className="case-changer-tool">
+      <SEOHead 
+        title={t('caseChangerTool.title')}
+        description={t('caseChangerTool.description')}
+      />
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
-        <Link to="/" className="back-button">
+        <Link to={createLink('')} className="back-button">
           <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
+          {t('navigation.allTools')}
         </Link>
-        <h1 className="tool-title">Изменения регистра</h1>
+        <h1 className="tool-title">{t('caseChangerTool.title')}</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn" title="Счетчик запусков">
             <img src="/icons/rocket.svg" alt="" />
@@ -173,12 +182,12 @@ const CaseChangerTool: React.FC = () => {
             className="input-textarea"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Введите ваш текст…"
+            placeholder={t('caseChangerTool.inputPlaceholder')}
           />
           <div className="input-controls">
             <button className="paste-button" onClick={handlePasteText}>
               <img src="/icons/button_paste.svg" alt="" />
-              Вставить
+              {t('caseChangerTool.buttons.paste')}
             </button>
             <span className="info">{countLines(inputText)} стр.</span>
           </div>
@@ -197,7 +206,7 @@ const CaseChangerTool: React.FC = () => {
                 onClick={() => handleRadioClick(selectedCase, setSelectedCase, 'lowercase')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              все строчные
+              {t('caseChangerTool.options.lowercase')}
             </label>
             <label className="radio-item">
               <input
@@ -208,7 +217,7 @@ const CaseChangerTool: React.FC = () => {
                 onClick={() => handleRadioClick(selectedCase, setSelectedCase, 'uppercase')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              ВСЕ ПРОПИСНЫЕ
+              {t('caseChangerTool.options.uppercase')}
             </label>
             <label className="radio-item">
               <input
@@ -219,7 +228,7 @@ const CaseChangerTool: React.FC = () => {
                 onClick={() => handleRadioClick(selectedCase, setSelectedCase, 'capitalize-each')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              Каждое С Заглавной*
+              {t('caseChangerTool.options.capitalizeEach')}
             </label>
             <label className="radio-item">
               <input
@@ -230,7 +239,7 @@ const CaseChangerTool: React.FC = () => {
                 onClick={() => handleRadioClick(selectedCase, setSelectedCase, 'capitalize-first')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              Первое с заглавной
+              {t('caseChangerTool.options.capitalizeFirst')}
             </label>
             <label className="radio-item">
               <input
@@ -241,7 +250,7 @@ const CaseChangerTool: React.FC = () => {
                 onClick={() => handleRadioClick(selectedCase, setSelectedCase, 'capitalize-after-punctuation')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              Первое с заглавной после точки и знаков !?
+              {t('caseChangerTool.options.capitalizeAfterPunctuation')}
             </label>
           </div>
 
@@ -254,7 +263,7 @@ const CaseChangerTool: React.FC = () => {
                     className="exceptions-textarea"
                     value={exceptions}
                     onChange={(e) => setExceptions(e.target.value)}
-                    placeholder="*Введите слова, через новую строку, или запятую, которым НЕ нужно изменять регистр"
+                    placeholder={t('caseChangerTool.exceptions.placeholder')}
                     rows={4}
                   />
                 </div>
@@ -267,7 +276,7 @@ const CaseChangerTool: React.FC = () => {
                   />
                   <button className="transfer-button" onClick={handleTransferWords}>
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Перенести
+                    {t('caseChangerTool.exceptions.transferButton')}
                   </button>
                 </div>
               </div>
@@ -279,11 +288,11 @@ const CaseChangerTool: React.FC = () => {
       {/* Кнопки управления */}
       <div className="control-buttons">
         <button className="action-btn primary" style={{ width: '445px' }} onClick={handleShowResult}>
-          Показать результат
+          {t('caseChangerTool.buttons.showResult')}
         </button>
         <button className="action-btn secondary icon-left" style={{ width: '445px' }} onClick={handleCopyResult}>
           <img src="/icons/button_copy.svg" alt="" />
-          Скопировать результат
+          {t('caseChangerTool.buttons.copyResult')}
         </button>
       </div>
 
@@ -293,7 +302,7 @@ const CaseChangerTool: React.FC = () => {
           className="result-textarea"
           value={outputText}
           readOnly
-          placeholder="Здесь будет результат"
+          placeholder={t('caseChangerTool.resultPlaceholder')}
         />
         <div className="result-controls">
           <span className="result-counter">{countLines(outputText)} стр.</span>
@@ -302,20 +311,20 @@ const CaseChangerTool: React.FC = () => {
 
       {/* SEO блок */}
       <div className="seo-section">
-        <h3>Что такое изменение регистра текста?</h3>
-        <p>Изменение регистра — это преобразование букв в тексте между строчными (маленькими) и прописными (заглавными) буквами. Этот инструмент позволяет быстро привести текст к нужному виду: сделать все буквы строчными, прописными, написать каждое слово с заглавной буквы или применить другие правила форматирования.</p>
+        <h3>{t('caseChangerTool.seo.whatIs')}</h3>
+        <p>{t('caseChangerTool.seo.whatIsText')}</p>
 
-        <h3>Зачем нужно изменение регистра?</h3>
-        <p>Правильный регистр букв важен для создания качественного контента. Он улучшает читаемость текста, делает его более профессиональным и соответствующим стандартам. Изменение регистра часто требуется при подготовке заголовков, обработке данных, форматировании списков или исправлении текстов, написанных с нарушением правил.</p>
+        <h3>{t('caseChangerTool.seo.whyNeed')}</h3>
+        <p>{t('caseChangerTool.seo.whyNeedText')}</p>
 
-        <h3>Какие варианты изменения регистра доступны?</h3>
-        <p>Инструмент поддерживает пять основных режимов: преобразование всех букв в строчные, преобразование в прописные, написание каждого слова с заглавной буквы (с возможностью указать исключения), написание только первой буквы с заглавной, а также автоматическая постановка заглавных букв после точек и восклицательных или вопросительных знаков.</p>
+        <h3>{t('caseChangerTool.seo.whatOptions')}</h3>
+        <p>{t('caseChangerTool.seo.whatOptionsText')}</p>
 
-        <h3>Как работают исключения?</h3>
-        <p>При выборе режима "Каждое С Заглавной" вы можете указать слова-исключения, которые должны остаться строчными. Это полезно для предлогов, союзов и артиклей в заголовках. Просто введите нужные слова в поле исключений — каждое с новой строки или через запятую.</p>
+        <h3>{t('caseChangerTool.seo.howExceptions')}</h3>
+        <p>{t('caseChangerTool.seo.howExceptionsText')}</p>
 
-        <h3>Для кого полезен этот инструмент?</h3>
-        <p>Инструмент будет полезен копирайтерам, редакторам, маркетологам, студентам и всем, кто работает с текстом. Он экономит время при форматировании заголовков, исправлении регистра в больших объемах текста и приведении контента к единообразному виду.</p>
+        <h3>{t('caseChangerTool.seo.whoUseful')}</h3>
+        <p>{t('caseChangerTool.seo.whoUsefulText')}</p>
       </div>
     </div>
   );

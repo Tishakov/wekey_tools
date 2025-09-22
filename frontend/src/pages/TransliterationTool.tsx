@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './TransliterationTool.css';
@@ -7,6 +10,8 @@ import './TransliterationTool.css';
 
 const TOOL_ID = 'transliteration';
 const TransliterationTool: React.FC = () => {
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [launchCount, setLaunchCount] = useState(0);
@@ -120,13 +125,20 @@ const TransliterationTool: React.FC = () => {
 
   return (
     <div className="transliteration-tool">
+      <SEOHead 
+        title={t('transliterationTool.seo.title')}
+        description={t('transliterationTool.seo.description')}
+        keywords={t('transliterationTool.seo.keywords')}
+        ogTitle={t('transliterationTool.seo.ogTitle')}
+        ogDescription={t('transliterationTool.seo.ogDescription')}
+      />
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
-        <Link to="/" className="back-button">
+        <Link to={createLink('')} className="back-button">
           <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
+          {t('navigation.allTools')}
         </Link>
-        <h1 className="tool-title">Транслитерация</h1>
+        <h1 className="tool-title">{t('transliterationTool.title')}</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn" title="Счетчик запусков">
             <img src="/icons/rocket.svg" alt="" />
@@ -149,14 +161,14 @@ const TransliterationTool: React.FC = () => {
             className="input-textarea"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Введите ваш текст…"
+            placeholder={t('transliterationTool.inputPlaceholder')}
           />
           <div className="input-controls">
             <button className="paste-button" onClick={handlePasteText}>
               <img src="/icons/button_paste.svg" alt="" />
-              Вставить
+              {t('transliterationTool.buttons.paste')}
             </button>
-            <span className="line-count">{countLines(inputText)} стр.</span>
+            <span className="line-count">{countLines(inputText)} {t('transliterationTool.lineCount')}</span>
           </div>
         </div>
 
@@ -170,7 +182,7 @@ const TransliterationTool: React.FC = () => {
                 checked={replaceSpaces}
                 onChange={(e) => setReplaceSpaces(e.target.checked)}
               />
-              Заменить пробелы на тире "-"
+              {t('transliterationTool.options.replaceSpaces')}
             </label>
             <label className="checkbox-item">
               <input
@@ -178,7 +190,7 @@ const TransliterationTool: React.FC = () => {
                 checked={removeQuotes}
                 onChange={(e) => setRemoveQuotes(e.target.checked)}
               />
-              Убрать апострофы и кавычки " ' "
+              {t('transliterationTool.options.removeQuotes')}
             </label>
           </div>
 
@@ -193,7 +205,7 @@ const TransliterationTool: React.FC = () => {
                 onClick={() => handleRadioClick(caseOption, setCaseOption, 'lowercase')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              все буквы строчные
+              {t('transliterationTool.options.allLowercase')}
             </label>
             <label className="radio-item">
               <input
@@ -204,7 +216,7 @@ const TransliterationTool: React.FC = () => {
                 onClick={() => handleRadioClick(caseOption, setCaseOption, 'uppercase')}
                 onChange={() => {}} // Пустой onChange чтобы React не ругался
               />
-              ВСЕ БУКВЫ ПРОПИСНЫЕ
+              {t('transliterationTool.options.allUppercase')}
             </label>
           </div>
 
@@ -216,7 +228,7 @@ const TransliterationTool: React.FC = () => {
                 checked={removeDoubleSpaces}
                 onChange={(e) => setRemoveDoubleSpaces(e.target.checked)}
               />
-              Удалить двойные пробелы
+              {t('transliterationTool.options.removeDoubleSpaces')}
             </label>
             <label className="checkbox-item">
               <input
@@ -224,7 +236,7 @@ const TransliterationTool: React.FC = () => {
                 checked={trimEdges}
                 onChange={(e) => setTrimEdges(e.target.checked)}
               />
-              Удалить пробелы в начале и в конце строк
+              {t('transliterationTool.options.removeLeadingTrailingSpaces')}
             </label>
           </div>
         </div>
@@ -233,11 +245,11 @@ const TransliterationTool: React.FC = () => {
       {/* Кнопки управления */}
       <div className="control-buttons">
         <button className="action-btn primary" style={{ width: '445px' }} onClick={handleShowResult}>
-          Показать результат
+          {t('transliterationTool.buttons.showResult')}
         </button>
         <button className="action-btn secondary icon-left" style={{ width: '445px' }} onClick={handleCopyResult}>
           <img src="/icons/button_copy.svg" alt="" />
-          Скопировать результат
+          {t('transliterationTool.buttons.copyResult')}
         </button>
       </div>
 
@@ -247,32 +259,32 @@ const TransliterationTool: React.FC = () => {
           className="result-textarea"
           value={outputText}
           readOnly
-          placeholder="Здесь будет результат"
+          placeholder={t('transliterationTool.resultPlaceholder')}
         />
         <div className="result-controls">
-          <span className="result-counter">{countLines(outputText)} стр.</span>
+          <span className="result-counter">{countLines(outputText)} {t('transliterationTool.lineCount')}</span>
         </div>
       </div>
 
       {/* SEO блок */}
       <div className="seo-section">
-        <h3>Что такое транслитерация?</h3>
-        <p>Транслитерация — это процесс замены букв одного алфавита символами другого, при котором сохраняется звучание слова. Чаще всего речь идёт о переводе кириллических букв в латинские. Такой способ записи позволяет использовать имена, названия или целые тексты там, где кириллица недоступна или неудобна. Онлайн-сервис Wekey Tools упрощает этот процесс, автоматически конвертируя текст в транслит.</p>
+        <h3>{t('transliterationTool.seo.whatIsTransliteration.title')}</h3>
+        <p>{t('transliterationTool.seo.whatIsTransliteration.text')}</p>
 
-        <h3>Зачем нужна транслитерация?</h3>
-        <p>Транслитерация необходима в самых разных сферах. Она применяется при создании доменных имён, URL-адресов и логинов, используется в заполнении международных анкет и документов, помогает адаптировать контент для поисковых систем и социальных сетей. Для специалистов по маркетингу и SEO транслит особенно полезен: он делает ссылки понятными и читаемыми, улучшая восприятие сайта пользователями и поисковиками.</p>
+        <h3>{t('transliterationTool.seo.whyNeeded.title')}</h3>
+        <p>{t('transliterationTool.seo.whyNeeded.text')}</p>
 
-        <h3>Как работает инструмент «Транслитерация»?</h3>
-        <p>Инструмент Wekey Tools автоматически преобразует каждую букву кириллицы в её латинский аналог по стандартным правилам. Вам достаточно вставить текст в поле ввода и нажать кнопку «Показать результат». При необходимости можно задействовать дополнительные опции: менять регистр букв, заменять пробелы на тире, удалять лишние символы или пробелы. Но даже если не выбирать ни одного правила, инструмент всё равно выдаст корректный результат.</p>
+        <h3>{t('transliterationTool.seo.howItWorks.title')}</h3>
+        <p>{t('transliterationTool.seo.howItWorks.text')}</p>
 
-        <h3>Какие тексты можно переводить?</h3>
-        <p>Инструмент подходит для любых кириллических текстов — от отдельных слов до больших абзацев. Он одинаково корректно обрабатывает имена, фамилии, названия брендов, тексты для сайтов и рекламные материалы. При этом результат можно сразу скопировать и использовать в работе.</p>
+        <h3>{t('transliterationTool.seo.whatTexts.title')}</h3>
+        <p>{t('transliterationTool.seo.whatTexts.text')}</p>
 
-        <h3>Чем полезна транслитерация для специалистов?</h3>
-        <p>Для маркетологов, копирайтеров и SEO-специалистов транслитерация — это способ экономить время и избегать ошибок при подготовке текстов. Автоматический конвертер в Wekey Tools делает процесс максимально быстрым и удобным. Достаточно одного клика, чтобы получить латинизированный текст, готовый к использованию в URL-ах, публикациях или документах.</p>
+        <h3>{t('transliterationTool.seo.forSpecialists.title')}</h3>
+        <p>{t('transliterationTool.seo.forSpecialists.text')}</p>
 
-        <h3>Как пользоваться транслитерацией онлайн?</h3>
-        <p>Все просто: введите текст на кириллице, выберите нужные опции или оставьте настройки по умолчанию и нажмите «Показать результат». Сервис мгновенно преобразует ваш текст в транслит, а кнопка «Скопировать результат» позволит тут же перенести его в любое другое приложение.</p>
+        <h3>{t('transliterationTool.seo.howToUse.title')}</h3>
+        <p>{t('transliterationTool.seo.howToUse.text')}</p>
       </div>
     </div>
   );

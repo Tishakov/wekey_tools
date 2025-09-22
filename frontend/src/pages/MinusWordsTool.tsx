@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './MinusWordsTool.css';
 import { statsService } from '../utils/statsService';
@@ -7,6 +8,7 @@ import { statsService } from '../utils/statsService';
 
 const TOOL_ID = 'minus-words';
 const MinusWordsTool: React.FC = () => {
+    const { createLink } = useLocalizedLink();
     // Состояния компонента
     const [inputText, setInputText] = useState('');
     const [words, setWords] = useState<string[]>([]);
@@ -116,7 +118,7 @@ const MinusWordsTool: React.FC = () => {
         <div className="tool-page">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     Все инструменты
                 </Link>

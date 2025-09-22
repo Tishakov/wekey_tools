@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './PasswordGeneratorTool.css';
 
@@ -9,6 +10,7 @@ import './PasswordGeneratorTool.css';
 const TOOL_ID = 'password-generator';
 const PasswordGeneratorTool: React.FC = () => {
     const { common, passwordGenerator } = useToolTranslation();
+    const { createLink } = useLocalizedLink();
     
     // Основные состояния
     const [passwordLength, setPasswordLength] = useState(12);
@@ -163,7 +165,7 @@ const PasswordGeneratorTool: React.FC = () => {
         <div className="password-generator-tool">
             {/* Header инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     {common.backToTools()}
                 </Link>

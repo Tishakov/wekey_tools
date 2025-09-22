@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Data Cleanup</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 50px; 
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button { 
+            padding: 15px 30px; 
+            margin: 10px; 
+            font-size: 18px; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #fff;
+            color: #333;
+            font-weight: bold;
+        }
+        button:hover { background: #f0f0f0; }
+        .success { color: #90EE90; font-size: 20px; }
+        .error { color: #FFB6C1; font-size: 18px; }
+        .info { color: #FFFF99; font-size: 16px; }
+        .warning { color: #FFA500; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Emergency Data Cleanup</h1>
+        <p class="warning">This tool will clear corrupted user data</p>
+        
+        <div id="status"></div>
+        
+        <button onclick="emergencyCleanup()">🧹 Emergency Cleanup</button>
+        <button onclick="checkData()">🔍 Check Data</button>
+        <button onclick="goToApp()">🏠 Go to App</button>
+    </div>
+    
+    <script>
+        function emergencyCleanup() {
+            const status = document.getElementById('status');
+            
+            try {
+                // Clear all localStorage
+                const keys = Object.keys(localStorage);
+                console.log('Clearing localStorage keys:', keys);
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                const sessionKeys = Object.keys(sessionStorage);
+                console.log('Clearing sessionStorage keys:', sessionKeys);
+                sessionStorage.clear();
+                
+                // Clear any wekey-specific data
+                const wekeyKeys = keys.filter(key => key.includes('wekey') || key.includes('visitor') || key.includes('analytics'));
+                console.log('Cleared wekey-specific keys:', wekeyKeys);
+                
+                status.innerHTML = `
+                    <div class="success">
+                        <h3>✅ Emergency Cleanup Complete!</h3>
+                        <p>Cleared ${keys.length} localStorage items</p>
+                        <p>Cleared ${sessionKeys.length} sessionStorage items</p>
+                        <p>Target user: 48adc040-147d-46cd-a1c7-fd44897125bf</p>
+                    </div>
+                `;
+                
+                console.log('Emergency cleanup completed for user: 48adc040-147d-46cd-a1c7-fd44897125bf');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+                console.error('Cleanup error:', error);
+            }
+        }
+        
+        function checkData() {
+            const status = document.getElementById('status');
+            
+            const keys = Object.keys(localStorage);
+            const sessionKeys = Object.keys(sessionStorage);
+            
+            status.innerHTML = `
+                <div class="info">
+                    <h3>📊 Current Storage Status:</h3>
+                    <p><strong>localStorage (${keys.length} items):</strong></p>
+                    <p>${keys.length > 0 ? keys.join(', ') : 'Empty ✅'}</p>
+                    <p><strong>sessionStorage (${sessionKeys.length} items):</strong></p>
+                    <p>${sessionKeys.length > 0 ? sessionKeys.join(', ') : 'Empty ✅'}</p>
+                </div>
+            `;
+        }
+        
+        function goToApp() {
+            window.location.href = 'http://localhost:5173/ru/';
+        }
+        
+        // Auto-check on load
+        window.onload = function() {
+            checkData();
+            
+            // Show immediate warning if we detect problematic data
+            const keys = Object.keys(localStorage);
+            const hasProblematicData = keys.some(key => {
+                try {
+                    const value = localStorage.getItem(key);
+                    return value && value.includes('48adc040-147d-46cd-a1c7-fd44897125bf');
+                } catch {
+                    return false;
+                }
+            });
+            
+            if (hasProblematicData) {
+                document.getElementById('status').innerHTML += `
+                    <div class="warning">
+                        <h3>⚠️ Problematic Data Detected!</h3>
+                        <p>Found data for corrupted user ID</p>
+                        <p>Click "Emergency Cleanup" to fix</p>
+                    </div>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>

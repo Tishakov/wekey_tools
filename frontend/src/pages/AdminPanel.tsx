@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
-import AdminDashboard from '../components/admin/AdminDashboard';
 import AdminTools from '../components/admin/AdminTools';
 import AdminUsers from '../components/admin/AdminUsers';
 import AdminFinance from '../components/admin/AdminFinance';
@@ -17,30 +16,12 @@ import type { HistoricalDataPoint } from '../services/historicalAnalyticsService
 import { getToolName } from '../utils/toolsRegistry';
 import './AdminPanel.css';
 
-interface AdminData {
-  success: boolean;
-  stats: {
-    totalUsage: number;
-    users: {
-      totalUsers: number;
-      activeToday: number;
-      newThisWeek: number;
-    };
-    toolUsage: Array<{
-      toolName: string;
-      usageCount: number;
-      lastUsed: string;
-    }>;
-  };
-}
-
 const AdminPanel: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [adminData, setAdminData] = useState<AdminData | null>(null);
   const [periodStats, setPeriodStats] = useState<{
     totalUsage: number;
     uniqueUsers: number;
@@ -289,9 +270,6 @@ const AdminPanel: React.FC = () => {
         throw new Error('Токен авторизации не найден');
       }
 
-      // Определяем, нужно ли включить или отключить все
-      const hasActiveTools = Array.isArray(tools) && tools.some(tool => tool.isActive);
-      
       // Переключаем все инструменты
       const togglePromises = tools.map(tool => 
         fetch(`http://localhost:8880/api/tools/${tool.id}/toggle`, {
@@ -400,8 +378,8 @@ const AdminPanel: React.FC = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setAdminData(data);
+        await response.json();
+        // adminData удален как неиспользуемый
       } else {
         setError('Ошибка загрузки данных');
       }
@@ -414,7 +392,6 @@ const AdminPanel: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     setIsLoggedIn(false);
-    setAdminData(null);
     setEmail('');
     setPassword('');
   };
@@ -724,7 +701,6 @@ const AdminPanel: React.FC = () => {
                             <MiniBarChart 
                               value={tool.usageCount}
                               maxValue={maxUsage}
-                              color="#3b82f6"
                               height={10}
                             />
                           </td>

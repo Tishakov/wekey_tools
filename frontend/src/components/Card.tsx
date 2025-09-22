@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import './Card.css';
 
 interface CardProps {
@@ -10,10 +11,11 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ title, icon, path }) => {
+  const { createLink } = useLocalizedLink();
   const isEmojiIcon = !icon.includes('.svg');
   
   return (
-    <Link to={path} className="card">
+    <Link to={createLink(path)} className="card">
       <div className="card-icon">
         {isEmojiIcon ? (
           icon

@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
+import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './DuplicateFinderTool.css';
 
 
 const TOOL_ID = 'duplicate-finder';
 const DuplicateFinderTool: React.FC = () => {
+    const { t } = useTranslation();
+    const { createLink } = useLocalizedLink();
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
     const [caseSensitive, setCaseSensitive] = useState(false);
@@ -155,13 +160,20 @@ const DuplicateFinderTool: React.FC = () => {
 
     return (
         <div className="duplicate-finder-tool">
+            <SEOHead 
+                title={t('duplicateFinderTool.seo.title')}
+                description={t('duplicateFinderTool.seo.description')}
+                keywords={t('duplicateFinderTool.seo.keywords')}
+                ogTitle={t('duplicateFinderTool.seo.ogTitle')}
+                ogDescription={t('duplicateFinderTool.seo.ogDescription')}
+            />
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('common.allTools')}
                 </Link>
-                <h1 className="tool-title">Поиск дубликатов</h1>
+                <h1 className="tool-title">{t('duplicateFinderTool.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -184,14 +196,14 @@ const DuplicateFinderTool: React.FC = () => {
                         <div className="input-field">
                             <textarea
                                 className="input-textarea"
-                                placeholder="Ваш список 1..."
+                                placeholder={t('duplicateFinderTool.list1Placeholder')}
                                 value={inputText1}
                                 onChange={(e) => setInputText1(e.target.value)}
                             />
                             <div className="input-controls">
                                 <button className="paste-button" onClick={handlePaste1}>
                                     <img src="/icons/button_paste.svg" alt="" />
-                                    Вставить
+                                    {t('common.paste')}
                                 </button>
                                 <label className="checkbox-item">
                                     <input
@@ -199,25 +211,25 @@ const DuplicateFinderTool: React.FC = () => {
                                         checked={caseSensitive}
                                         onChange={(e) => setCaseSensitive(e.target.checked)}
                                     />
-                                    <span className="checkbox-text">С учетом регистра</span>
+                                    <span className="checkbox-text">{t('duplicateFinderTool.caseSensitive')}</span>
                                 </label>
-                                <span className="info">{inputLines1} стр.</span>
+                                <span className="info">{inputLines1} {t('common.lineCount')}</span>
                             </div>
                         </div>
                         
                         <div className="input-field">
                             <textarea
                                 className="input-textarea"
-                                placeholder="Ваш список 2..."
+                                placeholder={t('duplicateFinderTool.list2Placeholder')}
                                 value={inputText2}
                                 onChange={(e) => setInputText2(e.target.value)}
                             />
                             <div className="input-controls">
                                 <button className="paste-button" onClick={handlePaste2}>
                                     <img src="/icons/button_paste.svg" alt="" />
-                                    Вставить
+                                    {t('common.paste')}
                                 </button>
-                                <span className="info">{inputLines2} стр.</span>
+                                <span className="info">{inputLines2} {t('common.lineCount')}</span>
                             </div>
                         </div>
                     </div>
@@ -231,7 +243,7 @@ const DuplicateFinderTool: React.FC = () => {
                     style={{ width: '445px' }} 
                     onClick={handleShowResult}
                 >
-                    Показать результат
+                    {t('duplicateFinderTool.buttons.find')}
                 </button>
                 
                 <button 
@@ -241,7 +253,7 @@ const DuplicateFinderTool: React.FC = () => {
                     disabled={!common}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied2 ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied2 ? t('duplicateFinderTool.buttons.copied') : t('duplicateFinderTool.buttons.copyCommon')}
                 </button>
             </div>
 
@@ -251,15 +263,15 @@ const DuplicateFinderTool: React.FC = () => {
                     {/* Колонка 1: Не пересекаются со вторым */}
                     <div className="result-column">
                         <div className="settings-group">
-                            <div className="connector-label">Не пересекаются с 2-м</div>
+                            <div className="connector-label">{t('duplicateFinderTool.results.uniqueInList1')}</div>
                             <textarea
                                 className="result-textarea"
-                                placeholder="Здесь будет результат"
+                                placeholder={t('common.resultPlaceholder')}
                                 value={onlyInFirst}
                                 readOnly
                             />
                             <div className="result-controls">
-                                <span className="result-counter">{resultLines1} стр.</span>
+                                <span className="result-counter">{resultLines1} {t('duplicateFinderTool.results.elementsCount')}</span>
                             </div>
                         </div>
                         <button 
@@ -268,22 +280,22 @@ const DuplicateFinderTool: React.FC = () => {
                             disabled={!onlyInFirst}
                         >
                             <img src="/icons/button_copy.svg" alt="" />
-                            {copied1 ? 'Скопировано!' : 'Скопировать результат'}
+                            {copied1 ? t('duplicateFinderTool.buttons.copied') : t('duplicateFinderTool.buttons.copyUnique1')}
                         </button>
                     </div>
 
                     {/* Колонка 2: Общие для двух списков */}
                     <div className="result-column">
                         <div className="settings-group">
-                            <div className="connector-label">Общие для двух списков</div>
+                            <div className="connector-label">{t('duplicateFinderTool.results.common')}</div>
                             <textarea
                                 className="result-textarea"
-                                placeholder="Здесь будет результат"
+                                placeholder={t('common.resultPlaceholder')}
                                 value={common}
                                 readOnly
                             />
                             <div className="result-controls">
-                                <span className="result-counter">{resultLines2} стр.</span>
+                                <span className="result-counter">{resultLines2} {t('duplicateFinderTool.results.elementsCount')}</span>
                             </div>
                         </div>
                         <button 
@@ -292,22 +304,22 @@ const DuplicateFinderTool: React.FC = () => {
                             disabled={!common}
                         >
                             <img src="/icons/button_copy.svg" alt="" />
-                            {copied2 ? 'Скопировано!' : 'Скопировать результат'}
+                            {copied2 ? t('duplicateFinderTool.buttons.copied') : t('duplicateFinderTool.buttons.copyCommon')}
                         </button>
                     </div>
 
                     {/* Колонка 3: Не пересекаются с первым */}
                     <div className="result-column">
                         <div className="settings-group">
-                            <div className="connector-label">Не пересекаются с 1-м</div>
+                            <div className="connector-label">{t('duplicateFinderTool.results.uniqueInList2')}</div>
                             <textarea
                                 className="result-textarea"
-                                placeholder="Здесь будет результат"
+                                placeholder={t('common.resultPlaceholder')}
                                 value={onlyInSecond}
                                 readOnly
                             />
                             <div className="result-controls">
-                                <span className="result-counter">{resultLines3} стр.</span>
+                                <span className="result-counter">{resultLines3} {t('duplicateFinderTool.results.elementsCount')}</span>
                             </div>
                         </div>
                         <button 
@@ -316,10 +328,31 @@ const DuplicateFinderTool: React.FC = () => {
                             disabled={!onlyInSecond}
                         >
                             <img src="/icons/button_copy.svg" alt="" />
-                            {copied3 ? 'Скопировано!' : 'Скопировать результат'}
+                            {copied3 ? t('duplicateFinderTool.buttons.copied') : t('duplicateFinderTool.buttons.copyUnique2')}
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* SEO-блок с описанием возможностей инструмента */}
+            <div className="seo-section">
+                <h2>{t('duplicateFinderTool.seo.whatIsDuplicateFinding.title')}</h2>
+                <p>{t('duplicateFinderTool.seo.whatIsDuplicateFinding.text')}</p>
+                
+                <h3>{t('duplicateFinderTool.seo.whenToUse.title')}</h3>
+                <p>{t('duplicateFinderTool.seo.whenToUse.text')}</p>
+                
+                <h3>{t('duplicateFinderTool.seo.howItWorks.title')}</h3>
+                <p>{t('duplicateFinderTool.seo.howItWorks.text')}</p>
+                
+                <h3>{t('duplicateFinderTool.seo.benefits.title')}</h3>
+                <p>{t('duplicateFinderTool.seo.benefits.text')}</p>
+                
+                <h3>{t('duplicateFinderTool.seo.forSpecialists.title')}</h3>
+                <p>{t('duplicateFinderTool.seo.forSpecialists.text')}</p>
+                
+                <h3>{t('duplicateFinderTool.seo.howToUse.title')}</h3>
+                <p>{t('duplicateFinderTool.seo.howToUse.text')}</p>
             </div>
         </div>
     );

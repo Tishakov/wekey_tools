@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { statsService } from '../utils/statsService';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import './WordGluingTool.css';
 
 
 const TOOL_ID = 'word-gluing';
 const WordGluingTool: React.FC = () => {
+    const { createLink } = useLocalizedLink();
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
     const [result, setResult] = useState('');
@@ -158,7 +160,7 @@ const WordGluingTool: React.FC = () => {
         <div className="word-gluing-tool">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     Все инструменты
                 </Link>

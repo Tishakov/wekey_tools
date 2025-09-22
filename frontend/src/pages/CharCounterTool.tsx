@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './CharCounterTool.css';
@@ -20,6 +21,7 @@ interface CountStats {
 
 const CharCounterTool: React.FC = () => {
     const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [exceptions, setExceptions] = useState('');
     const [launchCount, setLaunchCount] = useState(0);
@@ -192,7 +194,7 @@ const CharCounterTool: React.FC = () => {
         <div className="char-counter-tool">
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
                     {t('navigation.allTools')}
                 </Link>

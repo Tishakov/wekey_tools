@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './EmptyLinesRemovalTool.css';
@@ -7,6 +10,8 @@ import './EmptyLinesRemovalTool.css';
 
 const TOOL_ID = 'remove-empty-lines';
 const EmptyLinesRemovalTool: React.FC = () => {
+    const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -161,13 +166,20 @@ const EmptyLinesRemovalTool: React.FC = () => {
 
     return (
         <div className="empty-lines-removal-tool">
+            <SEOHead 
+                title={t('emptyLinesRemovalTool.seo.title')}
+                description={t('emptyLinesRemovalTool.seo.description')}
+                keywords={t('emptyLinesRemovalTool.seo.keywords')}
+                ogTitle={t('emptyLinesRemovalTool.seo.ogTitle')}
+                ogDescription={t('emptyLinesRemovalTool.seo.ogDescription')}
+            />
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
-                <Link to="/" className="back-button">
+                <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('navigation.allTools')}
                 </Link>
-                <h1 className="tool-title">Удаление пустых строк</h1>
+                <h1 className="tool-title">{t('emptyLinesRemovalTool.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -188,16 +200,16 @@ const EmptyLinesRemovalTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('emptyLinesRemovalTool.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('emptyLinesRemovalTool.buttons.paste')}
                         </button>
-                        <span className="info">{inputLines} стр.</span>
+                        <span className="info">{inputLines} {t('emptyLinesRemovalTool.lineCount')}</span>
                     </div>
                 </div>
 
@@ -211,7 +223,7 @@ const EmptyLinesRemovalTool: React.FC = () => {
                                 checked={removeEmptyLines}
                                 onChange={(e) => setRemoveEmptyLines(e.target.checked)}
                             />
-                            <span className="checkbox-text">Удалить пустые строки</span>
+                            <span className="checkbox-text">{t('emptyLinesRemovalTool.options.removeEmptyLines')}</span>
                         </label>
                     </div>
 
@@ -226,12 +238,12 @@ const EmptyLinesRemovalTool: React.FC = () => {
                                 onClick={() => handleRadioClick('removeContains')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">Удалить строки, которые содержат</span>
+                            <span className="checkbox-text">{t('emptyLinesRemovalTool.options.removeContains')}</span>
                         </label>
                         <div className="filter-controls">
                             <textarea
                                 className="filter-input"
-                                placeholder="Введите слова, через новую строку, или запятую"
+                                placeholder={t('emptyLinesRemovalTool.filterPlaceholder')}
                                 value={containsFilter}
                                 onChange={(e) => setContainsFilter(e.target.value)}
                                 disabled={filterOption !== 'removeContains'}
@@ -240,10 +252,10 @@ const EmptyLinesRemovalTool: React.FC = () => {
                                 className="filter-paste-button" 
                                 onClick={handlePasteContains} 
                                 disabled={filterOption !== 'removeContains'}
-                                title="Вставить"
+                                title={t('emptyLinesRemovalTool.buttons.paste')}
                             >
                                 <img src="/icons/button_paste.svg" alt="" />
-                                Вставить
+                                {t('emptyLinesRemovalTool.buttons.paste')}
                             </button>
                         </div>
                     </div>
@@ -259,12 +271,12 @@ const EmptyLinesRemovalTool: React.FC = () => {
                                 onClick={() => handleRadioClick('removeNotContains')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">Удалить строки, которые НЕ содержат</span>
+                            <span className="checkbox-text">{t('emptyLinesRemovalTool.options.removeNotContains')}</span>
                         </label>
                         <div className="filter-controls">
                             <textarea
                                 className="filter-input"
-                                placeholder="Введите слова, через новую строку, или запятую"
+                                placeholder={t('emptyLinesRemovalTool.filterPlaceholder')}
                                 value={notContainsFilter}
                                 onChange={(e) => setNotContainsFilter(e.target.value)}
                                 disabled={filterOption !== 'removeNotContains'}
@@ -273,10 +285,10 @@ const EmptyLinesRemovalTool: React.FC = () => {
                                 className="filter-paste-button" 
                                 onClick={handlePasteNotContains} 
                                 disabled={filterOption !== 'removeNotContains'}
-                                title="Вставить"
+                                title={t('emptyLinesRemovalTool.buttons.paste')}
                             >
                                 <img src="/icons/button_paste.svg" alt="" />
-                                Вставить
+                                {t('emptyLinesRemovalTool.buttons.paste')}
                             </button>
                         </div>
                     </div>
@@ -291,7 +303,7 @@ const EmptyLinesRemovalTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim() || (!removeEmptyLines && !filterOption)}
                 >
-                    Показать результат
+                    {t('emptyLinesRemovalTool.buttons.showResult')}
                 </button>
 
                 <button 
@@ -301,7 +313,7 @@ const EmptyLinesRemovalTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('emptyLinesRemovalTool.buttons.copied') : t('emptyLinesRemovalTool.buttons.copyResult')}
                 </button>
             </div>
 
@@ -309,13 +321,34 @@ const EmptyLinesRemovalTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('emptyLinesRemovalTool.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('emptyLinesRemovalTool.lineCount')}</span>
                 </div>
+            </div>
+
+            {/* SEO блок */}
+            <div className="seo-section">
+                <h3>{t('emptyLinesRemovalTool.seo.whatIsEmptyLinesRemoval.title')}</h3>
+                <p>{t('emptyLinesRemovalTool.seo.whatIsEmptyLinesRemoval.text')}</p>
+
+                <h3>{t('emptyLinesRemovalTool.seo.whyNeeded.title')}</h3>
+                <p>{t('emptyLinesRemovalTool.seo.whyNeeded.text')}</p>
+
+                <h3>{t('emptyLinesRemovalTool.seo.howItWorks.title')}</h3>
+                <p>{t('emptyLinesRemovalTool.seo.howItWorks.text')}</p>
+
+                <h3>{t('emptyLinesRemovalTool.seo.whatCanFilter.title')}</h3>
+                <p>{t('emptyLinesRemovalTool.seo.whatCanFilter.text')}</p>
+
+                <h3>{t('emptyLinesRemovalTool.seo.forSpecialists.title')}</h3>
+                <p>{t('emptyLinesRemovalTool.seo.forSpecialists.text')}</p>
+
+                <h3>{t('emptyLinesRemovalTool.seo.howToUse.title')}</h3>
+                <p>{t('emptyLinesRemovalTool.seo.howToUse.text')}</p>
             </div>
         </div>
     );

@@ -22,6 +22,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Форсируем ререндер при смене языка
   const [, forceUpdate] = useState({});
   
+  // Принудительная синхронизация языка из URL
+  useEffect(() => {
+    if (currentLanguage && i18n.language !== currentLanguage) {
+      console.log('🔄 [Layout] Forcing language sync:', i18n.language, '→', currentLanguage);
+      i18n.changeLanguage(currentLanguage);
+    }
+  }, [currentLanguage, i18n]);
+  
   useEffect(() => {
     // Форсируем ререндер при смене языка i18n
     const handleLanguageChange = () => {

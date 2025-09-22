@@ -105,7 +105,10 @@
     "upload": "Upload",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "allTools": "All Tools",
+    "lineCount": "lines",
+    "resultPlaceholder": "Result will be here"
   },
   "passwordGenerator": {
     "title": "Password Generator",
@@ -136,37 +139,140 @@
     "inputText": "Enter source text:"
   },
   "emojiTool": {
-    "title": "Add Emoji",
-    "inputText": "Enter text:",
-    "emojiPosition": "Emoji Position:",
-    "positions": {
-      "before": "Before word",
-      "after": "After word",
-      "random": "Random"
+    "title": "Emoji",
+    "description": "Add emojis to text with convenient search and categories",
+    "keywords": "emoji, emojis, smileys, symbols, unicode, add emoji",
+    "inputPlaceholder": "Enter text or add emojis...",
+    "searchPlaceholder": "Search emojis among {{count}}...",
+    "categories": {
+      "all": "All",
+      "activities": "Activities",
+      "animals": "Animals",
+      "gestures": "Gestures",
+      "food": "Food",
+      "faces": "Faces",
+      "medicine": "Medicine",
+      "music": "Music",
+      "objects": "Objects",
+      "clothes": "Clothes",
+      "education": "Education",
+      "weather": "Weather",
+      "nature": "Nature",
+      "jobs": "Jobs",
+      "travel": "Travel",
+      "hearts": "Hearts",
+      "symbols": "Symbols",
+      "tech": "Technology",
+      "transport": "Transport",
+      "flags": "Flags"
     },
-    "emojiCount": "Emojis per word:",
-    "selectEmoji": "Select emoji:"
+    "buttons": {
+      "copyResult": "Copy Result"
+    }
   },
   "caseChangerTool": {
     "title": "Case Changer",
-    "inputText": "Enter text:",
+    "description": "Change text case",
+    "inputPlaceholder": "Enter your text…",
     "options": {
-      "lowercase": "Lowercase",
-      "uppercase": "Uppercase",
-      "titleCase": "Title Case",
-      "sentenceCase": "Sentence Case",
-      "alternateCase": "Alternate Case",
-      "inverseCase": "Inverse Case"
+      "lowercase": "all lowercase",
+      "uppercase": "ALL UPPERCASE",
+      "capitalizeEach": "Capitalize Each Word*",
+      "capitalizeFirst": "Capitalize first word",
+      "capitalizeAfterPunctuation": "Capitalize after periods and !? marks"
+    },
+    "exceptions": {
+      "placeholder": "*Enter words, one per line or comma-separated, that should NOT be capitalized",
+      "transferButton": "Transfer"
+    },
+    "buttons": {
+      "showResult": "Show Result",
+      "copyResult": "Copy Result",
+      "paste": "Paste"
+    },
+    "resultPlaceholder": "Result will appear here",
+    "seo": {
+      "whatIs": "What is text case conversion?",
+      "whatIsText": "Case conversion is the transformation of letters in text between lowercase (small) and uppercase (capital) letters. This tool allows you to quickly format text to the desired style: make all letters lowercase, uppercase, capitalize each word, or apply other formatting rules.",
+      "whyNeed": "Why do you need case conversion?",
+      "whyNeedText": "Proper letter case is important for creating quality content. It improves text readability, makes it more professional and compliant with standards. Case conversion is often required when preparing headlines, processing data, formatting lists, or correcting texts written with rule violations.",
+      "whatOptions": "What case conversion options are available?",
+      "whatOptionsText": "The tool supports five main modes: converting all letters to lowercase, converting to uppercase, capitalizing each word (with the ability to specify exceptions), capitalizing only the first letter, and automatically capitalizing letters after periods and exclamation or question marks.",
+      "howExceptions": "How do exceptions work?",
+      "howExceptionsText": "When selecting \"Capitalize Each Word\" mode, you can specify exception words that should remain lowercase. This is useful for prepositions, conjunctions, and articles in titles. Simply enter the needed words in the exceptions field — one per line or comma-separated.",
+      "whoUseful": "Who will find this tool useful?",
+      "whoUsefulText": "The tool will be useful for copywriters, editors, marketers, students, and anyone working with text. It saves time when formatting headlines, correcting case in large volumes of text, and bringing content to a uniform appearance."
     }
   },
   "findReplaceTool": {
     "title": "Find & Replace",
-    "inputText": "Enter text:",
-    "findText": "Find:",
-    "replaceText": "Replace with:",
+    "description": "Search and replace text",
+    "inputPlaceholder": "Enter or paste your text here...",
+    "searchPlaceholder": "What to replace... (multiple on new lines)",
+    "replacePlaceholder": "Replace with...",
     "caseSensitive": "Case sensitive",
-    "replaceAll": "Replace all",
-    "matchCount": "Matches found:"
+    "modes": {
+      "empty": "Replace with empty",
+      "paragraph": "Replace with paragraph"
+    },
+    "buttons": {
+      "replace": "Replace",
+      "copy": "Copy Result",
+      "copied": "Copied!",
+      "paste": "Paste"
+    },
+    "resultPlaceholder": "Result will appear here"
+  },
+  "transliterationTool": {
+    "title": "Transliteration",
+    "description": "Convert Cyrillic to Latin",
+    "inputPlaceholder": "Enter your text…",
+    "options": {
+      "replaceSpaces": "Replace spaces with dashes \"-\"",
+      "removeQuotes": "Remove apostrophes and quotes \" ' \"",
+      "allLowercase": "all letters lowercase",
+      "allUppercase": "ALL LETTERS UPPERCASE",
+      "removeDoubleSpaces": "Remove double spaces",
+      "removeLeadingTrailingSpaces": "Remove spaces at the beginning and end of lines"
+    },
+    "buttons": {
+      "showResult": "Show Result",
+      "copyResult": "Copy Result",
+      "paste": "Paste"
+    },
+    "resultPlaceholder": "Result will appear here",
+    "lineCount": "lines",
+    "seo": {
+      "title": "Online Text Transliteration - Wekey Tools",
+      "description": "Fast Cyrillic to Latin conversion online. Transliteration with additional options: space replacement, case conversion, text cleanup.",
+      "keywords": "transliteration, cyrillic to latin, online transliteration, letter conversion, text conversion",
+      "ogTitle": "Transliteration - Wekey Tools",
+      "ogDescription": "Convert Cyrillic text to Latin letters with additional formatting options",
+      "whatIsTransliteration": {
+        "title": "What is transliteration?",
+        "text": "Transliteration is the process of replacing letters of one alphabet with symbols of another, while preserving the pronunciation of the word. Most often, it refers to converting Cyrillic letters to Latin. This method of writing allows you to use names, titles, or entire texts where Cyrillic is unavailable or inconvenient. The online Wekey Tools service simplifies this process by automatically converting text to transliteration."
+      },
+      "whyNeeded": {
+        "title": "Why is transliteration needed?",
+        "text": "Transliteration is necessary in various fields. It's used when creating domain names, URLs, and usernames, in filling out international forms and documents, helps adapt content for search engines and social networks. For marketing and SEO specialists, transliteration is especially useful: it makes links understandable and readable, improving the perception of the site by users and search engines."
+      },
+      "howItWorks": {
+        "title": "How does the \"Transliteration\" tool work?",
+        "text": "The Wekey Tools automatically converts each Cyrillic letter to its Latin equivalent according to standard rules. You just need to paste text into the input field and click the \"Show Result\" button. If necessary, you can use additional options: change letter case, replace spaces with dashes, remove extra characters or spaces. But even if you don't select any rules, the tool will still produce a correct result."
+      },
+      "whatTexts": {
+        "title": "What texts can be translated?",
+        "text": "The tool is suitable for any Cyrillic texts — from individual words to large paragraphs. It equally correctly processes names, surnames, brand names, website texts, and advertising materials. The result can be immediately copied and used in work."
+      },
+      "forSpecialists": {
+        "title": "How is transliteration useful for specialists?",
+        "text": "For marketers, copywriters, and SEO specialists, transliteration is a way to save time and avoid errors when preparing texts. The automatic converter in Wekey Tools makes the process as fast and convenient as possible. One click is enough to get Latinized text ready for use in URLs, publications, or documents."
+      },
+      "howToUse": {
+        "title": "How to use online transliteration?",
+        "text": "It's simple: enter text in Cyrillic, select the necessary options or leave the default settings and click \"Show Result\". The service instantly converts your text to transliteration, and the \"Copy Result\" button allows you to immediately transfer it to any other application."
+      }
+    }
   },
   "letterCounterTool": {
     "title": "Character Counter",
@@ -216,6 +322,489 @@
     "inputText": "Enter text:",
     "duplicatesFound": "Duplicates found:",
     "duplicatesRemoved": "Duplicates removed"
+  },
+  "emptyLinesRemovalTool": {
+    "title": "Empty Lines Removal",
+    "description": "Remove empty lines and filter text content",
+    "inputPlaceholder": "Enter your text...",
+    "options": {
+      "removeEmptyLines": "Remove empty lines",
+      "removeContains": "Remove lines that contain",
+      "removeNotContains": "Remove lines that DO NOT contain"
+    },
+    "filterPlaceholder": "Enter words, separated by new line or comma",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show Result",
+      "copyResult": "Copy Result",
+      "copied": "Copied!"
+    },
+    "resultPlaceholder": "Result will appear here",
+    "lineCount": "lines",
+    "seo": {
+      "title": "Remove Empty Lines Online - Wekey Tools",
+      "description": "Fast empty lines removal and text filtering by content. Powerful tool for cleaning and processing text data.",
+      "keywords": "remove empty lines, text filtering, text cleanup, line processing, text editor",
+      "ogTitle": "Empty Lines Removal - Wekey Tools",
+      "ogDescription": "Remove empty lines and filter text by content with our online tool",
+      "whatIsEmptyLinesRemoval": {
+        "title": "What is empty lines removal?",
+        "text": "Empty lines removal is the process of cleaning text from unnecessary line breaks and spaces that may appear when copying from different sources. This tool also allows filtering lines by content, removing or keeping only those lines that contain specific words or phrases."
+      },
+      "whyNeeded": {
+        "title": "Why remove empty lines?",
+        "text": "Empty lines often appear when copying text from various sources: web pages, documents, tables. They clutter the text and can interfere with further data processing. Removing empty lines makes text more compact and convenient for analysis, especially when working with large data arrays."
+      },
+      "howItWorks": {
+        "title": "How does the tool work?",
+        "text": "The tool offers several operating modes: simple empty line removal, removing lines containing specific words, or removing lines NOT containing specific words. You can enter keywords separated by commas or on new lines. The tool processes text instantly and shows the number of lines before and after processing."
+      },
+      "whatCanFilter": {
+        "title": "What types of filtering are available?",
+        "text": "The tool supports three types of filtering: removing empty lines, removing lines containing specified words, and removing lines NOT containing specified words. This allows you to quickly extract the needed information from large texts or conversely, clean text from unwanted elements."
+      },
+      "forSpecialists": {
+        "title": "Who will find this tool useful?",
+        "text": "The tool is especially useful for data analysts, copywriters, SEO specialists, and anyone working with text data. It will help quickly clean keyword lists, process data from tables, prepare content for publication, or extract needed information from large texts."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste your text into the input field, select the needed processing type: remove empty lines or set up content filtering. When using filters, specify keywords separated by commas or on separate lines. Click \"Show Result\" and copy the processed text."
+      }
+    }
+  },
+  "addSymbolTool": {
+    "title": "Add Symbol",
+    "description": "Add symbols to the beginning, end, or both places of lines",
+    "inputPlaceholder": "Enter or paste your text here...",
+    "symbolPlaceholder": "Enter your symbol before each word...",
+    "options": {
+      "addToStart": "Only to the beginning of line",
+      "addToEnd": "Only to the end of line",
+      "addToBoth": "To both beginning and end of line"
+    },
+    "exceptionsPlaceholder": "Enter words separated by new line or comma, to which you do NOT want to add this symbol",
+    "buttons": {
+      "paste": "Paste",
+      "transfer": "Transfer",
+      "showResult": "Show Result",
+      "copyResult": "Copy Result",
+      "copied": "Copied!"
+    },
+    "resultPlaceholder": "Result will appear here",
+    "lineCount": "lines",
+    "seo": {
+      "title": "Add Symbols to Lines Online - Wekey Tools",
+      "description": "Fast addition of symbols to the beginning, end, or both places of text lines. Tool with exceptions support and batch processing.",
+      "keywords": "add symbols, prefix suffix, line processing, text editing, batch processing",
+      "ogTitle": "Add Symbols - Wekey Tools",
+      "ogDescription": "Add symbols to text lines with exceptions support and various placement modes",
+      "whatIsSymbolAdding": {
+        "title": "What is adding symbols to lines?",
+        "text": "Adding symbols to lines is the process of automatically placing selected symbols or text at the beginning, end, or both places of each line of text. This tool is useful for formatting lists, adding prefixes and suffixes, creating bulleted lists, or preparing data for further processing."
+      },
+      "whyNeeded": {
+        "title": "Why add symbols to lines?",
+        "text": "Adding symbols to lines is often required when working with data: creating lists with markers, adding numbers, formatting code, preparing content for CMS, creating SQL queries from value lists. Instead of manually editing each line, this tool allows you to perform the operation instantly for the entire text."
+      },
+      "howItWorks": {
+        "title": "How does the symbol addition tool work?",
+        "text": "The tool offers three operating modes: adding only to the beginning of the line, only to the end, or to both places simultaneously. You can specify any symbols to add and set exception words to which symbols will not be added. There's a ready-made set of service words that can be quickly transferred to the exceptions list."
+      },
+      "whatCanProcess": {
+        "title": "What types of processing are available?",
+        "text": "The tool supports adding any symbols: punctuation marks, brackets, quotes, numbers, list markers, HTML tags, and much more. You can add both single symbols and entire phrases. The exceptions system allows skipping certain words, which is especially useful when working with service words or special terms."
+      },
+      "forSpecialists": {
+        "title": "Who will find this tool useful?",
+        "text": "The tool is especially useful for web developers, content managers, data analysts, copywriters, and anyone working with text lists. It will help quickly create bulleted lists, add HTML tags, prepare data for databases, format code, or create structured content."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste your text into the input field, specify the symbols you want to add, choose the placement mode (beginning, end, or both places). If necessary, add exception words or use the ready-made set of service words. Click \"Show Result\" and copy the processed text."
+      }
+    }
+  },
+  "duplicateFinderTool": {
+    "title": "Duplicate Finder",
+    "description": "Compare two lists to find unique and common elements",
+    "list1Placeholder": "List 1: Paste your first list here...",
+    "list2Placeholder": "List 2: Paste your second list here...",
+    "caseSensitive": "Case sensitive",
+    "buttons": {
+      "find": "Find Duplicates",
+      "copyUnique1": "Copy unique from list 1",
+      "copyCommon": "Copy common",
+      "copyUnique2": "Copy unique from list 2",
+      "copied": "Copied!"
+    },
+    "results": {
+      "uniqueInList1": "Unique in list 1",
+      "common": "Common elements",
+      "uniqueInList2": "Unique in list 2",
+      "elementsCount": "elements"
+    },
+    "seo": {
+      "title": "Duplicate Finder Tool Online - Wekey Tools",
+      "description": "Free comparison of two lists to find unique and common elements. Tool with case sensitivity and detailed analytics.",
+      "keywords": "duplicate finder, list comparison, unique elements, common elements, data analysis",
+      "ogTitle": "Duplicate Finder - Wekey Tools",
+      "ogDescription": "Quick comparison of two lists to identify unique and common elements",
+      "whatIsDuplicateFinding": {
+        "title": "What is duplicate finding in lists?",
+        "text": "Duplicate finding is the process of comparing two data lists to identify unique elements in each list and common elements between them. The tool automatically analyzes both lists and provides detailed information about differences and similarities, helping with data analysis and decision-making."
+      },
+      "whenToUse": {
+        "title": "When to use duplicate finder?",
+        "text": "The tool is essential when comparing customer lists, analyzing keywords, checking databases for matches, comparing inventory, competitor analysis, or working with any list data. It helps quickly identify overlaps, find unique elements, and optimize workflows."
+      },
+      "howItWorks": {
+        "title": "How does list comparison work?",
+        "text": "The tool compares two uploaded lists line by line, automatically removing empty lines and optionally considering character case. Results are presented in three columns: elements unique to the first list, common elements, and elements unique to the second list with count for each category."
+      },
+      "benefits": {
+        "title": "Benefits of online duplicate finding",
+        "text": "Fast processing of large lists, clear presentation of results in three columns, ability to consider or ignore case, instant copying of results, counting elements in each category, and complete privacy - all data is processed locally in the browser."
+      },
+      "forSpecialists": {
+        "title": "Who will find this tool useful?",
+        "text": "The tool is especially useful for data analysts, sales managers, marketers, database administrators, SEO specialists, and anyone working with list data. It will help quickly analyze customer databases, compare product lists, find keyword intersections, or identify unique elements for various business tasks."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste the first list in the left field, the second list in the right field. If necessary, enable case sensitivity option for precise comparison. Click \"Find Duplicates\" and get results in three columns. Use copy buttons to quickly save the needed data."
+      }
+    }
+  },
+  "utmGeneratorTool": {
+    "title": "UTM Generator",
+    "description": "Create UTM tags for tracking advertising campaign effectiveness",
+    "navigation": {
+      "allTools": "All tools"
+    },
+    "tooltips": {
+      "launchCounter": "Launch counter",
+      "hint": "Hint",
+      "screenshot": "Screenshot"
+    },
+    "url": {
+      "placeholder": "example.com",
+      "noBaseUrl": "Without link"
+    },
+    "sources": {
+      "toggle": "Other sources",
+      "names": {
+        "custom": "Custom values",
+        "googleAds": "Google ADS",
+        "esputnikEmail": "eSputnik Email",
+        "tiktok": "TikTok",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "telegram": "Telegram",
+        "viber": "Viber"
+      }
+    },
+    "fields": {
+      "utmSource": {
+        "label": "utm_source",
+        "placeholder": "google, instagram, facebook..."
+      },
+      "utmContent": {
+        "label": "utm_content",
+        "placeholder": "red, white, dark, big, small..."
+      },
+      "utmMedium": {
+        "label": "utm_medium",
+        "placeholder": "cpc, email, social..."
+      },
+      "utmTerm": {
+        "label": "utm_term",
+        "placeholder": "discount, free, webinar..."
+      },
+      "utmCampaign": {
+        "label": "utm_campaign",
+        "placeholder": "sale, top, product..."
+      }
+    },
+    "options": {
+      "transliteration": "Transliteration and result optimization"
+    },
+    "buttons": {
+      "showResult": "Show result",
+      "copyResult": "Copy result",
+      "copied": "Copied!"
+    },
+    "result": {
+      "placeholder": "Result will be here"
+    },
+    "seo": {
+      "title": "UTM Generator Online - Wekey Tools",
+      "description": "Free UTM parameter generator for tracking advertising campaign effectiveness. Create correct UTM tags with transliteration.",
+      "keywords": "utm generator, utm tags, utm parameters, campaign tracking, traffic analytics, link generator",
+      "ogTitle": "UTM Generator - Wekey Tools",
+      "ogDescription": "Simple and convenient UTM parameter generator for marketing campaigns",
+      "whatIsUtm": {
+        "title": "What are UTM tags?",
+        "text": "UTM tags (Urchin Tracking Module) are special parameters added to URLs for tracking traffic sources in web analytics. They allow you to accurately determine where visitors came to your site from: which advertising campaign, source, or specific ad."
+      },
+      "whenToUse": {
+        "title": "When to use UTM tags?",
+        "text": "UTM parameters are essential when launching advertising campaigns on social networks, contextual advertising, email campaigns, affiliate programs, and any marketing activities. They help measure ROI, optimize budgets, and make informed decisions about developing advertising channels."
+      },
+      "howItWorks": {
+        "title": "How does the UTM generator work?",
+        "text": "The tool automatically creates correct UTM parameters based on entered data. You specify the base URL and fill in the source, medium, campaign, term, and content fields. The generator creates the final link with properly encoded parameters and optionally applies transliteration for correct display in analytics."
+      },
+      "benefits": {
+        "title": "UTM generator benefits",
+        "text": "Automatic parameter encoding, built-in templates for popular advertising platforms, Cyrillic transliteration option, instant copying of ready links, support for all standard UTM parameters, and simple intuitive interface for quick work."
+      },
+      "forSpecialists": {
+        "title": "Who will find this tool useful?",
+        "text": "The tool is especially useful for marketers, performance specialists, SMM managers, web analysts, affiliate marketers, and business owners. It will help set up correct tracking of advertising campaigns, measure channel effectiveness, and optimize marketing expenses."
+      },
+      "howToUse": {
+        "title": "How to use the generator?",
+        "text": "Enter the base website URL, select traffic source from ready templates or enter manually. Fill in the needed UTM parameters: source, medium, campaign, term, and content. If necessary, enable transliteration and click \"Show result\"."
+      }
+    }
+  },
+  "numberGeneratorTool": {
+    "title": "Number Generator",
+    "description": "Generate random numbers in a specified range with option to exclude repeats",
+    "navigation": {
+      "allTools": "All Tools"
+    },
+    "tooltips": {
+      "launchCounter": "Launch counter",
+      "hint": "Hints",
+      "screenshot": "Screenshot"
+    },
+    "settings": {
+      "fromLabel": "Choose number FROM:",
+      "toLabel": "Choose number TO:",
+      "countLabel": "Number of results:",
+      "noRepeats": "No repeats"
+    },
+    "result": {
+      "placeholder": "Result will appear here",
+      "linesCount": "lines"
+    },
+    "errors": {
+      "noMoreUniqueNumbers": "Ran out of unique numbers in range from {{from}} to {{to}}.",
+      "useResetButton": "Use the \"Reset\" button to start over.",
+      "copyError": "Copy error:"
+    },
+    "buttons": {
+      "showResult": "Show Result",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "reset": "Reset"
+    },
+    "seo": {
+      "title": "Random Number Generator Online - Wekey Tools",
+      "description": "Free random number generator in a specified range. Customizable number of results with option to exclude repeats.",
+      "keywords": "number generator, random numbers, random, lottery, number range, no repeats",
+      "ogTitle": "Random Number Generator - Wekey Tools",
+      "ogDescription": "Simple and convenient random number generator with customizable range",
+      "whatIsNumberGenerator": {
+        "title": "What is a random number generator?",
+        "text": "A random number generator is a tool for creating pseudo-random numbers in a specified range. It uses mathematical algorithms to generate a sequence of numbers that are statistically indistinguishable from truly random ones. The tool allows you to set minimum and maximum values, number of generated numbers, and option to exclude repeats."
+      },
+      "whenToUse": {
+        "title": "When to use a number generator?",
+        "text": "The generator is indispensable for conducting lotteries and giveaways, choosing random participants, creating test data, games and entertainment, statistical research, passwords and codes. It will help in any situation where fair randomness or quick generation of numeric values is needed."
+      },
+      "howItWorks": {
+        "title": "How does the generator work?",
+        "text": "The tool uses JavaScript's built-in pseudo-random number generator to create numbers in the specified range. You set the minimum and maximum values, number of needed numbers. With the 'No repeats' option enabled, each number can only be generated once, which is useful for giveaways and selecting unique elements."
+      },
+      "benefits": {
+        "title": "Generator benefits",
+        "text": "Quick generation of multiple numbers simultaneously, customizable range from any minimum to maximum value, no repeats option for unique results, current time display for documenting results, instant copying of results, and simple intuitive interface."
+      },
+      "forSpecialists": {
+        "title": "Who will find this tool useful?",
+        "text": "The tool is especially useful for contest and giveaway organizers, teachers and students, software developers, data analysts, gamers and board game enthusiasts. It will help conduct fair drawings, create test data, select random samples, or add an element of randomness to any process."
+      },
+      "howToUse": {
+        "title": "How to use the generator?",
+        "text": "Set the minimum value using the 'FROM' slider, set the maximum value with the 'TO' slider, choose the number of needed numbers. If necessary, enable the 'No repeats' option to get unique values. Click 'Show Result' and copy the generated numbers."
+      }
+    }
+  },
+  "analyticsTool": {
+    "title": "End-to-End Analytics",
+    "description": "Tool for analyzing advertising campaign effectiveness and sales funnel performance",
+    "keywords": "analytics, marketing, advertising, conversion, CTR, ROI, sales funnel",
+    "groups": {
+      "traffic": "Traffic",
+      "costs": "Costs",
+      "website": "Website", 
+      "sales": "Sales Department",
+      "pricing": "Pricing",
+      "revenue": "Revenue",
+      "formulas": "Formulas"
+    },
+    "metrics": {
+      "clicks": {
+        "name": "Clicks",
+        "tooltip": "Number of clicks on advertising"
+      },
+      "impressions": {
+        "name": "Impressions",
+        "tooltip": "Number of ad impressions"
+      },
+      "ctr": {
+        "name": "CTR %",
+        "tooltip": "Click Through Rate - ratio of clicks to impressions"
+      },
+      "cpc": {
+        "name": "CPC (Cost per Click)",
+        "tooltip": "Cost Per Click - cost of one click"
+      },
+      "adCost": {
+        "name": "Ad Spend",
+        "tooltip": "Total advertising campaign costs"
+      },
+      "cr1": {
+        "name": "CR1 (Website Conversion %)",
+        "tooltip": "Conversion Rate 1 - percentage of visitors who became leads"
+      },
+      "leads": {
+        "name": "Leads, Sales",
+        "tooltip": "Number of leads generated"
+      },
+      "cpl": {
+        "name": "CPL (Cost per Lead)",
+        "tooltip": "Cost Per Lead - cost of acquiring one lead"
+      },
+      "cr2": {
+        "name": "CR2 (Lead to Sale %)",
+        "tooltip": "Conversion Rate 2 - percentage of leads that became sales"
+      },
+      "sales": {
+        "name": "Deals, Sales",
+        "tooltip": "Number of closed deals"
+      },
+      "cpo": {
+        "name": "CPO (Deal Price, Sale)",
+        "tooltip": "Cost Per Order - cost of acquiring one deal"
+      },
+      "aov": {
+        "name": "AOV (Average Order Value)",
+        "tooltip": "Average Order Value - average cost of one order"
+      },
+      "revenue": {
+        "name": "Gross Revenue",
+        "tooltip": "Total revenue from sales"
+      },
+      "marginPercent": {
+        "name": "Margin %",
+        "tooltip": "Percentage of margin from revenue"
+      },
+      "marginPerUnit": {
+        "name": "Margin per Unit",
+        "tooltip": "Margin from one product unit"
+      },
+      "totalMargin": {
+        "name": "Total Margin (Profit)",
+        "tooltip": "Total margin from all sales"
+      },
+      "netProfit": {
+        "name": "Net Profit", 
+        "tooltip": "Net profit after all expenses"
+      },
+      "netProfitPerUnit": {
+        "name": "Net Profit per Unit",
+        "tooltip": "Net profit from one unit"
+      },
+      "romi": {
+        "name": "ROMI %",
+        "tooltip": "Return on Marketing Investment"
+      },
+      "roas": {
+        "name": "ROAS",
+        "tooltip": "Return on Advertising Spend"
+      },
+      "drr": {
+        "name": "DRR %", 
+        "tooltip": "Digital Revenue Rate"
+      },
+      "iccr": {
+        "name": "ICCR %",
+        "tooltip": "Index of Customer Conversion Rate"
+      },
+      "cpm": {
+        "name": "CPM",
+        "tooltip": "Cost Per Mille - cost per thousand impressions"
+      }
+    },
+    "buttons": {
+      "aiAnalysis": "Get AI Analysis",
+      "analyzing": "Analyzing...",
+      "analyze": "Analyze",
+      "export": "Export",
+      "downloadTable": "Download Table",
+      "cancel": "Cancel",
+      "copy": "Copy"
+    },
+    "businessType": "Business Type",
+    "businessTypes": {
+      "ecommerce": "E-commerce",
+      "landing": "Landing",
+      "instagram": "Instagram"
+    },
+    "businessModel": "Business Model",
+    "businessModels": {
+      "product": "Product",
+      "service": "Service"
+    },
+    "trafficSource": "Traffic Source",
+    "trafficSources": {
+      "googleSearch": "Google Search",
+      "googleShopping": "Google Shopping",
+      "meta": "Meta (Facebook/Instagram)",
+      "tiktok": "TikTok",
+      "email": "Email"
+    },
+    "niche": "Niche",
+    "nichePlaceholder": "Describe your niche...",
+    "currency": "Currency",
+    "scale": {
+      "increase": "Increase scale",
+      "decrease": "Decrease scale"
+    },
+    "headers": {
+      "parameter": "Parameter",
+      "values": "Values",
+      "day": "Per 1 day",
+      "days": "days"
+    },
+    "period": "Period",
+    "periods": {
+      "day": "Day",
+      "month": "30 days"
+    },
+    "aiAnalysis": {
+      "title": "AI Analysis",
+      "analyzing": "Analyzing...",
+      "loading": {
+        "analyzing": "Analyzing your data.",
+        "timeWarning": "This may take up to 1 minute.",
+        "doNotClose": "Please don't close the window."
+      },
+      "resultTitle": "Analysis Result",
+      "placeholder": "Fill out the form on the left and click \"Get AI Analysis\" for detailed recommendations on your metrics."
+    },
+    "export": {
+      "title": "Choose display format",
+      "formatTitle": "Choose display format",
+      "formats": {
+        "vertical": "Vertical format",
+        "horizontal": "Horizontal format"
+      }
+    }
   },
   "footer": {
     "copyright": "© 2024 WEKey Tools. All rights reserved.",

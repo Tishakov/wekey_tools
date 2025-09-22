@@ -64,8 +64,8 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
   const gradientId = `gradient-${color.replace('#', '')}`;
   
   // Единый градиент для всех графиков
-  const getGradientColors = (baseColor: string) => {
-    // Всегда используем одинаковый градиент независимо от baseColor
+  const getGradientColors = () => {
+    // Всегда используем одинаковый градиент
     return {
       start: '#5E35F2',
       middle: '#5E35F2', // Можно оставить средний цвет таким же или сделать промежуточным
@@ -73,7 +73,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
     };
   };
 
-  const gradientColors = getGradientColors(color);
+  const gradientColors = getGradientColors();
 
   // Кастомный компонент для tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
