@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './DuplicateRemovalTool.css';
@@ -14,6 +17,17 @@ type DuplicateMode = 'remove-duplicates' | 'remove-all-duplicates' | 'remove-uni
 const DuplicateRemovalTool: React.FC = () => {
     const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
+    
+    // Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
+    
     const [inputText, setInputText] = useState('');
     const [mode, setMode] = useState<DuplicateMode>('remove-duplicates');
     const [result, setResult] = useState('');
@@ -151,7 +165,21 @@ const DuplicateRemovalTool: React.FC = () => {
     };
 
     // Обработчик кнопки "Показать результат"
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
         const processedText = processText(inputText);
         setResult(processedText);
     };
@@ -312,6 +340,19 @@ const DuplicateRemovalTool: React.FC = () => {
                 <h3>{t('duplicateRemoval.seo.howToUse.title')}</h3>
                 <p>{t('duplicateRemoval.seo.howToUse.text')}</p>
             </div>
+
+            {/* Модальные окна для авторизации */}
+            <AuthRequiredModal
+                isOpen={isAuthRequiredModalOpen}
+                onClose={closeAuthRequiredModal}
+                onLoginClick={openAuthModal}
+            />
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={closeAuthModal}
+                initialMode="login"
+            />
         </div>
     );
 };

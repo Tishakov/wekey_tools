@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import '../styles/tool-pages.css';
 import './PasswordGeneratorTool.css';
 
@@ -13,6 +16,16 @@ const PasswordGeneratorTool: React.FC = () => {
     const { t } = useTranslation();
     const { common, passwordGenerator } = useToolTranslation();
     const { createLink } = useLocalizedLink();
+    
+    // Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
     
     // Основные состояния
     const [passwordLength, setPasswordLength] = useState(12);
@@ -121,6 +134,11 @@ const PasswordGeneratorTool: React.FC = () => {
 
     // Основная функция генерации паролей
     const handleGeneratePasswords = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
         // Увеличиваем счетчик запусков и получаем актуальное значение
         try {
             const newCount = await statsService.incrementAndGetCount(TOOL_ID);
@@ -425,6 +443,19 @@ const PasswordGeneratorTool: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Модальные окна для авторизации */}
+            <AuthRequiredModal
+                isOpen={isAuthRequiredModalOpen}
+                onClose={closeAuthRequiredModal}
+                onLoginClick={openAuthModal}
+            />
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={closeAuthModal}
+                initialMode="login"
+            />
         </div>
     );
 };

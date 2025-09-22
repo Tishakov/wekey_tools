@@ -1625,5 +1625,14 @@
       "premium": "Premium",
       "admin": "Administrator"
     }
+  },
+  "authRequired": {
+    "title": "Authorization Required",
+    "description": "To use the tools, please sign in to your account or register for free.",
+    "benefit1": "Unlimited access to all tools",
+    "benefit2": "Save history and results",
+    "benefit3": "Personal usage statistics",
+    "loginButton": "Sign In",
+    "cancelButton": "Cancel"
   }
 }
