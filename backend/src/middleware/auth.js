@@ -135,11 +135,21 @@ const incrementApiUsage = async (req, res, next) => {
 // Опциональная аутентификация (не блокирует запрос если токена нет)
 const optionalAuth = async (req, res, next) => {
   try {
+    console.log('🔐 OptionalAuth middleware called:', {
+      hasAuthHeader: !!req.headers.authorization,
+      hasCookie: !!req.cookies.jwt,
+      userAgent: req.get('User-Agent')?.substring(0, 50)
+    });
+    
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
+      console.log('🎫 Token found in Authorization header');
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;
+      console.log('🍪 Token found in cookies');
+    } else {
+      console.log('❌ No token found in headers or cookies');
     }
 
     if (token) {
@@ -148,11 +158,19 @@ const optionalAuth = async (req, res, next) => {
       
       if (currentUser && currentUser.status === 'active') {
         req.user = currentUser;
+        console.log('✅ User authenticated:', {
+          id: currentUser.id,
+          email: currentUser.email,
+          status: currentUser.status
+        });
+      } else {
+        console.log('❌ User not found or inactive');
       }
     }
     
     next();
   } catch (error) {
+    console.log('⚠️ OptionalAuth error (ignored):', error.message);
     // Игнорируем ошибки токена в optional auth
     next();
   }

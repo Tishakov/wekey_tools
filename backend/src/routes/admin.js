@@ -172,7 +172,7 @@ router.get('/stats', async (req, res, next) => {
   }
 });
 
-// GET /api/admin/users - Список пользователей
+// GET /api/admin/users - Список пользователей с статистикой
 router.get('/users', async (req, res, next) => {
   try {
     const { page = 1, limit = 20, status, role } = req.query;
@@ -197,10 +197,32 @@ router.get('/users', async (req, res, next) => {
       offset: parseInt(offset)
     });
 
+    // Получаем статистику использования инструментов для каждого пользователя
+    const usersWithStats = await Promise.all(users.rows.map(async (user) => {
+      const userStats = await db.ToolUsage.findOne({
+        where: { userId: user.id },
+        attributes: [
+          [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'totalUsage'],
+          [db.sequelize.fn('COUNT', db.sequelize.fn('DISTINCT', db.sequelize.col('toolName'))), 'uniqueTools'],
+          [db.sequelize.fn('MAX', db.sequelize.col('createdAt')), 'lastToolUsage']
+        ],
+        raw: true
+      });
+
+      return {
+        ...user.toJSON(),
+        toolStats: {
+          totalUsage: parseInt(userStats?.totalUsage || 0),
+          uniqueTools: parseInt(userStats?.uniqueTools || 0),
+          lastToolUsage: userStats?.lastToolUsage || null
+        }
+      };
+    }));
+
     res.json({
       success: true,
       data: {
-        users: users.rows,
+        users: usersWithStats,
         pagination: {
           total: users.count,
           page: parseInt(page),
@@ -209,6 +231,7 @@ router.get('/users', async (req, res, next) => {
       }
     });
   } catch (error) {
+    console.error('Error fetching users with stats:', error);
     next(error);
   }
 });

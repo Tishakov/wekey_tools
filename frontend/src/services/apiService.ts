@@ -36,15 +36,15 @@ class ApiService {
 
   // Получение токена из localStorage
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('wekey_token');
   }
 
   // Сохранение токена
   setToken(token: string | null): void {
     if (token) {
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('wekey_token', token);
     } else {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('wekey_token');
     }
   }
 

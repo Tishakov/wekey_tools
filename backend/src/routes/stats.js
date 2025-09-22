@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, param, query, validationResult } = require('express-validator');
-// const { optionalAuth, checkApiLimit, incrementApiUsage } = require('../middleware/auth');
+const { optionalAuth, checkApiLimit, incrementApiUsage } = require('../middleware/auth');
 // const { AppError } = require('../middleware/errorHandler');
 const db = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
@@ -74,7 +74,7 @@ const sessionIdValidator = body('sessionId')
 
 // POST /api/stats/increment - Увеличить счетчик использования инструмента
 router.post('/increment',
-  // optionalAuth,
+  optionalAuth,
   // checkApiLimit,
   [
     toolNameValidator,
@@ -88,6 +88,16 @@ router.post('/increment',
   // incrementApiUsage,
   async (req, res, next) => {
     try {
+      console.log('📊 Stats increment request received:', {
+        body: req.body,
+        user: req.user ? `ID: ${req.user.id}, email: ${req.user.email}` : 'anonymous',
+        ip: req.ip,
+        headers: {
+          authorization: req.headers.authorization ? 'Bearer token present' : 'No auth header',
+          'user-agent': req.get('User-Agent')?.substring(0, 50)
+        }
+      });
+      
       const {
         toolName,
         sessionId,
@@ -114,7 +124,16 @@ router.post('/increment',
         wasSuccessful: true
       };
 
+      console.log('💾 Creating ToolUsage record with data:', usageData);
+
       const usage = await db.ToolUsage.create(usageData);
+      
+      console.log('✅ ToolUsage record created successfully:', {
+        id: usage.id,
+        userId: usage.userId,
+        toolName: usage.toolName,
+        createdAt: usage.createdAt
+      });
 
       // Получение обновленной статистики для инструмента
       const toolStats = await db.ToolUsage.findOne({

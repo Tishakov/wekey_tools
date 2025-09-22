@@ -13,6 +13,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 // НЕ импортируем проблемные middleware пока
 // const helmet = require('helmet');
@@ -63,6 +64,7 @@ const corsOptions = {
 
 // Базовые middleware (только необходимые)
 app.use(cors(corsOptions));
+app.use(cookieParser()); // Добавляем парсер кукисов
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
