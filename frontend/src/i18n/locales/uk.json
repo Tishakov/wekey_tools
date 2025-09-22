@@ -108,7 +108,9 @@
     "success": "Успішно",
     "allTools": "Всі інструменти",
     "lineCount": "рядків",
-    "resultPlaceholder": "Тут буде результат"
+    "resultPlaceholder": "Тут буде результат",
+    "close": "Закрити",
+    "continue": "Продовжити"
   },
   "passwordGenerator": {
     "title": "Генератор паролів",
@@ -1513,5 +1515,46 @@
     "founder": "Засновник проекту",
     "publicOffer": "Публічна оферта",
     "privacyPolicy": "Політика конфіденційності"
+  },
+  "auth": {
+    "login": "Увійти",
+    "loginTitle": "Увійти в особистий кабінет",
+    "loginButton": "Увійти",
+    "loginLink": "Увійти",
+    "register": "Реєстрація",
+    "registerTitle": "Створити аккаунт",
+    "registerButton": "Створити аккаунт",
+    "registerLink": "Створити аккаунт",
+    "logout": "Вийти",
+    "profile": "Профіль",
+    "subscription": "Підписка",
+    "userMenu": "Меню користувача",
+    "user": "Користувач",
+    "adminRole": "Адміністратор",
+    "premiumRole": "Преміум",
+    "email": "Email",
+    "emailPlaceholder": "Введіть ваш email",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введіть пароль",
+    "firstName": "Ім'я",
+    "firstNamePlaceholder": "Введіть ім'я",
+    "lastName": "Прізвище",
+    "lastNamePlaceholder": "Введіть прізвище",
+    "showPassword": "Показати пароль",
+    "hidePassword": "Приховати пароль",
+    "noAccount": "Немає аккаунта?",
+    "hasAccount": "Вже є аккаунт?",
+    "orContinueWith": "або продовжити з",
+    "continueWithGoogle": "Увійти через Google",
+    "googleComingSoon": "Google авторизація незабаром з'явиться",
+    "errors": {
+      "emailPasswordRequired": "Email та пароль обов'язкові",
+      "unknownError": "Сталася невідома помилка",
+      "adminOnlyInAdminPanel": "Адміністративні аккаунти доступні тільки через /admin"
+    },
+    "success": {
+      "loginSuccess": "Вхід виконано успішно",
+      "registerSuccess": "Реєстрацію виконано успішно"
+    }
   }
 }

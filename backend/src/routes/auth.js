@@ -45,4 +45,54 @@ router.post('/register',
 // GET /api/auth/verify - Проверка токена
 router.get('/verify', authController.verifyToken);
 
+// POST /api/auth/admin-login - Админский вход (для админ-панели)
+router.post('/admin-login',
+  [
+    body('email')
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Введите корректный email'),
+    body('password')
+      .notEmpty()
+      .withMessage('Введите пароль')
+  ],
+  authController.adminLogin
+);
+
+// GET /api/auth/profile - Получение профиля пользователя
+router.get('/profile', authController.getProfile);
+
+// PUT /api/auth/profile - Обновление профиля пользователя
+router.put('/profile',
+  [
+    body('firstName')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 50 })
+      .withMessage('Имя должно содержать от 1 до 50 символов'),
+    body('lastName')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 50 })
+      .withMessage('Фамилия должна содержать от 1 до 50 символов'),
+    body('language')
+      .optional()
+      .isIn(['ru', 'en', 'uk'])
+      .withMessage('Поддерживаемые языки: ru, en, uk'),
+    body('theme')
+      .optional()
+      .isIn(['light', 'dark'])
+      .withMessage('Поддерживаемые темы: light, dark'),
+    body('newPassword')
+      .optional()
+      .isLength({ min: 6 })
+      .withMessage('Новый пароль должен содержать минимум 6 символов'),
+    body('currentPassword')
+      .if(body('newPassword').exists())
+      .notEmpty()
+      .withMessage('Укажите текущий пароль для смены пароля')
+  ],
+  authController.updateProfile
+);
+
 module.exports = router;

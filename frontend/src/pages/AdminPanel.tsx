@@ -339,7 +339,7 @@ const AdminPanel: React.FC = () => {
 
     try {
       const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${API_BASE}/api/auth/admin-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

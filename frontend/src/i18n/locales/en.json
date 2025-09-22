@@ -108,7 +108,9 @@
     "success": "Success",
     "allTools": "All Tools",
     "lineCount": "lines",
-    "resultPlaceholder": "Result will be here"
+    "resultPlaceholder": "Result will be here",
+    "close": "Close",
+    "continue": "Continue"
   },
   "passwordGenerator": {
     "title": "Password Generator",
@@ -1522,5 +1524,46 @@
     "founder": "Project Founder",
     "publicOffer": "Public Offer",
     "privacyPolicy": "Privacy Policy"
+  },
+  "auth": {
+    "login": "Sign In",
+    "loginTitle": "Sign in to your account",
+    "loginButton": "Sign In",
+    "loginLink": "Sign In",
+    "register": "Sign Up",
+    "registerTitle": "Create account",
+    "registerButton": "Create Account",
+    "registerLink": "Create Account",
+    "logout": "Sign Out",
+    "profile": "Profile",
+    "subscription": "Subscription",
+    "userMenu": "User menu",
+    "user": "User",
+    "adminRole": "Administrator",
+    "premiumRole": "Premium",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter last name",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "or continue with",
+    "continueWithGoogle": "Sign in with Google",
+    "googleComingSoon": "Google auth coming soon",
+    "errors": {
+      "emailPasswordRequired": "Email and password are required",
+      "unknownError": "An unknown error occurred",
+      "adminOnlyInAdminPanel": "Administrative accounts are only available through /admin"
+    },
+    "success": {
+      "loginSuccess": "Successfully signed in",
+      "registerSuccess": "Successfully registered"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import LanguageSwitcher from './LanguageSwitcher';
+import UserButton from './UserButton';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -11,7 +12,7 @@ const Header: React.FC = () => {
         </div>
         
         <div className="header-right">
-          {/* Здесь можно добавить другие элементы */}
+          <UserButton />
         </div>
       </div>
     </header>

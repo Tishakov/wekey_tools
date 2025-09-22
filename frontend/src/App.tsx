@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import TransliterationTool from './pages/TransliterationTool';
@@ -34,7 +35,8 @@ import './styles/tool-pages.css';
 function App() {
   return (
     <HelmetProvider>
-      <Router>
+      <AuthProvider>
+        <Router>
         <Routes>
           {/* Редирект с корня на русский язык */}
           <Route path="/" element={<Navigate to="/ru" replace />} />
@@ -81,6 +83,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      </AuthProvider>
     </HelmetProvider>
   );
 }

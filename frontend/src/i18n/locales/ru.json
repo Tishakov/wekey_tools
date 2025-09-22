@@ -108,7 +108,9 @@
     "success": "Успешно",
     "allTools": "Все инструменты",
     "lineCount": "стр.",
-    "resultPlaceholder": "Здесь будет результат"
+    "resultPlaceholder": "Здесь будет результат",
+    "close": "Закрыть",
+    "continue": "Продолжить"
   },
   "passwordGenerator": {
     "title": "Генератор паролей",
@@ -1522,5 +1524,46 @@
     "founder": "Основатель проекта",
     "publicOffer": "Публичная оферта",
     "privacyPolicy": "Политика конфиденциальности"
+  },
+  "auth": {
+    "login": "Войти",
+    "loginTitle": "Войти в личный кабинет",
+    "loginButton": "Войти",
+    "loginLink": "Войти",
+    "register": "Регистрация",
+    "registerTitle": "Создать аккаунт",
+    "registerButton": "Создать аккаунт",
+    "registerLink": "Создать аккаунт",
+    "logout": "Выйти",
+    "profile": "Профиль",
+    "subscription": "Подписка",
+    "userMenu": "Меню пользователя",
+    "user": "Пользователь",
+    "adminRole": "Администратор",
+    "premiumRole": "Премиум",
+    "email": "Email",
+    "emailPlaceholder": "Введите ваш email",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "firstName": "Имя",
+    "firstNamePlaceholder": "Введите имя",
+    "lastName": "Фамилия",
+    "lastNamePlaceholder": "Введите фамилию",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "orContinueWith": "или продолжить с",
+    "continueWithGoogle": "Войти через Google",
+    "googleComingSoon": "Google авторизация скоро появится",
+    "errors": {
+      "emailPasswordRequired": "Email и пароль обязательны",
+      "unknownError": "Произошла неизвестная ошибка",
+      "adminOnlyInAdminPanel": "Административные аккаунты доступны только через /admin"
+    },
+    "success": {
+      "loginSuccess": "Вход выполнен успешно",
+      "registerSuccess": "Регистрация выполнена успешно"
+    }
   }
 }
