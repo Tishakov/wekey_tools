@@ -5,12 +5,25 @@ import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import SEOHead from '../components/SEOHead';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './AddSymbolTool.css';
 
 
 const TOOL_ID = 'add-symbol';
 const AddSymbolTool: React.FC = () => {
   const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
   const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
@@ -71,6 +84,21 @@ const AddSymbolTool: React.FC = () => {
   };
 
   const handleShowResult = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
     if (!symbolToAdd.trim()) {
       setOutputText('');
       return;

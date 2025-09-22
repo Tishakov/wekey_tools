@@ -9,6 +9,16 @@ import { openaiService, type WordInflectionResponse } from '../services/openaiSe
 const TOOL_ID = 'word-declension';
 const WordInflectionTool: React.FC = () => {
   const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
   const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
@@ -70,7 +80,22 @@ const WordInflectionTool: React.FC = () => {
   };
 
   // Обработка копирования
-  const handleCopy = () => {
+  const handleCopy = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
     if (result) {
       navigator.clipboard.writeText(result);
       setCopied(true);

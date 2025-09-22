@@ -5,6 +5,9 @@ import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './NumberGeneratorTool.css';
 
 
@@ -12,6 +15,16 @@ const TOOL_ID = 'number-generator';
 const NumberGeneratorTool: React.FC = () => {
     // Хуки
     const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
     const { createLink } = useLocalizedLink();
     
     // Основные состояния
@@ -54,6 +67,21 @@ const NumberGeneratorTool: React.FC = () => {
 
     // Основная функция генерации чисел
     const handleGenerateNumbers = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
         // Увеличиваем счетчик запусков и получаем актуальное значение
         try {
             const newCount = await statsService.incrementAndGetCount(TOOL_ID);

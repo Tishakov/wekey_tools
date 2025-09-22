@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './EmojiTool.css';
 import '../styles/tool-pages.css';
 import { EmojiImage } from '../utils/emojiUtils';
@@ -13,6 +16,16 @@ import SEOHead from '../components/SEOHead';
 const TOOL_ID = 'emoji';
 const EmojiTool: React.FC = () => {
     const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
     const { createLink } = useLocalizedLink();
     const [text, setText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -104,6 +117,21 @@ const EmojiTool: React.FC = () => {
 
     // Функция копирования результата
     const handleCopy = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
         try {
             await navigator.clipboard.writeText(text);
             setCopied(true);

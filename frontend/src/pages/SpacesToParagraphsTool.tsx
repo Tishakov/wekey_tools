@@ -4,12 +4,25 @@ import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './SpacesToParagraphsTool.css';
 
 
 const TOOL_ID = 'spaces-to-paragraphs';
 const SpacesToParagraphsTool: React.FC = () => {
     const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
@@ -103,7 +116,22 @@ const SpacesToParagraphsTool: React.FC = () => {
     };
 
     // Обработчик кнопки "Показать результат"
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
         const processedText = processText(inputText);
         setResult(processedText);
     };

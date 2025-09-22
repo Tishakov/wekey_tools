@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useLanguageFromUrl, useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './UtmGeneratorTool.css';
 import { statsService } from '../utils/statsService';
 
@@ -12,6 +15,16 @@ const TOOL_ID = 'utm-generator';
 const UtmGeneratorTool: React.FC = () => {
     // Хуки
     const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
     const { createLink } = useLocalizedLink();
     useLanguageFromUrl();
     
@@ -207,7 +220,22 @@ const UtmGeneratorTool: React.FC = () => {
     };
 
     // Обработчик показа результата
-    const handleShowResult = () => {
+    const handleShowResult = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
         const params: string[] = [];
         
         // Формируем параметры UTM

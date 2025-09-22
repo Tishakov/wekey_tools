@@ -8,6 +8,16 @@ import { openaiService, type SynonymResponse } from '../services/openaiService';
 const TOOL_ID = 'synonym-generator';
 const SynonymGeneratorTool: React.FC = () => {
   const { t } = useTranslation();
+
+// Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
@@ -69,7 +79,22 @@ const SynonymGeneratorTool: React.FC = () => {
   };
 
   // Обработка копирования
-  const handleCopy = () => {
+  const handleCopy = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик запусков
+        try {
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+            setLaunchCount(prev => prev + 1);
+        }
+
+
     if (result) {
       navigator.clipboard.writeText(result);
       setCopied(true);
