@@ -368,6 +368,19 @@ const AddSymbolTool: React.FC = () => {
         <h3>{t('addSymbolTool.seo.howToUse.title')}</h3>
         <p>{t('addSymbolTool.seo.howToUse.text')}</p>
       </div>
+
+      {/* Модальные окна для авторизации */}
+      <AuthRequiredModal
+        isOpen={isAuthRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        onLoginClick={openAuthModal}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode="login"
+      />
     </div>
   );
 };

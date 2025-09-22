@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { openaiService, type SynonymResponse } from '../services/openaiService';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 
 
 const TOOL_ID = 'synonym-generator';
@@ -36,9 +39,23 @@ const SynonymGeneratorTool: React.FC = () => {
 
   // Обработка текста и генерация синонимов через ChatGPT
   const generateSynonyms = async () => {
+    // Проверяем авторизацию перед выполнением
+    if (!requireAuth()) {
+      return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+    }
+
     if (!inputText.trim()) {
       setResult('');
       return;
+    }
+
+    // Увеличиваем счетчик запусков
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
     }
 
     setAiError('');
@@ -80,21 +97,6 @@ const SynonymGeneratorTool: React.FC = () => {
 
   // Обработка копирования
   const handleCopy = async () => {
-        // Проверяем авторизацию перед выполнением
-        if (!requireAuth()) {
-            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-        }
-
-        // Увеличиваем счетчик запусков
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
-
-
     if (result) {
       navigator.clipboard.writeText(result);
       setCopied(true);
@@ -284,6 +286,19 @@ const SynonymGeneratorTool: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Модальные окна для авторизации */}
+      <AuthRequiredModal
+        isOpen={isAuthRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        onLoginClick={openAuthModal}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode="login"
+      />
     </div>
   );
 };

@@ -354,6 +354,19 @@ const CaseChangerTool: React.FC = () => {
         <h3>{t('caseChangerTool.seo.whoUseful')}</h3>
         <p>{t('caseChangerTool.seo.whoUsefulText')}</p>
       </div>
+
+      {/* Модальные окна для авторизации */}
+      <AuthRequiredModal
+        isOpen={isAuthRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        onLoginClick={openAuthModal}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode="login"
+      />
     </div>
   );
 };

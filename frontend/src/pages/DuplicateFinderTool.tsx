@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import { statsService } from '../utils/statsService';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
@@ -12,6 +15,17 @@ const TOOL_ID = 'duplicate-finder';
 const DuplicateFinderTool: React.FC = () => {
     const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
+    
+    // Auth Required Hook
+    const {
+        isAuthRequiredModalOpen,
+        isAuthModalOpen,
+        requireAuth,
+        closeAuthRequiredModal,
+        closeAuthModal,
+        openAuthModal
+    } = useAuthRequired();
+    
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
     const [caseSensitive, setCaseSensitive] = useState(false);
@@ -57,6 +71,11 @@ const DuplicateFinderTool: React.FC = () => {
 
     // Функция поиска дубликатов
     const handleShowResult = async () => {
+        // Проверяем авторизацию перед выполнением
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
         if (!inputText1.trim() && !inputText2.trim()) {
             setOnlyInFirst('');
             setCommon('');
@@ -354,6 +373,19 @@ const DuplicateFinderTool: React.FC = () => {
                 <h3>{t('duplicateFinderTool.seo.howToUse.title')}</h3>
                 <p>{t('duplicateFinderTool.seo.howToUse.text')}</p>
             </div>
+
+            {/* Модальные окна для авторизации */}
+            <AuthRequiredModal
+                isOpen={isAuthRequiredModalOpen}
+                onClose={closeAuthRequiredModal}
+                onLoginClick={openAuthModal}
+            />
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={closeAuthModal}
+                initialMode="login"
+            />
         </div>
     );
 };

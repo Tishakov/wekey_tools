@@ -422,6 +422,19 @@ const TextByColumnsTool: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Модальные окна для авторизации */}
+            <AuthRequiredModal
+                isOpen={isAuthRequiredModalOpen}
+                onClose={closeAuthRequiredModal}
+                onLoginClick={openAuthModal}
+            />
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={closeAuthModal}
+                initialMode="login"
+            />
         </div>
     );
 };

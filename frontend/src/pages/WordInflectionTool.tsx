@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { openaiService, type WordInflectionResponse } from '../services/openaiService';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 
 
 const TOOL_ID = 'word-declension';
@@ -37,9 +40,23 @@ const WordInflectionTool: React.FC = () => {
 
   // Обработка текста и генерация склонений через ChatGPT
   const generateInflections = async () => {
+    // Проверяем авторизацию перед выполнением
+    if (!requireAuth()) {
+      return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+    }
+
     if (!inputText.trim()) {
       setResult('');
       return;
+    }
+
+    // Увеличиваем счетчик запусков
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
     }
 
     setAiError('');
@@ -81,21 +98,6 @@ const WordInflectionTool: React.FC = () => {
 
   // Обработка копирования
   const handleCopy = async () => {
-        // Проверяем авторизацию перед выполнением
-        if (!requireAuth()) {
-            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-        }
-
-        // Увеличиваем счетчик запусков
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
-
-
     if (result) {
       navigator.clipboard.writeText(result);
       setCopied(true);
@@ -303,6 +305,19 @@ const WordInflectionTool: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Модальные окна для авторизации */}
+      <AuthRequiredModal
+        isOpen={isAuthRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        onLoginClick={openAuthModal}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode="login"
+      />
     </div>
   );
 };

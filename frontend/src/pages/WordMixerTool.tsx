@@ -388,6 +388,19 @@ const WordMixerTool: React.FC = () => {
                     <p>{t('wordMixer.seo.howToUseContent')}</p>
                 </div>
             </div>
+
+            {/* Модальные окна для авторизации */}
+            <AuthRequiredModal
+                isOpen={isAuthRequiredModalOpen}
+                onClose={closeAuthRequiredModal}
+                onLoginClick={openAuthModal}
+            />
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={closeAuthModal}
+                initialMode="login"
+            />
         </div>
     );
 };

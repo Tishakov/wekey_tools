@@ -17,7 +17,6 @@ const ProfilePage: React.FC = () => {
         <div className="profile-page-content">
           <UserProfile 
             activeSection={activeSection}
-            onSectionChange={setActiveSection}
           />
         </div>
       </div>
