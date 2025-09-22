@@ -1,5 +1,6 @@
 .admin-users {
-  padding: 20px;
+  /* padding: 20px; */
+  /* Стили для админки пользователей */
 }
 
 .admin-users-header {
@@ -64,7 +65,7 @@
 .admin-users-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  gap: 20px;
   margin-bottom: 24px;
 }
 
