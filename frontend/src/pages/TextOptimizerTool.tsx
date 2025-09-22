@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -8,6 +9,7 @@ import './TextOptimizerTool.css';
 
 const TOOL_ID = 'text-optimizer';
 const TextOptimizerTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
@@ -193,9 +195,9 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('textOptimizer.allTools')}
                 </Link>
-                <h1 className="tool-title">Оптимизатор текста</h1>
+                <h1 className="tool-title">{t('textOptimizer.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -216,16 +218,16 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('textOptimizer.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('textOptimizer.buttons.paste')}
                         </button>
-                        <span className="info">{inputLines} стр.</span>
+                        <span className="info">{inputLines} {t('textOptimizer.lineCount')}</span>
                     </div>
                 </div>
 
@@ -238,7 +240,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                                 checked={options.removeTrimSpaces}
                                 onChange={() => handleOptionChange('removeTrimSpaces')}
                             />
-                            <span className="checkbox-text">Удалить лишние пробелы</span>
+                            <span className="checkbox-text">{t('textOptimizer.options.removeTrimSpaces')}</span>
                         </label>
 
                         <label className="checkbox-item">
@@ -247,7 +249,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                                 checked={options.addNeededSpaces}
                                 onChange={() => handleOptionChange('addNeededSpaces')}
                             />
-                            <span className="checkbox-text">Добавить нужные пробелы</span>
+                            <span className="checkbox-text">{t('textOptimizer.options.addNeededSpaces')}</span>
                         </label>
 
                         <label className="checkbox-item">
@@ -256,7 +258,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                                 checked={options.replaceMultipleSpaces}
                                 onChange={() => handleOptionChange('replaceMultipleSpaces')}
                             />
-                            <span className="checkbox-text">Двойные пробелы заменить на пробелы</span>
+                            <span className="checkbox-text">{t('textOptimizer.options.replaceMultipleSpaces')}</span>
                         </label>
 
                         <label className="checkbox-item">
@@ -265,7 +267,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                                 checked={options.fixCapitalization}
                                 onChange={() => handleOptionChange('fixCapitalization')}
                             />
-                            <span className="checkbox-text">Расставить корректный регистр</span>
+                            <span className="checkbox-text">{t('textOptimizer.options.fixCapitalization')}</span>
                         </label>
 
                         <label className="checkbox-item">
@@ -274,7 +276,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                                 checked={options.createParagraphs}
                                 onChange={() => handleOptionChange('createParagraphs')}
                             />
-                            <span className="checkbox-text">Сделать абзацы</span>
+                            <span className="checkbox-text">{t('textOptimizer.options.createParagraphs')}</span>
                         </label>
 
                         <label className="checkbox-item">
@@ -283,7 +285,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                                 checked={options.applyAll}
                                 onChange={() => handleOptionChange('applyAll')}
                             />
-                            <span className="checkbox-text">Все вышеперечисленное</span>
+                            <span className="checkbox-text">{t('textOptimizer.options.applyAll')}</span>
                         </label>
                     </div>
                 </div>
@@ -297,7 +299,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                     onClick={handleShowResult}
                     disabled={!inputText.trim() || (!Object.values(options).some(Boolean))}
                 >
-                    Показать результат
+                    {t('textOptimizer.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -307,7 +309,7 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('textOptimizer.buttons.copied') : t('textOptimizer.buttons.copy')}
                 </button>
             </div>
 
@@ -315,12 +317,47 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('textOptimizer.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('textOptimizer.lineCount')}</span>
+                </div>
+            </div>
+
+            {/* SEO блоки */}
+            <div className="seo-section">
+                <div className="seo-blocks">
+                    <div className="seo-block">
+                        <h2>{t('textOptimizer.seo.whatIsTextOptimizer')}</h2>
+                        <p>{t('textOptimizer.seo.whatIsTextOptimizerContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textOptimizer.seo.whyNeeded')}</h2>
+                        <p>{t('textOptimizer.seo.whyNeededContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textOptimizer.seo.howItWorks')}</h2>
+                        <p>{t('textOptimizer.seo.howItWorksContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textOptimizer.seo.whatTexts')}</h2>
+                        <p>{t('textOptimizer.seo.whatTextsContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textOptimizer.seo.forSpecialists')}</h2>
+                        <p>{t('textOptimizer.seo.forSpecialistsContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textOptimizer.seo.howToUse')}</h2>
+                        <p>{t('textOptimizer.seo.howToUseContent')}</p>
+                    </div>
                 </div>
             </div>
         </div>

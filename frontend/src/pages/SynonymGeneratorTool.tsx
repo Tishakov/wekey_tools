@@ -223,33 +223,39 @@ const SynonymGeneratorTool: React.FC = () => {
       <div className="seo-section">
         <div className="seo-content">
           <div className="seo-item">
-            <h2>{t('synonymGenerator.seo.whatIsSynonymGenerator.title')}</h2>
-            <p>{t('synonymGenerator.seo.whatIsSynonymGenerator.text')}</p>
+            <p>{t('synonymGenerator.seo.toolDescription')}</p>
           </div>
           
           <div className="seo-item">
-            <h2>{t('synonymGenerator.seo.whyNeeded.title')}</h2>
-            <p>{t('synonymGenerator.seo.whyNeeded.text')}</p>
+            <h2>{t('synonymGenerator.seo.whatIsSynonymGenerator')}</h2>
+            <p>{t('synonymGenerator.seo.whatIsSynonymGeneratorContent')}</p>
           </div>
           
           <div className="seo-item">
-            <h2>{t('synonymGenerator.seo.howItWorks.title')}</h2>
-            <p>{t('synonymGenerator.seo.howItWorks.text')}</p>
+            <h2>{t('synonymGenerator.seo.whyNeeded')}</h2>
+            <h3>{t('synonymGenerator.seo.whyNeededSubtitle')}</h3>
+            <p>{t('synonymGenerator.seo.whyNeededContent')}</p>
           </div>
           
           <div className="seo-item">
-            <h2>{t('synonymGenerator.seo.whatTexts.title')}</h2>
-            <p>{t('synonymGenerator.seo.whatTexts.text')}</p>
+            <h2>{t('synonymGenerator.seo.howItWorks')}</h2>
+            <h3>{t('synonymGenerator.seo.howItWorksSubtitle')}</h3>
+            <p>{t('synonymGenerator.seo.howItWorksContent')}</p>
           </div>
           
           <div className="seo-item">
-            <h2>{t('synonymGenerator.seo.forSpecialists.title')}</h2>
-            <p>{t('synonymGenerator.seo.forSpecialists.text')}</p>
+            <h2>{t('synonymGenerator.seo.whatTexts')}</h2>
+            <p>{t('synonymGenerator.seo.whatTextsContent')}</p>
           </div>
           
           <div className="seo-item">
-            <h2>{t('synonymGenerator.seo.howToUse.title')}</h2>
-            <p>{t('synonymGenerator.seo.howToUse.text')}</p>
+            <h2>{t('synonymGenerator.seo.forSpecialists')}</h2>
+            <p>{t('synonymGenerator.seo.forSpecialistsContent')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.howToUse')}</h2>
+            <p>{t('synonymGenerator.seo.howToUseContent')}</p>
           </div>
         </div>
       </div>

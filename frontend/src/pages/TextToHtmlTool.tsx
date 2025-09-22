@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -10,6 +11,7 @@ const TOOL_ID = 'text-to-html';
 type HtmlMode = 'paragraph' | 'line-break' | 'mixed';
 
 const TextToHtmlTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [mode, setMode] = useState<HtmlMode>('paragraph');
@@ -139,9 +141,9 @@ const TextToHtmlTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('textToHtml.allTools')}
                 </Link>
-                <h1 className="tool-title">Текст в HTML</h1>
+                <h1 className="tool-title">{t('textToHtml.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -162,16 +164,16 @@ const TextToHtmlTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('textToHtml.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('textToHtml.buttons.paste')}
                         </button>
-                        <span className="line-count">{inputLines} стр.</span>
+                        <span className="line-count">{inputLines} {t('textToHtml.lineCount')}</span>
                     </div>
                 </div>
 
@@ -186,7 +188,7 @@ const TextToHtmlTool: React.FC = () => {
                                 checked={mode === 'paragraph'}
                                 onChange={(e) => setMode(e.target.value as HtmlMode)}
                             />
-                            <span className="radio-text">&lt;p&gt; - только тег абзаца</span>
+                            <span className="radio-text">{t('textToHtml.modes.paragraph')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -197,7 +199,7 @@ const TextToHtmlTool: React.FC = () => {
                                 checked={mode === 'line-break'}
                                 onChange={(e) => setMode(e.target.value as HtmlMode)}
                             />
-                            <span className="radio-text">&lt;br&gt; - только тег строки</span>
+                            <span className="radio-text">{t('textToHtml.modes.lineBreak')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -208,7 +210,7 @@ const TextToHtmlTool: React.FC = () => {
                                 checked={mode === 'mixed'}
                                 onChange={(e) => setMode(e.target.value as HtmlMode)}
                             />
-                            <span className="radio-text">&lt;br&gt; and &lt;p&gt; - теги строки и абзаца</span>
+                            <span className="radio-text">{t('textToHtml.modes.mixed')}</span>
                         </label>
                     </div>
                 </div>
@@ -222,7 +224,7 @@ const TextToHtmlTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim()}
                 >
-                    Показать результат
+                    {t('textToHtml.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -232,7 +234,7 @@ const TextToHtmlTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('textToHtml.buttons.copied') : t('textToHtml.buttons.copy')}
                 </button>
             </div>
 
@@ -240,12 +242,47 @@ const TextToHtmlTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('textToHtml.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('textToHtml.lineCount')}</span>
+                </div>
+            </div>
+
+            {/* SEO блоки */}
+            <div className="seo-section">
+                <div className="seo-blocks">
+                    <div className="seo-block">
+                        <h2>{t('textToHtml.seo.whatIsTextToHtml')}</h2>
+                        <p>{t('textToHtml.seo.whatIsTextToHtmlContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textToHtml.seo.whyNeeded')}</h2>
+                        <p>{t('textToHtml.seo.whyNeededContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textToHtml.seo.howItWorks')}</h2>
+                        <p>{t('textToHtml.seo.howItWorksContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textToHtml.seo.whatTexts')}</h2>
+                        <p>{t('textToHtml.seo.whatTextsContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textToHtml.seo.forSpecialists')}</h2>
+                        <p>{t('textToHtml.seo.forSpecialistsContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textToHtml.seo.howToUse')}</h2>
+                        <p>{t('textToHtml.seo.howToUseContent')}</p>
+                    </div>
                 </div>
             </div>
         </div>

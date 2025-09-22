@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -8,6 +9,7 @@ import './TextSortingTool.css';
 
 const TOOL_ID = 'text-sorting';
 const TextSortingTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
@@ -158,9 +160,9 @@ const TextSortingTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('textSorting.allTools')}
                 </Link>
-                <h1 className="tool-title">Сортировка слов и строк</h1>
+                <h1 className="tool-title">{t('textSorting.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -181,16 +183,16 @@ const TextSortingTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('textSorting.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('textSorting.buttons.paste')}
                         </button>
-                        <span className="info">{inputLines} стр.</span>
+                        <span className="info">{inputLines} {t('textSorting.lineCount')}</span>
                     </div>
                 </div>
 
@@ -206,7 +208,7 @@ const TextSortingTool: React.FC = () => {
                                 onClick={() => handleRadioClick(sortOption, setSortOption, 'alphabetical-asc')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">По алфавиту (А-Я)</span>
+                            <span className="checkbox-text">{t('textSorting.options.alphabeticalAsc')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -218,7 +220,7 @@ const TextSortingTool: React.FC = () => {
                                 onClick={() => handleRadioClick(sortOption, setSortOption, 'alphabetical-desc')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">По алфавиту (Я-А)</span>
+                            <span className="checkbox-text">{t('textSorting.options.alphabeticalDesc')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -230,7 +232,7 @@ const TextSortingTool: React.FC = () => {
                                 onClick={() => handleRadioClick(sortOption, setSortOption, 'length-desc')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">По количеству символов (больше-меньше)</span>
+                            <span className="checkbox-text">{t('textSorting.options.lengthDesc')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -242,7 +244,7 @@ const TextSortingTool: React.FC = () => {
                                 onClick={() => handleRadioClick(sortOption, setSortOption, 'length-asc')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">По количеству символов (меньше-больше)</span>
+                            <span className="checkbox-text">{t('textSorting.options.lengthAsc')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -254,7 +256,7 @@ const TextSortingTool: React.FC = () => {
                                 onClick={() => handleRadioClick(sortOption, setSortOption, 'words-desc')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">По количеству слов (больше-меньше)</span>
+                            <span className="checkbox-text">{t('textSorting.options.wordsDesc')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -266,7 +268,7 @@ const TextSortingTool: React.FC = () => {
                                 onClick={() => handleRadioClick(sortOption, setSortOption, 'words-asc')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">По количеству слов (меньше-больше)</span>
+                            <span className="checkbox-text">{t('textSorting.options.wordsAsc')}</span>
                         </label>
                     </div>
                 </div>
@@ -280,7 +282,7 @@ const TextSortingTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim() || !sortOption}
                 >
-                    Показать результат
+                    {t('textSorting.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -290,7 +292,7 @@ const TextSortingTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('textSorting.buttons.copied') : t('textSorting.buttons.copy')}
                 </button>
             </div>
 
@@ -298,12 +300,47 @@ const TextSortingTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('textSorting.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('textSorting.lineCount')}</span>
+                </div>
+            </div>
+
+            {/* SEO блоки */}
+            <div className="seo-section">
+                <div className="seo-blocks">
+                    <div className="seo-block">
+                        <h2>{t('textSorting.seo.whatIsTextSorting')}</h2>
+                        <p>{t('textSorting.seo.whatIsTextSortingContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textSorting.seo.whyNeeded')}</h2>
+                        <p>{t('textSorting.seo.whyNeededContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textSorting.seo.howItWorks')}</h2>
+                        <p>{t('textSorting.seo.howItWorksContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textSorting.seo.whatTexts')}</h2>
+                        <p>{t('textSorting.seo.whatTextsContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textSorting.seo.forSpecialists')}</h2>
+                        <p>{t('textSorting.seo.forSpecialistsContent')}</p>
+                    </div>
+
+                    <div className="seo-block">
+                        <h2>{t('textSorting.seo.howToUse')}</h2>
+                        <p>{t('textSorting.seo.howToUseContent')}</p>
+                    </div>
                 </div>
             </div>
         </div>

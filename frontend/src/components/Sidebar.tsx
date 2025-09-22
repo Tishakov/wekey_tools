@@ -85,7 +85,9 @@ const Sidebar: React.FC = () => {
         <ul className="sidebar-menu">
           {sortedTools.map((tool) => {
             const isCompleted = completedTools.includes(tool.id);
-            const isActive = location.pathname === tool.path;
+            // Исправляем проверку активного инструмента - убираем языковой префикс из pathname
+            const currentPath = location.pathname.replace(/^\/[a-z]{2}/, '') || '/';
+            const isActive = currentPath === tool.path;
             const hasAI = aiTools.includes(tool.id);
             
             return (

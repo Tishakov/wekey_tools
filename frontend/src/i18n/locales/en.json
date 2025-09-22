@@ -1102,30 +1102,21 @@
       "keywords": "synonym generator, AI synonyms, word alternatives, synonym finder, ChatGPT synonyms",
       "ogTitle": "AI Synonym Generator - Wekey Tools",
       "ogDescription": "Advanced AI tool for generating synonyms in multiple languages",
-      "whatIsSynonymGenerator": {
-        "title": "What is an AI synonym generator?",
-        "text": "An AI synonym generator is a smart tool that uses artificial intelligence to find alternative words and expressions. The system analyzes context and meaning of original words, suggesting the most suitable synonyms while considering stylistic features."
-      },
-      "whyNeeded": {
-        "title": "Why do you need a synonym generator?",
-        "text": "The tool helps avoid repetition in text, enrich vocabulary, create more diverse content for SEO, prepare advertising text variations, improve writing style and find precise formulations for any tasks."
-      },
-      "howItWorks": {
-        "title": "How does the AI generator work?",
-        "text": "The system uses advanced machine learning algorithms to analyze semantic meaning of words. AI considers context, style, usage frequency and selects the most relevant synonyms while preserving meaning and emotional coloring."
-      },
-      "whatTexts": {
-        "title": "What words can generate synonyms for?",
-        "text": "The tool works with any words and phrases: nouns, adjectives, verbs, adverbs, set expressions. Supports professional terminology, colloquial speech, scientific style and literary texts."
-      },
-      "forSpecialists": {
-        "title": "Who benefits from the AI synonym generator?",
-        "text": "Copywriters, content managers, SEO specialists, journalists, translators, students, teachers, marketers, writers and everyone who works with text and strives for language diversity."
-      },
-      "howToUse": {
-        "title": "How to use the generator?",
-        "text": "Enter words or phrases (each on a new line), select the language for synonym generation, click 'Show result' and get a list of alternative options. AI will analyze context and suggest the most suitable synonyms."
-      }
+      "toolDescription": "Tool Description",
+      "whatIsSynonymGenerator": "What is an AI synonym generator?",
+      "whatIsSynonymGeneratorContent": "An AI synonym generator is a modern online tool based on artificial intelligence and natural language processing technologies. Unlike simple synonym dictionaries, it doesn't just pick random alternatives, but considers the context in which a word or expression is used. Thanks to this, you get not only a list of possible replacements, but truly appropriate, accurate and stylistically suitable synonyms. This approach allows you to improve text readability, make it more lively, natural and convincing.",
+      "whyNeeded": "Why do you need a synonym generator",
+      "whyNeededSubtitle": "Main tasks and advantages",
+      "whyNeededContent": "Frequent repetition of the same words makes text monotonous and reduces its effectiveness — whether it's a blog article, product description or advertisement. The AI synonym generator helps solve this problem: it diversifies vocabulary, improves style and makes content more professional. The tool is especially useful for SEO, as search engines value texts with rich vocabulary where key queries are organically woven into the structure. The generator also helps copywriters create multiple versions of the same text, which is convenient for testing advertisements or social media posts.",
+      "howItWorks": "How the AI generator works",
+      "howItWorksSubtitle": "Principles and technologies",
+      "howItWorksContent": "The tool is based on machine learning algorithms and neural networks trained on huge text corpora. The system analyzes the meaning of a word, its grammatical form and surrounding context. For example, the word 'key' can mean a tool, water source or solution to a problem. The generator determines which exact variant is needed and selects correct synonyms. This makes results more accurate and eliminates 'random' replacements characteristic of traditional dictionaries. As a result, you get a list of words that can be used in text without risk of distorting meaning.",
+      "whatTexts": "What words are supported",
+      "whatTextsContent": "The AI synonym generator works with virtually all parts of speech: nouns, verbs, adjectives, adverbs, set phrases and even idioms. It is equally useful in everyday vocabulary and professional spheres — whether marketing, law, medicine or IT. For example, a marketer can find different variants for an advertising slogan, and a student can improve formulations in academic work. Support for different speech styles — from business to artistic — makes the tool a universal assistant for any tasks.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The online generator will be an indispensable assistant for copywriters and SEO specialists who work with texts daily. Journalists and bloggers can use it to improve style and avoid repetitions. Translators — to find more precise words depending on context. Students and teachers — to diversify language in academic works and lectures. Marketers and advertisers can prepare multiple versions of ads and slogans for A/B testing. Writers and screenwriters will find a source of fresh ideas for artistic texts in the tool. Essentially, anyone who wants to write richer and more convincingly will find it useful.",
+      "howToUse": "How to use the generator",
+      "howToUseContent": "Working with the tool is very simple: paste words or phrases into the input field (one per line), select the generation language and click the 'Show result' button. Within seconds, the system will suggest a list of synonyms selected considering meaning and style. You can quickly copy ready variants and use them in text — whether it's an article, social media post, advertisement or letter. Thanks to the simple interface, you can use the generator even without special knowledge — everything is intuitive and convenient."
     }
   },
   "textByColumns": {
@@ -1186,6 +1177,126 @@
         "title": "How to use the tool?",
         "text": "Paste structured text, select the appropriate separator (semicolon, comma, etc.), add exceptions for headers or totals if needed, click 'Show result' and get data split into 6 columns for convenient work."
       }
+    }
+  },
+  "textOptimizer": {
+    "title": "Text Optimizer",
+    "description": "Automatic text optimization with multiple settings",
+    "allTools": "All tools",
+    "inputPlaceholder": "Enter your text...",
+    "resultPlaceholder": "Result will be here",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copy": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "options": {
+      "removeTrimSpaces": "Remove extra spaces",
+      "addNeededSpaces": "Add needed spaces",
+      "replaceMultipleSpaces": "Replace double spaces with single spaces",
+      "fixCapitalization": "Fix capitalization",
+      "createParagraphs": "Create paragraphs",
+      "applyAll": "All of the above"
+    },
+    "seo": {
+      "title": "Text Optimizer Online - Wekey Tools",
+      "description": "Automatic text optimization with settings for spaces, capitalization, paragraphs and punctuation",
+      "keywords": "text optimization, text formatting, spaces, capitalization, paragraphs, punctuation",
+      "ogTitle": "Text Optimizer - Wekey Tools",
+      "ogDescription": "Smart tool for automatic text optimization and formatting",
+      "whatIsTextOptimizer": "What is a text optimizer?",
+      "whatIsTextOptimizerContent": "A text optimizer is a tool for automatically improving text formatting and structure. It fixes common errors: extra spaces, incorrect punctuation, letter case, creates proper paragraphs and makes text more readable and professional.",
+      "whyNeeded": "Why do you need text optimization?",
+      "whyNeededContent": "Optimization is necessary for creating quality content: fixing copy errors from various sources, preparing texts for publication, improving readability, meeting formatting standards and creating a professional impression on readers.",
+      "howItWorks": "How does the optimizer work?",
+      "howItWorksContent": "The system analyzes text and applies selected rules: removes extra spaces at the beginning and end of lines, adds spaces after punctuation marks, replaces multiple spaces, fixes case after periods and creates proper paragraph structure.",
+      "whatTexts": "What texts can be optimized?",
+      "whatTextsContent": "Suitable for any texts: articles, documents, social media posts, product descriptions, letters, technical texts. Especially useful for content copied from PDF, web pages or other sources with broken formatting.",
+      "forSpecialists": "Who benefits from the optimizer?",
+      "forSpecialistsContent": "Copywriters, content managers, editors, journalists, bloggers, marketers, students, teachers, secretaries and everyone who works with text and strives for high-quality content formatting.",
+      "howToUse": "How to use the optimizer?",
+      "howToUseContent": "Paste text for optimization, select needed options (remove extra spaces, fix capitalization, create paragraphs, etc.) or use 'All of the above', click 'Show result' and get optimized text."
+    }
+  },
+  "textSorting": {
+    "title": "Text and Lines Sorting",
+    "description": "Tool for sorting text by various criteria",
+    "allTools": "All tools",
+    "inputPlaceholder": "Enter your text...",
+    "resultPlaceholder": "Result will be here",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copy": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "options": {
+      "alphabeticalAsc": "Alphabetically (A-Z)",
+      "alphabeticalDesc": "Alphabetically (Z-A)",
+      "lengthDesc": "By character count (more-less)",
+      "lengthAsc": "By character count (less-more)",
+      "wordsDesc": "By word count (more-less)",
+      "wordsAsc": "By word count (less-more)"
+    },
+    "seo": {
+      "title": "Text Sorting Online - Wekey Tools",
+      "description": "Convenient tool for sorting words and lines alphabetically, by length and word count",
+      "keywords": "text sorting, word sorting, line sorting, alphabetical sorting, sorting by length",
+      "ogTitle": "Text Sorting - Wekey Tools",
+      "ogDescription": "Fast text sorting by various criteria online",
+      "whatIsTextSorting": "What is text sorting?",
+      "whatIsTextSortingContent": "Text sorting is a tool for arranging lines and words by various criteria: alphabetical order, text length or word count. Allows you to quickly organize large amounts of textual information in the desired order.",
+      "whyNeeded": "Why is text sorting needed?",
+      "whyNeededContent": "Sorting is necessary for data organization: creating catalogs, ordering lists, content analysis, report preparation, database work and improving readability of large text arrays.",
+      "howItWorks": "How does sorting work?",
+      "howItWorksContent": "The system analyzes each line of text and applies the selected sorting criterion: alphabetical order (direct or reverse), line length in characters, number of words in a line. The result is displayed in sorted form.",
+      "whatTexts": "What texts can be sorted?",
+      "whatTextsContent": "Suitable for any lists: names, addresses, products, keywords, code lines, table data, search results. Especially useful for large lists requiring ordering.",
+      "forSpecialists": "Who benefits from sorting?",
+      "forSpecialistsContent": "Data analysts, content managers, SEO specialists, programmers, researchers, database administrators, editors, marketers and anyone working with large volumes of textual information.",
+      "howToUse": "How to use sorting?",
+      "howToUseContent": "Paste text for sorting, select criteria (alphabetically, by line length or word count), specify sort order (ascending or descending), click 'Show result' and get sorted text."
+    }
+  },
+  "textToHtml": {
+    "title": "Text to HTML",
+    "description": "Convert plain text to HTML code with tags",
+    "allTools": "All tools",
+    "inputPlaceholder": "Enter your text...",
+    "resultPlaceholder": "Result will be here",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copy": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "modes": {
+      "paragraph": "<p> - paragraph tag only",
+      "lineBreak": "<br> - line break tag only",
+      "mixed": "<br> and <p> - line break and paragraph tags"
+    },
+    "seo": {
+      "title": "Text to HTML Converter Online - Wekey Tools",
+      "description": "Convert plain text to HTML code with paragraph tags, line breaks and mixed mode",
+      "keywords": "text to html, html converter, html tags, p tag, br tag, html converter, text conversion",
+      "ogTitle": "Text to HTML - Wekey Tools",
+      "ogDescription": "Fast text to HTML code conversion with various tag modes",
+      "whatIsTextToHtml": "What is a text to HTML converter?",
+      "whatIsTextToHtmlContent": "A text to HTML converter is a tool for transforming plain text into HTML code with appropriate tags. Allows you to choose tag types: paragraph tags <p> only, line break tags <br> only, or mixed mode for creating proper HTML markup.",
+      "whyNeeded": "Why is HTML conversion needed?",
+      "whyNeededContent": "Conversion is necessary for web development: creating HTML pages, preparing content for websites, formatting text for blogs, creating email newsletters, working with CMS and accelerating web page layout process.",
+      "howItWorks": "How does the converter work?",
+      "howItWorksContent": "The system analyzes text structure and applies selected HTML tags: <p> mode creates paragraphs for each text block, <br> mode adds line breaks, mixed mode combines both tag types for optimal markup.",
+      "whatTexts": "What texts can be converted?",
+      "whatTextsContent": "Suitable for any text: articles, news, blog posts, product descriptions, letters, documents, comments. Especially useful for content that needs to be placed on websites or in HTML documents.",
+      "forSpecialists": "Who benefits from the converter?",
+      "forSpecialistsContent": "Web developers, layout designers, content managers, bloggers, copywriters, designers, marketers, site administrators and everyone who works with web content and HTML markup.",
+      "howToUse": "How to use the converter?",
+      "howToUseContent": "Paste text for conversion, select HTML tag mode (only <p>, only <br> or mixed), click 'Show result' and get ready HTML code for use on website."
     }
   },
   "footer": {
