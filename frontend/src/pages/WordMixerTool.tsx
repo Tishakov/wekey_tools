@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -7,7 +8,9 @@ import './WordMixerTool.css';
 
 
 const TOOL_ID = 'word-mixer';
+
 const WordMixerTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
@@ -173,7 +176,7 @@ const WordMixerTool: React.FC = () => {
                     <img src="/icons/arrow_left.svg" alt="" />
                     Все инструменты
                 </Link>
-                <h1 className="tool-title">Миксация слов</h1>
+                <h1 className="tool-title">{t('wordMixer.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -195,23 +198,23 @@ const WordMixerTool: React.FC = () => {
                     <div className="input-field">
                         <textarea
                             className="input-textarea"
-                            placeholder="Ваш список 1..."
+                            placeholder={t('wordMixer.placeholders.input1')}
                             value={inputText1}
                             onChange={(e) => setInputText1(e.target.value)}
                         />
                         <div className="input-controls">
                             <button className="paste-button" onClick={handlePaste1}>
                                 <img src="/icons/button_paste.svg" alt="" />
-                                Вставить
+                                {t('wordMixer.buttons.paste')}
                             </button>
-                            <span className="info">{inputLines1} стр.</span>
+                            <span className="info">{inputLines1} {t('wordMixer.counters.lines')}</span>
                         </div>
                     </div>
 
                     {/* Кнопка обмена 1-2 */}
                     <div className="swap-button-container">
-                        <button className="swap-button" onClick={swapValues12} title="Поменять местами">
-                            <img src="/icons/change.svg" alt="Поменять местами" />
+                        <button className="swap-button" onClick={swapValues12} title={t('wordMixer.buttons.swap')}>
+                            <img src="/icons/change.svg" alt={t('wordMixer.buttons.swap')} />
                         </button>
                     </div>
 
@@ -219,23 +222,23 @@ const WordMixerTool: React.FC = () => {
                     <div className="input-field">
                         <textarea
                             className="input-textarea"
-                            placeholder="Ваш список 2..."
+                            placeholder={t('wordMixer.placeholders.input2')}
                             value={inputText2}
                             onChange={(e) => setInputText2(e.target.value)}
                         />
                         <div className="input-controls">
                             <button className="paste-button" onClick={handlePaste2}>
                                 <img src="/icons/button_paste.svg" alt="" />
-                                Вставить
+                                {t('wordMixer.buttons.paste')}
                             </button>
-                            <span className="info">{inputLines2} стр.</span>
+                            <span className="info">{inputLines2} {t('wordMixer.counters.lines')}</span>
                         </div>
                     </div>
 
                     {/* Кнопка обмена 2-3 */}
                     <div className="swap-button-container">
-                        <button className="swap-button" onClick={swapValues23} title="Поменять местами">
-                            <img src="/icons/change.svg" alt="Поменять местами" />
+                        <button className="swap-button" onClick={swapValues23} title={t('wordMixer.buttons.swap')}>
+                            <img src="/icons/change.svg" alt={t('wordMixer.buttons.swap')} />
                         </button>
                     </div>
 
@@ -243,23 +246,23 @@ const WordMixerTool: React.FC = () => {
                     <div className="input-field">
                         <textarea
                             className="input-textarea"
-                            placeholder="Ваш список 3..."
+                            placeholder={t('wordMixer.placeholders.input3')}
                             value={inputText3}
                             onChange={(e) => setInputText3(e.target.value)}
                         />
                         <div className="input-controls">
                             <button className="paste-button" onClick={handlePaste3}>
                                 <img src="/icons/button_paste.svg" alt="" />
-                                Вставить
+                                {t('wordMixer.buttons.paste')}
                             </button>
-                            <span className="info">{inputLines3} стр.</span>
+                            <span className="info">{inputLines3} {t('wordMixer.counters.lines')}</span>
                         </div>
                     </div>
 
                     {/* Кнопка обмена 3-4 */}
                     <div className="swap-button-container">
-                        <button className="swap-button" onClick={swapValues34} title="Поменять местами">
-                            <img src="/icons/change.svg" alt="Поменять местами" />
+                        <button className="swap-button" onClick={swapValues34} title={t('wordMixer.buttons.swap')}>
+                            <img src="/icons/change.svg" alt={t('wordMixer.buttons.swap')} />
                         </button>
                     </div>
 
@@ -267,16 +270,16 @@ const WordMixerTool: React.FC = () => {
                     <div className="input-field">
                         <textarea
                             className="input-textarea"
-                            placeholder="Ваш список 4..."
+                            placeholder={t('wordMixer.placeholders.input4')}
                             value={inputText4}
                             onChange={(e) => setInputText4(e.target.value)}
                         />
                         <div className="input-controls">
                             <button className="paste-button" onClick={handlePaste4}>
                                 <img src="/icons/button_paste.svg" alt="" />
-                                Вставить
+                                {t('wordMixer.buttons.paste')}
                             </button>
-                            <span className="info">{inputLines4} стр.</span>
+                            <span className="info">{inputLines4} {t('wordMixer.counters.lines')}</span>
                         </div>
                     </div>
                 </div>
@@ -289,7 +292,7 @@ const WordMixerTool: React.FC = () => {
                     style={{ width: '445px' }} 
                     onClick={handleShowResult}
                 >
-                    Показать результат
+                    {t('wordMixer.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -299,7 +302,7 @@ const WordMixerTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('wordMixer.buttons.copied') : t('wordMixer.buttons.copy')}
                 </button>
             </div>
 
@@ -307,12 +310,54 @@ const WordMixerTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('wordMixer.placeholders.result')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('wordMixer.counters.lines')}</span>
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-item">
+                    <h2>{t('wordMixer.seo.toolDescription')}</h2>
+                    <div className="seo-subsection">
+                        <h3>{t('wordMixer.seo.whatIsWordMixer')}</h3>
+                        <p>{t('wordMixer.seo.whatIsWordMixerContent')}</p>
+                    </div>
+                </div>
+
+                <div className="seo-item">
+                    <h2>{t('wordMixer.seo.whyNeeded')}</h2>
+                    <div className="seo-subsection">
+                        <h3>{t('wordMixer.seo.whyNeededSubtitle')}</h3>
+                        <p>{t('wordMixer.seo.whyNeededContent')}</p>
+                    </div>
+                </div>
+
+                <div className="seo-item">
+                    <h2>{t('wordMixer.seo.howItWorks')}</h2>
+                    <div className="seo-subsection">
+                        <h3>{t('wordMixer.seo.howItWorksSubtitle')}</h3>
+                        <p>{t('wordMixer.seo.howItWorksContent')}</p>
+                    </div>
+                </div>
+
+                <div className="seo-item">
+                    <h2>{t('wordMixer.seo.whatLists')}</h2>
+                    <p>{t('wordMixer.seo.whatListsContent')}</p>
+                </div>
+
+                <div className="seo-item">
+                    <h2>{t('wordMixer.seo.forSpecialists')}</h2>
+                    <p>{t('wordMixer.seo.forSpecialistsContent')}</p>
+                </div>
+
+                <div className="seo-item">
+                    <h2>{t('wordMixer.seo.howToUse')}</h2>
+                    <p>{t('wordMixer.seo.howToUseContent')}</p>
                 </div>
             </div>
         </div>

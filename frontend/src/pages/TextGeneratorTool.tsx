@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { openaiService, type TextGenerationResponse } from '../services/openaiService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
@@ -10,6 +11,7 @@ import './TextGeneratorTool.css';
 
 const TOOL_ID = 'text-generator';
 const TextGeneratorTool: React.FC = () => {
+  const { t } = useTranslation();
   const { textGenerator } = useToolTranslation();
   const { createLink } = useLocalizedLink();
   
@@ -492,6 +494,41 @@ const TextGeneratorTool: React.FC = () => {
           <img src="/icons/button_copy.svg" alt="" />
           {copied ? 'Скопировано!' : 'Скопировать результат'}
         </button>
+      </div>
+
+      {/* SEO секция */}
+      <div className="seo-section">
+        <div className="seo-content">
+          <div className="seo-item">
+            <p>{t('textGenerator.seo.toolDescription')}</p>
+          </div>
+          <div className="seo-item">
+            <h2>{t('textGenerator.seo.whatIsTextGenerator')}</h2>
+            <p>{t('textGenerator.seo.whatIsTextGeneratorContent')}</p>
+          </div>
+          <div className="seo-item">
+            <h2>{t('textGenerator.seo.whyNeeded')}</h2>
+            <h3>{t('textGenerator.seo.whyNeededSubtitle')}</h3>
+            <p>{t('textGenerator.seo.whyNeededContent')}</p>
+          </div>
+          <div className="seo-item">
+            <h2>{t('textGenerator.seo.howItWorks')}</h2>
+            <h3>{t('textGenerator.seo.howItWorksSubtitle')}</h3>
+            <p>{t('textGenerator.seo.howItWorksContent')}</p>
+          </div>
+          <div className="seo-item">
+            <h2>{t('textGenerator.seo.whatTexts')}</h2>
+            <p>{t('textGenerator.seo.whatTextsContent')}</p>
+          </div>
+          <div className="seo-item">
+            <h2>{t('textGenerator.seo.forSpecialists')}</h2>
+            <p>{t('textGenerator.seo.forSpecialistsContent')}</p>
+          </div>
+          <div className="seo-item">
+            <h2>{t('textGenerator.seo.howToUse')}</h2>
+            <p>{t('textGenerator.seo.howToUseContent')}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

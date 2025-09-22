@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
@@ -9,6 +10,7 @@ import './PasswordGeneratorTool.css';
 
 const TOOL_ID = 'password-generator';
 const PasswordGeneratorTool: React.FC = () => {
+    const { t } = useTranslation();
     const { common, passwordGenerator } = useToolTranslation();
     const { createLink } = useLocalizedLink();
     
@@ -386,6 +388,41 @@ const PasswordGeneratorTool: React.FC = () => {
                         <img src="/icons/reset.svg" alt="" />
                         {common.reset()}
                     </button>
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <p>{t('passwordGenerator.seo.toolDescription')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('passwordGenerator.seo.whatIsPasswordGenerator')}</h2>
+                        <p>{t('passwordGenerator.seo.whatIsPasswordGeneratorContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('passwordGenerator.seo.whyNeeded')}</h2>
+                        <h3>{t('passwordGenerator.seo.whyNeededSubtitle')}</h3>
+                        <p>{t('passwordGenerator.seo.whyNeededContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('passwordGenerator.seo.howItWorks')}</h2>
+                        <h3>{t('passwordGenerator.seo.howItWorksSubtitle')}</h3>
+                        <p>{t('passwordGenerator.seo.howItWorksContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('passwordGenerator.seo.whatPasswords')}</h2>
+                        <p>{t('passwordGenerator.seo.whatPasswordsContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('passwordGenerator.seo.forSpecialists')}</h2>
+                        <p>{t('passwordGenerator.seo.forSpecialistsContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('passwordGenerator.seo.howToUse')}</h2>
+                        <p>{t('passwordGenerator.seo.howToUseContent')}</p>
+                    </div>
                 </div>
             </div>
         </div>

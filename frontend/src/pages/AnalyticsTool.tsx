@@ -1310,6 +1310,47 @@ const AnalyticsTool: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* SEO блок */}
+        <div className="seo-section">
+          <div className="seo-content">
+            <div className="seo-item">
+              <p>{t('analyticsTool.seo.toolDescription')}</p>
+            </div>
+            
+            <div className="seo-item">
+              <h2>{t('analyticsTool.seo.whatIsAnalytics')}</h2>
+              <p>{t('analyticsTool.seo.whatIsAnalyticsText')}</p>
+            </div>
+            
+            <div className="seo-item">
+              <h2>{t('analyticsTool.seo.whyNeededAnalytics')}</h2>
+              <h3>{t('analyticsTool.seo.whyNeededAnalyticsTitle')}</h3>
+              <p>{t('analyticsTool.seo.whyNeededAnalyticsText')}</p>
+            </div>
+            
+            <div className="seo-item">
+              <h2>{t('analyticsTool.seo.howItWorks')}</h2>
+              <h3>{t('analyticsTool.seo.howItWorksTitle')}</h3>
+              <p>{t('analyticsTool.seo.howItWorksText')}</p>
+            </div>
+            
+            <div className="seo-item">
+              <h2>{t('analyticsTool.seo.whatMetrics')}</h2>
+              <p>{t('analyticsTool.seo.whatMetricsText')}</p>
+            </div>
+            
+            <div className="seo-item">
+              <h2>{t('analyticsTool.seo.whoNeedsIt')}</h2>
+              <p>{t('analyticsTool.seo.whoNeedsItText')}</p>
+            </div>
+            
+            <div className="seo-item">
+              <h2>{t('analyticsTool.seo.howToUse')}</h2>
+              <p>{t('analyticsTool.seo.howToUseText')}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

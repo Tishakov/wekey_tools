@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -8,6 +9,7 @@ import './WordGluingTool.css';
 
 const TOOL_ID = 'word-gluing';
 const WordGluingTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
@@ -162,18 +164,18 @@ const WordGluingTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('navigation.allTools')}
                 </Link>
-                <h1 className="tool-title">Склейка слов</h1>
+                <h1 className="tool-title">{t('wordGluing.title')}</h1>
                 <div className="tool-header-buttons">
-                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                    <button className="tool-header-btn counter-btn" title={t('navigation.launchCounter')}>
                         <img src="/icons/rocket.svg" alt="" />
                         <span className="counter">{launchCount}</span>
                     </button>
-                    <button className="tool-header-btn icon-only" title="Подсказки">
+                    <button className="tool-header-btn icon-only" title={t('navigation.hints')}>
                         <img src="/icons/lamp.svg" alt="" />
                     </button>
-                    <button className="tool-header-btn icon-only" title="Скриншот">
+                    <button className="tool-header-btn icon-only" title={t('navigation.screenshot')}>
                         <img src="/icons/camera.svg" alt="" />
                     </button>
                 </div>
@@ -187,39 +189,39 @@ const WordGluingTool: React.FC = () => {
                         <div className="input-field">
                             <textarea
                                 className="input-textarea"
-                                placeholder="Введите первый список слов..."
+                                placeholder={t('wordGluing.placeholders.input1')}
                                 value={inputText1}
                                 onChange={(e) => setInputText1(e.target.value)}
                             />
                             <div className="input-controls">
                                 <button className="paste-button" onClick={handlePaste1}>
                                     <img src="/icons/button_paste.svg" alt="" />
-                                    Вставить
+                                    {t('wordGluing.buttons.paste')}
                                 </button>
-                                <span className="line-count">{inputLines1} стр.</span>
+                                <span className="line-count">{inputLines1} {t('wordGluing.counters.lines')}</span>
                             </div>
                         </div>
                         
                         <div className="input-field">
                             <textarea
                                 className="input-textarea"
-                                placeholder="Введите второй список слов..."
+                                placeholder={t('wordGluing.placeholders.input2')}
                                 value={inputText2}
                                 onChange={(e) => setInputText2(e.target.value)}
                             />
                             <div className="input-controls">
                                 <button className="paste-button" onClick={handlePaste2}>
                                     <img src="/icons/button_paste.svg" alt="" />
-                                    Вставить
+                                    {t('wordGluing.buttons.paste')}
                                 </button>
-                                <span className="line-count">{inputLines2} стр.</span>
+                                <span className="line-count">{inputLines2} {t('wordGluing.counters.lines')}</span>
                             </div>
                         </div>
                         
                         {/* Кнопка обмена значений - поверх полей по центру */}
                         <div className="swap-button-container">
-                            <button className="swap-button" onClick={swapValues} title="Поменять местами">
-                                <img src="/icons/change.svg" alt="Поменять местами" />
+                            <button className="swap-button" onClick={swapValues} title={t('wordGluing.buttons.swap')}>
+                                <img src="/icons/change.svg" alt={t('wordGluing.buttons.swap')} />
                             </button>
                         </div>
                     </div>
@@ -229,7 +231,7 @@ const WordGluingTool: React.FC = () => {
                 <div className="settings-section">
                     <div className="settings-group">
                         {/* Плашка заголовка внутри блока */}
-                        <div className="connector-label">Соединитель</div>
+                        <div className="connector-label">{t('wordGluing.connectors.title')}</div>
                         
                         {/* Сетка радио-кнопок 2x4 согласно скриншоту */}
                         <div className="connector-grid">
@@ -243,7 +245,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'nothing')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Ничего</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.nothing')}</span>
                             </label>
 
                             {/* Правая колонка */}
@@ -256,7 +258,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'semicolon')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Точка с запятой</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.semicolon')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -268,7 +270,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'space')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Пробел</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.space')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -280,7 +282,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'colon')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Двоеточие</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.colon')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -292,7 +294,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'comma-space')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Запятая+пробел</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.commaSpace')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -304,7 +306,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'dash')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Тире без пробела</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.dash')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -316,7 +318,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'dot-space')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Точка+пробел</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.dotSpace')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -328,7 +330,7 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'long-dash')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Длинное тире</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.longDash')}</span>
                             </label>
                         </div>
                     </div>
@@ -345,12 +347,12 @@ const WordGluingTool: React.FC = () => {
                                     onClick={() => handleRadioClick(connector, setConnector, 'other')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Другой</span>
+                                <span className="radio-text">{t('wordGluing.connectors.options.other')}</span>
                             </label>
                             <input
                                 type="text"
                                 className="custom-connector-input"
-                                placeholder="Введите свой"
+                                placeholder={t('wordGluing.connectors.customPlaceholder')}
                                 value={customConnector}
                                 onChange={(e) => setCustomConnector(e.target.value)}
                                 onFocus={() => setConnector('other')}
@@ -369,7 +371,7 @@ const WordGluingTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText1.trim() || !inputText2.trim()}
                 >
-                    Показать результат
+                    {t('wordGluing.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -379,7 +381,7 @@ const WordGluingTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('wordGluing.buttons.copied') : t('wordGluing.buttons.copy')}
                 </button>
             </div>
 
@@ -387,12 +389,53 @@ const WordGluingTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('wordGluing.placeholders.result')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('wordGluing.counters.lines')}</span>
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <p>{t('wordGluing.seo.toolDescription')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('wordGluing.seo.whatIsWordGluing')}</h2>
+                        <p>{t('wordGluing.seo.whatIsWordGluingContent')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('wordGluing.seo.whyNeeded')}</h2>
+                        <h3>{t('wordGluing.seo.whyNeededSubtitle')}</h3>
+                        <p>{t('wordGluing.seo.whyNeededContent')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('wordGluing.seo.howItWorks')}</h2>
+                        <h3>{t('wordGluing.seo.howItWorksSubtitle')}</h3>
+                        <p>{t('wordGluing.seo.howItWorksContent')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('wordGluing.seo.whatConnectors')}</h2>
+                        <p>{t('wordGluing.seo.whatConnectorsContent')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('wordGluing.seo.forSpecialists')}</h2>
+                        <p>{t('wordGluing.seo.forSpecialistsContent')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('wordGluing.seo.howToUse')}</h2>
+                        <p>{t('wordGluing.seo.howToUseContent')}</p>
+                    </div>
                 </div>
             </div>
         </div>

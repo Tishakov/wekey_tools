@@ -124,7 +124,24 @@
     "includeNumbers": "Numbers",
     "includeSymbols": "Symbols",
     "passwordCount": "Number of passwords:",
-    "copyError": "Copy error:"
+    "copyError": "Copy error:",
+    "seo": {
+      "toolDescription": "Tool Description",
+      "whatIsPasswordGenerator": "What is a password generator?",
+      "whatIsPasswordGeneratorContent": "A password generator is a specialized online tool for creating cryptographically strong passwords with customizable security parameters. Unlike simple generators, it considers modern cybersecurity requirements and allows creating passwords in different languages with flexible complexity settings. The tool uses a cryptographically strong random number generation algorithm, ensuring unpredictability and uniqueness of each password. This makes brute-force attacks practically impossible.",
+      "whyNeeded": "Why do you need a password generator",
+      "whyNeededSubtitle": "Main tasks and advantages",
+      "whyNeededContent": "Weak passwords are the main cause of account breaches and data leaks. People often use simple combinations, birth dates, or reuse passwords across different services, creating critical vulnerabilities. A password generator solves this problem by creating unique, complex passwords for each account. The tool is especially important for business: IT administrators generate temporary passwords for employees, developers create API keys, and security specialists form passwords for test accounts. Regular generation of new passwords is the foundation of modern information security.",
+      "howItWorks": "How the generator works",
+      "howItWorksSubtitle": "Principles and technologies",
+      "howItWorksContent": "The generator uses a cryptographically strong entropy source to create truly random sequences. The system forms a character set based on selected parameters: language alphabet, numbers, special symbols, letter case. Then the algorithm guarantees to include at least one character from each selected category and fills the remaining length with random characters. Final shuffling ensures even distribution of characters throughout the password length. This approach eliminates predictable patterns and ensures maximum entropy.",
+      "whatPasswords": "What passwords can be created",
+      "whatPasswordsContent": "The tool supports creating passwords of any complexity: from simple letter combinations to complex multi-character sequences with numbers and special characters. Three languages are available - Russian, English, and Ukrainian, allowing creation of passwords with national characters. You can set length from 1 to 100 characters, include or exclude uppercase letters, numbers, special symbols. The system generates from 1 to 10 passwords simultaneously, which is convenient for mass account creation or updating passwords for multiple accounts.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The generator is critically important for IT administrators who manage corporate systems and create employee accounts. Information security specialists use it to generate temporary passwords during audits and testing. Developers create API keys, access tokens, and passwords for test databases. System administrators generate passwords for servers, databases, and network equipment. Regular users enhance security of personal accounts. Companies use the tool to comply with security policies and regulatory requirements.",
+      "howToUse": "How to use the generator",
+      "howToUseContent": "Usage is extremely simple: select password length using the slider or enter exact value, specify alphabet language, check needed character types (uppercase letters, numbers, special characters), set number of passwords to generate, and click 'Generate' button. Ready passwords will appear in the result field and be ready for copying. For maximum security, it's recommended to use passwords of 12+ characters with all character types included. Each password is unique and meets modern security standards."
+    }
   },
   "textGenerator": {
     "title": "Text Generator",
@@ -136,7 +153,24 @@
       "fish": "Fish text"
     },
     "paragraphCount": "Number of paragraphs:",
-    "inputText": "Enter source text:"
+    "inputText": "Enter source text:",
+    "seo": {
+      "toolDescription": "Tool Description",
+      "whatIsTextGenerator": "What is an AI text generator?",
+      "whatIsTextGeneratorContent": "An AI text generator is a modern online tool based on artificial intelligence and deep learning technologies. Unlike simple Lorem Ipsum generators, it creates meaningful, coherent text on a given topic considering context, style, and user requirements. Thanks to training on huge datasets, the system understands language structure and can generate natural texts on various topics. This approach allows creating quality content for articles, descriptions, posts, and other tasks.",
+      "whyNeeded": "Why do you need a text generator",
+      "whyNeededSubtitle": "Main tasks and advantages",
+      "whyNeededContent": "Creating quality content requires time and creative effort, especially when you need to write large volumes of text or overcome writer's block. An AI text generator helps solve this problem: it creates structured content, generates ideas for topic development, and helps overcome blank page syndrome. The tool is especially useful for creating drafts, filling websites with content, testing layouts with real text. The generator also helps copywriters and content managers increase productivity when working with large volumes of material.",
+      "howItWorks": "How the AI generator works",
+      "howItWorksSubtitle": "Principles and technologies",
+      "howItWorksContent": "The tool is based on transformer neural networks trained on billions of text documents. The system analyzes language patterns, sentence structure, and semantic connections between words. During generation, AI considers specified parameters: language, text volume, number of paragraphs, and topic. The algorithm sequentially creates sentences while maintaining logical coherence and natural presentation. This allows obtaining texts that read naturally and correspond to human writing style.",
+      "whatTexts": "What texts can be created",
+      "whatTextsContent": "The tool supports text generation in Russian, English, and Ukrainian languages. You can create articles, product descriptions, social media posts, website content, test content for layouts. Length customization is available from a few sentences to large articles of thousands of characters. The system automatically structures text into paragraphs for better readability. Classic Lorem Ipsum is also available for design tasks where text structure matters more than meaning.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The generator will be an indispensable assistant for copywriters and content managers working with large volumes of text. Web designers and developers use it to fill layouts with realistic content. SEO specialists create base texts for further optimization. Marketers generate drafts for advertising materials and posts. Bloggers and journalists overcome creative blocks and get ideas for topic development. Students and teachers create educational materials and text examples.",
+      "howToUse": "How to use the generator",
+      "howToUseContent": "Usage is extremely simple: select generation language from dropdown list, set counting mode (characters or words), specify desired text volume using slider, configure number of paragraphs, and click 'Show Result'. AI will generate text according to specified parameters. Ready text will appear in result field and be ready for copying. For quality content, it's recommended to use volume from 100 words, which allows AI to create coherent and structured text."
+    }
   },
   "emojiTool": {
     "title": "Emoji",
@@ -221,7 +255,24 @@
       "copied": "Copied!",
       "paste": "Paste"
     },
-    "resultPlaceholder": "Result will appear here"
+    "resultPlaceholder": "Result will appear here",
+    "seo": {
+      "toolDescription": "Tool Description",
+      "whatIsFindReplace": "What is smart find and replace text tool?",
+      "whatIsFindReplaceText": "Smart find and replace text tool is an advanced online instrument for bulk document and text editing. Unlike simple editors, it allows simultaneous search and replacement of multiple different words, phrases, or symbols from a list. The tool supports case-sensitive search, replacement with empty strings for removing unwanted elements, and replacement with paragraphs for text structuring.",
+      "whyNeededFindReplace": "Why bulk find and replace is needed",
+      "whyNeededFindReplaceTitle": "Main tasks and advantages",
+      "whyNeededFindReplaceText": "When working with large text volumes, it's often necessary to replace dozens or hundreds of different words, fix errors, standardize terminology, or clean documents from unnecessary symbols. Manual editing would take hours, while bulk replacement solves the task in minutes. The tool is especially useful for SEO text optimization, content preparation for publishing, technical documentation processing, and text adaptation for different formats.",
+      "howItWorks": "How the search and replace algorithm works",
+      "howItWorksTitle": "Principles and technologies",
+      "howItWorksText": "The system uses regular expressions for precise search of specified strings in text. The algorithm sequentially processes each element from the search list, applying case sensitivity settings to it. When replacing with empty strings, extra spaces and empty lines are automatically cleaned. Paragraph replacement mode allows text structuring, turning found elements into separators between blocks.",
+      "whatModesSupported": "What replacement modes are supported",
+      "whatModesSupportedText": "The tool offers three working modes: standard replacement with specified text, replacement with empty strings for removing unwanted elements, and replacement with paragraphs for document structure creation. Case sensitivity function allows precise search process control. List processing capability makes the tool indispensable for bulk editing, HTML code cleanup, import data preparation, and text format standardization.",
+      "whoNeedsIt": "Who benefits from the find and replace tool",
+      "whoNeedsItText": "Editors and proofreaders use it for style and terminology unification in large documents. SEO specialists — for keyword and meta tag optimization. Web developers — for HTML/CSS code cleanup and processing. Translators — for term replacement and text adaptation. Content managers — for material preparation for publishing. Researchers and analysts — for data processing and information standardization.",
+      "howToUse": "How to use the find and replace tool",
+      "howToUseText": "Paste source text in the upper field. In the 'What to replace' field, enter a list of words or phrases to search (one per line). In the 'Replace with' field, specify replacement or choose deletion/paragraph mode. Enable case sensitivity if needed. Click 'Replace' and get processed text in the lower field. Copy the result for further use."
+    }
   },
   "transliterationTool": {
     "title": "Transliteration",
@@ -304,7 +355,23 @@
     "copyButton": "Copy result",
     "resetButton": "Clear",
     "showResultButton": "Show result",
-    "usage": "Usage: {{count}}"
+    "usage": "Usage: {{count}}",
+    "seo": {
+      "toolDescription": "Tool Description",
+      "description": "Advanced character counter for detailed text analysis with word exclusion, paragraph, sentence and special character counting capabilities",
+      "whatIsCharCounter": "What is an advanced character counter?",
+      "whatIsCharCounterText": "An advanced character counter is a professional tool for comprehensive text analysis that provides detailed statistics: character count with and without spaces, words, numbers, digits, special characters, paragraphs, and sentences. Includes functionality to exclude functional words for more accurate analysis.",
+      "whyNeededCharCounter": "Why is detailed text analysis needed?",
+      "whyNeededCharCounterText": "Content creation requires controlling text volume and structure. SEO optimization demands precise character counting for meta descriptions (up to 160 characters), titles (up to 60 characters), social media posts. Journalists use it for article limits compliance, copywriters for work volume estimation, students for academic requirements.",
+      "howItWorks": "How does the counting algorithm work?",
+      "howItWorksText": "The system uses regular expressions and Unicode analysis for accurate recognition of different character types. The algorithm tokenizes text, classifies each element (letters, digits, special characters), counts structural units (words, sentences, paragraphs) considering punctuation and formatting rules.",
+      "whatExclusions": "What do word exclusions provide?",
+      "whatExclusionsText": "The exclusion feature allows removing functional words (prepositions, conjunctions, particles) that don't carry semantic meaning from the count. This is especially useful for keyword analysis in SEO texts, semantic core determination, counting significant terms in academic papers, and creating more accurate content statistics.",
+      "forSpecialists": "For specialists and professionals",
+      "forSpecialistsText": "Copywriters use it for text volume and structure assessment, SEO specialists for search engine optimization, journalists for editorial standards compliance, teachers for student work evaluation, translators for service cost calculation based on character count.",
+      "howToUse": "How to use the character counter?",
+      "howToUseText": "Paste or enter text in the input field. The system automatically displays basic statistics. For detailed analysis, click 'Show result'. Use the 'Exceptions' checkbox to activate functional word filtering. Add custom exclusions or use the ready list of prepositions and conjunctions. Copy results for use in reports."
+    }
   },
   "textSortingTool": {
     "title": "Text Sorting",
@@ -543,30 +610,21 @@
       "keywords": "utm generator, utm tags, utm parameters, campaign tracking, traffic analytics, link generator",
       "ogTitle": "UTM Generator - Wekey Tools",
       "ogDescription": "Simple and convenient UTM parameter generator for marketing campaigns",
-      "whatIsUtm": {
-        "title": "What are UTM tags?",
-        "text": "UTM tags (Urchin Tracking Module) are special parameters added to URLs for tracking traffic sources in web analytics. They allow you to accurately determine where visitors came to your site from: which advertising campaign, source, or specific ad."
-      },
-      "whenToUse": {
-        "title": "When to use UTM tags?",
-        "text": "UTM parameters are essential when launching advertising campaigns on social networks, contextual advertising, email campaigns, affiliate programs, and any marketing activities. They help measure ROI, optimize budgets, and make informed decisions about developing advertising channels."
-      },
-      "howItWorks": {
-        "title": "How does the UTM generator work?",
-        "text": "The tool automatically creates correct UTM parameters based on entered data. You specify the base URL and fill in the source, medium, campaign, term, and content fields. The generator creates the final link with properly encoded parameters and optionally applies transliteration for correct display in analytics."
-      },
-      "benefits": {
-        "title": "UTM generator benefits",
-        "text": "Automatic parameter encoding, built-in templates for popular advertising platforms, Cyrillic transliteration option, instant copying of ready links, support for all standard UTM parameters, and simple intuitive interface for quick work."
-      },
-      "forSpecialists": {
-        "title": "Who will find this tool useful?",
-        "text": "The tool is especially useful for marketers, performance specialists, SMM managers, web analysts, affiliate marketers, and business owners. It will help set up correct tracking of advertising campaigns, measure channel effectiveness, and optimize marketing expenses."
-      },
-      "howToUse": {
-        "title": "How to use the generator?",
-        "text": "Enter the base website URL, select traffic source from ready templates or enter manually. Fill in the needed UTM parameters: source, medium, campaign, term, and content. If necessary, enable transliteration and click \"Show result\"."
-      }
+      "toolDescription": "Tool Description",
+      "whatIsUtmGenerator": "What is a UTM tag generator?",
+      "whatIsUtmGeneratorText": "A UTM tag generator is a professional online tool for creating special tracking parameters that are added to URLs for precise monitoring of traffic sources in web analytics. Unlike manual UTM parameter creation, it automatically generates correctly encoded links, prevents syntax errors, offers ready templates for popular advertising platforms, and provides Cyrillic transliteration for correct display in analytical systems.",
+      "whyNeededUtm": "Why UTM tags are needed in marketing",
+      "whyNeededUtmTitle": "Main tasks and advantages",
+      "whyNeededUtmText": "Without UTM tags, it's impossible to accurately determine the effectiveness of various advertising channels and campaigns. Marketers lose critically important information about which traffic sources bring the highest ROI. UTM parameters allow detailed analysis of user behavior from different sources, compare advertising platform effectiveness, optimize advertising budgets, and make informed decisions about scaling successful acquisition channels.",
+      "howItWorks": "How the UTM tag generator works",
+      "howItWorksTitle": "Principles and technologies",
+      "howItWorksText": "The system analyzes user-entered data and automatically generates correct UTM parameters according to Google Analytics standards. The algorithm properly encodes special characters, spaces, and Cyrillic for error-free URL transmission. When selecting ready templates, the tool automatically fills all fields with typical values for specific advertising platforms. The transliteration option converts Cyrillic characters to Latin for compatibility with all analytical systems.",
+      "whatParameters": "What UTM parameters are supported",
+      "whatParametersText": "The generator supports all five standard UTM parameters: utm_source (traffic source), utm_medium (acquisition channel), utm_campaign (campaign name), utm_content (ad content), and utm_term (keyword). Ready templates are available for Google Ads, Facebook, Instagram, TikTok, Email campaigns, Telegram, Viber, and other popular platforms. Users can create both complete links with base URL or just UTM tails for adding to existing addresses.",
+      "whoNeedsIt": "Who needs the UTM tag generator",
+      "whoNeedsItText": "Performance marketers use it for tracking paid channel effectiveness and optimizing advertising budgets. SMM specialists — for analyzing social media traffic and comparing platforms. Email marketers — for monitoring newsletter clickability and audience segmentation. Affiliate managers — for controlling partner traffic quality. Web analysts — for creating detailed conversion source reports. Business owners — for understanding real ROI of marketing investments.",
+      "howToUse": "How to use the UTM tag generator",
+      "howToUseText": "Enter your website's base URL or activate the 'No link' option to create only UTM parameters. Select traffic source from ready templates or enable 'Other sources' for manual filling. Specify values for needed UTM parameters: source, medium, campaign, content, and term. When working with Cyrillic, enable transliteration for correct analytics display. Click 'Show result' and copy the ready link for use in advertising campaigns."
     }
   },
   "numberGeneratorTool": {
@@ -607,30 +665,21 @@
       "keywords": "number generator, random numbers, random, lottery, number range, no repeats",
       "ogTitle": "Random Number Generator - Wekey Tools",
       "ogDescription": "Simple and convenient random number generator with customizable range",
-      "whatIsNumberGenerator": {
-        "title": "What is a random number generator?",
-        "text": "A random number generator is a tool for creating pseudo-random numbers in a specified range. It uses mathematical algorithms to generate a sequence of numbers that are statistically indistinguishable from truly random ones. The tool allows you to set minimum and maximum values, number of generated numbers, and option to exclude repeats."
-      },
-      "whenToUse": {
-        "title": "When to use a number generator?",
-        "text": "The generator is indispensable for conducting lotteries and giveaways, choosing random participants, creating test data, games and entertainment, statistical research, passwords and codes. It will help in any situation where fair randomness or quick generation of numeric values is needed."
-      },
-      "howItWorks": {
-        "title": "How does the generator work?",
-        "text": "The tool uses JavaScript's built-in pseudo-random number generator to create numbers in the specified range. You set the minimum and maximum values, number of needed numbers. With the 'No repeats' option enabled, each number can only be generated once, which is useful for giveaways and selecting unique elements."
-      },
-      "benefits": {
-        "title": "Generator benefits",
-        "text": "Quick generation of multiple numbers simultaneously, customizable range from any minimum to maximum value, no repeats option for unique results, current time display for documenting results, instant copying of results, and simple intuitive interface."
-      },
-      "forSpecialists": {
-        "title": "Who will find this tool useful?",
-        "text": "The tool is especially useful for contest and giveaway organizers, teachers and students, software developers, data analysts, gamers and board game enthusiasts. It will help conduct fair drawings, create test data, select random samples, or add an element of randomness to any process."
-      },
-      "howToUse": {
-        "title": "How to use the generator?",
-        "text": "Set the minimum value using the 'FROM' slider, set the maximum value with the 'TO' slider, choose the number of needed numbers. If necessary, enable the 'No repeats' option to get unique values. Click 'Show Result' and copy the generated numbers."
-      }
+      "toolDescription": "Tool Description",
+      "whatIsNumberGenerator": "What is a random number generator?",
+      "whatIsNumberGeneratorContent": "A random number generator is a specialized online tool for creating pseudo-random numbers within a specified range with various customizable parameters. Unlike simple generators, it offers flexible settings: range selection from any minimum to maximum value, determining the number of generated numbers, and the critically important no-repeat option. The tool uses modern generation algorithms ensuring statistically uniform result distribution for fair draws and scientific research.",
+      "whyNeeded": "Why do you need a number generator",
+      "whyNeededSubtitle": "Main applications and advantages",
+      "whyNeededContent": "A random number generator is indispensable in numerous situations requiring honest and unbiased selection. Contest and giveaway organizers use it for fair winner determination. Teachers and trainers select random participants for questions or tasks. Developers create test data for program verification. Researchers form random samples for experiments. Gamers add randomness elements to board games. All these tasks require guarantees of fairness and absence of human bias in selection.",
+      "howItWorks": "How the generator works",
+      "howItWorksSubtitle": "Algorithms and operating principles",
+      "howItWorksContent": "The tool is based on a cryptographically strong pseudo-random number generator that creates statistically uniformly distributed numbers within a specified range. Users set minimum and maximum values, and the required number count. When 'No repeats' mode is activated, the system tracks already generated numbers and excludes them from subsequent results. This guarantees uniqueness of each number in generation series, critically important for lotteries and participant selection. The algorithm ensures equal probability of each number appearing in the specified range.",
+      "whatNumbers": "What numbers can be generated",
+      "whatNumbersContent": "The tool supports generating whole numbers in practically unlimited range - from zero to thousands. You can create both single numbers and series of up to 10 numbers simultaneously. Positive numbers, zero, and even negative values are available with appropriate range settings. 'No repeats' mode is especially useful for creating unique sequences - for example, participant numbers in draws or random IDs. The system automatically tracks generation timestamps for result documentation.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The generator is critically important for event organizers conducting fair draws and lotteries. Teachers use it for random student selection, creating task variants, and forming groups. Software developers generate test data, random IDs, and tokens. Researchers and analysts create random samples for statistical studies. QA engineers test applications with various data sets. Gamers add randomness elements to board games and RPGs. Marketers conduct A/B testing with random user distribution.",
+      "howToUse": "How to use the generator",
+      "howToUseContent": "Usage is extremely simple: set minimum value using 'FROM' slider or enter exact number, set maximum value with 'TO' slider, choose number of generated numbers (1 to 10). If unique numbers are needed, activate 'No repeats' checkbox. Click 'Show Result' button and get random number list. Use 'Copy' button for quick result copying. 'Reset' button clears unique number history and allows starting generation anew."
     }
   },
   "analyticsTool": {
@@ -804,6 +853,23 @@
         "vertical": "Vertical format",
         "horizontal": "Horizontal format"
       }
+    },
+    "seo": {
+      "toolDescription": "Tool Description",
+      "whatIsAnalytics": "What is end-to-end analytics?",
+      "whatIsAnalyticsText": "End-to-end analytics is a comprehensive approach to business efficiency analysis that tracks the entire customer journey from the first ad click to purchase completion and profit generation. Unlike fragmented analysis of individual metrics, end-to-end analytics combines data from all sources: advertising systems, website, CRM, call center, and financial reporting to get a complete picture of marketing effectiveness.",
+      "whyNeededAnalytics": "Why end-to-end analytics is needed",
+      "whyNeededAnalyticsTitle": "Main tasks and advantages",
+      "whyNeededAnalyticsText": "Traditional analytics shows only individual metrics but doesn't provide understanding of real profitability. End-to-end analytics allows precise determination of which advertising channels and campaigns bring profit and which bring losses. This is critically important for proper budget allocation, scaling profitable directions, and shutting down unprofitable ones. The tool helps make data-driven decisions rather than assumptions.",
+      "howItWorks": "How the analytics system works",
+      "howItWorksTitle": "Principles and technologies",
+      "howItWorksText": "The system collects data from all stages of the sales funnel: impressions and clicks from advertising cabinets, website conversions, lead and sales data from CRM, financial indicators for profit and margin. All metrics are connected by mathematical formulas, ensuring automatic recalculation when any parameter changes. This allows modeling various scenarios and forecasting results.",
+      "whatMetrics": "What metrics are tracked",
+      "whatMetricsText": "The tool analyzes over 20 key indicators divided into 6 groups: traffic (clicks, impressions, CTR), costs (CPC, advertising spend), website (conversion, leads, CPL), sales (conversion to sale, deal count, CPO), pricing (average order value, revenue, margin) and profitability (net profit, ROMI, ROAS). Additionally, special formulas are calculated: DRR, ICCR, CPM for deep efficiency analysis.",
+      "whoNeedsIt": "Who needs end-to-end analytics",
+      "whoNeedsItText": "Business leaders use it for strategic decisions about scaling and investments. Marketers — for optimizing advertising campaigns and acquisition channels. Advertising specialists — for bid and budget optimization. Analysts — for reporting and forecasting. E-commerce owners — for understanding real profitability of products and traffic sources. Agencies — for demonstrating real effectiveness of their work to clients.",
+      "howToUse": "How to use the analytics tool",
+      "howToUseText": "Start by filling in basic metrics: click and impression counts from advertising cabinet, CPC and advertising spend. Specify website conversions and lead count, conversion to sale and average order value. Add product or service margin data. The system automatically calculates all derived indicators: CPL, CPO, profit, ROMI, ROAS. Use AI analysis for optimization recommendations and export data to Excel for further work."
     }
   },
   "duplicateRemoval": {
@@ -1297,6 +1363,155 @@
       "forSpecialistsContent": "Web developers, layout designers, content managers, bloggers, copywriters, designers, marketers, site administrators and everyone who works with web content and HTML markup.",
       "howToUse": "How to use the converter?",
       "howToUseContent": "Paste text for conversion, select HTML tag mode (only <p>, only <br> or mixed), click 'Show result' and get ready HTML code for use on website."
+    }
+  },
+  "wordGluing": {
+    "title": "Word Gluing",
+    "placeholders": {
+      "input1": "Enter the first list of words...",
+      "input2": "Enter the second list of words...",
+      "result": "The result will be here"
+    },
+    "buttons": {
+      "showResult": "Show Result",
+      "copy": "Copy Result",
+      "copied": "Copied!",
+      "paste": "Paste",
+      "swap": "Swap"
+    },
+    "counters": {
+      "lines": "lines"
+    },
+    "connectors": {
+      "title": "Connector",
+      "options": {
+        "nothing": "Nothing",
+        "space": "Space",
+        "commaSpace": "Comma+space",
+        "dotSpace": "Dot+space", 
+        "semicolon": "Semicolon",
+        "colon": "Colon",
+        "dash": "Dash without space",
+        "longDash": "Long dash",
+        "other": "Other"
+      },
+      "customPlaceholder": "Enter your own"
+    },
+    "seo": {
+      "title": "Word Gluing Online - Wekey Tools",
+      "description": "Convenient online tool for gluing two word lists with various connectors",
+      "keywords": "word gluing, join lists, combine text, glue words online",
+      "ogTitle": "Word Gluing - Wekey Tools", 
+      "ogDescription": "Fast combination of two word lists with customizable connectors",
+      "toolDescription": "Tool Description",
+      "whatIsWordGluing": "What is word gluing?",
+      "whatIsWordGluingContent": "Word gluing is the process of combining two lists of words or phrases into one resulting list. The tool takes elements from the first list, connects them with corresponding elements from the second list using a selected connector (space, comma, dash, etc.) and forms a new list. This is especially useful for creating ads, headlines, combined keywords for SEO, or any other tasks where you need to quickly connect a large number of elements.",
+      "whyNeeded": "Why word gluing is needed",
+      "whyNeededSubtitle": "Main use cases",
+      "whyNeededContent": "Word gluing saves a huge amount of time when working with large lists. In contextual advertising, you often need to create many ad variations by combining different products with characteristics. SEO specialists use the tool to generate semantic cores by combining main queries with modifiers. Copywriters create headline variations by connecting products with descriptions. The tool is also useful for creating URLs, filenames, generating combinations for A/B testing, and any other tasks involving mass text element combination.",
+      "howItWorks": "How gluing works",
+      "howItWorksSubtitle": "List combination principle",
+      "howItWorksContent": "The working principle is very simple: you add the first list to the left field, the second list to the right field, choose an appropriate connector and get the result. The tool takes the first line from the first list, connects it with the first line of the second list using the selected connector. Then it does the same with the second line, third, and so on. If one list has more elements than the other, the remaining elements are simply added to the result unchanged.",
+      "whatConnectors": "Available connectors",
+      "whatConnectorsContent": "The tool offers 8 ready connector options: no connector (just glues words), space, comma with space, dot with space, semicolon, colon, dash without space, and long dash with spaces. There's also the ability to enter your own connector — any symbol, word, or symbol combination. This allows creating unique combinations for specific tasks, whether creating hashtags, URL parameters, or special text formats.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The tool is indispensable for SEO specialists when creating semantic cores and long keyword lists. Contextual advertising specialists use it for quickly creating ad variations and key phrases. Copywriters and content managers — for generating headlines and subheadings. Internet marketers — for creating UTM tags and tracking parameters. Web developers — for generating file names, CSS classes, or other repetitive code elements. Anyone working with large volumes of text data will find a useful assistant in this tool.",
+      "howToUse": "How to use the tool",
+      "howToUseContent": "Usage is extremely simple: paste the first word list in the left field (each word on a new line), the second list in the right field. Choose an appropriate connector from the suggested options or enter your own in the 'Other' field. Click 'Show Result' and get a ready list of glued elements. The result can be immediately copied with the 'Copy Result' button. For convenience, there's a button to swap lists and quick paste buttons from clipboard."
+    }
+  },
+  "wordInflection": {
+    "title": "Word Inflection",
+    "placeholders": {
+      "input": "Enter words for inflection (each on a new line)...",
+      "result": "Word inflections will appear here"
+    },
+    "buttons": {
+      "showResult": "Show Result",
+      "generating": "Inflecting words...",
+      "copy": "Copy Result",
+      "copied": "Copied!",
+      "paste": "Paste"
+    },
+    "languages": {
+      "russian": "Русский",
+      "ukrainian": "Українська",
+      "english": "English"
+    },
+    "counters": {
+      "lines": "lines"
+    },
+    "ai": {
+      "loading": {
+        "title": "Inflecting your words by cases.",
+        "subtitle": "This may take up to 1 minute.",
+        "warning": "Please don't close the tool."
+      },
+      "error": "An error occurred while inflecting words"
+    },
+    "seo": {
+      "title": "Word Inflection Online with AI - Wekey Tools",
+      "description": "AI tool for automatic word inflection by cases in Russian, Ukrainian and English languages",
+      "keywords": "word inflection, cases, AI inflection, inflect words online, ChatGPT inflection",
+      "ogTitle": "Word Inflection with AI - Wekey Tools",
+      "ogDescription": "Smart tool for word inflection with support for three languages",
+      "toolDescription": "Tool Description",
+      "whatIsWordInflection": "What is AI word inflection?",
+      "whatIsWordInflectionContent": "AI word inflection is an intelligent tool that uses artificial intelligence capabilities to automatically change words by cases, genders, numbers and other grammatical categories. Unlike regular dictionaries, AI understands context and can correctly inflect even rare words, proper names, neologisms and special terms. The system supports Russian, Ukrainian and English languages, automatically determining the needed forms according to each language's rules.",
+      "whyNeeded": "Why word inflection is needed",
+      "whyNeededSubtitle": "Main applications in work",
+      "whyNeededContent": "Correct inflection is critically important for creating grammatically correct texts. Copywriters use the tool when writing advertising texts where they need to inflect product and service names. SEO specialists create natural texts with correct case forms of keywords for better ranking. Translators check inflection correctness when working with complex texts. Content managers quickly get all needed word forms for product descriptions. Journalists and bloggers save time on grammar checking, especially when working with names and special terms.",
+      "howItWorks": "How AI inflection works",
+      "howItWorksSubtitle": "Technology and principles",
+      "howItWorksContent": "The system uses neural networks trained on huge text corpora, which allows it to understand complex grammatical rules of each language. AI analyzes word morphology, determines its part of speech, gender, animacy and other characteristics. Then it generates all case forms in singular and plural. For Russian and Ukrainian languages, the system creates forms for six cases, for English it considers the peculiarities of pronoun inflection and special constructions. The algorithm also processes compound words, abbreviations and borrowings.",
+      "whatWords": "What words can be inflected",
+      "whatWordsContent": "The tool successfully processes almost any words: regular nouns, adjectives, pronouns, proper names, geographical names, brands, neologisms, professional terms, abbreviations and acronyms. AI is especially effective when working with rare words that may not be in regular dictionaries. The system correctly inflects compound words, foreign borrowings and modern slang. It also supports inflection of numerals, company names and specific terms from various fields of knowledge.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The tool is indispensable for copywriters and content managers who create large volumes of text with correct grammar. SEO specialists use it to create natural texts with correct case forms of keywords. Translators check inflection correctness when working with technical and artistic texts. Journalists and editors save time on grammatical checking of articles. Students and teachers study the peculiarities of inflecting complex words. Chatbot and voice assistant developers create more natural dialogues with correct case forms.",
+      "howToUse": "How to use the tool",
+      "howToUseContent": "Usage is extremely simple: enter words in the left field (each on a new line), select the needed language from the dropdown list and click 'Show Result'. AI will analyze each word and generate all case forms. The result will appear in the right field and be ready for copying. The system automatically replaces spaces with line breaks for convenient input of multiple words. Processing takes from a few seconds to a minute depending on the number of words and query complexity."
+    }
+  },
+  "wordMixer": {
+    "title": "Word Mixer",
+    "placeholders": {
+      "input1": "Your list 1...",
+      "input2": "Your list 2...",
+      "input3": "Your list 3...",
+      "input4": "Your list 4...",
+      "result": "The result will be here"
+    },
+    "buttons": {
+      "showResult": "Show Result",
+      "copy": "Copy Result",
+      "copied": "Copied!",
+      "paste": "Paste",
+      "swap": "Swap"
+    },
+    "counters": {
+      "lines": "lines"
+    },
+    "seo": {
+      "title": "Word Mixer Online - Wekey Tools",
+      "description": "Powerful online tool for creating all possible combinations from 4 word lists",
+      "keywords": "word mixer, word combinations, combination generator, text mixer, create variations",
+      "ogTitle": "Word Mixer - Wekey Tools",
+      "ogDescription": "Create all possible combinations from your word lists quickly and efficiently",
+      "toolDescription": "Tool Description",
+      "whatIsWordMixer": "What is word mixing?",
+      "whatIsWordMixerContent": "Word mixing is the process of creating all possible combinations from several lists of words or phrases. The tool sequentially combines elements from different lists, creating many unique variants. For example, from lists of adjectives, nouns and verbs you can get thousands of different combinations for headlines, slogans or descriptions. This is especially useful for content creation where you need many variations of one theme or for generating ideas in marketing and copywriting.",
+      "whyNeeded": "Why word mixing is needed",
+      "whyNeededSubtitle": "Main applications and advantages",
+      "whyNeededContent": "Word mixing saves a huge amount of time when creating multiple content variations. In advertising, you often need dozens or hundreds of ad variants for A/B testing — the tool generates them automatically. SEO specialists create extensive lists of key phrases by combining main queries with modifiers. Copywriters generate many variants of headlines, subheadings and descriptions. Content managers quickly create descriptions for large product catalogs. Marketers experiment with different message formulations for different audiences.",
+      "howItWorks": "How mixing works",
+      "howItWorksSubtitle": "List combination algorithm",
+      "howItWorksContent": "The algorithm works step by step: first it takes the first list as a base, then each element from this list is combined with each element of the second list. The resulting pairs are combined with elements of the third list, and so on. An important feature — the tool saves intermediate results of each stage, so you get not only final combinations of all lists, but also all intermediate variants. This provides the maximum number of useful combinations for any tasks.",
+      "whatLists": "What lists can be combined",
+      "whatListsContent": "The tool works with any text lists: words, phrases, sentences, numbers, codes. You can combine adjectives with nouns, verbs with objects, prefixes with word roots, product names with characteristics, geographical names with services. Popular scenarios: creating product names, generating domain names, forming advertising slogans, creating content plan variants, generating ideas for social media posts. Each list can contain from one to hundreds of elements.",
+      "forSpecialists": "Who benefits from the tool",
+      "forSpecialistsContent": "The tool is critically important for contextual advertising specialists who create mass campaigns with multiple ad variations. SEO specialists use it to generate semantic cores and create natural anchor links. Copywriters save hours of work when creating multiple text variants. Content managers quickly generate descriptions for online stores. Marketers create message variants for different audience segments. Bloggers and SMM specialists generate ideas for posts and headlines. Designers create variants of names and slogans for projects.",
+      "howToUse": "How to use the tool",
+      "howToUseContent": "Usage is extremely simple: enter the first word list in the first field (each word on a new line), the second list in the second field, and so on up to four lists. You can use from one to four lists in any combinations. Between fields there are buttons for quick swapping of lists. Click 'Show Result' and get all possible combinations. The result will contain both intermediate and final combinations, ready for copying and use in your projects."
     }
   },
   "footer": {

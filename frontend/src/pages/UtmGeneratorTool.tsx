@@ -548,23 +548,43 @@ const UtmGeneratorTool: React.FC = () => {
             
             {/* SEO-блок с описанием возможностей инструмента */}
             <div className="seo-section">
-                <h2>{t('utmGeneratorTool.seo.whatIsUtm.title')}</h2>
-                <p>{t('utmGeneratorTool.seo.whatIsUtm.text')}</p>
-                
-                <h3>{t('utmGeneratorTool.seo.whenToUse.title')}</h3>
-                <p>{t('utmGeneratorTool.seo.whenToUse.text')}</p>
-                
-                <h3>{t('utmGeneratorTool.seo.howItWorks.title')}</h3>
-                <p>{t('utmGeneratorTool.seo.howItWorks.text')}</p>
-                
-                <h3>{t('utmGeneratorTool.seo.benefits.title')}</h3>
-                <p>{t('utmGeneratorTool.seo.benefits.text')}</p>
-                
-                <h3>{t('utmGeneratorTool.seo.forSpecialists.title')}</h3>
-                <p>{t('utmGeneratorTool.seo.forSpecialists.text')}</p>
-                
-                <h3>{t('utmGeneratorTool.seo.howToUse.title')}</h3>
-                <p>{t('utmGeneratorTool.seo.howToUse.text')}</p>
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <p>{t('utmGeneratorTool.seo.toolDescription')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('utmGeneratorTool.seo.whatIsUtmGenerator')}</h2>
+                        <p>{t('utmGeneratorTool.seo.whatIsUtmGeneratorText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('utmGeneratorTool.seo.whyNeededUtm')}</h2>
+                        <h3>{t('utmGeneratorTool.seo.whyNeededUtmTitle')}</h3>
+                        <p>{t('utmGeneratorTool.seo.whyNeededUtmText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('utmGeneratorTool.seo.howItWorks')}</h2>
+                        <h3>{t('utmGeneratorTool.seo.howItWorksTitle')}</h3>
+                        <p>{t('utmGeneratorTool.seo.howItWorksText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('utmGeneratorTool.seo.whatParameters')}</h2>
+                        <p>{t('utmGeneratorTool.seo.whatParametersText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('utmGeneratorTool.seo.whoNeedsIt')}</h2>
+                        <p>{t('utmGeneratorTool.seo.whoNeedsItText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('utmGeneratorTool.seo.howToUse')}</h2>
+                        <p>{t('utmGeneratorTool.seo.howToUseText')}</p>
+                    </div>
+                </div>
             </div>
         </div>
         </>

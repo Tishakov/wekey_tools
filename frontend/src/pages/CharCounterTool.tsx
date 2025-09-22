@@ -354,6 +354,45 @@ const CharCounterTool: React.FC = () => {
                     {t('charCounterTool.copyButton')}
                 </button>
             </div>
+
+            {/* SEO блок */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <p>{t('charCounterTool.seo.toolDescription')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('charCounterTool.seo.whatIsCharCounter')}</h2>
+                        <p>{t('charCounterTool.seo.whatIsCharCounterText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('charCounterTool.seo.whyNeededCharCounter')}</h2>
+                        <p>{t('charCounterTool.seo.whyNeededCharCounterText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h3>{t('charCounterTool.seo.howItWorks')}</h3>
+                        <p>{t('charCounterTool.seo.howItWorksText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h3>{t('charCounterTool.seo.whatExclusions')}</h3>
+                        <p>{t('charCounterTool.seo.whatExclusionsText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h3>{t('charCounterTool.seo.forSpecialists')}</h3>
+                        <p>{t('charCounterTool.seo.forSpecialistsText')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h3>{t('charCounterTool.seo.howToUse')}</h3>
+                        <p>{t('charCounterTool.seo.howToUseText')}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

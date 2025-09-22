@@ -377,6 +377,41 @@ const NumberGeneratorTool: React.FC = () => {
                     </button>
                 </div>
             </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <p>{t('numberGeneratorTool.seo.toolDescription')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('numberGeneratorTool.seo.whatIsNumberGenerator')}</h2>
+                        <p>{t('numberGeneratorTool.seo.whatIsNumberGeneratorContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('numberGeneratorTool.seo.whyNeeded')}</h2>
+                        <h3>{t('numberGeneratorTool.seo.whyNeededSubtitle')}</h3>
+                        <p>{t('numberGeneratorTool.seo.whyNeededContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('numberGeneratorTool.seo.howItWorks')}</h2>
+                        <h3>{t('numberGeneratorTool.seo.howItWorksSubtitle')}</h3>
+                        <p>{t('numberGeneratorTool.seo.howItWorksContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('numberGeneratorTool.seo.whatNumbers')}</h2>
+                        <p>{t('numberGeneratorTool.seo.whatNumbersContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('numberGeneratorTool.seo.forSpecialists')}</h2>
+                        <p>{t('numberGeneratorTool.seo.forSpecialistsContent')}</p>
+                    </div>
+                    <div className="seo-item">
+                        <h2>{t('numberGeneratorTool.seo.howToUse')}</h2>
+                        <p>{t('numberGeneratorTool.seo.howToUseContent')}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

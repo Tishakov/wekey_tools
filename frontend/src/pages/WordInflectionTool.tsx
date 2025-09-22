@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
+import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { openaiService, type WordInflectionResponse } from '../services/openaiService';
 
 
 const TOOL_ID = 'word-declension';
 const WordInflectionTool: React.FC = () => {
-  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { createLink } = useLocalizedLink();
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
   const [copied, setCopied] = useState(false);
@@ -42,13 +45,13 @@ const WordInflectionTool: React.FC = () => {
         setResult(response.inflections.join('\n'));
         console.log('✅ AI inflections generated:', response.inflections.length, 'items');
       } else {
-        setAiError(response.error || 'Не удалось просклонять слова');
+        setAiError(response.error || t('wordInflection.ai.error'));
         console.error('❌ AI generation failed:', response.error);
       }
       
     } catch (error) {
       console.error('💥 Error during word inflection generation:', error);
-      setAiError('Произошла ошибка при склонении слов');
+      setAiError(t('wordInflection.ai.error'));
     } finally {
       setIsGenerating(false);
     }
@@ -114,23 +117,20 @@ const WordInflectionTool: React.FC = () => {
     <div className="word-inflection-tool">
       {/* Header-остров инструмента */}
       <div className="tool-header-island">
-        <button 
-          className="back-button"
-          onClick={() => navigate('/')}
-        >
+        <Link to={createLink('')} className="back-button">
           <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
-        </button>
-        <h1 className="tool-title">Склонение слов</h1>
+          {t('navigation.allTools')}
+        </Link>
+        <h1 className="tool-title">{t('wordInflection.title')}</h1>
         <div className="tool-header-buttons">
-          <button className="tool-header-btn counter-btn">
+          <button className="tool-header-btn counter-btn" title={t('navigation.launchCounter')}>
             <img src="/icons/rocket.svg" alt="" />
             <span className="counter">{launchCount}</span>
           </button>
-          <button className="tool-header-btn icon-only">
+          <button className="tool-header-btn icon-only" title={t('navigation.hints')}>
             <img src="/icons/lamp.svg" alt="" />
           </button>
-          <button className="tool-header-btn icon-only">
+          <button className="tool-header-btn icon-only" title={t('navigation.screenshot')}>
             <img src="/icons/camera.svg" alt="" />
           </button>
         </div>
@@ -145,7 +145,7 @@ const WordInflectionTool: React.FC = () => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Введите слова для склонения (каждое с новой строки)..."
+            placeholder={t('wordInflection.placeholders.input')}
           />
           <div className="input-controls">
             <div className="left-controls">
@@ -154,20 +154,20 @@ const WordInflectionTool: React.FC = () => {
                 onClick={handlePaste}
               >
                 <img src="/icons/button_paste.svg" alt="" />
-                Вставить
+                {t('wordInflection.buttons.paste')}
               </button>
               <select 
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
                 className="language-selector"
               >
-                <option value="russian">Русский</option>
-                <option value="ukrainian">Українська</option>
-                <option value="english">English</option>
+                <option value="russian">{t('wordInflection.languages.russian')}</option>
+                <option value="ukrainian">{t('wordInflection.languages.ukrainian')}</option>
+                <option value="english">{t('wordInflection.languages.english')}</option>
               </select>
             </div>
             <div className="info">
-              {getLineCount(inputText)} стр.
+              {getLineCount(inputText)} {t('wordInflection.counters.lines')}
             </div>
           </div>
         </div>
@@ -178,23 +178,23 @@ const WordInflectionTool: React.FC = () => {
             <textarea
               className="result-textarea"
               value={result}
-              placeholder="Здесь будут склонения слов"
+              placeholder={t('wordInflection.placeholders.result')}
               readOnly
             />
             {isGenerating && (
               <div className="ai-loading-overlay">
                 <div className="loading-spinner"></div>
                 <div className="loading-text">
-                  <p>Склоняем ваши слова по падежам.</p>
-                  <p>Это может занять до 1 минуты.</p>
-                  <p>Пожалуйста, не закрывайте инструмент.</p>
+                  <p>{t('wordInflection.ai.loading.title')}</p>
+                  <p>{t('wordInflection.ai.loading.subtitle')}</p>
+                  <p>{t('wordInflection.ai.loading.warning')}</p>
                 </div>
               </div>
             )}
           </div>
           <div className="result-controls">
             <div className="result-counter">
-              {getLineCount(result)} стр.
+              {getLineCount(result)} {t('wordInflection.counters.lines')}
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@ const WordInflectionTool: React.FC = () => {
           onClick={generateInflections}
           disabled={!inputText.trim() || isGenerating}
         >
-          {isGenerating ? 'Склоняем слова...' : 'Показать результат'}
+          {isGenerating ? t('wordInflection.buttons.generating') : t('wordInflection.buttons.showResult')}
         </button>
         
         <button 
@@ -234,8 +234,49 @@ const WordInflectionTool: React.FC = () => {
           disabled={!result}
         >
           <img src="/icons/button_copy.svg" alt="" />
-          {copied ? 'Скопировано!' : 'Скопировать результат'}
+          {copied ? t('wordInflection.buttons.copied') : t('wordInflection.buttons.copy')}
         </button>
+      </div>
+
+      {/* SEO секция */}
+      <div className="seo-section">
+        <div className="seo-content">
+          <div className="seo-item">
+            <p>{t('wordInflection.seo.toolDescription')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('wordInflection.seo.whatIsWordInflection')}</h2>
+            <p>{t('wordInflection.seo.whatIsWordInflectionContent')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('wordInflection.seo.whyNeeded')}</h2>
+            <h3>{t('wordInflection.seo.whyNeededSubtitle')}</h3>
+            <p>{t('wordInflection.seo.whyNeededContent')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('wordInflection.seo.howItWorks')}</h2>
+            <h3>{t('wordInflection.seo.howItWorksSubtitle')}</h3>
+            <p>{t('wordInflection.seo.howItWorksContent')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('wordInflection.seo.whatWords')}</h2>
+            <p>{t('wordInflection.seo.whatWordsContent')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('wordInflection.seo.forSpecialists')}</h2>
+            <p>{t('wordInflection.seo.forSpecialistsContent')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('wordInflection.seo.howToUse')}</h2>
+            <p>{t('wordInflection.seo.howToUseContent')}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

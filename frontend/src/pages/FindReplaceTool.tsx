@@ -320,6 +320,47 @@ const FindReplaceTool: React.FC = () => {
           <span className="result-counter">{countLines(result)} стр.</span>
         </div>
       </div>
+
+      {/* SEO блок */}
+      <div className="seo-section">
+        <div className="seo-content">
+          <div className="seo-item">
+            <p>{t('findReplaceTool.seo.toolDescription')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('findReplaceTool.seo.whatIsFindReplace')}</h2>
+            <p>{t('findReplaceTool.seo.whatIsFindReplaceText')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('findReplaceTool.seo.whyNeededFindReplace')}</h2>
+            <h3>{t('findReplaceTool.seo.whyNeededFindReplaceTitle')}</h3>
+            <p>{t('findReplaceTool.seo.whyNeededFindReplaceText')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('findReplaceTool.seo.howItWorks')}</h2>
+            <h3>{t('findReplaceTool.seo.howItWorksTitle')}</h3>
+            <p>{t('findReplaceTool.seo.howItWorksText')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('findReplaceTool.seo.whatModesSupported')}</h2>
+            <p>{t('findReplaceTool.seo.whatModesSupportedText')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('findReplaceTool.seo.whoNeedsIt')}</h2>
+            <p>{t('findReplaceTool.seo.whoNeedsItText')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('findReplaceTool.seo.howToUse')}</h2>
+            <p>{t('findReplaceTool.seo.howToUseText')}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
