@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -11,6 +12,7 @@ type MatchType = 'broad' | 'phrase' | 'exact';
 type CaseType = 'lowercase' | 'uppercase' | 'capitalize-first' | '';
 
 const MatchTypesTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [outputText, setOutputText] = useState('');
@@ -168,9 +170,9 @@ const MatchTypesTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('matchTypes.allTools')}
                 </Link>
-                <h1 className="tool-title">Типы соответствия</h1>
+                <h1 className="tool-title">{t('matchTypes.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -191,16 +193,16 @@ const MatchTypesTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('matchTypes.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('matchTypes.buttons.paste')}
                         </button>
-                        <span className="info">{countLines(inputText)} стр.</span>
+                        <span className="info">{countLines(inputText)} {t('matchTypes.lineCount')}</span>
                     </div>
                 </div>
 
@@ -215,7 +217,7 @@ const MatchTypesTool: React.FC = () => {
                                 checked={matchType === 'broad'}
                                 onChange={() => handleMatchTypeChange('broad')}
                             />
-                            <span className="radio-text">Широкое соответствие</span>
+                            <span className="radio-text">{t('matchTypes.matchTypes.broad')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -226,7 +228,7 @@ const MatchTypesTool: React.FC = () => {
                                 checked={matchType === 'phrase'}
                                 onChange={() => handleMatchTypeChange('phrase')}
                             />
-                            <span className="radio-text">Фразовое соответствие</span>
+                            <span className="radio-text">{t('matchTypes.matchTypes.phrase')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -237,7 +239,7 @@ const MatchTypesTool: React.FC = () => {
                                 checked={matchType === 'exact'}
                                 onChange={() => handleMatchTypeChange('exact')}
                             />
-                            <span className="radio-text">Точное соответствие</span>
+                            <span className="radio-text">{t('matchTypes.matchTypes.exact')}</span>
                         </label>
                     </div>
 
@@ -252,7 +254,7 @@ const MatchTypesTool: React.FC = () => {
                                 onChange={() => {}} // Пустой onChange для валидности
                                 onClick={() => handleCaseTypeChange('lowercase')}
                             />
-                            <span className="radio-text">все строчные</span>
+                            <span className="radio-text">{t('matchTypes.caseTypes.lowercase')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -264,7 +266,7 @@ const MatchTypesTool: React.FC = () => {
                                 onChange={() => {}} // Пустой onChange для валидности
                                 onClick={() => handleCaseTypeChange('uppercase')}
                             />
-                            <span className="radio-text">ВСЕ ПРОПИСНЫЕ</span>
+                            <span className="radio-text">{t('matchTypes.caseTypes.uppercase')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -276,7 +278,7 @@ const MatchTypesTool: React.FC = () => {
                                 onChange={() => {}} // Пустой onChange для валидности
                                 onClick={() => handleCaseTypeChange('capitalize-first')}
                             />
-                            <span className="radio-text">Первое с заглавной</span>
+                            <span className="radio-text">{t('matchTypes.caseTypes.capitalizeFirst')}</span>
                         </label>
                     </div>
                 </div>
@@ -290,7 +292,7 @@ const MatchTypesTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim()}
                 >
-                    Показать результат
+                    {t('matchTypes.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -300,7 +302,7 @@ const MatchTypesTool: React.FC = () => {
                     disabled={!outputText.trim()}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('matchTypes.buttons.copied') : t('matchTypes.buttons.copyResult')}
                 </button>
             </div>
 
@@ -310,10 +312,45 @@ const MatchTypesTool: React.FC = () => {
                     className="result-textarea"
                     value={outputText}
                     readOnly
-                    placeholder="Здесь будет результат"
+                    placeholder={t('matchTypes.resultPlaceholder')}
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{countLines(outputText)} стр.</span>
+                    <span className="result-counter">{countLines(outputText)} {t('matchTypes.lineCount')}</span>
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <h2>{t('matchTypes.seo.whatAreMatchTypes.title')}</h2>
+                        <p>{t('matchTypes.seo.whatAreMatchTypes.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('matchTypes.seo.whyNeeded.title')}</h2>
+                        <p>{t('matchTypes.seo.whyNeeded.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('matchTypes.seo.howItWorks.title')}</h2>
+                        <p>{t('matchTypes.seo.howItWorks.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('matchTypes.seo.whatKeywords.title')}</h2>
+                        <p>{t('matchTypes.seo.whatKeywords.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('matchTypes.seo.forSpecialists.title')}</h2>
+                        <p>{t('matchTypes.seo.forSpecialists.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('matchTypes.seo.howToUse.title')}</h2>
+                        <p>{t('matchTypes.seo.howToUse.text')}</p>
+                    </div>
                 </div>
             </div>
         </div>

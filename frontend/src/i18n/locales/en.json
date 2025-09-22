@@ -806,6 +806,388 @@
       }
     }
   },
+  "duplicateRemoval": {
+    "title": "Duplicate Removal",
+    "description": "Tool for removing duplicate lines from text",
+    "keywords": "duplicate removal, text cleanup, unique lines, list processing",
+    "inputPlaceholder": "Enter your text...",
+    "resultPlaceholder": "Result will appear here",
+    "modes": {
+      "removeDuplicates": "Remove duplicates",
+      "removeAllDuplicates": "Remove all duplicates",
+      "removeUnique": "Remove unique"
+    },
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copyResult": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "seo": {
+      "whatIsDuplicateRemoval": {
+        "title": "What is duplicate removal?",
+        "text": "Duplicate removal is the process of finding and eliminating repeated lines in text. Our tool allows you to clean lists of duplicate entries, leaving only unique elements."
+      },
+      "whyNeeded": {
+        "title": "Why remove duplicates?",
+        "text": "Duplicates in lists can occur when merging data from different sources, input errors, or automatic generation. Removing them helps clean data, reduce file size, and improve information quality."
+      },
+      "howItWorks": {
+        "title": "How does the tool work?",
+        "text": "The tool analyzes each line of text and offers three processing modes: remove duplicates (keeps first occurrence), remove all duplicates (removes all repeating lines), and remove unique (keeps only lines with duplicates)."
+      },
+      "whatTexts": {
+        "title": "What texts can be processed?",
+        "text": "Suitable for any lists: email addresses, names, phone numbers, keywords, URLs, product items, and other data where repetitions may occur."
+      },
+      "forSpecialists": {
+        "title": "Who is this tool for?",
+        "text": "Marketers, data analysts, database administrators, SEO specialists, content managers, and anyone working with lists and arrays of text data."
+      },
+      "howToUse": {
+        "title": "How to use?",
+        "text": "Paste or enter text with a list, select the desired duplicate removal mode, click 'Show result' and copy the cleaned list."
+      }
+    }
+  },
+  "minusWords": {
+    "title": "Minus Words Processing",
+    "description": "Tool for selecting and processing minus words from text for contextual advertising",
+    "keywords": "minus words, contextual advertising, exclusions, negative keywords, Yandex Direct, Google Ads",
+    "inputPlaceholder": "Enter your text...",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copyMinusWords": "Copy minus words",
+      "copied": "Copied!",
+      "removeWord": "Remove word"
+    },
+    "placeholders": {
+      "minusWords": "Selected minus words will be here",
+      "processingWords": "Words for processing will be here"
+    },
+    "lineCount": "lines",
+    "wordCount": "words",
+    "allTools": "All tools",
+    "seo": {
+      "title": "Minus Words Processing Online - Wekey Tools",
+      "description": "Convenient tool for selecting and forming minus words list for contextual advertising",
+      "keywords": "minus words, contextual advertising, exclusions, negative keywords, Yandex Direct, Google Ads",
+      "ogTitle": "Minus Words Processing - Wekey Tools",
+      "ogDescription": "Quick minus words selection from text for contextual advertising setup",
+      "whatAreMinusWords": {
+        "title": "What are minus words?",
+        "text": "Minus words (negative keywords) are words for which you don't want to show your ads. They help exclude irrelevant impressions, save budget and attract higher quality traffic. Properly selected minus words increase advertising campaign effectiveness."
+      },
+      "whyNeeded": {
+        "title": "Why are minus words needed?",
+        "text": "Minus words protect from showing ads for non-target queries, reduce cost per click, increase CTR and conversion, save advertising budget. Without minus words, ads may show for inappropriate queries, leading to wasted spending and low campaign effectiveness."
+      },
+      "howItWorks": {
+        "title": "How does the tool work?",
+        "text": "The tool breaks down entered text into separate words, cleans them from punctuation and allows selecting needed words by clicking. Selected words are automatically added to minus words list, which can be copied and used in advertising systems."
+      },
+      "whatTexts": {
+        "title": "What texts can be processed?",
+        "text": "Suitable for processing any texts: search queries, product descriptions, thematic articles, competitor keyword lists, search query reports. The tool correctly processes texts in Cyrillic and Latin."
+      },
+      "forSpecialists": {
+        "title": "Who is this tool useful for?",
+        "text": "Contextual advertising specialists, PPC managers, internet marketers, business owners, advertising agencies and everyone who sets up advertising in Yandex.Direct, Google Ads or other advertising systems."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste text with potential minus words, click 'Show result', click on words you want to add to minus words, and copy the ready list. Unnecessary words can be removed with the 'x' button."
+      }
+    }
+  },
+  "matchTypes": {
+    "title": "Match Types",
+    "description": "Tool for formatting keywords for different match types in contextual advertising",
+    "keywords": "match types, keywords, advertising, Yandex Direct, Google Ads, broad match, phrase match, exact match",
+    "inputPlaceholder": "Enter your text...",
+    "resultPlaceholder": "Result will be here",
+    "matchTypes": {
+      "broad": "Broad match",
+      "phrase": "Phrase match",
+      "exact": "Exact match"
+    },
+    "caseTypes": {
+      "lowercase": "all lowercase",
+      "uppercase": "ALL UPPERCASE",
+      "capitalizeFirst": "Capitalize first"
+    },
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copyResult": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "allTools": "All tools",
+    "seo": {
+      "title": "Keyword Match Types Online - Wekey Tools",
+      "description": "Format keywords for contextual advertising with broad, phrase and exact match types",
+      "keywords": "match types, keywords, advertising, Yandex Direct, Google Ads, broad match, phrase match, exact match",
+      "ogTitle": "Match Types - Wekey Tools",
+      "ogDescription": "Quick keyword formatting for contextual advertising with different match types",
+      "whatAreMatchTypes": {
+        "title": "What are match types?",
+        "text": "Match types are settings in contextual advertising that determine which search queries will trigger your ads. Broad match covers maximum queries, phrase match shows for the phrase and its variations, exact match only for specific queries."
+      },
+      "whyNeeded": {
+        "title": "Why are match types needed?",
+        "text": "Proper use of match types helps control advertising reach and relevance. This allows you to save budget, increase CTR, reduce cost per click and improve traffic quality. Each type is suitable for different advertising campaign goals."
+      },
+      "howItWorks": {
+        "title": "How does the tool work?",
+        "text": "The tool automatically formats your keywords according to the selected match type. Broad match cleans words from special characters, phrase match adds quotes, exact match adds square brackets. Additionally, you can change text case."
+      },
+      "whatKeywords": {
+        "title": "What keywords can be processed?",
+        "text": "Suitable for any keywords: single-word queries, long phrases, brand queries, geo-dependent keywords, commercial and informational queries. The tool correctly processes texts in Cyrillic and Latin."
+      },
+      "forSpecialists": {
+        "title": "Who is this tool useful for?",
+        "text": "Contextual advertising specialists, PPC managers, marketers, business owners, internet marketing agencies and everyone who sets up advertising in Yandex.Direct, Google Ads or other advertising systems."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste a list of keywords, select the desired match type (broad, phrase or exact), if necessary select case change, click 'Show result' and copy the formatted keywords."
+      }
+    }
+  },
+  "removeLineBreaks": {
+    "title": "Remove Line Breaks",
+    "description": "Tool for removing line breaks and merging text with various replacement options",
+    "keywords": "remove line breaks, merge lines, text formatting, text processing",
+    "inputPlaceholder": "Enter or paste your text here...",
+    "resultPlaceholder": "Result will be here",
+    "replaceWith": "Replace line break with",
+    "replacements": {
+      "nothing": "Nothing",
+      "space": "Space",
+      "dash": "Dash",
+      "hyphen": "Hyphen",
+      "commaSpace": "Comma+space",
+      "dotSpace": "Dot+space",
+      "semicolon": "Semicolon",
+      "colon": "Colon",
+      "other": "Other",
+      "customPlaceholder": "Custom option"
+    },
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copyResult": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "allTools": "All tools",
+    "seo": {
+      "title": "Remove Line Breaks Online - Wekey Tools",
+      "description": "Quick removal of line breaks and text merging with various replacement options",
+      "keywords": "remove line breaks, merge lines, text formatting, text processing",
+      "ogTitle": "Remove Line Breaks - Wekey Tools",
+      "ogDescription": "Convenient tool for removing line breaks and merging text",
+      "whatIsLineBreakRemoval": {
+        "title": "What is line break removal?",
+        "text": "Line break removal is the process of merging multi-line text into a single line or paragraph. The tool removes line break characters and optionally replaces them with chosen symbols: spaces, punctuation marks, or custom characters."
+      },
+      "whyNeeded": {
+        "title": "Why remove line breaks?",
+        "text": "Line break removal is necessary when copying text from PDF documents, tables, preparing text for social media, creating meta descriptions, forming keyword lists. It helps get clean, readable text without unnecessary breaks."
+      },
+      "howItWorks": {
+        "title": "How does the tool work?",
+        "text": "The tool splits text into lines, removes empty lines and merges remaining lines into one block. You can choose what to replace line breaks with: leave without replacement, add spaces, punctuation marks, or your own custom symbol."
+      },
+      "whatTexts": {
+        "title": "What texts can be processed?",
+        "text": "Suitable for any multi-line texts: articles copied from PDF, lists, table data, code, poems, addresses, technical descriptions. The tool correctly processes texts in any languages."
+      },
+      "forSpecialists": {
+        "title": "Who is this tool useful for?",
+        "text": "Copywriters, content managers, SEO specialists, editors, students, researchers, site administrators and everyone who works with text content and needs quick formatting."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste multi-line text, select line break replacement option (nothing, space, punctuation marks or custom option), click 'Show result' and copy the processed text."
+      }
+    }
+  },
+  "spacesToParagraphs": {
+    "title": "Spaces to Paragraphs",
+    "description": "Convert text by replacing spaces with line breaks",
+    "allTools": "All tools",
+    "inputPlaceholder": "Enter your text...",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "copy": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "settings": {
+      "removePunctuation": "Remove all punctuation marks",
+      "removeSpecialChars": "Remove all special characters",
+      "lowercase": "Convert result to lowercase",
+      "capitalizeEach": "Capitalize each paragraph"
+    },
+    "resultPlaceholder": "Result will be here",
+    "seo": {
+      "title": "Spaces to Paragraphs Online - Wekey Tools",
+      "description": "Convert text by replacing spaces with line breaks to create paragraphs",
+      "keywords": "spaces to paragraphs, text conversion, line breaks, text formatting",
+      "ogTitle": "Spaces to Paragraphs - Wekey Tools",
+      "ogDescription": "Convenient tool for converting spaces to line breaks",
+      "whatIsSpacesToParagraphs": {
+        "title": "What is spaces to paragraphs conversion?",
+        "text": "Spaces to paragraphs conversion is the process of replacing all spaces in text with line breaks, creating a separate paragraph from each word. This helps structure text, create lists, or prepare data for further processing."
+      },
+      "whyNeeded": {
+        "title": "Why convert spaces to paragraphs?",
+        "text": "The tool is useful for creating lists from sentences, preparing keywords for advertising, formatting data for import, creating vertical lists, processing tags, and creating structured content from continuous text."
+      },
+      "howItWorks": {
+        "title": "How does the conversion work?",
+        "text": "The tool replaces all spaces and space groups with line break characters. Additionally, you can remove punctuation marks, special characters, convert to lowercase, or capitalize the first letter of each paragraph."
+      },
+      "whatTexts": {
+        "title": "What texts can be processed?",
+        "text": "Suitable for any texts: keywords separated by spaces, product lists, tags, titles, addresses, advertising phrases. Especially useful for SEO specialists and content managers when working with data arrays."
+      },
+      "forSpecialists": {
+        "title": "Who is this tool useful for?",
+        "text": "SEO specialists, content managers, marketers, data analysts, copywriters, online store administrators, and everyone who works with lists, keywords, and data structuring."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste text with spaces, select needed processing options (remove punctuation, special characters, case settings), click 'Show result' and get a structured list from your data."
+      }
+    }
+  },
+  "synonymGenerator": {
+    "title": "Synonym Generator",
+    "description": "AI synonym generator with multi-language support",
+    "allTools": "All tools",
+    "inputPlaceholder": "Enter words or phrases (each on a new line)...",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "generating": "Generating synonyms...",
+      "copy": "Copy result",
+      "copied": "Copied!"
+    },
+    "lineCount": "lines",
+    "languages": {
+      "russian": "Русский",
+      "ukrainian": "Українська",
+      "english": "English"
+    },
+    "resultPlaceholder": "Result will be here",
+    "loading": {
+      "title": "Generating synonyms for your words.",
+      "subtitle": "This may take up to 1 minute.",
+      "warning": "Please don't close the tool."
+    },
+    "errors": {
+      "generic": "An error occurred while generating synonyms",
+      "noSynonyms": "Failed to generate synonyms"
+    },
+    "seo": {
+      "title": "AI Synonym Generator Online - Wekey Tools",
+      "description": "Smart AI synonym generator with support for Russian, Ukrainian and English languages",
+      "keywords": "synonym generator, AI synonyms, word alternatives, synonym finder, ChatGPT synonyms",
+      "ogTitle": "AI Synonym Generator - Wekey Tools",
+      "ogDescription": "Advanced AI tool for generating synonyms in multiple languages",
+      "whatIsSynonymGenerator": {
+        "title": "What is an AI synonym generator?",
+        "text": "An AI synonym generator is a smart tool that uses artificial intelligence to find alternative words and expressions. The system analyzes context and meaning of original words, suggesting the most suitable synonyms while considering stylistic features."
+      },
+      "whyNeeded": {
+        "title": "Why do you need a synonym generator?",
+        "text": "The tool helps avoid repetition in text, enrich vocabulary, create more diverse content for SEO, prepare advertising text variations, improve writing style and find precise formulations for any tasks."
+      },
+      "howItWorks": {
+        "title": "How does the AI generator work?",
+        "text": "The system uses advanced machine learning algorithms to analyze semantic meaning of words. AI considers context, style, usage frequency and selects the most relevant synonyms while preserving meaning and emotional coloring."
+      },
+      "whatTexts": {
+        "title": "What words can generate synonyms for?",
+        "text": "The tool works with any words and phrases: nouns, adjectives, verbs, adverbs, set expressions. Supports professional terminology, colloquial speech, scientific style and literary texts."
+      },
+      "forSpecialists": {
+        "title": "Who benefits from the AI synonym generator?",
+        "text": "Copywriters, content managers, SEO specialists, journalists, translators, students, teachers, marketers, writers and everyone who works with text and strives for language diversity."
+      },
+      "howToUse": {
+        "title": "How to use the generator?",
+        "text": "Enter words or phrases (each on a new line), select the language for synonym generation, click 'Show result' and get a list of alternative options. AI will analyze context and suggest the most suitable synonyms."
+      }
+    }
+  },
+  "textByColumns": {
+    "title": "Text by Columns",
+    "description": "Split text into columns with configurable separators",
+    "allTools": "All tools",
+    "inputPlaceholder": "Enter your text...",
+    "buttons": {
+      "paste": "Paste",
+      "showResult": "Show result",
+      "transfer": "Transfer",
+      "copy": "Copy"
+    },
+    "lineCount": "lines",
+    "separator": {
+      "label": "Separator",
+      "semicolon": "Semicolon \";\"",
+      "comma": "Comma \",\"",
+      "dot": "Dot \".\"",
+      "space": "Space \" \"",
+      "other": "Other",
+      "customPlaceholder": "Enter separator"
+    },
+    "exceptions": {
+      "placeholder": "Enter text or symbol to NOT split lines into columns that contain it",
+      "presetWords": "header\ntotal\nall\nsum\ngeneral\nfinal\nresult\nconclusion"
+    },
+    "results": {
+      "columnPlaceholder": "{{number}} word"
+    },
+    "seo": {
+      "title": "Split Text by Columns Online - Wekey Tools",
+      "description": "Convenient tool for splitting text into columns with configurable separators and exceptions",
+      "keywords": "text splitting, columns, separators, text processing, data parsing",
+      "ogTitle": "Text by Columns - Wekey Tools",
+      "ogDescription": "Efficient tool for structuring text into columns",
+      "whatIsTextByColumns": {
+        "title": "What is text splitting by columns?",
+        "text": "Text splitting by columns is the process of dividing structured text into separate columns using specified separators. The tool automatically distributes data from each line across 6 columns, simplifying the processing of lists, tables, and structured information."
+      },
+      "whyNeeded": {
+        "title": "Why do you need column splitting?",
+        "text": "The tool is useful for processing CSV data, creating structured lists, analyzing imported data, preparing information for tables, separating product catalogs, processing export results, and structuring any data with separators."
+      },
+      "howItWorks": {
+        "title": "How does text splitting work?",
+        "text": "The system analyzes each line of text and splits it by the selected separator character (semicolon, comma, dot, space, or custom symbol). The resulting parts are distributed across 6 columns. You can set exceptions for lines that should not be split."
+      },
+      "whatTexts": {
+        "title": "What texts can be processed?",
+        "text": "Suitable for any structured data: CSV files, product lists, contact data, export results, tabular data, catalogs, price lists. Supports various separator formats and allows excluding headers and summary lines."
+      },
+      "forSpecialists": {
+        "title": "Who benefits from this tool?",
+        "text": "Data analysts, content managers, marketers, online store administrators, database specialists, SEO specialists, and everyone who works with structured data and needs quick processing."
+      },
+      "howToUse": {
+        "title": "How to use the tool?",
+        "text": "Paste structured text, select the appropriate separator (semicolon, comma, etc.), add exceptions for headers or totals if needed, click 'Show result' and get data split into 6 columns for convenient work."
+      }
+    }
+  },
   "footer": {
     "copyright": "© 2024 WEKey Tools. All rights reserved.",
     "developer": "Developed by",

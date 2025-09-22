@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -8,6 +9,7 @@ import './SpacesToParagraphsTool.css';
 
 const TOOL_ID = 'spaces-to-paragraphs';
 const SpacesToParagraphsTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
@@ -136,9 +138,9 @@ const SpacesToParagraphsTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('spacesToParagraphs.allTools')}
                 </Link>
-                <h1 className="tool-title">Пробелы на абзацы</h1>
+                <h1 className="tool-title">{t('spacesToParagraphs.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -159,16 +161,16 @@ const SpacesToParagraphsTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('spacesToParagraphs.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('spacesToParagraphs.buttons.paste')}
                         </button>
-                        <span className="info">{inputLines} стр.</span>
+                        <span className="info">{inputLines} {t('spacesToParagraphs.lineCount')}</span>
                     </div>
                 </div>
 
@@ -182,7 +184,7 @@ const SpacesToParagraphsTool: React.FC = () => {
                                 checked={removePunctuation}
                                 onChange={(e) => setRemovePunctuation(e.target.checked)}
                             />
-                            <span className="checkbox-text">Удалить все знаки препинания</span>
+                            <span className="checkbox-text">{t('spacesToParagraphs.settings.removePunctuation')}</span>
                         </label>
 
                         <label className="checkbox-item">
@@ -191,7 +193,7 @@ const SpacesToParagraphsTool: React.FC = () => {
                                 checked={removeSpecialChars}
                                 onChange={(e) => setRemoveSpecialChars(e.target.checked)}
                             />
-                            <span className="checkbox-text">Удалить все спецсимволы</span>
+                            <span className="checkbox-text">{t('spacesToParagraphs.settings.removeSpecialChars')}</span>
                         </label>
                     </div>
 
@@ -206,7 +208,7 @@ const SpacesToParagraphsTool: React.FC = () => {
                                 onClick={() => handleRadioClick(caseOption, setCaseOption, 'lowercase')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">Результат перевести в нижний регистр</span>
+                            <span className="checkbox-text">{t('spacesToParagraphs.settings.lowercase')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -218,7 +220,7 @@ const SpacesToParagraphsTool: React.FC = () => {
                                 onClick={() => handleRadioClick(caseOption, setCaseOption, 'capitalizeEach')}
                                 onChange={() => {}} // Пустой onChange чтобы React не ругался
                             />
-                            <span className="checkbox-text">Каждый абзац с большой буквы</span>
+                            <span className="checkbox-text">{t('spacesToParagraphs.settings.capitalizeEach')}</span>
                         </label>
                     </div>
                 </div>
@@ -232,7 +234,7 @@ const SpacesToParagraphsTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim()}
                 >
-                    Показать результат
+                    {t('spacesToParagraphs.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -242,7 +244,7 @@ const SpacesToParagraphsTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('spacesToParagraphs.buttons.copied') : t('spacesToParagraphs.buttons.copy')}
                 </button>
             </div>
 
@@ -250,12 +252,47 @@ const SpacesToParagraphsTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('spacesToParagraphs.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('spacesToParagraphs.lineCount')}</span>
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <h2>{t('spacesToParagraphs.seo.whatIsSpacesToParagraphs.title')}</h2>
+                        <p>{t('spacesToParagraphs.seo.whatIsSpacesToParagraphs.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('spacesToParagraphs.seo.whyNeeded.title')}</h2>
+                        <p>{t('spacesToParagraphs.seo.whyNeeded.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('spacesToParagraphs.seo.howItWorks.title')}</h2>
+                        <p>{t('spacesToParagraphs.seo.howItWorks.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('spacesToParagraphs.seo.whatTexts.title')}</h2>
+                        <p>{t('spacesToParagraphs.seo.whatTexts.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('spacesToParagraphs.seo.forSpecialists.title')}</h2>
+                        <p>{t('spacesToParagraphs.seo.forSpecialists.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('spacesToParagraphs.seo.howToUse.title')}</h2>
+                        <p>{t('spacesToParagraphs.seo.howToUse.text')}</p>
+                    </div>
                 </div>
             </div>
         </div>

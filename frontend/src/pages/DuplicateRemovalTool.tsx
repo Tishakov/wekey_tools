@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
+import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './DuplicateRemovalTool.css';
 
@@ -10,6 +12,7 @@ const TOOL_ID = 'remove-duplicates';
 type DuplicateMode = 'remove-duplicates' | 'remove-all-duplicates' | 'remove-unique';
 
 const DuplicateRemovalTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [mode, setMode] = useState<DuplicateMode>('remove-duplicates');
@@ -170,22 +173,27 @@ const DuplicateRemovalTool: React.FC = () => {
 
     return (
         <div className="duplicate-removal-tool">
+            <SEOHead 
+                title={t('duplicateRemoval.title')}
+                description={t('duplicateRemoval.description')}
+                keywords={t('duplicateRemoval.keywords')}
+            />
             {/* Header-остров инструмента */}
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('common.backToTools')}
                 </Link>
-                <h1 className="tool-title">Удаление дубликатов</h1>
+                <h1 className="tool-title">{t('duplicateRemoval.title')}</h1>
                 <div className="tool-header-buttons">
-                    <button className="tool-header-btn counter-btn" title="Счетчик запусков">
+                    <button className="tool-header-btn counter-btn" title={t('common.usageCount')}>
                         <img src="/icons/rocket.svg" alt="" />
                         <span className="counter">{launchCount}</span>
                     </button>
-                    <button className="tool-header-btn icon-only" title="Подсказки">
+                    <button className="tool-header-btn icon-only" title={t('common.tips')}>
                         <img src="/icons/lamp.svg" alt="" />
                     </button>
-                    <button className="tool-header-btn icon-only" title="Скриншот">
+                    <button className="tool-header-btn icon-only" title={t('common.screenshot')}>
                         <img src="/icons/camera.svg" alt="" />
                     </button>
                 </div>
@@ -197,16 +205,16 @@ const DuplicateRemovalTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('duplicateRemoval.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('duplicateRemoval.buttons.paste')}
                         </button>
-                        <span className="info">{inputLines} стр.</span>
+                        <span className="info">{inputLines} {t('duplicateRemoval.lineCount')}</span>
                     </div>
                 </div>
 
@@ -221,7 +229,7 @@ const DuplicateRemovalTool: React.FC = () => {
                                 checked={mode === 'remove-duplicates'}
                                 onChange={(e) => setMode(e.target.value as DuplicateMode)}
                             />
-                            <span className="radio-text">Удалить дубликаты</span>
+                            <span className="radio-text">{t('duplicateRemoval.modes.removeDuplicates')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -232,7 +240,7 @@ const DuplicateRemovalTool: React.FC = () => {
                                 checked={mode === 'remove-all-duplicates'}
                                 onChange={(e) => setMode(e.target.value as DuplicateMode)}
                             />
-                            <span className="radio-text">Удалить все дубликаты</span>
+                            <span className="radio-text">{t('duplicateRemoval.modes.removeAllDuplicates')}</span>
                         </label>
 
                         <label className="radio-item">
@@ -243,7 +251,7 @@ const DuplicateRemovalTool: React.FC = () => {
                                 checked={mode === 'remove-unique'}
                                 onChange={(e) => setMode(e.target.value as DuplicateMode)}
                             />
-                            <span className="radio-text">Удалить уникальные</span>
+                            <span className="radio-text">{t('duplicateRemoval.modes.removeUnique')}</span>
                         </label>
                     </div>
                 </div>
@@ -257,7 +265,7 @@ const DuplicateRemovalTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim()}
                 >
-                    Показать результат
+                    {t('duplicateRemoval.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -267,7 +275,7 @@ const DuplicateRemovalTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('duplicateRemoval.buttons.copied') : t('duplicateRemoval.buttons.copyResult')}
                 </button>
             </div>
 
@@ -275,13 +283,34 @@ const DuplicateRemovalTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('duplicateRemoval.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{resultLines} стр.</span>
+                    <span className="result-counter">{resultLines} {t('duplicateRemoval.lineCount')}</span>
                 </div>
+            </div>
+
+            {/* SEO блок */}
+            <div className="seo-section">
+                <h3>{t('duplicateRemoval.seo.whatIsDuplicateRemoval.title')}</h3>
+                <p>{t('duplicateRemoval.seo.whatIsDuplicateRemoval.text')}</p>
+
+                <h3>{t('duplicateRemoval.seo.whyNeeded.title')}</h3>
+                <p>{t('duplicateRemoval.seo.whyNeeded.text')}</p>
+
+                <h3>{t('duplicateRemoval.seo.howItWorks.title')}</h3>
+                <p>{t('duplicateRemoval.seo.howItWorks.text')}</p>
+
+                <h3>{t('duplicateRemoval.seo.whatTexts.title')}</h3>
+                <p>{t('duplicateRemoval.seo.whatTexts.text')}</p>
+
+                <h3>{t('duplicateRemoval.seo.forSpecialists.title')}</h3>
+                <p>{t('duplicateRemoval.seo.forSpecialists.text')}</p>
+
+                <h3>{t('duplicateRemoval.seo.howToUse.title')}</h3>
+                <p>{t('duplicateRemoval.seo.howToUse.text')}</p>
             </div>
         </div>
     );

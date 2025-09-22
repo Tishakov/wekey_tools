@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -8,6 +9,7 @@ import './RemoveLineBreaksTool.css';
 
 const TOOL_ID = 'remove-line-breaks';
 const RemoveLineBreaksTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
@@ -132,9 +134,9 @@ const RemoveLineBreaksTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('removeLineBreaks.allTools')}
                 </Link>
-                <h1 className="tool-title">Удаление переносов</h1>
+                <h1 className="tool-title">{t('removeLineBreaks.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -157,14 +159,14 @@ const RemoveLineBreaksTool: React.FC = () => {
                         className="input-textarea"
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
-                        placeholder="Введите или вставьте ваш текст здесь..."
+                        placeholder={t('removeLineBreaks.inputPlaceholder')}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('removeLineBreaks.buttons.paste')}
                         </button>
-                        <span className="info">{countLines(inputText)} стр.</span>
+                        <span className="info">{countLines(inputText)} {t('removeLineBreaks.lineCount')}</span>
                     </div>
                 </div>
 
@@ -172,7 +174,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                 <div className="settings-section">
                     <div className="settings-group">
                         {/* Плашка заголовка внутри блока */}
-                        <div className="connector-label">Заменить перенос строки</div>
+                        <div className="connector-label">{t('removeLineBreaks.replaceWith')}</div>
                         
                         {/* Сетка радио-кнопок 2x4 */}
                         <div className="connector-grid">
@@ -186,7 +188,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'nothing')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Ничего</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.nothing')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -198,7 +200,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'space')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Пробел</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.space')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -210,7 +212,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'dash')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Тире</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.dash')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -222,7 +224,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'hyphen')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Дефис</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.hyphen')}</span>
                             </label>
 
                             {/* Правая колонка */}
@@ -235,7 +237,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'comma-space')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Запятая+пробел</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.commaSpace')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -247,7 +249,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'dot-space')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Точка+пробел</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.dotSpace')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -259,7 +261,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'semicolon')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Точка с запятой</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.semicolon')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -271,7 +273,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'colon')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Двоеточие</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.colon')}</span>
                             </label>
                         </div>
                     </div>
@@ -288,12 +290,12 @@ const RemoveLineBreaksTool: React.FC = () => {
                                     onClick={() => handleRadioClick(replacement, setReplacement, 'other')}
                                     onChange={() => {}}
                                 />
-                                <span className="radio-text">Другой</span>
+                                <span className="radio-text">{t('removeLineBreaks.replacements.other')}</span>
                             </label>
                             <input
                                 type="text"
                                 className="custom-connector-input"
-                                placeholder="Свой вариант"
+                                placeholder={t('removeLineBreaks.replacements.customPlaceholder')}
                                 value={customReplacement}
                                 onChange={(e) => setCustomReplacement(e.target.value)}
                                 onFocus={() => setReplacement('other')}
@@ -312,7 +314,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                     onClick={handleShowResult}
                     disabled={!inputText.trim()}
                 >
-                    Показать результат
+                    {t('removeLineBreaks.buttons.showResult')}
                 </button>
                 
                 <button 
@@ -322,7 +324,7 @@ const RemoveLineBreaksTool: React.FC = () => {
                     disabled={!result}
                 >
                     <img src="/icons/button_copy.svg" alt="" />
-                    {copied ? 'Скопировано!' : 'Скопировать результат'}
+                    {copied ? t('removeLineBreaks.buttons.copied') : t('removeLineBreaks.buttons.copyResult')}
                 </button>
             </div>
 
@@ -330,12 +332,47 @@ const RemoveLineBreaksTool: React.FC = () => {
             <div className="result-section">
                 <textarea
                     className="result-textarea"
-                    placeholder="Здесь будет результат"
+                    placeholder={t('removeLineBreaks.resultPlaceholder')}
                     value={result}
                     readOnly
                 />
                 <div className="result-controls">
-                    <span className="result-counter">{countLines(result)} стр.</span>
+                    <span className="result-counter">{countLines(result)} {t('removeLineBreaks.lineCount')}</span>
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <h2>{t('removeLineBreaks.seo.whatIsLineBreakRemoval.title')}</h2>
+                        <p>{t('removeLineBreaks.seo.whatIsLineBreakRemoval.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('removeLineBreaks.seo.whyNeeded.title')}</h2>
+                        <p>{t('removeLineBreaks.seo.whyNeeded.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('removeLineBreaks.seo.howItWorks.title')}</h2>
+                        <p>{t('removeLineBreaks.seo.howItWorks.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('removeLineBreaks.seo.whatTexts.title')}</h2>
+                        <p>{t('removeLineBreaks.seo.whatTexts.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('removeLineBreaks.seo.forSpecialists.title')}</h2>
+                        <p>{t('removeLineBreaks.seo.forSpecialists.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('removeLineBreaks.seo.howToUse.title')}</h2>
+                        <p>{t('removeLineBreaks.seo.howToUse.text')}</p>
+                    </div>
                 </div>
             </div>
         </div>

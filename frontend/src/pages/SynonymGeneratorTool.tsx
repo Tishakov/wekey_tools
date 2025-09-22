@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { openaiService, type SynonymResponse } from '../services/openaiService';
 
 
 const TOOL_ID = 'synonym-generator';
 const SynonymGeneratorTool: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
@@ -42,13 +44,13 @@ const SynonymGeneratorTool: React.FC = () => {
         setResult(response.synonyms.join('\n'));
         console.log('✅ AI synonyms generated:', response.synonyms.length, 'items');
       } else {
-        setAiError(response.error || 'Не удалось сгенерировать синонимы');
+        setAiError(response.error || t('synonymGenerator.errors.noSynonyms'));
         console.error('❌ AI generation failed:', response.error);
       }
       
     } catch (error) {
       console.error('💥 Error during synonym generation:', error);
-      setAiError('Произошла ошибка при генерации синонимов');
+      setAiError(t('synonymGenerator.errors.generic'));
     } finally {
       setIsGenerating(false);
     }
@@ -99,9 +101,9 @@ const SynonymGeneratorTool: React.FC = () => {
           onClick={() => navigate('/')}
         >
           <img src="/icons/arrow_left.svg" alt="" />
-          Все инструменты
+          {t('synonymGenerator.allTools')}
         </button>
-        <h1 className="tool-title">Генератор синонимов</h1>
+        <h1 className="tool-title">{t('synonymGenerator.title')}</h1>
         <div className="tool-header-buttons">
           <button className="tool-header-btn counter-btn">
             <img src="/icons/rocket.svg" alt="" />
@@ -124,7 +126,7 @@ const SynonymGeneratorTool: React.FC = () => {
             className="input-textarea"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Введите слова или фразы (каждое с новой строки)..."
+            placeholder={t('synonymGenerator.inputPlaceholder')}
           />
           <div className="input-controls">
             <div className="left-controls">
@@ -133,20 +135,20 @@ const SynonymGeneratorTool: React.FC = () => {
                 onClick={handlePaste}
               >
                 <img src="/icons/button_paste.svg" alt="" />
-                Вставить
+                {t('synonymGenerator.buttons.paste')}
               </button>
               <select 
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
                 className="language-selector"
               >
-                <option value="russian">Русский</option>
-                <option value="ukrainian">Українська</option>
-                <option value="english">English</option>
+                <option value="russian">{t('synonymGenerator.languages.russian')}</option>
+                <option value="ukrainian">{t('synonymGenerator.languages.ukrainian')}</option>
+                <option value="english">{t('synonymGenerator.languages.english')}</option>
               </select>
             </div>
             <div className="info">
-              {getLineCount(inputText)} стр.
+              {getLineCount(inputText)} {t('synonymGenerator.lineCount')}
             </div>
           </div>
         </div>
@@ -157,23 +159,23 @@ const SynonymGeneratorTool: React.FC = () => {
             <textarea
               className="result-textarea"
               value={result}
-              placeholder="Здесь будет результат"
+              placeholder={t('synonymGenerator.resultPlaceholder')}
               readOnly
             />
             {isGenerating && (
               <div className="ai-loading-overlay">
                 <div className="loading-spinner"></div>
                 <div className="loading-text">
-                  <p>Генерируем синонимы для ваших слов.</p>
-                  <p>Это может занять до 1 минуты.</p>
-                  <p>Пожалуйста, не закрывайте инструмент.</p>
+                  <p>{t('synonymGenerator.loading.title')}</p>
+                  <p>{t('synonymGenerator.loading.subtitle')}</p>
+                  <p>{t('synonymGenerator.loading.warning')}</p>
                 </div>
               </div>
             )}
           </div>
           <div className="result-controls">
             <div className="result-counter">
-              {getLineCount(result)} стр.
+              {getLineCount(result)} {t('synonymGenerator.lineCount')}
             </div>
           </div>
         </div>
@@ -203,7 +205,7 @@ const SynonymGeneratorTool: React.FC = () => {
           onClick={generateSynonyms}
           disabled={!inputText.trim() || isGenerating}
         >
-          {isGenerating ? 'Генерация синонимов...' : 'Показать результат'}
+          {isGenerating ? t('synonymGenerator.buttons.generating') : t('synonymGenerator.buttons.showResult')}
         </button>
         
         <button 
@@ -213,8 +215,43 @@ const SynonymGeneratorTool: React.FC = () => {
           disabled={!result}
         >
           <img src="/icons/button_copy.svg" alt="" />
-          {copied ? 'Скопировано!' : 'Скопировать результат'}
+          {copied ? t('synonymGenerator.buttons.copied') : t('synonymGenerator.buttons.copy')}
         </button>
+      </div>
+
+      {/* SEO секция */}
+      <div className="seo-section">
+        <div className="seo-content">
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.whatIsSynonymGenerator.title')}</h2>
+            <p>{t('synonymGenerator.seo.whatIsSynonymGenerator.text')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.whyNeeded.title')}</h2>
+            <p>{t('synonymGenerator.seo.whyNeeded.text')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.howItWorks.title')}</h2>
+            <p>{t('synonymGenerator.seo.howItWorks.text')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.whatTexts.title')}</h2>
+            <p>{t('synonymGenerator.seo.whatTexts.text')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.forSpecialists.title')}</h2>
+            <p>{t('synonymGenerator.seo.forSpecialists.text')}</p>
+          </div>
+          
+          <div className="seo-item">
+            <h2>{t('synonymGenerator.seo.howToUse.title')}</h2>
+            <p>{t('synonymGenerator.seo.howToUse.text')}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

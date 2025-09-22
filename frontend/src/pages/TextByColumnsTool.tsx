@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
@@ -8,6 +9,7 @@ import './TextByColumnsTool.css';
 
 const TOOL_ID = 'text-by-columns';
 const TextByColumnsTool: React.FC = () => {
+    const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
     const [inputText, setInputText] = useState('');
     const [copied, setCopied] = useState<boolean[]>([false, false, false, false, false, false]);
@@ -54,7 +56,7 @@ const TextByColumnsTool: React.FC = () => {
     // Функция переноса готовых слов в поле исключений
     const handleTransferWords = () => {
         const currentExceptions = exceptions.trim();
-        const presetWords = "заголовок\nитого\nвсего\nсумма\nобщий\nфинал\nрезультат\nзаключение";
+        const presetWords = t('textByColumns.exceptions.presetWords');
         
         if (currentExceptions === '') {
             setExceptions(presetWords);
@@ -181,9 +183,9 @@ const TextByColumnsTool: React.FC = () => {
             <div className="tool-header-island">
                 <Link to={createLink('')} className="back-button">
                     <img src="/icons/arrow_left.svg" alt="" />
-                    Все инструменты
+                    {t('textByColumns.allTools')}
                 </Link>
-                <h1 className="tool-title">Текст по столбцам</h1>
+                <h1 className="tool-title">{t('textByColumns.title')}</h1>
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
@@ -204,16 +206,16 @@ const TextByColumnsTool: React.FC = () => {
                 <div className="input-section">
                     <textarea
                         className="input-textarea"
-                        placeholder="Введите ваш текст..."
+                        placeholder={t('textByColumns.inputPlaceholder')}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                     />
                     <div className="input-controls">
                         <button className="paste-button" onClick={handlePaste}>
                             <img src="/icons/button_paste.svg" alt="" />
-                            Вставить
+                            {t('textByColumns.buttons.paste')}
                         </button>
-                        <span className="info">{inputLines} стр.</span>
+                        <span className="info">{inputLines} {t('textByColumns.lineCount')}</span>
                     </div>
                 </div>
 
@@ -221,7 +223,7 @@ const TextByColumnsTool: React.FC = () => {
                 <div className="settings-section">
                     {/* Разделитель */}
                     <div className="settings-group">
-                        <div className="connector-label">Разделитель</div>
+                        <div className="connector-label">{t('textByColumns.separator.label')}</div>
                         
                         <div className="radio-options">
                             <label className="radio-item">
@@ -231,7 +233,7 @@ const TextByColumnsTool: React.FC = () => {
                                     checked={separator === 'semicolon'}
                                     onChange={() => handleRadioClick(separator, setSeparator, 'semicolon')}
                                 />
-                                <span className="radio-text">Точка с запятой ";"</span>
+                                <span className="radio-text">{t('textByColumns.separator.semicolon')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -241,7 +243,7 @@ const TextByColumnsTool: React.FC = () => {
                                     checked={separator === 'comma'}
                                     onChange={() => handleRadioClick(separator, setSeparator, 'comma')}
                                 />
-                                <span className="radio-text">Запятая ","</span>
+                                <span className="radio-text">{t('textByColumns.separator.comma')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -251,7 +253,7 @@ const TextByColumnsTool: React.FC = () => {
                                     checked={separator === 'dot'}
                                     onChange={() => handleRadioClick(separator, setSeparator, 'dot')}
                                 />
-                                <span className="radio-text">Точка "."</span>
+                                <span className="radio-text">{t('textByColumns.separator.dot')}</span>
                             </label>
 
                             <label className="radio-item">
@@ -261,7 +263,7 @@ const TextByColumnsTool: React.FC = () => {
                                     checked={separator === 'space'}
                                     onChange={() => handleRadioClick(separator, setSeparator, 'space')}
                                 />
-                                <span className="radio-text">Пробел " "</span>
+                                <span className="radio-text">{t('textByColumns.separator.space')}</span>
                             </label>
                         </div>
                     </div>
@@ -276,12 +278,12 @@ const TextByColumnsTool: React.FC = () => {
                                     checked={separator === 'other'}
                                     onChange={() => handleRadioClick(separator, setSeparator, 'other')}
                                 />
-                                <span className="radio-text">Другой</span>
+                                <span className="radio-text">{t('textByColumns.separator.other')}</span>
                             </label>
                             <input
                                 type="text"
                                 className="custom-input"
-                                placeholder="Введите разделитель"
+                                placeholder={t('textByColumns.separator.customPlaceholder')}
                                 value={customSeparator}
                                 onChange={(e) => setCustomSeparator(e.target.value)}
                                 onFocus={() => setSeparator('other')}
@@ -296,7 +298,7 @@ const TextByColumnsTool: React.FC = () => {
                             <div className="exceptions-left">
                                 <textarea
                                     className="exceptions-textarea"
-                                    placeholder="Введите текст или символ, чтобы НЕ разделять строки на колонки, которые будут содержать это"
+                                    placeholder={t('textByColumns.exceptions.placeholder')}
                                     value={exceptions}
                                     onChange={(e) => setExceptions(e.target.value)}
                                     rows={4}
@@ -305,20 +307,13 @@ const TextByColumnsTool: React.FC = () => {
                             <div className="exceptions-right">
                                 <textarea
                                     className="exceptions-textarea preset-words"
-                                    value={`заголовок
-итого
-всего
-сумма
-общий
-финал
-результат
-заключение`}
+                                    value={t('textByColumns.exceptions.presetWords')}
                                     readOnly
                                     rows={4}
                                 />
                                 <button className="transfer-button" onClick={handleTransferWords}>
                                     <img src="/icons/arrow_left.svg" alt="" />
-                                    Перенести
+                                    {t('textByColumns.buttons.transfer')}
                                 </button>
                             </div>
                         </div>
@@ -332,7 +327,7 @@ const TextByColumnsTool: React.FC = () => {
                     className="action-btn primary" 
                     onClick={handleShowResult}
                 >
-                    Показать результат
+                    {t('textByColumns.buttons.showResult')}
                 </button>
             </div>
 
@@ -344,24 +339,59 @@ const TextByColumnsTool: React.FC = () => {
                             <div className="result-field">
                                 <textarea
                                     className="result-textarea"
-                                    placeholder={`${index + 1}-е слово`}
+                                    placeholder={t('textByColumns.results.columnPlaceholder', { number: index + 1 })}
                                     value={column}
                                     readOnly
                                 />
                                 <div className="result-controls">
-                                    <span className="result-counter">{getColumnLines(index)} стр.</span>
+                                    <span className="result-counter">{getColumnLines(index)} {t('textByColumns.lineCount')}</span>
                                 </div>
                             </div>
                             <button 
                                 className="copy-btn-icon" 
                                 onClick={() => handleCopy(index)}
                                 disabled={!column}
-                                title="Скопировать"
+                                title={t('textByColumns.buttons.copy')}
                             >
-                                <img src="/icons/button_copy.svg" alt="Копировать" />
+                                <img src="/icons/button_copy.svg" alt={t('textByColumns.buttons.copy')} />
                             </button>
                         </div>
                     ))}
+                </div>
+            </div>
+
+            {/* SEO секция */}
+            <div className="seo-section">
+                <div className="seo-content">
+                    <div className="seo-item">
+                        <h2>{t('textByColumns.seo.whatIsTextByColumns.title')}</h2>
+                        <p>{t('textByColumns.seo.whatIsTextByColumns.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('textByColumns.seo.whyNeeded.title')}</h2>
+                        <p>{t('textByColumns.seo.whyNeeded.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('textByColumns.seo.howItWorks.title')}</h2>
+                        <p>{t('textByColumns.seo.howItWorks.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('textByColumns.seo.whatTexts.title')}</h2>
+                        <p>{t('textByColumns.seo.whatTexts.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('textByColumns.seo.forSpecialists.title')}</h2>
+                        <p>{t('textByColumns.seo.forSpecialists.text')}</p>
+                    </div>
+                    
+                    <div className="seo-item">
+                        <h2>{t('textByColumns.seo.howToUse.title')}</h2>
+                        <p>{t('textByColumns.seo.howToUse.text')}</p>
+                    </div>
                 </div>
             </div>
         </div>
