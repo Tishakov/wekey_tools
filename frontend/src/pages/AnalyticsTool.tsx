@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import ColumnIcon from '../assets/icons/column.svg?react';
 import StringIcon from '../assets/icons/string.svg?react';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
+import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
 import { openaiService, type AnalyticsData } from '../services/openaiService';
@@ -28,9 +32,21 @@ interface Group {
   metrics: Metric[];
 }
 
+const TOOL_ID = 'cross-analytics';
+
 const AnalyticsTool: React.FC = () => {
   const { t } = useTranslation();
   const { createLink } = useLocalizedLink();
+
+  // Auth Required Hook
+  const {
+    isAuthRequiredModalOpen,
+    isAuthModalOpen,
+    requireAuth,
+    closeAuthRequiredModal,
+    closeAuthModal,
+    openAuthModal
+  } = useAuthRequired();
 
   const metricsConfig: Group[] = [
     {
@@ -102,6 +118,7 @@ const AnalyticsTool: React.FC = () => {
 
   // Состояние для периода (по умолчанию 30 дней)
   const [period, setPeriod] = useState<number>(30);
+  const [launchCount, setLaunchCount] = useState(0);
   
   // Состояние для попапа экспорта
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
@@ -188,6 +205,20 @@ const AnalyticsTool: React.FC = () => {
     }
   }, []); // Запускаем только один раз при монтировании
 
+  // Загрузка статистики (без увеличения счетчика)
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const count = await statsService.getLaunchCount(TOOL_ID);
+        setLaunchCount(count);
+      } catch (error) {
+        console.warn('Failed to load statistics:', error);
+        setLaunchCount(0);
+      }
+    };
+    loadStats();
+  }, []);
+
   // Функция плавного закрытия модального окна
   const closeModal = () => {
     setIsModalClosing(true);
@@ -215,9 +246,23 @@ const AnalyticsTool: React.FC = () => {
   const handleAIAnalysis = async () => {
     console.log('🎯 Starting AI analysis...');
     
+    // Проверяем авторизацию перед выполнением
+    if (!requireAuth()) {
+      return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+    }
+    
     if (!niche.trim()) {
       setAiError(t('analyticsTool.aiAnalysis.nicheRequired'));
       return;
+    }
+    
+    // Увеличиваем счетчик использования для анализа ИИ
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
     }
     
     setIsAnalyzing(true);
@@ -716,7 +761,21 @@ const AnalyticsTool: React.FC = () => {
   };
 
   // Функция экспорта в Excel из оригинала
-  const exportToExcel = (format: 'vertical' | 'horizontal' = 'vertical') => {
+  const exportToExcel = async (format: 'vertical' | 'horizontal' = 'vertical') => {
+    // Проверяем авторизацию перед выполнением
+    if (!requireAuth()) {
+      return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+    }
+
+    // Увеличиваем счетчик использования для экспорта
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Failed to update stats:', error);
+      setLaunchCount(prev => prev + 1);
+    }
+
     try {
       let exportData;
       
@@ -887,7 +946,7 @@ const AnalyticsTool: React.FC = () => {
           <div className="tool-header-buttons">
             <button className="tool-header-btn counter-btn" title={t('common.usageCount')}>
               <img src="/icons/rocket.svg" alt="" />
-              <span className="counter">0</span>
+              <span className="counter">{launchCount}</span>
             </button>
             <button className="tool-header-btn icon-only" title={t('common.tips')}>
               <img src="/icons/lamp.svg" alt="" />
@@ -1351,6 +1410,19 @@ const AnalyticsTool: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Модальные окна для авторизации */}
+        <AuthRequiredModal
+          isOpen={isAuthRequiredModalOpen}
+          onClose={closeAuthRequiredModal}
+          onLoginClick={openAuthModal}
+        />
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={closeAuthModal}
+          initialMode="login"
+        />
       </div>
     </>
   );

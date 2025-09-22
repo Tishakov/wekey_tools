@@ -32,6 +32,7 @@ const EmojiTool: React.FC = () => {
     const [launchCount, setLaunchCount] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [copied, setCopied] = useState(false);
+    const [hasUsedEmojiInSession, setHasUsedEmojiInSession] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Категории с алфавитной сортировкой (кроме "Все")
@@ -58,16 +59,15 @@ const EmojiTool: React.FC = () => {
         { id: 'flags', name: t('emojiTool.categories.flags'), icon: '🏁' }
     ];
 
-    // Обновление статистики
+    // Загрузка статистики (без увеличения счетчика)
     useEffect(() => {
         const loadStats = async () => {
             try {
-                const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-                setLaunchCount(newCount);
-            } catch (error) {
-                console.warn('Failed to update statistics:', error);
                 const count = await statsService.getLaunchCount(TOOL_ID);
                 setLaunchCount(count);
+            } catch (error) {
+                console.warn('Failed to load statistics:', error);
+                setLaunchCount(0);
             }
         };
         loadStats();
@@ -90,7 +90,25 @@ const EmojiTool: React.FC = () => {
     });
 
     // Функции для работы с текстом
-    const insertEmoji = (emoji: string) => {
+    const insertEmoji = async (emoji: string) => {
+        // Проверяем авторизацию перед использованием
+        if (!requireAuth()) {
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Увеличиваем счетчик только при первом использовании эмодзи в сессии
+        if (!hasUsedEmojiInSession) {
+            try {
+                const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+                setLaunchCount(newCount);
+                setHasUsedEmojiInSession(true);
+            } catch (error) {
+                console.error('Failed to update stats:', error);
+                setLaunchCount(prev => prev + 1);
+                setHasUsedEmojiInSession(true);
+            }
+        }
+
         const textarea = textareaRef.current;
         if (!textarea) {
             // Fallback: добавляем в конец, если ref недоступен
@@ -117,21 +135,7 @@ const EmojiTool: React.FC = () => {
 
     // Функция копирования результата
     const handleCopy = async () => {
-        // Проверяем авторизацию перед выполнением
-        if (!requireAuth()) {
-            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-        }
-
-        // Увеличиваем счетчик запусков
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
-
-
+        // Копирование не требует авторизации и не увеличивает счетчик
         try {
             await navigator.clipboard.writeText(text);
             setCopied(true);
