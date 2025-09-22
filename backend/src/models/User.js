@@ -53,6 +53,13 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('dark', 'light'),
       defaultValue: 'dark'
     },
+    avatar: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 255]
+      }
+    },
     // Для отслеживания использования API
     apiRequestsCount: {
       type: DataTypes.INTEGER,

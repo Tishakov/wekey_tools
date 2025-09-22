@@ -267,6 +267,38 @@ class ApiService {
     return !!this.getToken();
   }
 
+  // ===================
+  // АВАТАРЫ
+  // ===================
+
+  async uploadAvatar(formData: FormData): Promise<ApiResponse> {
+    // Для загрузки файлов не устанавливаем Content-Type, браузер сделает это автоматически
+    const headers = this.getHeaders();
+    delete headers['Content-Type'];
+
+    const response = await fetch(`${this.baseURL}/api/users/avatar`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new ApiError(data.message || 'Ошибка загрузки аватара', response.status, data);
+    }
+
+    return data;
+  }
+
+  async deleteAvatar(): Promise<ApiResponse> {
+    return this.delete('/api/users/avatar');
+  }
+
+  // ===================
+  // HEALTH CHECK
+  // ===================
+
   // Проверка доступности API
   async healthCheck(): Promise<boolean> {
     try {

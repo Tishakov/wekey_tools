@@ -68,6 +68,9 @@ app.use(cookieParser()); // Добавляем парсер кукисов
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Статическая раздача файлов для аватаров
+app.use('/uploads', express.static('uploads'));
+
 // Глобальное логирование всех запросов
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - IP: ${req.ip}`);

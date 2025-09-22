@@ -41,6 +41,12 @@ const UserButton: React.FC = () => {
     return user?.email?.[0]?.toUpperCase() || 'U';
   };
 
+  const getAvatarUrl = (avatarPath: string | null) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    return `http://localhost:8880${avatarPath}`;
+  };
+
   return (
     <>
       <div className="user-button-container">
@@ -52,7 +58,15 @@ const UserButton: React.FC = () => {
               aria-label={t('auth.userMenu')}
             >
               <div className="user-avatar">
-                {getUserInitials()}
+                {user?.avatar ? (
+                  <img 
+                    src={getAvatarUrl(user.avatar) || ''} 
+                    alt="Avatar" 
+                    className="user-avatar-image"
+                  />
+                ) : (
+                  getUserInitials()
+                )}
               </div>
               <span className="user-name">{getUserDisplayName()}</span>
               <svg 

@@ -252,6 +252,7 @@ exports.getProfile = async (req, res) => {
         role: user.role,
         language: user.language,
         theme: user.theme,
+        avatar: user.avatar,
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
         loginCount: user.loginCount,

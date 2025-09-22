@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import AvatarUpload from '../components/profile/AvatarUpload';
 import './UserProfile.css';
 
 interface UserSettings {
@@ -181,9 +182,22 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-avatar">
-          <span className="profile-initials">
-            {(user.firstName?.[0] || '') + (user.lastName?.[0] || '')}
-          </span>
+          {user.avatar ? (
+            <img 
+              src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:8880${user.avatar}`} 
+              alt="User avatar" 
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                objectFit: 'cover'
+              }}
+            />
+          ) : (
+            <span className="profile-initials">
+              {(user.firstName?.[0] || '') + (user.lastName?.[0] || '')}
+            </span>
+          )}
         </div>
         <div className="profile-info">
           <h1 className="profile-name">
@@ -230,6 +244,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     {t('profile.cancel')}
                   </button>
                 )}
+              </div>
+              
+              {/* Секция аватара */}
+              <div className="profile-avatar-section">
+                <h4>Фото профиля</h4>
+                <AvatarUpload />
               </div>
               
               <form onSubmit={handleProfileSubmit} className="profile-form">

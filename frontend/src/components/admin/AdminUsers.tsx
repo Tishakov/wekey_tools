@@ -8,6 +8,7 @@ interface User {
   email: string;
   role: 'user' | 'admin' | 'premium';
   status: 'active' | 'inactive' | 'banned';
+  avatar?: string | null;
   createdAt: string;
   lastLoginAt: string | null;
   loginCount: number;
@@ -100,15 +101,6 @@ const AdminUsers: React.FC = () => {
     return first + last || '?';
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return 'Никогда';
     const date = new Date(dateString);
@@ -130,15 +122,6 @@ const AdminUsers: React.FC = () => {
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active': return 'Активен';
-      case 'inactive': return 'Неактивен';
-      case 'banned': return 'Заблокирован';
-      default: return status;
-    }
-  };
-
   // Подсчет статистики
   const activeUsers = users.filter(user => user.status === 'active').length;
   const premiumUsers = users.filter(user => user.role === 'premium').length;
@@ -157,10 +140,6 @@ const AdminUsers: React.FC = () => {
   return (
     <div className="admin-users">
       <div className="admin-users-header">
-        <div>
-          <h1 className="admin-users-title">Пользователи</h1>
-          <p className="admin-users-subtitle">Управление пользователями системы</p>
-        </div>
         <div className="admin-users-controls">
           <input
             type="text"
@@ -209,8 +188,6 @@ const AdminUsers: React.FC = () => {
           <thead>
             <tr>
               <th>Пользователь</th>
-              <th>Роль</th>
-              <th>Статус</th>
               <th>Дата регистрации</th>
               <th>Последний сеанс</th>
               <th>Входов</th>
@@ -222,7 +199,7 @@ const AdminUsers: React.FC = () => {
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={9} className="admin-users-empty">
+                <td colSpan={7} className="admin-users-empty">
                   Пользователи не найдены
                 </td>
               </tr>
@@ -232,9 +209,25 @@ const AdminUsers: React.FC = () => {
                   <td>
                     <div className="user-info">
                       <div className="user-avatar">
-                        {getInitials(user.firstName, user.lastName)}
+                        {user.avatar ? (
+                          <img 
+                            src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:8880${user.avatar}`} 
+                            alt="User avatar" 
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        ) : (
+                          getInitials(user.firstName, user.lastName)
+                        )}
                       </div>
                       <div className="user-details">
+                        <span className={`user-role-badge ${user.role}`}>
+                          {getRoleLabel(user.role)}
+                        </span>
                         <div className="user-name">
                           {user.firstName && user.lastName 
                             ? `${user.firstName} ${user.lastName}`
@@ -246,18 +239,8 @@ const AdminUsers: React.FC = () => {
                     </div>
                   </td>
                   <td>
-                    <span className={`user-role ${user.role}`}>
-                      {getRoleLabel(user.role)}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`user-status ${user.status}`}>
-                      {getStatusLabel(user.status)}
-                    </span>
-                  </td>
-                  <td>
                     <div className="user-date">
-                      <div className="user-date-main">{formatDate(user.createdAt)}</div>
+                      <div className="user-date-main">{formatDateTime(user.createdAt)}</div>
                     </div>
                   </td>
                   <td>
@@ -273,13 +256,11 @@ const AdminUsers: React.FC = () => {
                   <td>
                     <div className="user-stats">
                       <div className="user-stats-number">{user.toolStats.totalUsage}</div>
-                      <div className="user-stats-label">всего</div>
                     </div>
                   </td>
                   <td>
                     <div className="user-stats">
                       <div className="user-stats-number">{user.toolStats.uniqueTools}</div>
-                      <div className="user-stats-label">уникальных</div>
                     </div>
                   </td>
                   <td>

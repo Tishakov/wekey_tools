@@ -10,6 +10,7 @@ export interface User {
   role: 'user' | 'admin' | 'premium';
   language?: 'ru' | 'en' | 'uk';
   theme?: 'light' | 'dark';
+  avatar?: string | null;
   createdAt?: string;
   lastLoginAt?: string;
   loginCount?: number;
@@ -27,6 +28,7 @@ interface AuthContextType {
   register: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User> & { currentPassword?: string; newPassword?: string }) => Promise<void>;
+  updateUser: (user: User) => void;
   checkAuth: () => Promise<void>;
 }
 
@@ -210,6 +212,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  // Функция обновления пользователя
+  const updateUser = (updatedUser: User): void => {
+    setUser(updatedUser);
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -219,6 +226,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updateProfile,
+    updateUser,
     checkAuth
   };
 

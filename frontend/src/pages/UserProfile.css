@@ -115,6 +115,23 @@
   color: #FFFFFF;
 }
 
+/* Секция аватара - компактная */
+.profile-avatar-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.profile-avatar-section h4 {
+  margin: 0 0 15px 0;
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
 .edit-button, .cancel-button, .save-button {
   padding: 10px 20px;
   border: none;
@@ -162,6 +179,15 @@
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Секция аватара в профиле */
+.profile-avatar-section {
+  margin: 30px 0;
+  padding: 25px;
+  background: #1A1A1C;
+  border: 1px solid #333335;
+  border-radius: 12px;
 }
 
 .profile-form {

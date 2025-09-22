@@ -1,5 +1,8 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const { protect, restrictTo } = require('../middleware/auth');
+const { avatarUpload, handleMulterError } = require('../middleware/upload');
 const { AppError } = require('../middleware/errorHandler');
 const db = require('../config/database');
 
@@ -92,6 +95,88 @@ router.get('/subscription', async (req, res, next) => {
         isActive: subscription.isActive(),
         daysRemaining: subscription.getDaysRemaining(),
         isExpiringSoon: subscription.isExpiringSoon()
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/users/avatar - Загрузка аватара
+router.post('/avatar', 
+  avatarUpload.single('avatar'),
+  handleMulterError,
+  async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return next(new AppError('Файл не был загружен', 400));
+      }
+
+      console.log('📸 Avatar upload for user:', req.user.id);
+      console.log('📁 File details:', {
+        filename: req.file.filename,
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      });
+
+      // Удаляем старый аватар если он есть
+      if (req.user.avatar) {
+        const oldAvatarPath = path.join(__dirname, '../../uploads/avatars', path.basename(req.user.avatar));
+        if (fs.existsSync(oldAvatarPath)) {
+          fs.unlinkSync(oldAvatarPath);
+          console.log('🗑️ Old avatar deleted:', oldAvatarPath);
+        }
+      }
+
+      // Создаем URL для аватара
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+      // Обновляем пользователя в базе данных
+      await req.user.update({ avatar: avatarUrl });
+      
+      // Перезагружаем пользователя чтобы получить актуальные данные
+      await req.user.reload();
+
+      res.json({
+        success: true,
+        message: 'Аватар успешно обновлен',
+        data: {
+          avatar: avatarUrl,
+          user: req.user
+        }
+      });
+    } catch (error) {
+      // Удаляем загруженный файл в случае ошибки
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      next(error);
+    }
+  }
+);
+
+// DELETE /api/users/avatar - Удаление аватара
+router.delete('/avatar', async (req, res, next) => {
+  try {
+    if (!req.user.avatar) {
+      return next(new AppError('У пользователя нет аватара', 404));
+    }
+
+    // Удаляем файл аватара
+    const avatarPath = path.join(__dirname, '../../uploads/avatars', path.basename(req.user.avatar));
+    if (fs.existsSync(avatarPath)) {
+      fs.unlinkSync(avatarPath);
+      console.log('🗑️ Avatar deleted:', avatarPath);
+    }
+
+    // Обновляем пользователя в базе данных
+    await req.user.update({ avatar: null });
+
+    res.json({
+      success: true,
+      message: 'Аватар успешно удален',
+      data: {
+        user: req.user
       }
     });
   } catch (error) {
