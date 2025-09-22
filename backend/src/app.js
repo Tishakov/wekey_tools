@@ -14,6 +14,7 @@ process.on("unhandledRejection", (reason, promise) => {
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 
 // НЕ импортируем проблемные middleware пока
 // const helmet = require('helmet');
@@ -25,6 +26,10 @@ console.log("📦 Базовые модули загружены");
 
 const config = require('./config/config');
 console.log("⚙️ Конфиг загружен");
+
+// Инициализируем Passport
+require('./config/passport');
+console.log("🔐 Passport OAuth настроен");
 
 const logger = require('./utils/logger');
 console.log("📝 Логгер загружен");
@@ -68,6 +73,9 @@ app.use(cookieParser()); // Добавляем парсер кукисов
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Инициализация Passport
+app.use(passport.initialize());
+
 // Статическая раздача файлов для аватаров
 app.use('/uploads', express.static('uploads'));
 
@@ -84,6 +92,7 @@ app.use((req, res, next) => {
 // Импорт и регистрация роутов
 try {
   const authRoutes = require('./routes/auth');
+  const oauthRoutes = require('./routes/oauth');
   const adminRoutes = require('./routes/admin');
   const statsRoutes = require('./routes/stats');
   const usersRoutes = require('./routes/users');
@@ -91,6 +100,7 @@ try {
   const toolsRoutes = require('./routes/tools');
 
   app.use('/api/auth', authRoutes);
+  app.use('/auth', oauthRoutes); // OAuth маршруты без /api префикса
   app.use('/api/admin', adminRoutes);
   app.use('/api/stats', statsRoutes);
   app.use('/api/analytics', analyticsRoutes); // Подключаем User tracking аналитику

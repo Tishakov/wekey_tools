@@ -16,7 +16,6 @@ const Sidebar: React.FC = () => {
   const getToolName = (toolId: string, fallbackTitle: string) => {
     const translationKey = `tools.names.${toolId}`;
     const translated = t(translationKey);
-    console.log('🔧 [Sidebar] Tool translation:', { toolId, translationKey, translated, fallbackTitle });
     // Если перевод не найден, возвращаем fallback
     return translated !== translationKey ? translated : fallbackTitle;
   };

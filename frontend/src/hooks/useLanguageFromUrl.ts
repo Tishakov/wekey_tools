@@ -16,11 +16,15 @@ export const getDefaultLanguage = (): SupportedLanguage => 'ru';
 
 // Хук для работы с языком из URL
 export const useLanguageFromUrl = () => {
+  console.log('🔄 [useLanguageFromUrl] Hook called with pathname:', window.location.pathname);
+  
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { i18n } = useTranslation();
   const lastRedirectRef = useRef<string>('');
+
+  console.log('🔄 [useLanguageFromUrl] Extracted lang:', lang, 'from pathname:', location.pathname);
 
   // Определяем текущий язык из URL или используем язык по умолчанию
   const currentLanguage: SupportedLanguage = (lang && isSupportedLanguage(lang)) 
@@ -30,23 +34,21 @@ export const useLanguageFromUrl = () => {
   // Принудительно устанавливаем язык при первой загрузке, если он отличается
   useEffect(() => {
     if (lang && isSupportedLanguage(lang) && i18n.language !== lang) {
-      console.log('🚀 [useLanguageFromUrl] Initial language setup:', i18n.language, '→', lang);
       i18n.changeLanguage(lang);
     }
   }, []); // Выполняется только при первом рендере
 
   useEffect(() => {
-    console.log('🌍 [useLanguageFromUrl] Effect triggered:', { 
-      lang, 
-      currentLanguage, 
-      'i18n.language': i18n.language,
-      pathname: location.pathname,
-      lastRedirect: lastRedirectRef.current
-    });
-
     // Защита от циклических редиректов
     if (lastRedirectRef.current === location.pathname) {
-      console.log('⚠️ [useLanguageFromUrl] Preventing circular redirect for:', location.pathname);
+      return;
+    }
+
+    // Исключаем системные роуты из языковой обработки
+    if (location.pathname.startsWith('/auth/') || 
+        location.pathname.startsWith('/admin') ||
+        location.pathname === '/auth/callback') {
+      console.log('🔒 [useLanguageFromUrl] Skipping language processing for system route:', location.pathname);
       return;
     }
 
@@ -64,7 +66,6 @@ export const useLanguageFromUrl = () => {
       }
       
       const newPath = `/${getDefaultLanguage()}${pathWithoutLang}${location.search}`;
-      console.log('🔄 [useLanguageFromUrl] Redirecting to:', newPath);
       
       lastRedirectRef.current = newPath;
       navigate(newPath, { replace: true });
@@ -76,7 +77,6 @@ export const useLanguageFromUrl = () => {
 
     // Синхронизируем i18n с языком из URL
     if (i18n.language !== currentLanguage) {
-      console.log('🔄 [useLanguageFromUrl] Changing i18n language from', i18n.language, 'to', currentLanguage);
       i18n.changeLanguage(currentLanguage);
     }
   }, [lang, navigate, location, i18n, currentLanguage]);
@@ -84,15 +84,9 @@ export const useLanguageFromUrl = () => {
   // Функция для смены языка
   const changeLanguage = (newLang: SupportedLanguage) => {
     const currentPath = location.pathname;
-    console.log('🔄 [changeLanguage] Changing language:', { 
-      from: currentLanguage, 
-      to: newLang, 
-      currentPath 
-    });
     
     // Заменяем язык в URL
     const newPath = currentPath.replace(/^\/[a-z]{2}/, `/${newLang}`);
-    console.log('🔄 [changeLanguage] Navigating to:', newPath + location.search);
     navigate(newPath + location.search);
   };
 

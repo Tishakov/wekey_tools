@@ -18,9 +18,13 @@ module.exports = (sequelize) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true // Разрешаем null для Google пользователей
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
       validate: {
-        len: [6, 100]
+        len: [1, 100]
       }
     },
     firstName: {
@@ -74,7 +78,16 @@ module.exports = (sequelize) => {
       defaultValue: DataTypes.NOW
     },
     // Метаданные
-    emailVerified: {
+    googleId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true
+    },
+    isGoogleUser: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isEmailVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
@@ -87,6 +100,10 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     passwordResetExpires: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    lastLogin: {
       type: DataTypes.DATE,
       allowNull: true
     },
@@ -108,7 +125,7 @@ module.exports = (sequelize) => {
         }
       },
       beforeUpdate: async (user) => {
-        if (user.changed('password')) {
+        if (user.changed('password') && user.password) {
           user.password = await bcrypt.hash(user.password, 12);
         }
       }
@@ -117,6 +134,9 @@ module.exports = (sequelize) => {
 
   // Методы экземпляра
   User.prototype.checkPassword = async function(candidatePassword) {
+    if (!this.password) {
+      return false; // Google пользователи не имеют пароля
+    }
     return await bcrypt.compare(candidatePassword, this.password);
   };
 

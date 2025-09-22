@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
+import OAuthCallback from './components/OAuthCallback';
 import Home from './pages/Home';
 import ProfilePage from './pages/ProfilePage';
 import TransliterationTool from './pages/TransliterationTool';
@@ -39,6 +40,9 @@ function App() {
       <AuthProvider>
         <Router>
         <Routes>
+          {/* OAuth callback - ДОЛЖЕН БЫТЬ ПЕРВЫМ для правильного матчинга */}
+          <Route path="/auth/*" element={<OAuthCallback />} />
+          
           {/* Редирект с корня на русский язык */}
           <Route path="/" element={<Navigate to="/ru" replace />} />
           
