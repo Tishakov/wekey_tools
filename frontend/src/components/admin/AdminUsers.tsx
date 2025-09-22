@@ -39,6 +39,16 @@ const AdminUsers: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Состояние для сортировки
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  // Состояние для фильтрации
+  const [filters, setFilters] = useState({
+    roles: [] as string[],
+    statuses: [] as string[]
+  });
 
   const fetchUsers = async (page: number = 1) => {
     try {
@@ -94,6 +104,106 @@ const AdminUsers: React.FC = () => {
   const handleRefresh = () => {
     fetchUsers(currentPage);
   };
+
+  // Функция для обработки сортировки
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      // Если кликнули по тому же полю, меняем направление
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Если новое поле, устанавливаем по возрастанию
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // Функция для сортировки пользователей
+  const sortUsers = (usersToSort: User[]) => {
+    if (!sortField) return usersToSort;
+
+    return [...usersToSort].sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (sortField) {
+        case 'name':
+          aValue = `${a.firstName || ''} ${a.lastName || ''}`.trim().toLowerCase();
+          bValue = `${b.firstName || ''} ${b.lastName || ''}`.trim().toLowerCase();
+          break;
+        case 'email':
+          aValue = a.email.toLowerCase();
+          bValue = b.email.toLowerCase();
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        case 'lastLoginAt':
+          aValue = a.lastLoginAt ? new Date(a.lastLoginAt) : new Date(0);
+          bValue = b.lastLoginAt ? new Date(b.lastLoginAt) : new Date(0);
+          break;
+        case 'loginCount':
+          aValue = a.loginCount;
+          bValue = b.loginCount;
+          break;
+        case 'totalUsage':
+          aValue = a.toolStats.totalUsage;
+          bValue = b.toolStats.totalUsage;
+          break;
+        case 'uniqueTools':
+          aValue = a.toolStats.uniqueTools;
+          bValue = b.toolStats.uniqueTools;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  // Функция для фильтрации пользователей
+  const filterUsers = (usersToFilter: User[]) => {
+    return usersToFilter.filter(user => {
+      // Фильтр по ролям
+      if (filters.roles.length > 0 && !filters.roles.includes(user.role)) {
+        return false;
+      }
+      
+      // Фильтр по статусам
+      if (filters.statuses.length > 0 && !filters.statuses.includes(user.status)) {
+        return false;
+      }
+      
+      // Фильтр по поисковому запросу
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
+        const email = user.email.toLowerCase();
+        
+        if (!fullName.includes(searchLower) && !email.includes(searchLower)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  };
+
+  // Функция для обработки изменения фильтров
+  const handleFilterChange = (type: 'roles' | 'statuses', value: string, checked: boolean) => {
+    setFilters(prev => ({
+      ...prev,
+      [type]: checked 
+        ? [...prev[type], value]
+        : prev[type].filter(item => item !== value)
+    }));
+  };
+
+  // Получаем отфильтрованных и отсортированных пользователей
+  const processedUsers = sortUsers(filterUsers(users));
 
   const getInitials = (firstName: string, lastName: string) => {
     const first = firstName ? firstName.charAt(0).toUpperCase() : '';
@@ -183,28 +293,120 @@ const AdminUsers: React.FC = () => {
         </div>
       </div>
 
+      <div className="admin-users-filters">
+        <div className="filter-section">
+          <span className="filter-label">Роли:</span>
+          <div className="filter-tags">
+            {[
+              { value: 'user', label: 'Пользователь' },
+              { value: 'premium', label: 'Премиум' },
+              { value: 'admin', label: 'Админ' }
+            ].map(role => (
+              <button
+                key={role.value}
+                className={`filter-tag ${filters.roles.includes(role.value) ? 'active' : ''}`}
+                data-filter={role.value}
+                onClick={() => handleFilterChange('roles', role.value, !filters.roles.includes(role.value))}
+              >
+                {role.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="filter-section">
+          <span className="filter-label">Статусы:</span>
+          <div className="filter-tags">
+            {[
+              { value: 'active', label: 'Активен' },
+              { value: 'inactive', label: 'Неактивен' },
+              { value: 'banned', label: 'Заблокирован' }
+            ].map(status => (
+              <button
+                key={status.value}
+                className={`filter-tag ${filters.statuses.includes(status.value) ? 'active' : ''}`}
+                data-filter={status.value}
+                onClick={() => handleFilterChange('statuses', status.value, !filters.statuses.includes(status.value))}
+              >
+                {status.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <button 
+          className={`clear-filters-btn ${(filters.roles.length === 0 && filters.statuses.length === 0) ? 'disabled' : ''}`}
+          onClick={() => setFilters({ roles: [], statuses: [] })}
+          disabled={filters.roles.length === 0 && filters.statuses.length === 0}
+        >
+          ✕ Очистить
+        </button>
+      </div>
+
       <div className="admin-users-table-container">
         <table className="admin-users-table">
           <thead>
             <tr>
-              <th>Пользователь</th>
-              <th>Дата регистрации</th>
-              <th>Последний сеанс</th>
-              <th>Входов</th>
-              <th>Использований</th>
-              <th>Инструментов</th>
+              <th onClick={() => handleSort('name')} className="sortable">
+                Пользователь
+                {sortField === 'name' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('createdAt')} className="sortable">
+                Дата регистрации
+                {sortField === 'createdAt' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('lastLoginAt')} className="sortable">
+                Последний сеанс
+                {sortField === 'lastLoginAt' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('loginCount')} className="sortable">
+                Входов
+                {sortField === 'loginCount' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('totalUsage')} className="sortable">
+                Использований
+                {sortField === 'totalUsage' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('uniqueTools')} className="sortable">
+                Инструментов
+                {sortField === 'uniqueTools' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
               <th>Действия</th>
             </tr>
           </thead>
           <tbody>
-            {users.length === 0 ? (
+            {processedUsers.length === 0 ? (
               <tr>
                 <td colSpan={7} className="admin-users-empty">
-                  Пользователи не найдены
+                  {users.length === 0 ? 'Пользователи не найдены' : 'Нет пользователей, соответствующих фильтрам'}
                 </td>
               </tr>
             ) : (
-              users.map((user) => (
+              processedUsers.map((user) => (
                 <tr key={user.id}>
                   <td>
                     <div className="user-info">

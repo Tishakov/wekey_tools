@@ -125,6 +125,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem('wekey_token', newToken);
         setToken(newToken);
         setUser(userData);
+        
+        // Загружаем полный профиль пользователя
+        try {
+          const profileResponse = await fetch(`${API_BASE}/auth/profile`, {
+            headers: {
+              'Authorization': `Bearer ${newToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            if (profileData.success && profileData.user) {
+              setUser(profileData.user);
+            }
+          }
+        } catch (profileError) {
+          console.warn('Не удалось загрузить полный профиль:', profileError);
+        }
       } else {
         throw new Error(data.message || 'Ошибка входа в систему');
       }

@@ -275,6 +275,146 @@
   margin-bottom: 2px;
 }
 
+.admin-users-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.admin-users-table th.sortable:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+}
+
+.sort-indicator {
+  font-size: 12px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.admin-users-filters {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 16px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.filter-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: #28282A;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.filter-tag:hover {
+  background: #333335;
+  color: var(--text-primary);
+}
+
+.filter-tag.active {
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  padding: 6px 12px; /* Тот же padding как у неактивных */
+}
+
+/* Цвета для ролей - как у бейджей */
+.filter-tag.active[data-filter="user"] {
+  background: #22C55E;
+}
+
+.filter-tag.active[data-filter="premium"] {
+  background: #F59E0B;
+}
+
+.filter-tag.active[data-filter="admin"] {
+  background: #EF4444;
+}
+
+/* Цвета для статусов */
+.filter-tag.active[data-filter="active"] {
+  background: #22C55E;
+}
+
+.filter-tag.active[data-filter="inactive"] {
+  background: #F59E0B;
+}
+
+.filter-tag.active[data-filter="banned"] {
+  background: #EF4444;
+}
+
+/* Hover состояния для активных тегов */
+.filter-tag.active[data-filter="user"]:hover,
+.filter-tag.active[data-filter="active"]:hover {
+  background: #16A34A;
+}
+
+.filter-tag.active[data-filter="premium"]:hover,
+.filter-tag.active[data-filter="inactive"]:hover {
+  background: #D97706;
+}
+
+.filter-tag.active[data-filter="admin"]:hover,
+.filter-tag.active[data-filter="banned"]:hover {
+  background: #DC2626;
+}
+
+.clear-filters-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--error-color, #EF4444);
+  border-radius: 20px;
+  color: var(--error-color, #EF4444);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.clear-filters-btn:hover {
+  background: var(--error-color, #EF4444);
+  color: white;
+}
+
+.clear-filters-btn.disabled,
+.clear-filters-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .user-actions {
   display: flex;
   gap: 8px;
@@ -385,5 +525,26 @@
   
   .admin-users-table {
     min-width: 800px;
+  }
+  
+  .admin-users-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .filter-tags {
+    flex-wrap: wrap;
+  }
+  
+  .clear-filters-btn {
+    margin-left: 0;
+    align-self: flex-start;
   }
 }
