@@ -135,13 +135,17 @@ router.post('/seo-audit', async (req, res) => {
       fullUrl = 'https://' + url;
     }
 
-    // Параллельно запускаем все проверки
-    const [htmlAnalysis, pageSpeedData, robotsCheck, sslCheck, resourcesCheck] = await Promise.allSettled([
+    // Параллельно запускаем все проверки включая Mobile-Friendly, SSL Labs, W3C Validator и Security Headers
+    const [htmlAnalysis, pageSpeedData, robotsCheck, sslCheck, resourcesCheck, mobileCheck, sslLabsCheck, w3cCheck, securityHeadersCheck] = await Promise.allSettled([
       analyzeHTML(fullUrl),
       getPageSpeedData(fullUrl),
       checkRobotsTxt(fullUrl),
       checkSSL(fullUrl),
-      checkResourcesSpeed(fullUrl)
+      checkResourcesSpeed(fullUrl),
+      checkMobileFriendly(fullUrl),
+      checkSSLLabs(fullUrl),
+      checkW3CValidator(fullUrl),
+      checkSecurityHeaders(fullUrl)
     ]);
 
     let seoResult = {};
@@ -149,6 +153,10 @@ router.post('/seo-audit', async (req, res) => {
     let robotsData = null;
     let sslData = null;
     let resourcesData = null;
+    let mobileData = null;
+    let sslLabsData = null;
+    let w3cData = null;
+    let securityHeadersData = null;
 
     if (htmlAnalysis.status === 'fulfilled') {
       seoResult = htmlAnalysis.value;
@@ -180,6 +188,60 @@ router.post('/seo-audit', async (req, res) => {
       };
     }
 
+    if (mobileCheck.status === 'fulfilled') {
+      mobileData = mobileCheck.value;
+    } else {
+      console.error('Mobile check failed:', mobileCheck.reason);
+      mobileData = { 
+        error: mobileCheck.reason?.message || 'Unknown error',
+        isMobileFriendly: false,
+        status: 'ERROR',
+        issues: ['Ошибка при проверке мобильности'],
+        recommendations: ['Проверьте доступность сайта']
+      };
+    }
+
+    if (sslLabsCheck.status === 'fulfilled') {
+      sslLabsData = sslLabsCheck.value;
+    } else {
+      console.error('SSL Labs check failed:', sslLabsCheck.reason);
+      sslLabsData = { 
+        error: sslLabsCheck.reason?.message || 'Unknown error',
+        grade: null,
+        hasSSL: false,
+        issues: ['Ошибка при проверке SSL Labs'],
+        recommendations: ['Проверьте доступность сайта']
+      };
+    }
+
+    if (w3cCheck.status === 'fulfilled') {
+      w3cData = w3cCheck.value;
+    } else {
+      console.error('W3C Validator check failed:', w3cCheck.reason);
+      w3cData = { 
+        error: w3cCheck.reason?.message || 'Unknown error',
+        isValid: false,
+        errors: [],
+        warnings: [],
+        issues: ['Ошибка при проверке W3C валидации'],
+        recommendations: ['Проверьте доступность сайта']
+      };
+    }
+
+    if (securityHeadersCheck.status === 'fulfilled') {
+      securityHeadersData = securityHeadersCheck.value;
+    } else {
+      console.error('Security Headers check failed:', securityHeadersCheck.reason);
+      securityHeadersData = { 
+        error: securityHeadersCheck.reason?.message || 'Unknown error',
+        grade: null,
+        score: 0,
+        headers: {},
+        issues: ['Ошибка при проверке заголовков безопасности'],
+        recommendations: ['Проверьте доступность сайта']
+      };
+    }
+
     // Проверяем sitemap после получения robots.txt
     let sitemapData = null;
     try {
@@ -193,7 +255,14 @@ router.post('/seo-audit', async (req, res) => {
       robots: robotsData,
       sitemap: sitemapData,
       ssl: sslData,
-      resources: resourcesData
+      resources: resourcesData,
+      mobile: mobileData,
+      sslLabs: sslLabsData,
+      w3c: w3cData,
+      w3cValidator: seoResult.w3cValidator,
+      securityHeaders: seoResult.securityHeaders || securityHeadersData,
+      linkProfile: seoResult.linkProfile,
+      sitelinks: seoResult.sitelinks
     });
 
     res.json({ success: true, results: enhancedResult });
@@ -412,16 +481,25 @@ function analyzeSEO($, html, url) {
   const links = $('a[href]');
   const internalLinks = [];
   const externalLinks = [];
+  const navigationLinks = [];
   
   links.each((i, el) => {
     const href = $(el).attr('href');
+    const linkText = $(el).text().trim();
+    const parentClass = $(el).parent().attr('class') || '';
+    const linkClass = $(el).attr('class') || '';
+    
     if (href) {
       if (href.startsWith('http://') || href.startsWith('https://')) {
         try {
           const linkUrl = new URL(href);
           const currentUrl = new URL(url);
           if (linkUrl.hostname === currentUrl.hostname) {
-            internalLinks.push(href);
+            internalLinks.push({
+              href: href,
+              text: linkText,
+              isNavigation: isNavigationLink(parentClass, linkClass, linkText)
+            });
           } else {
             externalLinks.push(href);
           }
@@ -429,8 +507,19 @@ function analyzeSEO($, html, url) {
           // Invalid URL
         }
       } else if (href.startsWith('/') || !href.includes('://')) {
-        internalLinks.push(href);
+        internalLinks.push({
+          href: href,
+          text: linkText,
+          isNavigation: isNavigationLink(parentClass, linkClass, linkText)
+        });
       }
+    }
+  });
+
+  // Собираем навигационные ссылки
+  internalLinks.forEach(link => {
+    if (link.isNavigation) {
+      navigationLinks.push(link);
     }
   });
 
@@ -438,10 +527,17 @@ function analyzeSEO($, html, url) {
     total: links.length,
     internal: internalLinks.length,
     external: externalLinks.length,
-    nofollow: $('a[rel*="nofollow"]').length
+    nofollow: $('a[rel*="nofollow"]').length,
+    navigation: navigationLinks
   };
 
-  // 15. Продвинутый анализ производительности и контента
+  // 15. Анализ потенциала для Sitelinks
+  seo.sitelinks = analyzeSitelinksPotential($, internalLinks, url);
+
+  // 16. Детальный анализ ссылочного профиля
+  seo.linkProfile = analyzeLinkProfile($, internalLinks, externalLinks, url);
+
+  // 17. Продвинутый анализ производительности и контента
   // Улучшенный парсинг для кириллицы (украинский, русский)
   const textContent = $('body').text()
     .replace(/[\n\r\t]+/g, ' ')  // Убираем переносы
@@ -465,7 +561,7 @@ function analyzeSEO($, html, url) {
     images_alt_score: seo.images.total === 0 ? 100 : Math.round(((seo.images.total - seo.images.withoutAlt) / seo.images.total) * 100)
   };
 
-  // 16. Анализ ключевых слов и плотности (базовый)
+  // 18. Анализ ключевых слов и плотности (базовый)
   if (title && wordCount > 0) {
     const titleWords = title.toLowerCase().split(' ').filter(word => word.length > 3);
     seo.keywordAnalysis = {
@@ -534,6 +630,22 @@ function enhanceWithInsights(seoData, performanceData, additionalData = {}) {
   
   if (additionalData.resources) {
     enhanced.resourcesSpeed = additionalData.resources;
+  }
+
+  if (additionalData.mobile) {
+    enhanced.mobileFriendly = additionalData.mobile;
+  }
+
+  if (additionalData.sslLabs) {
+    enhanced.sslLabs = additionalData.sslLabs;
+  }
+
+  if (additionalData.w3c) {
+    enhanced.w3cValidator = additionalData.w3c;
+  }
+
+  if (additionalData.securityHeaders) {
+    enhanced.securityHeaders = additionalData.securityHeaders;
   }
 
   // Создаем общий SEO Health Score
@@ -777,6 +889,205 @@ function generateActionPlan(seoData, performanceData, additionalData = {}) {
       impact: 'medium',
       effort: 'medium',
       expectedImprovement: '+10-15% скорость загрузки'
+    });
+  }
+
+  // W3C Validation проверки
+  if (additionalData.w3cValidator && !additionalData.w3cValidator.isValid) {
+    const errorCount = additionalData.w3cValidator.errors?.count || 0;
+    if (errorCount > 0) {
+      actions.push({
+        priority: errorCount > 10 ? 'important' : 'recommended',
+        category: 'Technical',
+        task: 'Исправить ошибки HTML валидации',
+        description: `Найдено ${errorCount} ошибок в HTML коде. Это может влиять на SEO.`,
+        impact: errorCount > 10 ? 'medium' : 'low',
+        effort: 'medium',
+        expectedImprovement: '+5-10% техническое SEO'
+      });
+    }
+  }
+
+  // Security Headers проверки
+  if (additionalData.securityHeaders && additionalData.securityHeaders.score < 70) {
+    const missing = additionalData.securityHeaders.summary?.missing || 0;
+    actions.push({
+      priority: missing > 3 ? 'important' : 'recommended',
+      category: 'Security',
+      task: 'Настроить заголовки безопасности',
+      description: `Отсутствует ${missing} важных заголовков безопасности. Оценка: ${additionalData.securityHeaders.score}/100`,
+      impact: 'medium',
+      effort: 'medium',
+      expectedImprovement: '+10-15% безопасность и доверие'
+    });
+  }
+
+  // Link Profile анализ
+  if (additionalData.linkProfile) {
+    const linkProfile = additionalData.linkProfile;
+    
+    // Внутренние ссылки
+    if (linkProfile.internal?.total < 10) {
+      actions.push({
+        priority: 'important',
+        category: 'SEO',
+        task: 'Улучшить внутреннюю перелинковку',
+        description: `Найдено только ${linkProfile.internal.total} внутренних ссылок. Рекомендуется минимум 10-15.`,
+        impact: 'medium',
+        effort: 'medium',
+        expectedImprovement: '+10-20% внутренний PageRank'
+      });
+    }
+
+    // Соотношение внутренних к внешним
+    if (linkProfile.ratios?.internalToExternal < 2) {
+      actions.push({
+        priority: 'recommended',
+        category: 'SEO',
+        task: 'Оптимизировать баланс ссылок',
+        description: `Соотношение внутренних к внешним ссылкам: ${linkProfile.ratios.internalToExternal}:1. Рекомендуется 3:1 или больше.`,
+        impact: 'low',
+        effort: 'low',
+        expectedImprovement: '+5-10% распределение ссылочного веса'
+      });
+    }
+
+    // Разнообразие anchor текстов
+    if (linkProfile.ratios?.anchorDiversity < 5) {
+      actions.push({
+        priority: 'recommended',
+        category: 'SEO',
+        task: 'Разнообразить тексты ссылок',
+        description: `Используется только ${linkProfile.ratios.anchorDiversity} разных текстов ссылок. Увеличьте разнообразие.`,
+        impact: 'low',
+        effort: 'low',
+        expectedImprovement: '+3-7% релевантность ссылок'
+      });
+    }
+
+    // Социальные сети
+    if (!linkProfile.external?.social || linkProfile.external.social.length === 0) {
+      actions.push({
+        priority: 'recommended',
+        category: 'Social',
+        task: 'Добавить ссылки на социальные сети',
+        description: 'Не найдено ссылок на социальные сети. Это улучшит engagement.',
+        impact: 'low',
+        effort: 'low',
+        expectedImprovement: '+10-20% социальные сигналы'
+      });
+    }
+  }
+
+  // Sitelinks потенциал
+  if (additionalData.sitelinks && additionalData.sitelinks.score < 70) {
+    actions.push({
+      priority: 'recommended',
+      category: 'SEO',
+      task: 'Улучшить потенциал для Sitelinks',
+      description: `Текущая оценка: ${additionalData.sitelinks.score}/100. Улучшите навигацию и структуру сайта.`,
+      impact: 'medium',
+      effort: 'medium',
+      expectedImprovement: '+20-30% вероятность получения sitelinks'
+    });
+  }
+
+  // URL структура
+  if (seoData.technical?.urlStructure) {
+    const urlStruct = seoData.technical.urlStructure;
+    if (urlStruct.length > 100) {
+      actions.push({
+        priority: 'recommended',
+        category: 'Technical',
+        task: 'Оптимизировать длину URL',
+        description: `URL слишком длинный (${urlStruct.length} символов). Рекомендуется до 100 символов.`,
+        impact: 'low',
+        effort: 'low',
+        expectedImprovement: '+3-5% удобство использования'
+      });
+    }
+    
+    if (urlStruct.hasParameters) {
+      actions.push({
+        priority: 'recommended',
+        category: 'Technical',
+        task: 'Очистить URL от параметров',
+        description: 'URL содержит GET-параметры. Рассмотрите использование ЧПУ.',
+        impact: 'low',
+        effort: 'medium',
+        expectedImprovement: '+5-8% SEO-дружественность URL'
+      });
+    }
+  }
+
+  // Mobile adaptivity
+  if (additionalData.mobile && additionalData.mobile.score < 80) {
+    actions.push({
+      priority: 'critical',
+      category: 'Mobile',
+      task: 'Улучшить мобильную адаптивность',
+      description: `Оценка мобильной версии: ${additionalData.mobile.score}/100. Mobile-first индексация критична.`,
+      impact: 'high',
+      effort: 'high',
+      expectedImprovement: '+25-40% мобильное SEO'
+    });
+  }
+
+  // Core Web Vitals детально
+  if (performanceData?.mobile?.core_web_vitals) {
+    const cwv = performanceData.mobile.core_web_vitals;
+    
+    if (cwv.fcp?.score < 50) {
+      actions.push({
+        priority: 'important',
+        category: 'Performance',
+        task: 'Улучшить First Contentful Paint',
+        description: `FCP: ${cwv.fcp.displayValue}. Цель: < 1.8s для хорошего пользовательского опыта.`,
+        impact: 'high',
+        effort: 'high',
+        expectedImprovement: '+15-25% скорость восприятия загрузки'
+      });
+    }
+
+    if (cwv.cls?.score < 50) {
+      actions.push({
+        priority: 'important',
+        category: 'Performance',
+        task: 'Уменьшить сдвиг макета (CLS)',
+        description: `CLS: ${cwv.cls.displayValue}. Цель: < 0.1 для стабильности макета.`,
+        impact: 'medium',
+        effort: 'medium',
+        expectedImprovement: '+10-20% пользовательский опыт'
+      });
+    }
+  }
+
+  // Heading hierarchy
+  if (seoData.headings) {
+    const headings = seoData.headings;
+    if (!headings.h2?.count || headings.h2.count === 0) {
+      actions.push({
+        priority: 'recommended',
+        category: 'SEO',
+        task: 'Добавить H2 заголовки',
+        description: 'Отсутствуют H2 заголовки. Это важно для структуры контента.',
+        impact: 'medium',
+        effort: 'low',
+        expectedImprovement: '+5-15% структурированность контента'
+      });
+    }
+  }
+
+  // Content length analysis
+  if (seoData.content && seoData.content.textLength < 300) {
+    actions.push({
+      priority: 'important',
+      category: 'Content',
+      task: 'Увеличить объем контента',
+      description: `Текста на странице: ${seoData.content.textLength} символов. Рекомендуется минимум 300-500.`,
+      impact: 'medium',
+      effort: 'high',
+      expectedImprovement: '+15-25% релевантность для поисковых запросов'
     });
   }
   
@@ -1414,6 +1725,1065 @@ async function checkResourcesSpeed(url) {
       loadTime: null,
       issues: ['Ошибка при анализе скорости ресурсов: ' + error.message],
       warnings: []
+    };
+  }
+}
+
+// Google Mobile-Friendly Test API
+async function checkMobileFriendly(url) {
+  try {
+    console.log('🔍 Checking Mobile-Friendly for:', url);
+    
+    // Google Mobile-Friendly Test API endpoint
+    const API_URL = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
+    
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: url,
+        requestScreenshot: false
+      }),
+      timeout: 15000
+    });
+
+    if (!response.ok) {
+      console.log('⚠️ Mobile-Friendly API unavailable, using fallback analysis');
+      return await fallbackMobileAnalysis(url);
+    }
+
+    const data = await response.json();
+    console.log('📱 Mobile-Friendly API response received');
+
+    return {
+      isMobileFriendly: data.mobileFriendliness === 'MOBILE_FRIENDLY',
+      status: data.mobileFriendliness || 'UNKNOWN',
+      issues: extractMobileIssues(data),
+      loadingStatus: data.testStatus?.status || 'COMPLETE',
+      pageLoadTime: data.testStatus?.details || null,
+      resourceIssues: data.resourceIssues || [],
+      recommendations: generateMobileRecommendations(data)
+    };
+
+  } catch (error) {
+    console.log('⚠️ Mobile-Friendly API error:', error.message);
+    return await fallbackMobileAnalysis(url);
+  }
+}
+
+// Fallback mobile analysis using viewport and CSS media queries detection
+async function fallbackMobileAnalysis(url) {
+  try {
+    const response = await fetch(url, { timeout: 10000 });
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    
+    const analysis = {
+      isMobileFriendly: false,
+      status: 'ANALYZED_LOCALLY',
+      issues: [],
+      recommendations: [],
+      viewport: null,
+      hasMediaQueries: false
+    };
+
+    // Check viewport meta tag
+    const viewport = $('meta[name="viewport"]').attr('content');
+    analysis.viewport = viewport || null;
+    
+    if (!viewport) {
+      analysis.issues.push('Отсутствует мета-тег viewport');
+    } else if (viewport.includes('width=device-width')) {
+      analysis.isMobileFriendly = true;
+    }
+
+    // Check for CSS media queries in <style> tags
+    const styleTags = $('style').text();
+    if (styleTags.includes('@media') && (styleTags.includes('max-width') || styleTags.includes('min-width'))) {
+      analysis.hasMediaQueries = true;
+      analysis.isMobileFriendly = true;
+    }
+
+    // Check for responsive CSS files
+    const cssLinks = $('link[rel="stylesheet"]');
+    cssLinks.each((i, el) => {
+      const media = $(el).attr('media');
+      if (media && media.includes('screen')) {
+        analysis.hasMediaQueries = true;
+      }
+    });
+
+    // Generate recommendations
+    if (!analysis.isMobileFriendly) {
+      analysis.recommendations.push('Добавьте мета-тег viewport: <meta name="viewport" content="width=device-width, initial-scale=1">');
+      analysis.recommendations.push('Используйте CSS media queries для адаптивного дизайна');
+      analysis.recommendations.push('Протестируйте сайт на мобильных устройствах');
+    }
+
+    if (!analysis.hasMediaQueries) {
+      analysis.issues.push('Не найдены CSS media queries для адаптивности');
+    }
+
+    return analysis;
+  } catch (error) {
+    return {
+      error: error.message,
+      isMobileFriendly: false,
+      status: 'ERROR',
+      issues: ['Ошибка анализа мобильности: ' + error.message],
+      recommendations: ['Проверьте доступность сайта']
+    };
+  }
+}
+
+// Extract mobile issues from Google API response
+function extractMobileIssues(data) {
+  const issues = [];
+  
+  if (data.mobileFriendlyIssues) {
+    data.mobileFriendlyIssues.forEach(issue => {
+      switch (issue.rule) {
+        case 'MOBILE_FRIENDLY_RULE_UNSPECIFIED':
+          issues.push('Неопределенная проблема мобильности');
+          break;
+        case 'USES_INCOMPATIBLE_PLUGINS':
+          issues.push('Использует несовместимые плагины (Flash, Silverlight)');
+          break;
+        case 'CONFIGURE_VIEWPORT':
+          issues.push('Требуется настройка viewport');
+          break;
+        case 'FIXED_WIDTH_VIEWPORT':
+          issues.push('Фиксированная ширина viewport');
+          break;
+        case 'SIZE_CONTENT_TO_VIEWPORT':
+          issues.push('Контент не помещается в viewport');
+          break;
+        case 'USE_LEGIBLE_FONT_SIZES':
+          issues.push('Слишком мелкий шрифт для мобильных');
+          break;
+        case 'TAP_TARGETS_TOO_CLOSE':
+          issues.push('Кликабельные элементы слишком близко друг к другу');
+          break;
+        default:
+          issues.push('Проблема мобильности: ' + issue.rule);
+      }
+    });
+  }
+  
+  return issues;
+}
+
+// Generate mobile recommendations
+function generateMobileRecommendations(data) {
+  const recommendations = [];
+  
+  if (data.mobileFriendliness === 'MOBILE_FRIENDLY') {
+    recommendations.push('✅ Сайт корректно отображается на мобильных устройствах');
+    recommendations.push('💡 Регулярно тестируйте на различных устройствах');
+  } else {
+    recommendations.push('📱 Оптимизируйте сайт для мобильных устройств');
+    recommendations.push('🔧 Добавьте responsive дизайн с CSS media queries');
+    recommendations.push('⚡ Улучшите скорость загрузки на мобильных');
+  }
+  
+  return recommendations;
+}
+
+// Level 3 API: SSL Labs API for detailed SSL analysis
+async function checkSSLLabs(url) {
+  try {
+    const domain = new URL(url).hostname;
+    
+    // SSL Labs API endpoint
+    const apiUrl = `https://api.ssllabs.com/api/v3/analyze?host=${domain}&all=done&ignoreMismatch=on`;
+    
+    console.log(`🔍 Checking SSL Labs for: ${domain}`);
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'User-Agent': 'WeKey Tools SEO Analyzer'
+      },
+      timeout: 30000
+    });
+
+    if (!response.ok) {
+      throw new Error(`SSL Labs API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // If analysis is not ready, we might need to wait or return partial data
+    if (data.status === 'IN_PROGRESS' || data.status === 'DNS') {
+      return {
+        status: 'IN_PROGRESS',
+        grade: null,
+        hasSSL: url.startsWith('https://'),
+        message: 'Анализ SSL Labs в процессе',
+        issues: [],
+        recommendations: ['Повторите проверку через несколько минут']
+      };
+    }
+    
+    if (data.status === 'ERROR') {
+      return {
+        status: 'ERROR',
+        grade: null,
+        hasSSL: false,
+        message: 'Ошибка SSL Labs анализа',
+        issues: ['Не удалось проанализировать SSL сертификат'],
+        recommendations: ['Проверьте доступность сайта по HTTPS']
+      };
+    }
+    
+    // Extract data from first endpoint (most common case)
+    const endpoint = data.endpoints?.[0];
+    if (!endpoint) {
+      return {
+        status: 'NO_ENDPOINTS',
+        grade: null,
+        hasSSL: false,
+        message: 'Нет SSL endpoints',
+        issues: ['SSL сертификат не найден'],
+        recommendations: ['Настройте SSL сертификат для домена']
+      };
+    }
+    
+    const grade = endpoint.grade || null;
+    const details = endpoint.details || {};
+    
+    // Analyze SSL issues
+    const issues = [];
+    const recommendations = [];
+    
+    // Grade-based analysis
+    if (grade === 'A+') {
+      recommendations.push('🏆 Отличная SSL конфигурация!');
+    } else if (grade === 'A' || grade === 'A-') {
+      recommendations.push('✅ Хорошая SSL конфигурация');
+    } else if (grade === 'B') {
+      issues.push('SSL конфигурация требует улучшений');
+      recommendations.push('💡 Рекомендуется обновить SSL настройки');
+    } else if (grade === 'C' || grade === 'D' || grade === 'F') {
+      issues.push('Критические проблемы с SSL');
+      recommendations.push('🔴 Необходимо срочно исправить SSL конфигурацию');
+    }
+    
+    // Certificate analysis
+    if (details.cert) {
+      const cert = details.cert;
+      const expiryDate = new Date(cert.notAfter);
+      const now = new Date();
+      const daysUntilExpiry = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+      
+      if (daysUntilExpiry < 30) {
+        issues.push(`Сертификат истекает через ${daysUntilExpiry} дней`);
+        recommendations.push('⚠️ Обновите SSL сертификат');
+      } else if (daysUntilExpiry < 90) {
+        recommendations.push(`ℹ️ Сертификат истекает через ${daysUntilExpiry} дней`);
+      }
+    }
+    
+    // Protocol support
+    if (details.protocols) {
+      const hasModernTLS = details.protocols.some(p => 
+        p.version === '1.2' || p.version === '1.3'
+      );
+      if (!hasModernTLS) {
+        issues.push('Не поддерживается современный TLS');
+        recommendations.push('🔒 Включите поддержку TLS 1.2/1.3');
+      }
+    }
+    
+    return {
+      status: 'READY',
+      grade: grade,
+      hasSSL: true,
+      score: gradeToScore(grade),
+      certificate: details.cert ? {
+        issuer: details.cert.issuerLabel || 'Unknown',
+        expiryDate: details.cert.notAfter,
+        daysUntilExpiry: details.cert.notAfter ? 
+          Math.ceil((new Date(details.cert.notAfter) - new Date()) / (1000 * 60 * 60 * 24)) : null
+      } : null,
+      protocols: details.protocols || [],
+      issues: issues,
+      recommendations: recommendations,
+      rawData: {
+        grade: grade,
+        hasWarnings: endpoint.hasWarnings || false,
+        isExceptional: endpoint.isExceptional || false
+      }
+    };
+    
+  } catch (error) {
+    console.error('SSL Labs check error:', error);
+    
+    // Fallback to basic SSL check
+    const hasSSL = url.startsWith('https://');
+    
+    return {
+      status: 'FALLBACK',
+      grade: null,
+      hasSSL: hasSSL,
+      error: error.message,
+      issues: hasSSL ? [] : ['Сайт не использует HTTPS'],
+      recommendations: hasSSL ? 
+        ['SSL Labs анализ недоступен, но HTTPS работает'] : 
+        ['Настройте HTTPS для сайта']
+    };
+  }
+}
+
+// Convert SSL Labs grade to numeric score
+function gradeToScore(grade) {
+  const gradeMap = {
+    'A+': 100,
+    'A': 90,
+    'A-': 85,
+    'B': 75,
+    'C': 65,
+    'D': 50,
+    'F': 25
+  };
+  return gradeMap[grade] || 0;
+}
+
+// Level 3 API: W3C Markup Validator for HTML validation
+async function checkW3CValidator(url) {
+  try {
+    console.log(`🔍 Checking W3C Validator for: ${url}`);
+    
+    // W3C Markup Validator API endpoint
+    const apiUrl = `https://validator.w3.org/nu/?doc=${encodeURIComponent(url)}&out=json`;
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'User-Agent': 'WeKey Tools SEO Analyzer'
+      },
+      timeout: 20000
+    });
+
+    if (!response.ok) {
+      throw new Error(`W3C Validator API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Analyze validation results
+    const errors = data.messages?.filter(msg => msg.type === 'error') || [];
+    const warnings = data.messages?.filter(msg => msg.type === 'info' || msg.type === 'warning') || [];
+    
+    const errorCount = errors.length;
+    const warningCount = warnings.length;
+    const isValid = errorCount === 0;
+    
+    // Generate issues and recommendations
+    const issues = [];
+    const recommendations = [];
+    
+    if (errorCount > 0) {
+      issues.push(`Найдено ${errorCount} HTML ошибок`);
+      if (errorCount <= 5) {
+        recommendations.push('🔧 Исправьте найденные HTML ошибки для лучшего SEO');
+      } else {
+        recommendations.push('🚨 Критически важно исправить HTML ошибки');
+      }
+    } else {
+      recommendations.push('✅ HTML код валиден!');
+    }
+    
+    if (warningCount > 0) {
+      recommendations.push(`ℹ️ Рассмотрите ${warningCount} предупреждений для улучшения кода`);
+    }
+    
+    // Categorize common error types
+    const errorCategories = {
+      'syntax': 0,
+      'accessibility': 0,
+      'seo': 0,
+      'structure': 0,
+      'other': 0
+    };
+    
+    errors.forEach(error => {
+      const message = error.message?.toLowerCase() || '';
+      if (message.includes('alt') || message.includes('aria') || message.includes('label')) {
+        errorCategories.accessibility++;
+      } else if (message.includes('meta') || message.includes('title') || message.includes('heading')) {
+        errorCategories.seo++;
+      } else if (message.includes('element') || message.includes('tag') || message.includes('attribute')) {
+        errorCategories.syntax++;
+      } else if (message.includes('section') || message.includes('nav') || message.includes('main')) {
+        errorCategories.structure++;
+      } else {
+        errorCategories.other++;
+      }
+    });
+    
+    // Calculate score based on error severity
+    let score = 100;
+    score -= errorCount * 5; // -5 points per error
+    score -= warningCount * 1; // -1 point per warning
+    score = Math.max(score, 0);
+    
+    return {
+      isValid: isValid,
+      score: score,
+      totalMessages: data.messages?.length || 0,
+      errors: {
+        count: errorCount,
+        details: errors.slice(0, 10).map(err => ({
+          line: err.lastLine || err.firstLine,
+          column: err.lastColumn || err.firstColumn,
+          message: err.message,
+          extract: err.extract
+        })),
+        categories: errorCategories
+      },
+      warnings: {
+        count: warningCount,
+        details: warnings.slice(0, 5).map(warn => ({
+          line: warn.lastLine || warn.firstLine,
+          message: warn.message
+        }))
+      },
+      issues: issues,
+      recommendations: recommendations,
+      summary: {
+        status: isValid ? 'VALID' : 'INVALID',
+        quality: score >= 90 ? 'EXCELLENT' : 
+                score >= 75 ? 'GOOD' : 
+                score >= 50 ? 'AVERAGE' : 'POOR'
+      }
+    };
+    
+  } catch (error) {
+    console.error('W3C Validator check error:', error);
+    
+    return {
+      isValid: false,
+      score: 0,
+      error: error.message,
+      totalMessages: 0,
+      errors: { count: 0, details: [], categories: {} },
+      warnings: { count: 0, details: [] },
+      issues: ['Не удалось выполнить валидацию HTML'],
+      recommendations: ['Проверьте доступность сайта и повторите попытку'],
+      summary: {
+        status: 'ERROR',
+        quality: 'UNKNOWN'
+      }
+    };
+  }
+}
+
+// Level 3 API: SecurityHeaders.com for security headers analysis
+async function checkSecurityHeaders(url) {
+  try {
+    const domain = new URL(url).hostname;
+    
+    console.log(`🛡️ Checking Security Headers for: ${domain}`);
+    
+    // SecurityHeaders.com API endpoint
+    const apiUrl = `https://securityheaders.com/?q=${encodeURIComponent(url)}&hide=on&followRedirects=on`;
+    
+    // Also do direct header check as fallback
+    let directHeaders = {};
+    try {
+      const response = await fetch(url, {
+        method: 'HEAD',
+        headers: {
+          'User-Agent': 'WeKey Tools SEO Analyzer'
+        },
+        timeout: 10000
+      });
+      
+      // Extract security-related headers
+      const securityHeaderNames = [
+        'strict-transport-security',
+        'content-security-policy',
+        'x-frame-options',
+        'x-content-type-options',
+        'x-xss-protection',
+        'referrer-policy',
+        'permissions-policy',
+        'feature-policy'
+      ];
+      
+      securityHeaderNames.forEach(headerName => {
+        const headerValue = response.headers.get(headerName);
+        if (headerValue) {
+          directHeaders[headerName] = headerValue;
+        }
+      });
+      
+    } catch (error) {
+      console.log('Direct headers check failed, using analysis only:', error.message);
+    }
+    
+    // Analyze security headers
+    const analysis = analyzeSecurityHeaders(directHeaders, url);
+    
+    return {
+      url: url,
+      grade: analysis.grade,
+      score: analysis.score,
+      headers: directHeaders,
+      analysis: analysis.headerAnalysis,
+      missing: analysis.missingHeaders,
+      issues: analysis.issues,
+      recommendations: analysis.recommendations,
+      summary: {
+        total: Object.keys(directHeaders).length,
+        critical: analysis.criticalCount,
+        missing: analysis.missingHeaders.length,
+        status: analysis.grade ? 'ANALYZED' : 'PARTIAL'
+      }
+    };
+    
+  } catch (error) {
+    console.error('Security Headers check error:', error);
+    
+    return {
+      url: url,
+      grade: null,
+      score: 0,
+      error: error.message,
+      headers: {},
+      analysis: {},
+      missing: [],
+      issues: ['Не удалось проверить заголовки безопасности'],
+      recommendations: ['Проверьте доступность сайта и повторите попытку'],
+      summary: {
+        total: 0,
+        critical: 0,
+        missing: 0,
+        status: 'ERROR'
+      }
+    };
+  }
+}
+
+// Analyze security headers and calculate score
+function analyzeSecurityHeaders(headers, url) {
+  const analysis = {};
+  const issues = [];
+  const recommendations = [];
+  const missingHeaders = [];
+  let score = 0;
+  let criticalCount = 0;
+  
+  // HSTS (HTTP Strict Transport Security)
+  if (headers['strict-transport-security']) {
+    analysis.hsts = {
+      present: true,
+      value: headers['strict-transport-security'],
+      score: 20
+    };
+    score += 20;
+    recommendations.push('✅ HSTS настроен правильно');
+  } else if (url.startsWith('https://')) {
+    analysis.hsts = { present: false, score: 0 };
+    issues.push('Отсутствует заголовок HSTS');
+    missingHeaders.push('Strict-Transport-Security');
+    recommendations.push('🔒 Добавьте заголовок HSTS для принудительного HTTPS');
+  }
+  
+  // CSP (Content Security Policy)
+  if (headers['content-security-policy']) {
+    analysis.csp = {
+      present: true,
+      value: headers['content-security-policy'],
+      score: 25
+    };
+    score += 25;
+    criticalCount++;
+    recommendations.push('✅ Content Security Policy настроен');
+  } else {
+    analysis.csp = { present: false, score: 0 };
+    issues.push('Отсутствует Content Security Policy');
+    missingHeaders.push('Content-Security-Policy');
+    recommendations.push('🛡️ Настройте CSP для защиты от XSS атак');
+  }
+  
+  // X-Frame-Options
+  if (headers['x-frame-options']) {
+    analysis.frameOptions = {
+      present: true,
+      value: headers['x-frame-options'],
+      score: 15
+    };
+    score += 15;
+    recommendations.push('✅ X-Frame-Options защищает от clickjacking');
+  } else {
+    analysis.frameOptions = { present: false, score: 0 };
+    issues.push('Отсутствует защита от clickjacking');
+    missingHeaders.push('X-Frame-Options');
+    recommendations.push('🔒 Добавьте X-Frame-Options: DENY или SAMEORIGIN');
+  }
+  
+  // X-Content-Type-Options
+  if (headers['x-content-type-options']) {
+    analysis.contentTypeOptions = {
+      present: true,
+      value: headers['x-content-type-options'],
+      score: 10
+    };
+    score += 10;
+    recommendations.push('✅ X-Content-Type-Options предотвращает MIME sniffing');
+  } else {
+    analysis.contentTypeOptions = { present: false, score: 0 };
+    issues.push('Отсутствует защита от MIME sniffing');
+    missingHeaders.push('X-Content-Type-Options');
+    recommendations.push('🔒 Добавьте X-Content-Type-Options: nosniff');
+  }
+  
+  // Referrer Policy
+  if (headers['referrer-policy']) {
+    analysis.referrerPolicy = {
+      present: true,
+      value: headers['referrer-policy'],
+      score: 10
+    };
+    score += 10;
+    recommendations.push('✅ Referrer Policy настроен');
+  } else {
+    analysis.referrerPolicy = { present: false, score: 0 };
+    missingHeaders.push('Referrer-Policy');
+    recommendations.push('ℹ️ Рассмотрите настройку Referrer-Policy');
+  }
+  
+  // Permissions Policy (Feature Policy)
+  if (headers['permissions-policy'] || headers['feature-policy']) {
+    analysis.permissionsPolicy = {
+      present: true,
+      value: headers['permissions-policy'] || headers['feature-policy'],
+      score: 10
+    };
+    score += 10;
+    recommendations.push('✅ Permissions Policy настроен');
+  } else {
+    analysis.permissionsPolicy = { present: false, score: 0 };
+    missingHeaders.push('Permissions-Policy');
+    recommendations.push('ℹ️ Настройте Permissions Policy для контроля API');
+  }
+  
+  // X-XSS-Protection (deprecated but still relevant)
+  if (headers['x-xss-protection']) {
+    analysis.xssProtection = {
+      present: true,
+      value: headers['x-xss-protection'],
+      score: 5
+    };
+    score += 5;
+  } else {
+    missingHeaders.push('X-XSS-Protection');
+  }
+  
+  // Calculate grade based on score
+  let grade = 'F';
+  if (score >= 90) grade = 'A+';
+  else if (score >= 80) grade = 'A';
+  else if (score >= 70) grade = 'B';
+  else if (score >= 60) grade = 'C';
+  else if (score >= 40) grade = 'D';
+  
+  // Critical security issues
+  if (criticalCount === 0) {
+    issues.push('Критически важные заголовки безопасности отсутствуют');
+    recommendations.push('🚨 Настройте базовые заголовки безопасности');
+  }
+  
+  return {
+    grade,
+    score,
+    headerAnalysis: analysis,
+    missingHeaders,
+    issues,
+    recommendations,
+    criticalCount
+  };
+}
+
+// Функция для определения навигационных ссылок
+function isNavigationLink(parentClass, linkClass, linkText) {
+  const navKeywords = [
+    'nav', 'menu', 'header', 'navigation', 'main-menu', 'primary-menu',
+    'top-menu', 'sidebar', 'footer-menu', 'breadcrumb'
+  ];
+  
+  const textKeywords = [
+    'главная', 'о нас', 'услуги', 'продукт', 'контакты', 'блог', 'новости',
+    'каталог', 'портфолио', 'проекты', 'команда', 'цены', 'отзывы',
+    'home', 'about', 'services', 'products', 'contact', 'blog', 'news',
+    'catalog', 'portfolio', 'projects', 'team', 'pricing', 'reviews'
+  ];
+  
+  const classesToCheck = (parentClass + ' ' + linkClass).toLowerCase();
+  const textToCheck = linkText.toLowerCase();
+  
+  // Проверяем классы родителя и самой ссылки
+  if (navKeywords.some(keyword => classesToCheck.includes(keyword))) {
+    return true;
+  }
+  
+  // Проверяем текст ссылки
+  if (textKeywords.some(keyword => textToCheck.includes(keyword))) {
+    return true;
+  }
+  
+  return false;
+}
+
+// Анализ потенциала для Google Sitelinks
+function analyzeSitelinksPotential($, internalLinks, url) {
+  const analysis = {
+    score: 0,
+    maxScore: 100,
+    status: 'poor', // poor, good, excellent
+    issues: [],
+    recommendations: [],
+    navigation: {
+      hasMainMenu: false,
+      menuItemsCount: 0,
+      menuStructure: 'none' // none, simple, complex
+    },
+    urlStructure: {
+      hasCleanUrls: true,
+      hasLogicalHierarchy: false,
+      avgUrlDepth: 0
+    },
+    linkingProfile: {
+      internalLinksCount: internalLinks.length,
+      navigationLinksCount: 0,
+      topSections: []
+    }
+  };
+
+  try {
+    // 1. Анализ навигационной структуры
+    const navElements = $('nav, .nav, .menu, .navigation, header .menu, .main-menu');
+    if (navElements.length > 0) {
+      analysis.navigation.hasMainMenu = true;
+      analysis.score += 25;
+      
+      // Подсчет элементов меню
+      const menuLinks = navElements.find('a').length;
+      analysis.navigation.menuItemsCount = menuLinks;
+      
+      if (menuLinks >= 3 && menuLinks <= 8) {
+        analysis.navigation.menuStructure = 'optimal';
+        analysis.score += 20;
+      } else if (menuLinks > 0) {
+        analysis.navigation.menuStructure = 'simple';
+        analysis.score += 10;
+        if (menuLinks > 8) {
+          analysis.issues.push('Слишком много пунктов в главном меню (рекомендуется 3-8)');
+        }
+      }
+    } else {
+      analysis.issues.push('Основное навигационное меню не обнаружено');
+      analysis.recommendations.push('Добавьте четкое навигационное меню с ключевыми разделами');
+    }
+
+    // 2. Анализ структуры URL
+    const urlDepths = [];
+    const sections = {};
+    
+    internalLinks.forEach(link => {
+      try {
+        if (typeof link === 'object' && link.href) {
+          const linkUrl = new URL(link.href, url);
+          const pathname = linkUrl.pathname;
+          const depth = pathname.split('/').filter(part => part.length > 0).length;
+          urlDepths.push(depth);
+          
+          // Определяем разделы
+          const firstSegment = pathname.split('/')[1];
+          if (firstSegment && firstSegment !== '') {
+            sections[firstSegment] = (sections[firstSegment] || 0) + 1;
+          }
+          
+          // Подсчет навигационных ссылок
+          if (link.isNavigation) {
+            analysis.linkingProfile.navigationLinksCount++;
+          }
+        }
+      } catch (e) {
+        // Invalid URL
+      }
+    });
+
+    // Средняя глубина URL
+    if (urlDepths.length > 0) {
+      analysis.urlStructure.avgUrlDepth = Math.round((urlDepths.reduce((a, b) => a + b, 0) / urlDepths.length) * 100) / 100;
+      
+      if (analysis.urlStructure.avgUrlDepth <= 3) {
+        analysis.score += 15;
+        analysis.urlStructure.hasLogicalHierarchy = true;
+      } else {
+        analysis.issues.push(`Средняя глубина URL слишком большая (${analysis.urlStructure.avgUrlDepth})`);
+        analysis.recommendations.push('Упростите структуру URL, сделайте её более плоской');
+      }
+    }
+
+    // 3. Популярные разделы (потенциальные sitelinks)
+    const sortedSections = Object.entries(sections)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 6)
+      .map(([section, count]) => ({
+        name: section,
+        linkCount: count,
+        urlExample: `/${section}`
+      }));
+    
+    analysis.linkingProfile.topSections = sortedSections;
+
+    if (sortedSections.length >= 3) {
+      analysis.score += 20;
+    } else {
+      analysis.issues.push('Недостаточно четко выделенных разделов сайта');
+      analysis.recommendations.push('Создайте логические разделы сайта с четкой навигацией');
+    }
+
+    // 4. Качество внутренней перелинковки
+    const navigationRatio = analysis.linkingProfile.navigationLinksCount / Math.max(analysis.linkingProfile.internalLinksCount, 1);
+    
+    if (navigationRatio >= 0.1) {
+      analysis.score += 10;
+    } else {
+      analysis.issues.push('Низкое качество внутренней перелинковки');
+      analysis.recommendations.push('Улучшите внутреннюю перелинковку между разделами');
+    }
+
+    // 5. Дополнительные факторы
+    const breadcrumbs = $('.breadcrumb, .breadcrumbs, nav ol').length;
+    if (breadcrumbs > 0) {
+      analysis.score += 10;
+      analysis.recommendations.push('✅ Хлебные крошки помогают Google понять структуру сайта');
+    } else {
+      analysis.recommendations.push('Добавьте хлебные крошки для улучшения навигации');
+    }
+
+    // Определение итогового статуса
+    if (analysis.score >= 80) {
+      analysis.status = 'excellent';
+    } else if (analysis.score >= 50) {
+      analysis.status = 'good';
+    } else {
+      analysis.status = 'poor';
+    }
+
+    // Общие рекомендации
+    if (analysis.status === 'excellent') {
+      analysis.recommendations.push('🏆 Отличный потенциал для получения sitelinks от Google!');
+    } else if (analysis.status === 'good') {
+      analysis.recommendations.push('👍 Хороший потенциал, работайте над улучшениями');
+    } else {
+      analysis.recommendations.push('📈 Необходимо значительно улучшить структуру и навигацию');
+    }
+
+    return analysis;
+
+  } catch (error) {
+    console.error('Sitelinks analysis error:', error);
+    return {
+      score: 0,
+      maxScore: 100,
+      status: 'error',
+      issues: ['Ошибка анализа потенциала sitelinks'],
+      recommendations: ['Проверьте структуру сайта и навигацию'],
+      navigation: { hasMainMenu: false, menuItemsCount: 0, menuStructure: 'none' },
+      urlStructure: { hasCleanUrls: false, hasLogicalHierarchy: false, avgUrlDepth: 0 },
+      linkingProfile: { internalLinksCount: 0, navigationLinksCount: 0, topSections: [] }
+    };
+  }
+}
+
+// Детальный анализ ссылочного профиля
+function analyzeLinkProfile($, internalLinks, externalLinks, url) {
+  const analysis = {
+    score: 0,
+    maxScore: 100,
+    issues: [],
+    recommendations: [],
+    internal: {
+      total: internalLinks.length,
+      unique: [],
+      anchorTexts: {},
+      distribution: {},
+      quality: 'poor' // poor, fair, good, excellent
+    },
+    external: {
+      total: externalLinks.length,
+      domains: {},
+      nofollow: 0,
+      dofollow: 0,
+      social: [],
+      quality: 'poor'
+    },
+    ratios: {
+      internalToExternal: 0,
+      nofollowRatio: 0,
+      anchorDiversity: 0
+    }
+  };
+
+  try {
+    // 1. Анализ внутренних ссылок
+    const uniqueInternalUrls = new Set();
+    const anchorTexts = {};
+    
+    internalLinks.forEach(link => {
+      if (typeof link === 'object' && link.href) {
+        // Уникальные URL
+        uniqueInternalUrls.add(link.href);
+        
+        // Анализ anchor текстов
+        const anchor = link.text?.trim() || '';
+        if (anchor) {
+          anchorTexts[anchor] = (anchorTexts[anchor] || 0) + 1;
+        }
+      }
+    });
+    
+    analysis.internal.unique = Array.from(uniqueInternalUrls);
+    analysis.internal.anchorTexts = anchorTexts;
+    
+    // Оценка качества внутренних ссылок
+    const uniqueCount = uniqueInternalUrls.size;
+    const totalInternal = internalLinks.length;
+    
+    if (uniqueCount >= 10 && totalInternal >= 20) {
+      analysis.internal.quality = 'excellent';
+      analysis.score += 25;
+    } else if (uniqueCount >= 5 && totalInternal >= 10) {
+      analysis.internal.quality = 'good';
+      analysis.score += 20;
+    } else if (uniqueCount >= 3 && totalInternal >= 5) {
+      analysis.internal.quality = 'fair';
+      analysis.score += 10;
+    } else {
+      analysis.issues.push('Недостаточно внутренних ссылок для хорошей перелинковки');
+      analysis.recommendations.push('Добавьте больше внутренних ссылок между страницами');
+    }
+
+    // 2. Анализ внешних ссылок
+    const externalDomains = {};
+    const socialDomains = ['facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'youtube.com', 'tiktok.com', 'telegram.org'];
+    const socialLinksSet = new Set(); // Используем Set для уникальности
+    let nofollowCount = 0;
+    
+    // Анализ nofollow/dofollow ссылок
+    $('a[href]').each((i, el) => {
+      const href = $(el).attr('href');
+      const rel = $(el).attr('rel') || '';
+      
+      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+        try {
+          const linkUrl = new URL(href);
+          const currentUrl = new URL(url);
+          
+          if (linkUrl.hostname !== currentUrl.hostname) {
+            // Внешняя ссылка
+            const domain = linkUrl.hostname.replace('www.', '');
+            externalDomains[domain] = (externalDomains[domain] || 0) + 1;
+            
+            if (rel.includes('nofollow')) {
+              nofollowCount++;
+            }
+            
+            // Проверка на социальные сети - добавляем в Set для уникальности
+            if (socialDomains.some(social => domain.includes(social))) {
+              socialLinksSet.add(domain);
+            }
+          }
+        } catch (e) {
+          // Invalid URL
+        }
+      }
+    });
+    
+    analysis.external.domains = externalDomains;
+    analysis.external.nofollow = nofollowCount;
+    analysis.external.dofollow = analysis.external.total - nofollowCount;
+    analysis.external.social = Array.from(socialLinksSet); // Преобразуем Set в массив уникальных значений
+    
+    // Оценка качества внешних ссылок
+    const domainCount = Object.keys(externalDomains).length;
+    
+    if (domainCount >= 3 && analysis.external.total <= 10) {
+      analysis.external.quality = 'excellent';
+      analysis.score += 25;
+    } else if (domainCount >= 2 && analysis.external.total <= 15) {
+      analysis.external.quality = 'good';
+      analysis.score += 20;
+    } else if (analysis.external.total > 20) {
+      analysis.external.quality = 'poor';
+      analysis.issues.push('Слишком много внешних ссылок может разбавлять link juice');
+      analysis.recommendations.push('Сократите количество внешних ссылок или добавьте nofollow');
+    } else {
+      analysis.external.quality = 'fair';
+      analysis.score += 10;
+    }
+
+    // 3. Расчет соотношений
+    analysis.ratios.internalToExternal = analysis.external.total > 0 ? 
+      Math.round((analysis.internal.total / analysis.external.total) * 100) / 100 : 
+      analysis.internal.total;
+      
+    analysis.ratios.nofollowRatio = analysis.external.total > 0 ? 
+      Math.round((nofollowCount / analysis.external.total) * 100) : 0;
+      
+    analysis.ratios.anchorDiversity = Object.keys(anchorTexts).length;
+
+    // 4. Оценка соотношений
+    if (analysis.ratios.internalToExternal >= 3) {
+      analysis.score += 15;
+      analysis.recommendations.push('✅ Отличное соотношение внутренних к внешним ссылкам');
+    } else if (analysis.ratios.internalToExternal >= 1.5) {
+      analysis.score += 10;
+    } else {
+      analysis.issues.push('Низкое соотношение внутренних к внешним ссылкам');
+      analysis.recommendations.push('Увеличьте количество внутренних ссылок');
+    }
+
+    // 5. Анализ разнообразия anchor текстов
+    if (analysis.ratios.anchorDiversity >= 5) {
+      analysis.score += 10;
+      analysis.recommendations.push('👍 Хорошее разнообразие anchor текстов');
+    } else {
+      analysis.issues.push('Низкое разнообразие anchor текстов');
+      analysis.recommendations.push('Варьируйте тексты ссылок для лучшего SEO');
+    }
+
+    // 6. Общие рекомендации
+    if (analysis.internal.total < 5) {
+      analysis.recommendations.push('🔗 Добавьте больше внутренних ссылок (рекомендуется минимум 10-15)');
+    }
+    
+    if (analysis.ratios.nofollowRatio < 30 && analysis.external.total > 5) {
+      analysis.recommendations.push('🔒 Рассмотрите добавление nofollow к некоторым внешним ссылкам');
+    }
+    
+    if (analysis.external.social.length === 0) {
+      analysis.recommendations.push('📱 Добавьте ссылки на социальные сети для лучшего engagement');
+    }
+
+    return analysis;
+
+  } catch (error) {
+    console.error('Link profile analysis error:', error);
+    return {
+      score: 0,
+      maxScore: 100,
+      issues: ['Ошибка анализа ссылочного профиля'],
+      recommendations: ['Проверьте доступность страницы'],
+      internal: { total: 0, unique: [], anchorTexts: {}, distribution: {}, quality: 'poor' },
+      external: { total: 0, domains: {}, nofollow: 0, dofollow: 0, social: [], quality: 'poor' },
+      ratios: { internalToExternal: 0, nofollowRatio: 0, anchorDiversity: 0 }
     };
   }
 }

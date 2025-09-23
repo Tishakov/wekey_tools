@@ -10,6 +10,42 @@ import AuthModal from '../components/AuthModal';
 import './SeoAudit.css';
 import '../styles/tool-pages.css';
 
+// Функция для расчета цвета на основе процента
+const getProgressColor = (percentage: number): string => {
+  if (percentage <= 30) {
+    // 0-30%: красный
+    return '#EF4444';
+  } else if (percentage <= 60) {
+    // 30-60%: переход от красного к желтому
+    const progress = (percentage - 30) / 30; // 0-1
+    const red = Math.round(239 - (239 - 245) * progress);
+    const green = Math.round(68 + (158 - 68) * progress);
+    const blue = Math.round(68 + (11 - 68) * progress);
+    return `rgb(${red}, ${green}, ${blue})`;
+  } else {
+    // 60-100%: переход от желтого к зеленому
+    const progress = (percentage - 60) / 40; // 0-1
+    const red = Math.round(245 - (245 - 16) * progress);
+    const green = Math.round(158 + (185 - 158) * progress);
+    const blue = Math.round(11 + (129 - 11) * progress);
+    return `rgb(${red}, ${green}, ${blue})`;
+  }
+};
+
+// Специальная функция для цветов ключевых слов (другая логика)
+const getKeywordColor = (density: number): string => {
+  if (density < 0.5) {
+    // Менее 0.5% - желтый (мало для SEO)
+    return '#F59E0B';
+  } else if (density >= 0.5 && density <= 3) {
+    // 0.5-3% - зеленый (оптимально)
+    return '#10B981';
+  } else {
+    // Более 3% - красный (переспам)
+    return '#EF4444';
+  }
+};
+
 interface SeoAuditResult {
   url: string;
   loading: boolean;
@@ -222,6 +258,120 @@ interface SeoAuditResult {
       warnings?: string[];
       error?: string;
     };
+    mobileFriendly?: {
+      isMobileFriendly: boolean;
+      status: string;
+      issues?: string[];
+      recommendations?: string[];
+      viewport?: string | null;
+      hasMediaQueries?: boolean;
+      loadingStatus?: string;
+      resourceIssues?: any[];
+      error?: string;
+    };
+    sslLabs?: {
+      status: string;
+      grade: string | null;
+      hasSSL: boolean;
+      score?: number;
+      certificate?: {
+        issuer: string;
+        expiryDate: string;
+        daysUntilExpiry: number | null;
+      };
+      protocols?: any[];
+      issues?: string[];
+      recommendations?: string[];
+      message?: string;
+      error?: string;
+      rawData?: {
+        grade: string;
+        hasWarnings: boolean;
+        isExceptional: boolean;
+      };
+    };
+    w3cValidator?: {
+      isValid: boolean;
+      score: number;
+      totalMessages: number;
+      errors: {
+        count: number;
+        details: Array<{
+          line?: number;
+          column?: number;
+          message: string;
+          extract?: string;
+        }>;
+        categories?: {
+          syntax: number;
+          accessibility: number;
+          seo: number;
+          structure: number;
+          other: number;
+        };
+      };
+      warnings: {
+        count: number;
+        details: Array<{
+          line?: number;
+          message: string;
+        }>;
+      };
+      issues?: string[];
+      recommendations?: string[];
+      summary: {
+        status: string;
+        quality: string;
+      };
+      error?: string;
+    };
+    securityHeaders?: {
+      url: string;
+      grade: string | null;
+      score: number;
+      headers: Record<string, string>;
+      analysis: Record<string, {
+        present: boolean;
+        value?: string;
+        score: number;
+      }>;
+      missing: string[];
+      issues?: string[];
+      recommendations?: string[];
+      summary: {
+        total: number;
+        critical: number;
+        missing: number;
+        status: string;
+      };
+      error?: string;
+    };
+    linkProfile?: {
+      score: number;
+      maxScore: number;
+      issues: string[];
+      recommendations: string[];
+      internal: {
+        total: number;
+        unique: string[];
+        anchorTexts: Record<string, number>;
+        distribution: Record<string, any>;
+        quality: string;
+      };
+      external: {
+        total: number;
+        domains: Record<string, number>;
+        nofollow: number;
+        dofollow: number;
+        social: string[];
+        quality: string;
+      };
+      ratios: {
+        internalToExternal: number;
+        nofollowRatio: number;
+        anchorDiversity: number;
+      };
+    };
   };
 }
 
@@ -234,6 +384,9 @@ const SeoAudit: React.FC = () => {
   const [result, setResult] = useState<SeoAuditResult | null>(null);
   const [launchCount, setLaunchCount] = useState(0);
   const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'desktop'>('mobile');
+  const [w3cErrorsToShow, setW3cErrorsToShow] = useState(5);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [actionPlanToShow, setActionPlanToShow] = useState(6);
 
   // Определяем текущие данные устройства с fallback
   const getCurrentDeviceData = () => {
@@ -259,6 +412,20 @@ const SeoAudit: React.FC = () => {
 
   const currentDeviceData = getCurrentDeviceData();
 
+  // Функция для показа дополнительных W3C ошибок
+  const showMoreW3cErrors = () => {
+    setW3cErrorsToShow(prev => prev + 5);
+  };
+
+  // Функции для управления tooltip
+  const showTooltip = (tooltipId: string) => {
+    setActiveTooltip(tooltipId);
+  };
+
+  const hideTooltip = () => {
+    setActiveTooltip(null);
+  };
+
   // Загружаем счетчик запусков
   useEffect(() => {
     const loadLaunchCount = async () => {
@@ -279,6 +446,9 @@ const SeoAudit: React.FC = () => {
       alert('Пожалуйста, введите URL сайта');
       return;
     }
+
+    // Сбрасываем количество показываемых W3C ошибок при новом аудите
+    setW3cErrorsToShow(5);
 
     // Нормализация URL
     let normalizedUrl = url.trim();
@@ -465,7 +635,10 @@ const SeoAudit: React.FC = () => {
                           <div className="score-category-bar">
                             <div 
                               className="score-category-fill technical"
-                              style={{ width: `${Math.round(result.data.overallScore.technical)}%` }}
+                              style={{ 
+                                width: `${Math.round(result.data.overallScore.technical)}%`,
+                                backgroundColor: getProgressColor(Math.round(result.data.overallScore.technical))
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -479,7 +652,10 @@ const SeoAudit: React.FC = () => {
                           <div className="score-category-bar">
                             <div 
                               className="score-category-fill content"
-                              style={{ width: `${Math.round(result.data.overallScore.content)}%` }}
+                              style={{ 
+                                width: `${Math.round(result.data.overallScore.content)}%`,
+                                backgroundColor: getProgressColor(Math.round(result.data.overallScore.content))
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -493,7 +669,10 @@ const SeoAudit: React.FC = () => {
                           <div className="score-category-bar">
                             <div 
                               className="score-category-fill performance"
-                              style={{ width: `${Math.round(result.data.overallScore.performance)}%` }}
+                              style={{ 
+                                width: `${Math.round(result.data.overallScore.performance)}%`,
+                                backgroundColor: getProgressColor(Math.round(result.data.overallScore.performance))
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -568,6 +747,20 @@ const SeoAudit: React.FC = () => {
                             <h4>📊 Core Web Vitals</h4>
                             <div className="web-vitals-grid">
                               <div className="web-vital-item">
+                                <span 
+                                  className="web-vital-tooltip-trigger"
+                                  onMouseEnter={() => showTooltip('lcp')}
+                                  onMouseLeave={hideTooltip}
+                                >
+                                  ❓
+                                </span>
+                                {activeTooltip === 'lcp' && (
+                                  <div className="web-vital-tooltip">
+                                    <strong>Largest Contentful Paint</strong><br/>
+                                    Время загрузки самого большого видимого элемента на странице. 
+                                    Хороший показатель: ≤ 2.5 сек.
+                                  </div>
+                                )}
                                 <div className="web-vital-icon">🎯</div>
                                 <div className="web-vital-info">
                                   <div className="web-vital-name">LCP</div>
@@ -593,6 +786,20 @@ const SeoAudit: React.FC = () => {
                               </div>
 
                               <div className="web-vital-item">
+                                <span 
+                                  className="web-vital-tooltip-trigger"
+                                  onMouseEnter={() => showTooltip('fid')}
+                                  onMouseLeave={hideTooltip}
+                                >
+                                  ❓
+                                </span>
+                                {activeTooltip === 'fid' && (
+                                  <div className="web-vital-tooltip">
+                                    <strong>First Input Delay</strong><br/>
+                                    Время от первого взаимодействия пользователя до ответа браузера. 
+                                    Хороший показатель: ≤ 100 мс.
+                                  </div>
+                                )}
                                 <div className="web-vital-icon">⚡</div>
                                 <div className="web-vital-info">
                                   <div className="web-vital-name">FID</div>
@@ -618,6 +825,20 @@ const SeoAudit: React.FC = () => {
                               </div>
 
                               <div className="web-vital-item">
+                                <span 
+                                  className="web-vital-tooltip-trigger"
+                                  onMouseEnter={() => showTooltip('cls')}
+                                  onMouseLeave={hideTooltip}
+                                >
+                                  ❓
+                                </span>
+                                {activeTooltip === 'cls' && (
+                                  <div className="web-vital-tooltip">
+                                    <strong>Cumulative Layout Shift</strong><br/>
+                                    Измеряет стабильность макета страницы. Показывает, насколько элементы 
+                                    "прыгают" при загрузке. Хороший показатель: ≤ 0.1.
+                                  </div>
+                                )}
                                 <div className="web-vital-icon">📐</div>
                                 <div className="web-vital-info">
                                   <div className="web-vital-name">CLS</div>
@@ -663,7 +884,10 @@ const SeoAudit: React.FC = () => {
                             <div className="seo-audit-score-bar">
                               <div 
                                 className="seo-audit-score-fill" 
-                                style={{ width: `${result.data.performance.title_length_score}%` }}
+                                style={{ 
+                                  width: `${result.data.performance.title_length_score}%`,
+                                  backgroundColor: getProgressColor(result.data.performance.title_length_score)
+                                }}
                               ></div>
                             </div>
                             <span className="seo-audit-score-value">{result.data.performance.title_length_score}/100</span>
@@ -673,7 +897,10 @@ const SeoAudit: React.FC = () => {
                             <div className="seo-audit-score-bar">
                               <div 
                                 className="seo-audit-score-fill" 
-                                style={{ width: `${result.data.performance.description_length_score}%` }}
+                                style={{ 
+                                  width: `${result.data.performance.description_length_score}%`,
+                                  backgroundColor: getProgressColor(result.data.performance.description_length_score)
+                                }}
                               ></div>
                             </div>
                             <span className="seo-audit-score-value">{result.data.performance.description_length_score}/100</span>
@@ -683,7 +910,10 @@ const SeoAudit: React.FC = () => {
                             <div className="seo-audit-score-bar">
                               <div 
                                 className="seo-audit-score-fill" 
-                                style={{ width: `${result.data.performance.h1_score}%` }}
+                                style={{ 
+                                  width: `${result.data.performance.h1_score}%`,
+                                  backgroundColor: getProgressColor(result.data.performance.h1_score)
+                                }}
                               ></div>
                             </div>
                             <span className="seo-audit-score-value">{result.data.performance.h1_score}/100</span>
@@ -946,115 +1176,8 @@ const SeoAudit: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Правая колонка */}
-                  <div className="seo-audit-column-right">
-                    {/* Техническое SEO */}
-                    <div className="seo-audit-section">
-                      <h3>⚙️ Техническая настройка</h3>
-                      
-                      <div className="seo-audit-item">
-                        <div className="seo-audit-item-header">
-                          <span className={`seo-audit-status ${(result.data.structuredData?.count ?? 0) > 0 ? 'good' : 'warning'}`}>
-                            {(result.data.structuredData?.count ?? 0) > 0 ? '✅' : '❌'}
-                          </span>
-                          <span className="seo-audit-title">Разметка для поисковиков</span>
-                        </div>
-                        <div className="seo-audit-content-block">
-                          {(result.data.structuredData?.count ?? 0) > 0 ? (
-                            <div>
-                              <p className="seo-audit-value">Найдено {result.data.structuredData?.count} блоков структурированных данных</p>
-                              <p className="seo-audit-tip">💡 Это помогает Google лучше понимать содержимое сайта и показывать расширенные сниппеты в поиске.</p>
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="seo-audit-value">Структурированные данные не найдены</p>
-                              <p className="seo-audit-tip">💡 Добавление разметки Schema.org может улучшить отображение сайта в результатах поиска.</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Изображения и ссылки */}
-                    {result.data.images && (
-                      <div className="seo-audit-section">
-                        <h3>🖼️ Контент и медиа</h3>
-                        
-                        <div className="seo-audit-item">
-                          <div className="seo-audit-item-header">
-                            <span className={`seo-audit-status ${result.data.images.withoutAlt === 0 ? 'good' : 'warning'}`}>
-                              {result.data.images.withoutAlt === 0 ? '✅' : '⚠️'}
-                            </span>
-                            <span className="seo-audit-title">Alt-тексты изображений</span>
-                          </div>
-                          <div className="seo-audit-content-block">
-                            <p className="seo-audit-value">
-                              Всего изображений: {result.data.images.total}
-                              {result.data.images.withoutAlt > 0 && (
-                                `, без alt-текста: ${result.data.images.withoutAlt}`
-                              )}
-                            </p>
-                            {result.data.performance?.images_alt_score !== undefined && (
-                              <div className="seo-audit-score-item">
-                                <span className="seo-audit-score-label">Оценка ALT</span>
-                                <div className="seo-audit-score-bar">
-                                  <div 
-                                    className="seo-audit-score-fill" 
-                                    style={{ width: `${result.data.performance.images_alt_score}%` }}
-                                  ></div>
-                                </div>
-                                <span className="seo-audit-score-value">{result.data.performance.images_alt_score}/100</span>
-                              </div>
-                            )}
-                            {result.data.images.withoutAlt > 0 && (
-                              <p className="seo-audit-tip">💡 Alt-тексты помогают поисковикам понять содержимое изображений и важны для доступности сайта.</p>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Анализ контента */}
-                        {result.data.performance && (
-                          <div className="seo-audit-item">
-                            <div className="seo-audit-item-header">
-                              <span className={`seo-audit-status ${(result.data.performance.wordCount || 0) >= 300 ? 'good' : 'warning'}`}>
-                                {(result.data.performance.wordCount || 0) >= 300 ? '✅' : '⚠️'}
-                              </span>
-                              <span className="seo-audit-title">Объем контента</span>
-                            </div>
-                            <div className="seo-audit-content-block">
-                              <p className="seo-audit-value">
-                                Слов на странице: {result.data.performance.wordCount || 0}
-                              </p>
-                              <p className="seo-audit-meta">
-                                Размер HTML: {result.data.performance.htmlSizeKB || 0} KB
-                                {result.data.performance.textToHtmlRatio && 
-                                  `, соотношение текст/код: ${result.data.performance.textToHtmlRatio}%`
-                                }
-                              </p>
-                              {result.data.performance.content_score !== undefined && (
-                                <div className="seo-audit-score-item">
-                                  <span className="seo-audit-score-label">Контент</span>
-                                  <div className="seo-audit-score-bar">
-                                    <div 
-                                      className="seo-audit-score-fill" 
-                                      style={{ width: `${result.data.performance.content_score}%` }}
-                                    ></div>
-                                  </div>
-                                  <span className="seo-audit-score-value">{result.data.performance.content_score}/100</span>
-                                </div>
-                              )}
-                              {(result.data.performance.wordCount || 0) < 300 && (
-                                <p className="seo-audit-tip">💡 Рекомендуется минимум 300 слов для хорошего ранжирования в поисковых системах.</p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Продвинутый технический анализ */}
+                    {/* Продвинутый технический анализ - перенесено для баланса колонок */}
                     {result.data.technical && (
                       <div className="seo-audit-section">
                         <h3>🔧 Технический анализ</h3>
@@ -1100,46 +1223,292 @@ const SeoAudit: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Анализ ключевых слов */}
-                    {result.data.keywordAnalysis && (
+                    {/* W3C Markup Validator - Level 3 */}
+                    {result.data.w3cValidator && (
                       <div className="seo-audit-section">
-                        <h3>🎯 Анализ ключевых слов</h3>
+                        <h3>🔍 W3C Валидация</h3>
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
-                            <span className="seo-audit-status good">📊</span>
-                            <span className="seo-audit-title">Плотность ключевых слов</span>
+                            <span className={`seo-audit-status ${result.data.w3cValidator.isValid ? 'good' : 'error'}`}>
+                              {result.data.w3cValidator.isValid ? '✅' : '❌'}
+                            </span>
+                            <span className="seo-audit-title">HTML Валидация</span>
                           </div>
                           <div className="seo-audit-content-block">
-                            {Object.entries(result.data.keywordAnalysis.keywordDensity || {}).map(([keyword, data]) => (
-                              <div key={keyword} className="seo-audit-keyword-item">
-                                <div className="seo-audit-keyword-header">
-                                  <span className="seo-audit-keyword-name">"{keyword}"</span>
-                                  <span className="seo-audit-keyword-stats">{data.count} раз ({data.density}%)</span>
+                            <p className="seo-audit-value">
+                              📊 Статус: <span className={result.data.w3cValidator.isValid ? 'text-success' : 'text-error'}>
+                                {result.data.w3cValidator.isValid ? 'Код валиден' : 'Найдены ошибки'}
+                              </span>
+                            </p>
+                            {result.data.w3cValidator.score !== undefined && (
+                              <>
+                                <p className="seo-audit-meta">🎯 Оценка качества: {result.data.w3cValidator.score}/100</p>
+                                <div className="seo-audit-score-item">
+                                  <span className="seo-audit-score-label">Качество HTML</span>
+                                  <div className="seo-audit-score-bar">
+                                    <div 
+                                      className="seo-audit-score-fill" 
+                                      style={{ 
+                                        width: `${result.data.w3cValidator.score}%`,
+                                        backgroundColor: getProgressColor(result.data.w3cValidator.score)
+                                      }}
+                                    ></div>
+                                  </div>
+                                  <span className="seo-audit-score-value">{result.data.w3cValidator.score}/100</span>
                                 </div>
-                                <div className="seo-audit-keyword-bar">
-                                  <div 
-                                    className="seo-audit-keyword-fill" 
-                                    style={{ 
-                                      width: `${Math.min(data.density * 33.33, 100)}%`,
-                                      backgroundColor: data.density >= 0.5 && data.density <= 3 ? '#10B981' : 
-                                                     data.density < 0.5 ? '#F59E0B' : '#EF4444'
-                                    }}
-                                  ></div>
-                                </div>
+                              </>
+                            )}
+                            
+                            <div className="w3c-stats">
+                              <div className="w3c-stat-item">
+                                <span className="stat-label">❌ Ошибки:</span>
+                                <span className={`stat-value ${result.data.w3cValidator.errors.count > 0 ? 'text-error' : 'text-success'}`}>
+                                  {result.data.w3cValidator.errors.count}
+                                </span>
                               </div>
-                            ))}
-                            {result.data.keywordAnalysis.recommendations.length > 0 && (
-                              <div className="seo-audit-recommendations">
-                                {result.data.keywordAnalysis.recommendations?.map((rec, index) => (
-                                  <p key={index} className="seo-audit-tip">{rec}</p>
+                              <div className="w3c-stat-item">
+                                <span className="stat-label">⚠️ Предупреждения:</span>
+                                <span className={`stat-value ${result.data.w3cValidator.warnings.count > 0 ? 'text-warning' : 'text-success'}`}>
+                                  {result.data.w3cValidator.warnings.count}
+                                </span>
+                              </div>
+                              <div className="w3c-stat-item">
+                                <span className="stat-label">📝 Всего сообщений:</span>
+                                <span className="stat-value">{result.data.w3cValidator.totalMessages}</span>
+                              </div>
+                            </div>
+
+                            {result.data.w3cValidator.errors.count > 0 && result.data.w3cValidator.errors.details.length > 0 && (
+                              <div className="w3c-errors">
+                                <h4>❌ Основные ошибки:</h4>
+                                {result.data.w3cValidator.errors.details.slice(0, w3cErrorsToShow).map((error, i) => (
+                                  <div key={i} className="w3c-error-item">
+                                    {error.line && (
+                                      <div className="error-location">Строка {error.line}{error.column ? `, колонка ${error.column}` : ''}</div>
+                                    )}
+                                    <div className="error-message">{error.message}</div>
+                                    {error.extract && (
+                                      <div className="error-extract">
+                                        <code>{error.extract.trim()}</code>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                                {result.data.w3cValidator.errors.count > w3cErrorsToShow && (
+                                  <div className="w3c-show-more">
+                                    <p className="more-errors">И еще {result.data.w3cValidator.errors.count - w3cErrorsToShow} ошибок...</p>
+                                    <button 
+                                      className="show-more-button"
+                                      onClick={showMoreW3cErrors}
+                                    >
+                                      Показать еще 5
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            {result.data.w3cValidator.issues && result.data.w3cValidator.issues.length > 0 && (
+                              <div className="seo-audit-issues">
+                                <h4>🚨 Проблемы:</h4>
+                                {result.data.w3cValidator.issues.map((issue, i) => (
+                                  <p key={i} className="seo-audit-issue">{issue}</p>
                                 ))}
                               </div>
+                            )}
+                            
+                            {result.data.w3cValidator.recommendations && result.data.w3cValidator.recommendations.length > 0 && (
+                              <div className="seo-audit-warnings">
+                                <h4>💡 Рекомендации:</h4>
+                                {result.data.w3cValidator.recommendations.map((rec, i) => (
+                                  <p key={i} className="seo-audit-warning">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {!result.data.w3cValidator.isValid && (
+                              <p className="seo-audit-tip">🔧 Валидный HTML код улучшает SEO и доступность сайта!</p>
                             )}
                           </div>
                         </div>
                       </div>
                     )}
+
+                    {/* Mobile-Friendly Test - Level 3 */}
+                    {result.data.mobileFriendly && (
+                      <div className="seo-audit-section">
+                        <h3>📱 Мобильная адаптивность</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${result.data.mobileFriendly.isMobileFriendly ? 'good' : 'error'}`}>
+                              {result.data.mobileFriendly.isMobileFriendly ? '✅' : '❌'}
+                            </span>
+                            <span className="seo-audit-title">Google Mobile-Friendly Test</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            <p className="seo-audit-value">
+                              📱 Статус: <span className={result.data.mobileFriendly.isMobileFriendly ? 'text-success' : 'text-error'}>
+                                {result.data.mobileFriendly.isMobileFriendly ? 'Адаптивен для мобильных' : 'Не адаптирован для мобильных'}
+                              </span>
+                            </p>
+                            {result.data.mobileFriendly.status && (
+                              <p className="seo-audit-meta">🔍 Анализ: {result.data.mobileFriendly.status}</p>
+                            )}
+                            {result.data.mobileFriendly.viewport && (
+                              <div className="seo-audit-technical-details">
+                                <p>📏 Viewport: <code>{result.data.mobileFriendly.viewport}</code></p>
+                              </div>
+                            )}
+                            {result.data.mobileFriendly.hasMediaQueries !== undefined && (
+                              <p className="seo-audit-meta">🎨 CSS Media Queries: {result.data.mobileFriendly.hasMediaQueries ? '✅' : '❌'}</p>
+                            )}
+                            {result.data.mobileFriendly.issues && result.data.mobileFriendly.issues.length > 0 && (
+                              <div className="seo-audit-issues">
+                                <h4>❌ Проблемы мобильности:</h4>
+                                {result.data.mobileFriendly.issues.map((issue, i) => (
+                                  <p key={i} className="seo-audit-issue">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+                            {result.data.mobileFriendly.recommendations && result.data.mobileFriendly.recommendations.length > 0 && (
+                              <div className="seo-audit-warnings">
+                                <h4>💡 Рекомендации:</h4>
+                                {result.data.mobileFriendly.recommendations.map((rec, i) => (
+                                  <p key={i} className="seo-audit-warning">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                            {!result.data.mobileFriendly.isMobileFriendly && (
+                              <p className="seo-audit-tip">📱 Мобильная адаптивность критически важна - более 60% пользователей заходят с мобильных устройств!</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SSL Labs Analysis - Level 3 */}
+                    {result.data.sslLabs && (
+                      <div className="seo-audit-section">
+                        <h3>🛡️ SSL Labs анализ</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${
+                              result.data.sslLabs.grade === 'A+' || result.data.sslLabs.grade === 'A' ? 'good' : 
+                              result.data.sslLabs.grade === 'B' || result.data.sslLabs.grade === 'A-' ? 'warning' : 'error'
+                            }`}>
+                              {result.data.sslLabs.grade === 'A+' ? '🏆' : 
+                               result.data.sslLabs.grade === 'A' || result.data.sslLabs.grade === 'A-' ? '✅' : 
+                               result.data.sslLabs.grade === 'B' ? '⚠️' : '❌'}
+                            </span>
+                            <span className="seo-audit-title">SSL сертификат</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            {result.data.sslLabs.grade ? (
+                              <div>
+                                <p className="seo-audit-value">
+                                  🏅 Оценка SSL Labs: <span className={`ssl-grade grade-${result.data.sslLabs.grade?.replace('+', 'plus').replace('-', 'minus')}`}>
+                                    {result.data.sslLabs.grade}
+                                  </span>
+                                </p>
+                                {result.data.sslLabs.score && (
+                                  <>
+                                    <p className="seo-audit-meta">📊 Балл: {result.data.sslLabs.score}/100</p>
+                                    <div className="seo-audit-score-item">
+                                      <span className="seo-audit-score-label">SSL безопасность</span>
+                                      <div className="seo-audit-score-bar">
+                                        <div 
+                                          className="seo-audit-score-fill" 
+                                          style={{ 
+                                            width: `${result.data.sslLabs.score}%`,
+                                            backgroundColor: getProgressColor(result.data.sslLabs.score)
+                                          }}
+                                        ></div>
+                                      </div>
+                                      <span className="seo-audit-score-value">{result.data.sslLabs.score}/100</span>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <p className="seo-audit-value">
+                                🔍 Статус: {result.data.sslLabs.status === 'IN_PROGRESS' ? 'Анализ в процессе' : 
+                                           result.data.sslLabs.status === 'ERROR' ? 'Ошибка анализа' : 
+                                           result.data.sslLabs.status === 'FALLBACK' ? 'Базовая проверка' : 
+                                           'Анализ недоступен'}
+                              </p>
+                            )}
+                            
+                            {result.data.sslLabs.certificate && (
+                              <div className="seo-audit-technical-details">
+                                <p>🏢 Издатель: <code>{result.data.sslLabs.certificate.issuer}</code></p>
+                                {result.data.sslLabs.certificate.daysUntilExpiry !== null && (
+                                  <p className={`certificate-expiry ${result.data.sslLabs.certificate.daysUntilExpiry < 30 ? 'text-error' : 
+                                                                    result.data.sslLabs.certificate.daysUntilExpiry < 90 ? 'text-warning' : 'text-success'}`}>
+                                    📅 Истекает через: {result.data.sslLabs.certificate.daysUntilExpiry} дней
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                            
+                            {result.data.sslLabs.issues && result.data.sslLabs.issues.length > 0 && (
+                              <div className="seo-audit-issues">
+                                <h4>❌ Проблемы SSL:</h4>
+                                {result.data.sslLabs.issues.map((issue, i) => (
+                                  <p key={i} className="seo-audit-issue">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {result.data.sslLabs.recommendations && result.data.sslLabs.recommendations.length > 0 && (
+                              <div className="seo-audit-warnings">
+                                <h4>💡 Рекомендации:</h4>
+                                {result.data.sslLabs.recommendations.map((rec, i) => (
+                                  <p key={i} className="seo-audit-warning">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {result.data.sslLabs.status === 'IN_PROGRESS' && (
+                              <p className="seo-audit-tip">⏳ SSL Labs анализ может занять несколько минут. Повторите проверку позже для получения детальных результатов.</p>
+                            )}
+                            
+                            {!result.data.sslLabs.hasSSL && (
+                              <p className="seo-audit-tip">🔒 HTTPS является обязательным фактором ранжирования в поисковых системах!</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Техническое SEO */}
+                    <div className="seo-audit-section">
+                      <h3>⚙️ Техническая настройка</h3>
+                      
+                      <div className="seo-audit-item">
+                        <div className="seo-audit-item-header">
+                          <span className={`seo-audit-status ${(result.data.structuredData?.count ?? 0) > 0 ? 'good' : 'warning'}`}>
+                            {(result.data.structuredData?.count ?? 0) > 0 ? '✅' : '❌'}
+                          </span>
+                          <span className="seo-audit-title">Разметка для поисковиков</span>
+                        </div>
+                        <div className="seo-audit-content-block">
+                          {(result.data.structuredData?.count ?? 0) > 0 ? (
+                            <div>
+                              <p className="seo-audit-value">Найдено {result.data.structuredData?.count} блоков структурированных данных</p>
+                              <p className="seo-audit-tip">💡 Это помогает Google лучше понимать содержимое сайта и показывать расширенные сниппеты в поиске.</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="seo-audit-value">Структурированные данные не найдены</p>
+                              <p className="seo-audit-tip">💡 Добавление разметки Schema.org может улучшить отображение сайта в результатах поиска.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
                     {/* SSL и безопасность - Level 2 */}
                     {result.data.ssl && (
@@ -1232,7 +1601,547 @@ const SeoAudit: React.FC = () => {
                               </div>
                             )}
                             {result.data.resourcesSpeed.loadTime && result.data.resourcesSpeed.loadTime > 3000 && (
-                              <p className="seo-audit-tip">💡 Время загрузки больше 3 секунд критично влияет на пользователей и SEO. Рекомендуется оптимизация.</p>
+                              <p className="seo-audit-tip">💡 Время загрузки влияет на рейтинг в поисковых системах. Оптимизируйте размер и код страницы.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Правая колонка */}
+                  <div className="seo-audit-column-right">
+                    {/* Изображения и ссылки */}
+                    {result.data.images && (
+                      <div className="seo-audit-section">
+                        <h3>🖼️ Контент и медиа</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${result.data.images.withoutAlt === 0 ? 'good' : 'warning'}`}>
+                              {result.data.images.withoutAlt === 0 ? '✅' : '⚠️'}
+                            </span>
+                            <span className="seo-audit-title">Alt-тексты изображений</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            <p className="seo-audit-value">
+                              Всего изображений: {result.data.images.total}
+                              {result.data.images.withoutAlt > 0 && (
+                                `, без alt-текста: ${result.data.images.withoutAlt}`
+                              )}
+                            </p>
+                            {result.data.performance?.images_alt_score !== undefined && (
+                              <div className="seo-audit-score-item">
+                                <span className="seo-audit-score-label">Оценка ALT</span>
+                                <div className="seo-audit-score-bar">
+                                  <div 
+                                    className="seo-audit-score-fill" 
+                                    style={{ 
+                                      width: `${result.data.performance.images_alt_score}%`,
+                                      backgroundColor: getProgressColor(result.data.performance.images_alt_score)
+                                    }}
+                                  ></div>
+                                </div>
+                                <span className="seo-audit-score-value">{result.data.performance.images_alt_score}/100</span>
+                              </div>
+                            )}
+                            {result.data.images.withoutAlt > 0 && (
+                              <p className="seo-audit-tip">💡 Alt-тексты помогают поисковикам понять содержимое изображений и важны для доступности сайта.</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Анализ контента */}
+                        {result.data.performance && (
+                          <div className="seo-audit-item">
+                            <div className="seo-audit-item-header">
+                              <span className={`seo-audit-status ${(result.data.performance.wordCount || 0) >= 300 ? 'good' : 'warning'}`}>
+                                {(result.data.performance.wordCount || 0) >= 300 ? '✅' : '⚠️'}
+                              </span>
+                              <span className="seo-audit-title">Объем контента</span>
+                            </div>
+                            <div className="seo-audit-content-block">
+                              <p className="seo-audit-value">
+                                Слов на странице: {result.data.performance.wordCount || 0}
+                              </p>
+                              <p className="seo-audit-meta">
+                                Размер HTML: {result.data.performance.htmlSizeKB || 0} KB
+                                {result.data.performance.textToHtmlRatio && 
+                                  `, соотношение текст/код: ${result.data.performance.textToHtmlRatio}%`
+                                }
+                              </p>
+                              {result.data.performance.content_score !== undefined && (
+                                <div className="seo-audit-score-item">
+                                  <span className="seo-audit-score-label">Контент</span>
+                                  <div className="seo-audit-score-bar">
+                                    <div 
+                                      className="seo-audit-score-fill" 
+                                      style={{ 
+                                        width: `${result.data.performance.content_score}%`,
+                                        backgroundColor: getProgressColor(result.data.performance.content_score)
+                                      }}
+                                    ></div>
+                                  </div>
+                                  <span className="seo-audit-score-value">{result.data.performance.content_score}/100</span>
+                                </div>
+                              )}
+                              {(result.data.performance.wordCount || 0) < 300 && (
+                                <p className="seo-audit-tip">💡 Рекомендуется минимум 300 слов для хорошего ранжирования в поисковых системах.</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Анализ ключевых слов */}
+                    {result.data.keywordAnalysis && (
+                      <div className="seo-audit-section">
+                        <h3>🎯 Анализ ключевых слов</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className="seo-audit-status good">📊</span>
+                            <span className="seo-audit-title">Плотность ключевых слов</span>
+                          </div>
+                          
+                          <div className="keyword-zones-info">
+                            <div className="keyword-zone">
+                              <div className="keyword-zone-color" style={{ backgroundColor: '#F59E0B' }}></div>
+                              <span className="keyword-zone-text">&lt; 0,5% — встречается редко (мало для SEO)</span>
+                            </div>
+                            <div className="keyword-zone">
+                              <div className="keyword-zone-color" style={{ backgroundColor: '#10B981' }}></div>
+                              <span className="keyword-zone-text">0,5-3% — оптимальная зона</span>
+                            </div>
+                            <div className="keyword-zone">
+                              <div className="keyword-zone-color" style={{ backgroundColor: '#EF4444' }}></div>
+                              <span className="keyword-zone-text">&gt; 3% — может быть переспамлено</span>
+                            </div>
+                          </div>
+                          
+                          <div className="seo-audit-content-block">
+                            {Object.entries(result.data.keywordAnalysis.keywordDensity || {}).map(([keyword, data]) => (
+                              <div key={keyword} className="seo-audit-keyword-item">
+                                <div className="seo-audit-keyword-header">
+                                  <span className="seo-audit-keyword-name">"{keyword}"</span>
+                                  <span className="seo-audit-keyword-stats">{data.count} раз ({data.density}%)</span>
+                                </div>
+                                <div className="seo-audit-keyword-bar">
+                                  <div 
+                                    className="seo-audit-keyword-fill" 
+                                    style={{ 
+                                      width: `${Math.min((data.density / 5) * 100, 100)}%`,
+                                      backgroundColor: getKeywordColor(data.density)
+                                    }}
+                                  ></div>
+                                </div>
+                                <div className="keyword-scale-labels">
+                                  <span className="scale-label">0%</span>
+                                  <span className="scale-label">0,3%</span>
+                                  <span className="scale-label">1,5%</span>
+                                  <span className="scale-label">2,5%</span>
+                                  <span className="scale-label">3,5%</span>
+                                  <span className="scale-label">4,5%</span>
+                                  <span className="scale-label">5%+</span>
+                                </div>
+                              </div>
+                            ))}
+                            {result.data.keywordAnalysis.recommendations.length > 0 && (
+                              <div className="seo-audit-recommendations">
+                                {result.data.keywordAnalysis.recommendations?.map((rec, index) => (
+                                  <p key={index} className="seo-audit-tip">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Анализ ссылочного профиля */}
+                    {result.data.linkProfile && (
+                      <div className="seo-audit-section">
+                        <h3>🔗 Ссылочный профиль</h3>
+                        
+                        <div className="seo-audit-info-block">
+                          <p><strong>Анализ ссылочного профиля</strong> помогает оценить качество внутренней и внешней перелинковки сайта:</p>
+                          <ul>
+                            <li><strong>Внутренние ссылки</strong> - ссылки между страницами вашего сайта, улучшают навигацию и распределение веса</li>
+                            <li><strong>Внешние ссылки</strong> - ссылки на другие сайты, должны быть качественными и релевантными</li>
+                            <li><strong>Анкорный текст</strong> - текст ссылок, влияет на понимание контента поисковыми системами</li>
+                          </ul>
+                        </div>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${
+                              result.data.linkProfile.score >= 80 ? 'good' : 
+                              result.data.linkProfile.score >= 50 ? 'warning' : 'error'
+                            }`}>
+                              {result.data.linkProfile.score >= 80 ? '🏆' : 
+                               result.data.linkProfile.score >= 50 ? '👍' : '📈'}
+                            </span>
+                            <span className="seo-audit-title">Качество ссылок</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            <p className="seo-audit-value">
+                              📊 Оценка ссылочного профиля: <span className={
+                                result.data.linkProfile.score >= 80 ? 'text-success' : 
+                                result.data.linkProfile.score >= 50 ? 'text-warning' : 'text-error'
+                              }>
+                                {result.data.linkProfile.score}/{result.data.linkProfile.maxScore}
+                              </span>
+                            </p>
+                            
+                            <div className="seo-audit-score-item">
+                              <span className="seo-audit-score-label">Ссылочный профиль</span>
+                              <div className="seo-audit-score-bar">
+                                <div 
+                                  className="seo-audit-score-fill" 
+                                  style={{ 
+                                    width: `${result.data.linkProfile.score}%`,
+                                    backgroundColor: getProgressColor(result.data.linkProfile.score)
+                                  }}
+                                ></div>
+                              </div>
+                              <span className="seo-audit-score-value">{result.data.linkProfile.score}/100</span>
+                            </div>
+
+                            <div className="link-profile-stats">
+                              <div className="link-stat-section">
+                                <h5>🔗 Внутренние ссылки</h5>
+                                <p className="link-stat-description">
+                                  <small>Внутренние ссылки соединяют страницы вашего сайта и помогают поисковым системам понять структуру сайта</small>
+                                </p>
+                                <div className="link-stats-grid">
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">📊 Всего внутренних ссылок:</span>
+                                    <span className={`stat-value ${result.data.linkProfile.internal.total >= 10 ? 'text-success' : 'text-warning'}`}>
+                                      {result.data.linkProfile.internal.total}
+                                    </span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🔗 Уникальных URL адресов:</span>
+                                    <span className="stat-value">{result.data.linkProfile.internal.unique.length}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">📝 Разных текстов ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.ratios.anchorDiversity}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">⭐ Общее качество:</span>
+                                    <span className={`stat-value quality-${result.data.linkProfile.internal.quality}`}>
+                                      {result.data.linkProfile.internal.quality === 'excellent' ? '🏆 Отлично' :
+                                       result.data.linkProfile.internal.quality === 'good' ? '✅ Хорошо' :
+                                       result.data.linkProfile.internal.quality === 'fair' ? '⚠️ Средне' : '❌ Плохо'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="link-stat-section">
+                                <h5>🌐 Внешние ссылки</h5>
+                                <p className="link-stat-description">
+                                  <small>Ссылки на внешние сайты должны быть релевантными и вести на качественные ресурсы</small>
+                                </p>
+                                <div className="link-stats-grid">
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🌐 Всего внешних ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.external.total}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🏢 Разных сайтов:</span>
+                                    <span className="stat-value">{Object.keys(result.data.linkProfile.external.domains).length}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🚫 Nofollow ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.external.nofollow} ({result.data.linkProfile.ratios.nofollowRatio}%)</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">✅ Dofollow ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.external.dofollow}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="link-ratios">
+                                <h5>📊 Ключевые соотношения</h5>
+                                <p className="link-stat-description">
+                                  <small>Рекомендуемое соотношение внутренних к внешним ссылкам: 3:1 или больше</small>
+                                </p>
+                                <div className="ratio-item">
+                                  <span className="ratio-label">⚖️ Баланс внутренних к внешним ссылкам:</span>
+                                  <span className={`ratio-value ${result.data.linkProfile.ratios.internalToExternal >= 3 ? 'text-success' : 
+                                                                 result.data.linkProfile.ratios.internalToExternal >= 1.5 ? 'text-warning' : 'text-error'}`}>
+                                    {result.data.linkProfile.ratios.internalToExternal}:1
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {Object.keys(result.data.linkProfile.external.domains).length > 0 && (
+                              <div className="external-domains">
+                                <h5>🌍 Топ внешних доменов:</h5>
+                                <div className="domains-list">
+                                  {Object.entries(result.data.linkProfile.external.domains)
+                                    .sort(([,a], [,b]) => b - a)
+                                    .slice(0, 5)
+                                    .map(([domain, count]) => (
+                                    <div key={domain} className="domain-item">
+                                      <span className="domain-name">{domain}</span>
+                                      <span className="domain-count">{count} ссылок</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {result.data.linkProfile.external.social.length > 0 && (
+                              <div className="social-links">
+                                <h5>📱 Социальные сети:</h5>
+                                <div className="social-list">
+                                  {result.data.linkProfile.external.social.slice(0, 3).map((social, index) => (
+                                    <span key={index} className="social-badge">{social}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {result.data.linkProfile.issues.length > 0 && (
+                              <div className="link-profile-issues">
+                                <h5>⚠️ Проблемы:</h5>
+                                {result.data.linkProfile.issues.map((issue, index) => (
+                                  <p key={index} className="seo-audit-error">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+
+                            {result.data.linkProfile.recommendations.length > 0 && (
+                              <div className="link-profile-recommendations">
+                                <h5>💡 Рекомендации:</h5>
+                                {result.data.linkProfile.recommendations.map((rec, index) => (
+                                  <p key={index} className="seo-audit-tip">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Анализ потенциала Sitelinks */}
+                    {result.data.sitelinks && (
+                      <div className="seo-audit-section">
+                        <h3>🔗 Потенциал для Sitelinks</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${
+                              result.data.sitelinks.status === 'excellent' ? 'good' : 
+                              result.data.sitelinks.status === 'good' ? 'warning' : 'error'
+                            }`}>
+                              {result.data.sitelinks.status === 'excellent' ? '🏆' : 
+                               result.data.sitelinks.status === 'good' ? '👍' : '📈'}
+                            </span>
+                            <span className="seo-audit-title">Готовность к Sitelinks</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            <p className="seo-audit-value">
+                              📊 Оценка потенциала: <span className={
+                                result.data.sitelinks.score >= 80 ? 'text-success' : 
+                                result.data.sitelinks.score >= 50 ? 'text-warning' : 'text-error'
+                              }>
+                                {result.data.sitelinks.score}/{result.data.sitelinks.maxScore}
+                              </span>
+                            </p>
+                            
+                            <div className="seo-audit-score-item">
+                              <span className="seo-audit-score-label">Sitelinks потенциал</span>
+                              <div className="seo-audit-score-bar">
+                                <div 
+                                  className="seo-audit-score-fill" 
+                                  style={{ 
+                                    width: `${result.data.sitelinks.score}%`,
+                                    backgroundColor: getProgressColor(result.data.sitelinks.score)
+                                  }}
+                                ></div>
+                              </div>
+                              <span className="seo-audit-score-value">{result.data.sitelinks.score}/100</span>
+                            </div>
+
+                            <div className="sitelinks-analysis">
+                              <div className="sitelinks-metric">
+                                <span className="metric-label">🧭 Навигация:</span>
+                                <span className={`metric-value ${result.data.sitelinks.navigation.hasMainMenu ? 'text-success' : 'text-error'}`}>
+                                  {result.data.sitelinks.navigation.hasMainMenu ? 
+                                    `${result.data.sitelinks.navigation.menuItemsCount} пунктов меню` : 
+                                    'Меню не найдено'
+                                  }
+                                </span>
+                              </div>
+                              
+                              <div className="sitelinks-metric">
+                                <span className="metric-label">🔗 Внутренние ссылки:</span>
+                                <span className="metric-value">
+                                  {result.data.sitelinks.linkingProfile.internalLinksCount}
+                                  {result.data.sitelinks.linkingProfile.navigationLinksCount > 0 && 
+                                    ` (навигационных: ${result.data.sitelinks.linkingProfile.navigationLinksCount})`
+                                  }
+                                </span>
+                              </div>
+                              
+                              <div className="sitelinks-metric">
+                                <span className="metric-label">📂 Средняя глубина URL:</span>
+                                <span className={`metric-value ${result.data.sitelinks.urlStructure.avgUrlDepth <= 3 ? 'text-success' : 'text-warning'}`}>
+                                  {result.data.sitelinks.urlStructure.avgUrlDepth} уровня
+                                </span>
+                              </div>
+                            </div>
+
+                            {result.data.sitelinks.linkingProfile.topSections.length > 0 && (
+                              <div className="sitelinks-sections">
+                                <h5>📁 Основные разделы сайта:</h5>
+                                <div className="sections-list">
+                                  {result.data.sitelinks.linkingProfile.topSections.slice(0, 6).map((section, index) => (
+                                    <div key={index} className="section-item">
+                                      <span className="section-name">/{section.name}</span>
+                                      <span className="section-count">{section.linkCount} ссылок</span>
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className="seo-audit-tip">
+                                  💡 Эти разделы имеют наибольший потенциал для показа в Sitelinks
+                                </p>
+                              </div>
+                            )}
+
+                            {result.data.sitelinks.issues.length > 0 && (
+                              <div className="sitelinks-issues">
+                                <h5>⚠️ Проблемы:</h5>
+                                {result.data.sitelinks.issues.map((issue, index) => (
+                                  <p key={index} className="seo-audit-error">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+
+                            {result.data.sitelinks.recommendations.length > 0 && (
+                              <div className="sitelinks-recommendations">
+                                <h5>💡 Рекомендации:</h5>
+                                {result.data.sitelinks.recommendations.map((rec, index) => (
+                                  <p key={index} className="seo-audit-tip">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Security Headers Analysis - Level 3 */}
+                    {result.data.securityHeaders && (
+                      <div className="seo-audit-section">
+                        <h3>🛡️ Заголовки безопасности</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${
+                              result.data.securityHeaders.grade === 'A+' || result.data.securityHeaders.grade === 'A' ? 'good' : 
+                              result.data.securityHeaders.grade === 'B' || result.data.securityHeaders.grade === 'C' ? 'warning' : 'error'
+                            }`}>
+                              {result.data.securityHeaders.grade === 'A+' ? '🏆' : 
+                               result.data.securityHeaders.grade === 'A' ? '✅' : 
+                               result.data.securityHeaders.grade === 'B' || result.data.securityHeaders.grade === 'C' ? '⚠️' : '❌'}
+                            </span>
+                            <span className="seo-audit-title">Security Headers</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            {result.data.securityHeaders.grade ? (
+                              <div>
+                                <p className="seo-audit-value">
+                                  🏅 Оценка безопасности: <span className={`security-grade grade-${result.data.securityHeaders.grade?.replace('+', 'plus')}`}>
+                                    {result.data.securityHeaders.grade}
+                                  </span>
+                                </p>
+                                <p className="seo-audit-meta">📊 Балл: {result.data.securityHeaders.score}/100</p>
+                                <div className="seo-audit-score-item">
+                                  <span className="seo-audit-score-label">Безопасность</span>
+                                  <div className="seo-audit-score-bar">
+                                    <div 
+                                      className="seo-audit-score-fill" 
+                                      style={{ 
+                                        width: `${result.data.securityHeaders.score}%`,
+                                        backgroundColor: getProgressColor(result.data.securityHeaders.score)
+                                      }}
+                                    ></div>
+                                  </div>
+                                  <span className="seo-audit-score-value">{result.data.securityHeaders.score}/100</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="seo-audit-value">🔍 Статус: {result.data.securityHeaders.summary.status}</p>
+                            )}
+                            
+                            <div className="security-summary">
+                              <div className="security-stat">
+                                <span className="stat-label">🛡️ Настроено:</span>
+                                <span className="stat-value">{result.data.securityHeaders.summary.total}</span>
+                              </div>
+                              <div className="security-stat">
+                                <span className="stat-label">🚨 Критичных:</span>
+                                <span className="stat-value">{result.data.securityHeaders.summary.critical}</span>
+                              </div>
+                              <div className="security-stat">
+                                <span className="stat-label">❌ Отсутствует:</span>
+                                <span className="stat-value">{result.data.securityHeaders.summary.missing}</span>
+                              </div>
+                            </div>
+
+                            {result.data.securityHeaders.missing && result.data.securityHeaders.missing.length > 0 && (
+                              <div className="security-missing">
+                                <h4>❌ Отсутствующие заголовки:</h4>
+                                <div className="missing-headers-grid">
+                                  {result.data.securityHeaders.missing.slice(0, 6).map((header, i) => (
+                                    <span key={i} className="missing-header-tag">{header}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {Object.keys(result.data.securityHeaders.headers).length > 0 && (
+                              <div className="security-present">
+                                <h4>✅ Настроенные заголовки:</h4>
+                                <div className="present-headers-list">
+                                  {Object.keys(result.data.securityHeaders.headers).map((header, i) => (
+                                    <div key={i} className="present-header-item">
+                                      <span className="header-name">{header}</span>
+                                      <span className="header-status">✓</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {result.data.securityHeaders.issues && result.data.securityHeaders.issues.length > 0 && (
+                              <div className="seo-audit-issues">
+                                <h4>🚨 Проблемы безопасности:</h4>
+                                {result.data.securityHeaders.issues.map((issue, i) => (
+                                  <p key={i} className="seo-audit-issue">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {result.data.securityHeaders.recommendations && result.data.securityHeaders.recommendations.length > 0 && (
+                              <div className="seo-audit-warnings">
+                                <h4>💡 Рекомендации:</h4>
+                                {result.data.securityHeaders.recommendations.slice(0, 4).map((rec, i) => (
+                                  <p key={i} className="seo-audit-warning">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {result.data.securityHeaders.score < 50 && (
+                              <p className="seo-audit-tip">🔒 Заголовки безопасности критически важны для защиты пользователей и SEO!</p>
                             )}
                           </div>
                         </div>
@@ -1246,7 +2155,7 @@ const SeoAudit: React.FC = () => {
                   <div className="seo-audit-action-plan">
                     <h3>🎯 Персональный план действий</h3>
                     <div className="action-plan-grid">
-                      {result.data.actionPlan.slice(0, 6).map((action, index) => (
+                      {result.data.actionPlan.slice(0, actionPlanToShow).map((action, index) => (
                         <div key={index} className={`action-plan-item priority-${action.priority}`}>
                           <div className="action-plan-header">
                             <span className={`action-priority-badge ${action.priority}`}>
@@ -1278,6 +2187,18 @@ const SeoAudit: React.FC = () => {
                         </div>
                       ))}
                     </div>
+                    {result.data.actionPlan.length > 6 && (
+                      <div className="action-plan-controls">
+                        <button
+                          className="show-more-button"
+                          onClick={() => setActionPlanToShow(prev => prev === 6 ? result.data.actionPlan!.length : 6)}
+                        >
+                          {actionPlanToShow === 6 
+                            ? `Показать все рекомендации (${result.data.actionPlan.length})` 
+                            : 'Показать топ-6'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
