@@ -31,6 +31,7 @@ import WordGluingTool from './pages/WordGluingTool';
 import RemoveLineBreaksTool from './pages/RemoveLineBreaksTool';
 import TextByColumnsTool from './pages/TextByColumnsTool';
 import MatchTypesTool from './pages/MatchTypesTool';
+import SiteAudit from './pages/SiteAudit';
 import AdminPanel from './pages/AdminPanel';
 import './styles/tool-pages.css';
 
@@ -88,6 +89,7 @@ function App() {
             <Route path="remove-line-breaks" element={<RemoveLineBreaksTool />} />
             <Route path="text-by-columns" element={<TextByColumnsTool />} />
             <Route path="match-types" element={<MatchTypesTool />} />
+            <Route path="site-audit" element={<SiteAudit />} />
           </Route>
         </Routes>
       </Router>

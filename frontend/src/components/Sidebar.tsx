@@ -47,7 +47,8 @@ const Sidebar: React.FC = () => {
     'match-types',           // Типы соответствия
     'number-generator',      // Генератор чисел
     'password-generator',    // Генератор паролей
-    'emoji'                  // Эмодзи
+    'emoji',                 // Эмодзи
+    'site-audit'             // Аудит сайта
   ];
   
   // Список инструментов с ИИ интеграцией

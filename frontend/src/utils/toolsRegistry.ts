@@ -150,6 +150,11 @@ export const TOOLS_REGISTRY: Record<string, ToolInfo> = {
     id: 'cross-analytics',
     name: 'Сквозная аналитика',
     description: 'Аналитика взаимодействий'
+  },
+  'site-audit': {
+    id: 'site-audit',
+    name: 'Аудит сайта',
+    description: 'Комплексный анализ технологий и аналитики сайта'
   }
 };
 

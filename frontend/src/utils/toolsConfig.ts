@@ -217,6 +217,15 @@ export const toolsConfig: Tool[] = [
     icon: '/icons/tool_emoji.svg',
     path: '/emoji',
     category: 'text-processing'
+  },
+  {
+    id: 'site-audit',
+    title: 'Аудит сайта',
+    description: 'Комплексный анализ технологий и аналитики сайта',
+    icon: '/icons/tool_audit_site.svg',
+    path: '/site-audit',
+    category: 'analytics',
+    status: 'ready'
   }
 ];
 

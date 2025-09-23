@@ -41,7 +41,8 @@
       "match-types": "Match Types",
       "add-symbol": "Add Symbol",
       "duplicate-finder": "Duplicate Finder",
-      "cross-analytics": "Cross Analytics"
+      "cross-analytics": "Cross Analytics",
+      "site-audit": "Site Audit"
     },
     "descriptions": {
       "case-changer": "Tool for changing text case",
@@ -77,7 +78,8 @@
       "match-types": "Determine match types",
       "add-symbol": "Add symbols to text",
       "duplicate-finder": "Find duplicate content",
-      "cross-analytics": "Cross-platform analytics"
+      "cross-analytics": "Cross-platform analytics",
+      "site-audit": "Comprehensive analysis of website technologies and analytics"
     }
   },
   "common": {

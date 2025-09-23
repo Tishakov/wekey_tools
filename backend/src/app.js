@@ -98,6 +98,7 @@ try {
   const usersRoutes = require('./routes/users');
   const analyticsRoutes = require('./routes/analytics');
   const toolsRoutes = require('./routes/tools');
+  const siteAuditRoutes = require('./routes/siteAudit');
 
   app.use('/api/auth', authRoutes);
   app.use('/auth', oauthRoutes); // OAuth маршруты без /api префикса
@@ -106,6 +107,7 @@ try {
   app.use('/api/analytics', analyticsRoutes); // Подключаем User tracking аналитику
   app.use('/api/users', usersRoutes);
   app.use('/api', toolsRoutes); // Подключаем управление инструментами
+  app.use('/api/tools', siteAuditRoutes); // Подключаем анализ сайтов
   
   console.log('✅ All routes registered successfully');
 } catch (error) {
