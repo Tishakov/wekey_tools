@@ -1344,7 +1344,38 @@ const SeoAudit: React.FC = () => {
 
                     {/* Социальные сети - перенесено из правой колонки для баланса */}
                     <div className="seo-audit-section">
-                      <h3>📱 Социальные сети</h3>
+                      <h3 
+                        className="seo-audit-section-header" 
+                        onClick={() => toggleSection('social-networks')}
+                        style={{ 
+                          cursor: 'pointer', 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center',
+                          marginBottom: collapsedSections.has('social-networks') ? '0px' : undefined,
+                          transition: 'margin-bottom 0.4s ease-in-out'
+                        }}
+                      >
+                        📱 Социальные сети
+                        <img 
+                          src="/icons/arrow_circle.svg" 
+                          alt="" 
+                          style={{ 
+                            width: '20px', 
+                            height: '20px',
+                            transform: collapsedSections.has('social-networks') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.4s ease-in-out'
+                          }}
+                        />
+                      </h3>
+                      <div 
+                        className="seo-audit-section-content"
+                        style={{
+                          overflow: 'hidden',
+                          maxHeight: collapsedSections.has('social-networks') ? '0px' : '1000px',
+                          transition: 'max-height 0.4s ease-in-out',
+                        }}
+                      >
                       
                       <div className="seo-audit-item">
                         <div className="seo-audit-item-header">
@@ -1374,6 +1405,7 @@ const SeoAudit: React.FC = () => {
                             </div>
                           )}
                         </div>
+                      </div>
                       </div>
                     </div>
 
