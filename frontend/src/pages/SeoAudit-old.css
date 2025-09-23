@@ -1,0 +1,520 @@
+/* SEO Audit Tool Specific Styles */
+.seo-audit-tool {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px 0;
+}
+
+/* Header */
+.seo-audit-header-island {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px 32px;
+  margin: 0 auto 24px;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.seo-audit-back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.seo-audit-back-button:hover {
+  color: #4a90e2;
+}
+
+.seo-audit-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.seo-audit-header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.seo-audit-header-btn {
+  background: rgba(74, 144, 226, 0.1);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #4a90e2;
+  font-weight: 500;
+}
+
+.seo-audit-header-btn:hover {
+  background: rgba(74, 144, 226, 0.15);
+  border-color: rgba(74, 144, 226, 0.3);
+}
+
+.seo-audit-counter-btn .seo-audit-counter {
+  background: #4a90e2;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.seo-audit-icon-only {
+  padding: 8px;
+}
+
+/* Main Workspace */
+.seo-audit-main-workspace {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Input Section */
+.seo-audit-input-row {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.seo-audit-url-container {
+  width: 100%;
+}
+
+.seo-audit-url-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.seo-audit-url-field {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all 0.2s;
+  background: white;
+}
+
+.seo-audit-url-field:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.seo-audit-url-field::placeholder {
+  color: #9ca3af;
+}
+
+/* Control Buttons */
+.seo-audit-control-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.seo-audit-action-btn {
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.seo-audit-primary {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: white;
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.3);
+}
+
+.seo-audit-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+.seo-audit-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.seo-audit-secondary {
+  background: rgba(255, 255, 255, 0.95);
+  color: #4a90e2;
+  border: 2px solid rgba(74, 144, 226, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.seo-audit-secondary:hover:not(:disabled) {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: rgba(74, 144, 226, 0.3);
+  transform: translateY(-1px);
+}
+
+.seo-audit-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.seo-audit-icon-left img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Results Container */
+.seo-audit-results-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Loading State */
+.seo-audit-loading-state {
+  padding: 60px 40px;
+  text-align: center;
+  color: #666;
+}
+
+.seo-audit-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e1e5e9;
+  border-top: 3px solid #4a90e2;
+  border-radius: 50%;
+  animation: seo-audit-spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes seo-audit-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.seo-audit-loading-note {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-top: 8px;
+}
+
+/* Error State */
+.seo-audit-error-state {
+  padding: 40px;
+  text-align: center;
+  color: #e74c3c;
+}
+
+.seo-audit-error-help {
+  color: #666;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+/* Content */
+.seo-audit-content {
+  padding: 32px 40px;
+}
+
+.seo-audit-content-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 32px 0;
+  text-align: center;
+}
+
+/* SEO Summary */
+.seo-audit-summary {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 1px solid #dee2e6;
+}
+
+.seo-audit-summary h3 {
+  color: #2c3e50;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.seo-audit-scores {
+  display: grid;
+  gap: 16px;
+}
+
+.seo-audit-score-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.seo-audit-score-label {
+  min-width: 100px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.seo-audit-score-bar {
+  flex: 1;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.seo-audit-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997, #17a2b8);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.seo-audit-score-value {
+  font-weight: 600;
+  color: #495057;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* Groups */
+.seo-audit-group {
+  margin-bottom: 32px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.seo-audit-group h3 {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: white;
+  margin: 0;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Items */
+.seo-audit-item {
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+  transition: all 0.2s;
+}
+
+.seo-audit-item:last-child {
+  border-bottom: none;
+}
+
+.seo-audit-item:hover {
+  background: #fafbfc;
+}
+
+.seo-audit-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.seo-audit-status {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.seo-audit-good {
+  color: #28a745;
+}
+
+.seo-audit-warning {
+  color: #ffc107;
+}
+
+.seo-audit-error {
+  color: #dc3545;
+}
+
+.seo-audit-info {
+  color: #17a2b8;
+}
+
+.seo-audit-item-title {
+  font-size: 16px;
+}
+
+.seo-audit-item-content {
+  padding: 0 24px 20px 60px;
+}
+
+.seo-audit-value {
+  font-size: 14px;
+  color: #495057;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.seo-audit-meta {
+  font-size: 13px;
+  color: #6c757d;
+  margin: 4px 0;
+}
+
+.seo-audit-tip {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  color: #856404;
+  margin: 8px 0 0 0;
+  line-height: 1.4;
+}
+
+/* Social Preview */
+.seo-audit-social-preview {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.seo-audit-social-preview p {
+  margin: 4px 0;
+}
+
+/* Headings Summary */
+.seo-audit-headings-summary {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.seo-audit-heading-stat {
+  background: #e9ecef;
+  color: #495057;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .seo-audit-tool {
+    padding: 15px 0;
+  }
+
+  .seo-audit-header-island {
+    padding: 16px 20px;
+    margin: 0 15px 20px;
+  }
+
+  .seo-audit-title {
+    font-size: 20px;
+  }
+
+  .seo-audit-header-buttons {
+    gap: 8px;
+  }
+
+  .seo-audit-main-workspace {
+    padding: 0 15px;
+  }
+
+  .seo-audit-input-row {
+    padding: 20px;
+  }
+
+  .seo-audit-url-field {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+
+  .seo-audit-control-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .seo-audit-action-btn {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .seo-audit-content {
+    padding: 24px 20px;
+  }
+
+  .seo-audit-content-title {
+    font-size: 24px;
+  }
+
+  .seo-audit-summary {
+    padding: 20px;
+  }
+
+  .seo-audit-item-header {
+    padding: 12px 16px;
+  }
+
+  .seo-audit-item-content {
+    padding: 0 16px 16px 44px;
+  }
+
+  .seo-audit-score-item {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .seo-audit-score-label {
+    min-width: auto;
+  }
+
+  .seo-audit-score-value {
+    text-align: left;
+  }
+
+  .seo-audit-headings-summary {
+    gap: 8px;
+  }
+}

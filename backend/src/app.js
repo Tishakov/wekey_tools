@@ -322,7 +322,10 @@ app.use((err, req, res, next) => {
   console.error('❌ Global Error Handler:', err);
   console.error('Stack:', err.stack);
   
-  res.status(err.status || 500).json({ 
+  // Убеждаемся что statusCode это число
+  const statusCode = err.statusCode || 500;
+  
+  res.status(statusCode).json({ 
     success: false,
     error: 'Internal server error',
     message: err.message,

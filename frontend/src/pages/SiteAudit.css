@@ -390,33 +390,6 @@
   }
 }
 
-/* SEO секция */
-.seo-info .info-item {
-  margin-bottom: 8px;
-}
-
-.seo-info .info-meta {
-  color: #8892b0;
-  font-size: 0.9em;
-  margin-left: 8px;
-}
-
-.seo-features {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.feature-tag {
-  background: #112240;
-  color: #64ffda;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.85em;
-  border: 1px solid #233554;
-}
-
 .headings-info {
   margin-top: 12px;
   padding: 8px;
@@ -600,4 +573,96 @@
   .security-tags {
     justify-content: flex-start;
   }
+}
+
+/* SEO Recommendation блок */
+.seo-recommendation {
+  background: linear-gradient(135deg, #1a4d3a 0%, #2d6b4f 100%);
+  border: 1px solid #09CEA7;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.recommendation-text {
+  color: #E0E0E0;
+  margin: 0 0 15px 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.recommendation-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #09CEA7;
+  color: #0A0A0A;
+  padding: 12px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.recommendation-button:hover {
+  background: #07b396;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(9, 206, 167, 0.3);
+}
+
+/* Мобильная адаптация для рекомендации */
+@media (max-width: 768px) {
+  .seo-recommendation {
+    padding: 15px;
+  }
+  
+  .recommendation-text {
+    font-size: 0.9rem;
+  }
+  
+  .recommendation-button {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* SEO Recommendation блок */
+.seo-recommendation {
+  background: linear-gradient(135deg, #1a4d3a 0%, #2d6b4f 100%);
+  border: 1px solid #09CEA7;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.recommendation-text {
+  color: #E0E0E0;
+  margin: 0 0 15px 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.recommendation-button {
+  display: inline-block;
+  background: linear-gradient(135deg, #09CEA7 0%, #07B299 100%);
+  color: #1C1D1F;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.recommendation-button:hover {
+  background: linear-gradient(135deg, #07B299 0%, #059688 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(9, 206, 167, 0.3);
+  color: #1C1D1F;
+  text-decoration: none;
 }

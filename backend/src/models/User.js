@@ -114,6 +114,19 @@ module.exports = (sequelize) => {
     loginCount: {
       type: DataTypes.INTEGER,
       defaultValue: 0
+    },
+    // Google API токены для Search Console
+    googleAccessToken: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    googleRefreshToken: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    googleTokenExpiry: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     tableName: 'users',

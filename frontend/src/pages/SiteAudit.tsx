@@ -5,6 +5,8 @@ import { useAuthRequired } from '../hooks/useAuthRequired';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './SiteAudit.css';
 import '../styles/tool-pages.css';
 
@@ -94,7 +96,7 @@ interface AuditResult {
 const SiteAudit: React.FC = () => {
   const { t } = useTranslation();
   const { createLink } = useLocalizedLink();
-  const { requireAuth } = useAuthRequired();
+  const { requireAuth, isAuthRequiredModalOpen, isAuthModalOpen, closeAuthRequiredModal, closeAuthModal, openAuthModal } = useAuthRequired();
   const { user } = useAuth();
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<AuditResult | null>(null);
@@ -531,6 +533,18 @@ const SiteAudit: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Модальные окна */}
+      <AuthRequiredModal 
+        isOpen={isAuthRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        onLoginClick={openAuthModal}
+      />
+      
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+      />
     </div>
   );
 };

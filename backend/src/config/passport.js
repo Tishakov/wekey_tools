@@ -33,7 +33,7 @@ passport.use(new GoogleStrategy({
   clientID: config.google.clientId,
   clientSecret: config.google.clientSecret,
   callbackURL: config.google.redirectUri,
-  scope: ['profile', 'email']
+  scope: ['profile', 'email', 'https://www.googleapis.com/auth/webmasters.readonly']
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log('🔍 Google OAuth Profile received:', {
@@ -58,11 +58,18 @@ passport.use(new GoogleStrategy({
 
     if (user) {
       console.log('✅ Found existing user by Google ID:', user.email);
-      // Пользователь найден - обновляем avatar если изменился
+      // Пользователь найден - обновляем токены и avatar
+      user.googleAccessToken = accessToken;
+      if (refreshToken) {
+        user.googleRefreshToken = refreshToken;
+      }
+      // Устанавливаем время истечения токена (обычно 1 час)
+      user.googleTokenExpiry = new Date(Date.now() + 3600 * 1000);
+      
       if (profile.photos && profile.photos[0] && user.avatar !== profile.photos[0].value) {
         user.avatar = profile.photos[0].value;
-        await user.save();
       }
+      await user.save();
       return done(null, user);
     }
 
@@ -99,6 +106,14 @@ passport.use(new GoogleStrategy({
       if (profile.photos && profile.photos[0]) {
         user.avatar = profile.photos[0].value;
       }
+      
+      // Сохраняем токены для Search Console API
+      user.googleAccessToken = accessToken;
+      if (refreshToken) {
+        user.googleRefreshToken = refreshToken;
+      }
+      user.googleTokenExpiry = new Date(Date.now() + 3600 * 1000);
+      
       await user.save();
       return done(null, user);
     }
@@ -122,7 +137,10 @@ passport.use(new GoogleStrategy({
       avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
       isGoogleUser: true,
       isEmailVerified: true, // Google email уже верифицирован
-      role: 'user'
+      role: 'user',
+      googleAccessToken: accessToken,
+      googleRefreshToken: refreshToken,
+      googleTokenExpiry: new Date(Date.now() + 3600 * 1000)
       // НЕ устанавливаем password для Google пользователей
     };
     

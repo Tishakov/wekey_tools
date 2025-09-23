@@ -1,0 +1,450 @@
+/* SeoAudit.css - CSS для SEO Аудита, аналогичный SiteAudit.css но с seo-audit префиксом */
+
+/* Переопределение main-workspace для вертикального layout */
+.seo-audit-tool .main-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Audit Row - структура как в UtmGeneratorTool */
+.seo-audit-row {
+  width: 100%;
+  max-width: 910px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Audit URL Container - аналог url-container */
+.seo-audit-url-container {
+  width: 100%;
+  max-width: 910px;
+  background-color: #28282A;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+/* Audit URL Wrapper - аналог url-input-wrapper */
+.seo-audit-url-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 6px;
+  padding: 0;
+  transition: border-color 0.2s ease;
+}
+
+.seo-audit-url-wrapper:focus-within {
+  border-color: #09CEA7;
+}
+
+/* Audit URL Field - аналог url-input-field */
+.seo-audit-url-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #FAFAFA;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 12px 16px;
+  outline: none;
+  font-family: inherit;
+}
+
+.seo-audit-url-field::placeholder {
+  color: #808184;
+}
+
+/* Контейнер результатов */
+.seo-audit-results-container {
+  margin-top: 32px;
+}
+
+/* Двухколоночная структура */
+.seo-audit-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 30px;
+  align-items: start;
+}
+
+.seo-audit-column-left,
+.seo-audit-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: fit-content;
+}
+
+/* Кастомный скроллбар для seo-audit-content */
+.seo-audit-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.seo-audit-content::-webkit-scrollbar-track {
+  background: #1C1D1F;
+}
+
+.seo-audit-content::-webkit-scrollbar-thumb {
+  background: #333335;
+  border-radius: 4px;
+}
+
+.seo-audit-content::-webkit-scrollbar-thumb:hover {
+  background: #404042;
+}
+
+/* Состояния загрузки и ошибки */
+.seo-audit-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: #28282A;
+  border-radius: 12px;
+  border: 1px solid #333335;
+}
+
+.seo-audit-loading-state .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333335;
+  border-top: 3px solid #09CEA7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.seo-audit-loading-state p {
+  margin: 4px 0;
+  font-size: 16px;
+  color: #FAFAFA;
+  text-align: center;
+}
+
+.seo-audit-loading-state .loading-note {
+  font-size: 14px;
+  color: #808184;
+}
+
+.seo-audit-error-state {
+  padding: 24px;
+  background: #2D1B1B;
+  border: 1px solid #5D2A2A;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.seo-audit-error-state h3 {
+  margin: 0 0 12px 0;
+  color: #F87171;
+  font-size: 18px;
+}
+
+.seo-audit-error-state p {
+  margin: 8px 0;
+  color: #FAFAFA;
+}
+
+.seo-audit-error-state .error-help {
+  font-size: 14px;
+  color: #D1D5DB;
+}
+
+/* Основной контент результатов */
+.seo-audit-content {
+  margin-top: 24px;
+}
+
+/* Секции */
+.seo-audit-section {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.seo-audit-section h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #FAFAFA;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Состояния загрузки и ошибки */
+.seo-audit-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: #F9FAFB;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+}
+
+.seo-audit-loading-state .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E5E7EB;
+  border-top: 3px solid #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.seo-audit-loading-state p {
+  margin: 4px 0;
+  font-size: 16px;
+  color: #374151;
+  text-align: center;
+}
+
+.seo-audit-loading-state .loading-note {
+  font-size: 14px;
+  color: #6B7280;
+}
+
+.seo-audit-error-state {
+  padding: 24px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.seo-audit-error-state h3 {
+  margin: 0 0 12px 0;
+  color: #DC2626;
+  font-size: 18px;
+}
+
+.seo-audit-error-state p {
+  margin: 8px 0;
+  color: #7F1D1D;
+}
+
+.seo-audit-error-state .error-help {
+  font-size: 14px;
+  color: #991B1B;
+}
+
+/* Основной контент результатов */
+.seo-audit-content {
+  margin-top: 24px;
+}
+
+/* Двухколоночная структура - как в SiteAudit */
+.seo-audit-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 24px;
+}
+
+.seo-audit-column-left,
+.seo-audit-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Секции */
+.seo-audit-section {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.seo-audit-section h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Элементы внутри секций */
+.seo-audit-item {
+  margin-bottom: 20px;
+}
+
+.seo-audit-item:last-child {
+  margin-bottom: 0;
+}
+
+.seo-audit-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.seo-audit-status {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.seo-audit-status.good {
+  color: #059669;
+}
+
+.seo-audit-status.warning {
+  color: #D97706;
+}
+
+.seo-audit-status.error {
+  color: #DC2626;
+}
+
+.seo-audit-title {
+  font-weight: 600;
+  color: #374151;
+  font-size: 16px;
+}
+
+.seo-audit-content-block {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.seo-audit-value {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.5;
+}
+
+.seo-audit-meta {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.seo-audit-tip {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: #059669;
+  background: #ECFDF5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #10B981;
+}
+
+/* Оценки SEO */
+.seo-audit-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.seo-audit-score-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.seo-audit-score-label {
+  min-width: 80px;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.seo-audit-score-bar {
+  flex: 1;
+  height: 8px;
+  background: #E5E7EB;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.seo-audit-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #10B981 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.seo-audit-score-value {
+  min-width: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-align: right;
+}
+
+/* Превью социальных сетей */
+.seo-audit-social-preview {
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.seo-audit-social-preview p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #374151;
+}
+
+.seo-audit-social-preview strong {
+  color: #111827;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .seo-audit-columns {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .seo-audit-section {
+    padding: 16px;
+  }
+  
+  .seo-audit-content-block {
+    padding: 12px;
+  }
+  
+  .seo-audit-score-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .seo-audit-score-label {
+    min-width: auto;
+  }
+  
+  .seo-audit-score-bar {
+    width: 100%;
+  }
+}
+
+/* Анимация загрузки */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

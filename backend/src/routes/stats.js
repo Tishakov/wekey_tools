@@ -53,7 +53,7 @@ const toolNameValidator = body('toolName')
     'add-symbol', 'find-replace', 'text-generator',
     'synonym-generator', 'word-declension', 'text-by-columns',
     'char-counter', 'match-types', 'number-generator',
-    'password-generator', 'emoji', 'site-audit',
+    'password-generator', 'emoji', 'site-audit', 'seo-audit',
     // Форматы с подчеркиваниями
     'case_changer_tool', 'remove_duplicates_tool', 'duplicate_finder_tool',
     'text_to_html_tool', 'text_optimizer_tool', 'spaces_to_paragraphs_tool',
@@ -63,7 +63,7 @@ const toolNameValidator = body('toolName')
     'add_symbol_tool', 'find_replace_tool', 'text_generator_tool',
     'synonym_generator_tool', 'word_declension_tool', 'text_by_columns_tool',
     'char_counter_tool', 'match_types_tool', 'number_generator_tool',
-    'password_generator_tool', 'emoji_tool', 'site_audit_tool'
+    'password_generator_tool', 'emoji_tool', 'site_audit_tool', 'seo_audit_tool'
   ])
   .withMessage('Неизвестное название инструмента');
 

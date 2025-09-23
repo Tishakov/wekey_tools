@@ -5,6 +5,8 @@ import { useAuthRequired } from '../hooks/useAuthRequired';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { statsService } from '../utils/statsService';
+import AuthRequiredModal from '../components/AuthRequiredModal';
+import AuthModal from '../components/AuthModal';
 import './SeoAudit.css';
 import '../styles/tool-pages.css';
 
@@ -126,17 +128,99 @@ interface SeoAuditResult {
         hasMinifiedCSS: boolean;
       };
     };
+    // Новые поля Level 2
+    webVitals?: {
+      mobile?: {
+        performance_score: number;
+        core_web_vitals: {
+          lcp: { value: number; score: number; displayValue: string };
+          fid: { value: number; score: number; displayValue: string };
+          cls: { value: number; score: number; displayValue: string };
+        };
+      };
+      desktop?: {
+        performance_score: number;
+        core_web_vitals: {
+          lcp: { value: number; score: number; displayValue: string };
+          fid: { value: number; score: number; displayValue: string };
+          cls: { value: number; score: number; displayValue: string };
+        };
+      };
+      error?: string;
+    };
+    overallScore?: {
+      technical: number;
+      content: number;
+      performance: number;
+      overall: number;
+    };
+    actionPlan?: Array<{
+      priority: 'critical' | 'important' | 'recommended';
+      category: string;
+      task: string;
+      description: string;
+      impact: 'high' | 'medium' | 'low';
+      effort: 'high' | 'medium' | 'low';
+      expectedImprovement: string;
+    }>;
+    visualData?: {
+      scoreBreakdown: {
+        technical: number;
+        content: number;
+        performance: number;
+      };
+      headingsChart: {
+        h1: number; h2: number; h3: number; h4: number; h5: number; h6: number;
+      };
+      contentStats: {
+        wordCount: number;
+        imagesTotal: number;
+        imagesWithoutAlt: number;
+        linksInternal: number;
+        linksExternal: number;
+      };
+      coreWebVitals?: {
+        lcp: { value: number; score: number; displayValue: string };
+        fid: { value: number; score: number; displayValue: string };
+        cls: { value: number; score: number; displayValue: string };
+      };
+    };
   };
 }
 
 const SeoAudit: React.FC = () => {
   const { t } = useTranslation();
   const { createLink } = useLocalizedLink();
-  const { requireAuth } = useAuthRequired();
+  const { requireAuth, isAuthRequiredModalOpen, isAuthModalOpen, closeAuthRequiredModal, closeAuthModal, openAuthModal } = useAuthRequired();
   const { user } = useAuth();
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<SeoAuditResult | null>(null);
   const [launchCount, setLaunchCount] = useState(0);
+  const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'desktop'>('mobile');
+
+  // Определяем текущие данные устройства с fallback
+  const getCurrentDeviceData = () => {
+    if (!result?.data?.webVitals) return null;
+    
+    // Сначала пробуем выбранное устройство
+    if (result.data.webVitals[selectedDevice]) {
+      return result.data.webVitals[selectedDevice];
+    }
+    
+    // Fallback на mobile если desktop недоступен
+    if (selectedDevice === 'desktop' && result.data.webVitals.mobile) {
+      return result.data.webVitals.mobile;
+    }
+    
+    // Fallback на desktop если mobile недоступен  
+    if (selectedDevice === 'mobile' && result.data.webVitals.desktop) {
+      return result.data.webVitals.desktop;
+    }
+    
+    return null;
+  };
+
+  const currentDeviceData = getCurrentDeviceData();
 
   // Загружаем счетчик запусков
   useEffect(() => {
@@ -192,6 +276,9 @@ const SeoAudit: React.FC = () => {
       }
 
       const data = await response.json();
+
+      console.log('🔍 SEO Audit results:', data.results);
+      console.log('🔍 Web Vitals:', data.results?.webVitals);
 
       setResult({
         url: normalizedUrl,
@@ -292,7 +379,240 @@ const SeoAudit: React.FC = () => {
 
             {result.data && (
               <div className="seo-audit-content">
-                {/* Двухколоночная структура как в Site Audit */}
+                {/* Общий Health Score Dashboard - КИЛЛЕР ФИЧА */}
+                {result.data.overallScore && (
+                  <div className="seo-audit-dashboard">
+                    <div className="seo-audit-health-score">
+                      <div className="health-score-main">
+                        <div className="health-score-circle">
+                          <svg width="120" height="120" className="health-score-svg">
+                            <circle cx="60" cy="60" r="50" className="health-score-bg"></circle>
+                            <circle 
+                              cx="60" 
+                              cy="60" 
+                              r="50" 
+                              className="health-score-fill"
+                              style={{
+                                strokeDasharray: `${2 * Math.PI * 50}`,
+                                strokeDashoffset: `${2 * Math.PI * 50 * (1 - result.data.overallScore.overall / 100)}`
+                              }}
+                            ></circle>
+                          </svg>
+                          <div className="health-score-text">
+                            <span className="health-score-number">{Math.round(result.data.overallScore.overall)}</span>
+                            <span className="health-score-label">SEO Health</span>
+                          </div>
+                        </div>
+                        <div className="health-score-status">
+                          <h3>
+                            {result.data.overallScore.overall >= 80 ? '🚀 Отличное SEO!' : 
+                             result.data.overallScore.overall >= 60 ? '⚡ Хорошее SEO' :
+                             result.data.overallScore.overall >= 40 ? '⚠️ Требует улучшения' : '🔧 Много проблем'}
+                          </h3>
+                          <p className="health-score-description">
+                            {result.data.overallScore.overall >= 80 ? 'Ваш сайт отлично оптимизирован для поисковых систем' : 
+                             result.data.overallScore.overall >= 60 ? 'Хорошая основа, но есть возможности для улучшения' :
+                             result.data.overallScore.overall >= 40 ? 'Необходимы базовые SEO улучшения' : 'Требуется комплексная SEO оптимизация'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Детализация по категориям */}
+                      <div className="health-score-breakdown">
+                        <div className="score-category">
+                          <div className="score-category-header">
+                            <span className="score-category-icon">⚙️</span>
+                            <span className="score-category-name">Техническое SEO</span>
+                            <span className="score-category-value">{Math.round(result.data.overallScore.technical)}/100</span>
+                          </div>
+                          <div className="score-category-bar">
+                            <div 
+                              className="score-category-fill technical"
+                              style={{ width: `${Math.round(result.data.overallScore.technical)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        
+                        <div className="score-category">
+                          <div className="score-category-header">
+                            <span className="score-category-icon">📝</span>
+                            <span className="score-category-name">Качество контента</span>
+                            <span className="score-category-value">{Math.round(result.data.overallScore.content)}/100</span>
+                          </div>
+                          <div className="score-category-bar">
+                            <div 
+                              className="score-category-fill content"
+                              style={{ width: `${Math.round(result.data.overallScore.content)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        
+                        <div className="score-category">
+                          <div className="score-category-header">
+                            <span className="score-category-icon">⚡</span>
+                            <span className="score-category-name">Производительность</span>
+                            <span className="score-category-value">{Math.round(result.data.overallScore.performance)}/100</span>
+                          </div>
+                          <div className="score-category-bar">
+                            <div 
+                              className="score-category-fill performance"
+                              style={{ width: `${Math.round(result.data.overallScore.performance)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Performance Dashboard с переключателем устройств */}
+                    {(result.data.webVitals?.mobile || result.data.webVitals?.desktop) && (
+                      <div className="core-web-vitals-dashboard">
+                        <div className="performance-header">
+                          <h3>🚀 Производительность (Google PageSpeed)</h3>
+                          <div className="device-toggle">
+                            <button 
+                              className={`device-toggle-btn ${selectedDevice === 'mobile' ? 'active' : ''} ${!result.data.webVitals?.mobile ? 'disabled' : ''}`}
+                              onClick={() => setSelectedDevice('mobile')}
+                              disabled={!result.data.webVitals?.mobile}
+                            >
+                              📱 Mobile {!result.data.webVitals?.mobile ? '(недоступно)' : ''}
+                            </button>
+                            <button 
+                              className={`device-toggle-btn ${selectedDevice === 'desktop' ? 'active' : ''} ${!result.data.webVitals?.desktop ? 'disabled' : ''}`}
+                              onClick={() => setSelectedDevice('desktop')}
+                              disabled={!result.data.webVitals?.desktop}
+                            >
+                              💻 Desktop {!result.data.webVitals?.desktop ? '(недоступно)' : ''}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Общая скорость загрузки - ВИДНОЕ МЕСТО */}
+                        {currentDeviceData?.performance_score !== undefined && (
+                          <div className="performance-score-main">
+                            <div className="performance-score-circle">
+                              <svg width="120" height="120">
+                                <circle cx="60" cy="60" r="50" className="performance-score-bg"></circle>
+                                <circle 
+                                  cx="60" cy="60" r="50" 
+                                  className={`performance-score-fill ${
+                                    currentDeviceData.performance_score >= 90 ? 'excellent' : 
+                                    currentDeviceData.performance_score >= 70 ? 'good' : 
+                                    currentDeviceData.performance_score >= 50 ? 'average' : 'poor'
+                                  }`}
+                                  style={{
+                                    strokeDasharray: `${2 * Math.PI * 50}`,
+                                    strokeDashoffset: `${2 * Math.PI * 50 * (1 - currentDeviceData.performance_score / 100)}`
+                                  }}
+                                ></circle>
+                              </svg>
+                              <div className="performance-score-text">
+                                <span className="performance-score-number">{currentDeviceData.performance_score}</span>
+                                <span className="performance-score-label">Скорость</span>
+                              </div>
+                            </div>
+                            <div className="performance-score-status">
+                              <h4>
+                                {currentDeviceData.performance_score >= 90 ? '🟢 Отличная скорость' : 
+                                 currentDeviceData.performance_score >= 70 ? '🟡 Хорошая скорость' : 
+                                 currentDeviceData.performance_score >= 50 ? '🟠 Средняя скорость' : '🔴 Медленная загрузка'}
+                              </h4>
+                              <p>
+                                {currentDeviceData.performance_score >= 90 ? 'Ваш сайт загружается очень быстро! Пользователи будут довольны.' : 
+                                 currentDeviceData.performance_score >= 70 ? 'Неплохая скорость, но есть возможности для улучшения.' : 
+                                 currentDeviceData.performance_score >= 50 ? 'Скорость ниже среднего. Рекомендуется оптимизация.' : 'Критически медленная загрузка. Нужны срочные улучшения!'}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Core Web Vitals для выбранного устройства */}
+                        {currentDeviceData?.core_web_vitals && (
+                          <div className="web-vitals-section">
+                            <h4>📊 Core Web Vitals</h4>
+                            <div className="web-vitals-grid">
+                              <div className="web-vital-item">
+                                <div className="web-vital-icon">🎯</div>
+                                <div className="web-vital-info">
+                                  <div className="web-vital-name">LCP</div>
+                                  <div className="web-vital-description">Загрузка контента</div>
+                                </div>
+                                <div className="web-vital-value">
+                                  <span className="web-vital-number">{currentDeviceData.core_web_vitals.lcp.displayValue}</span>
+                                  <div className="web-vital-score-circle">
+                                    <svg width="40" height="40">
+                                      <circle cx="20" cy="20" r="18" className="web-vital-bg"></circle>
+                                      <circle 
+                                        cx="20" cy="20" r="18" 
+                                        className={`web-vital-fill ${currentDeviceData.core_web_vitals.lcp.score >= 75 ? 'good' : currentDeviceData.core_web_vitals.lcp.score >= 50 ? 'average' : 'poor'}`}
+                                        style={{
+                                          strokeDasharray: `${2 * Math.PI * 18}`,
+                                          strokeDashoffset: `${2 * Math.PI * 18 * (1 - currentDeviceData.core_web_vitals.lcp.score / 100)}`
+                                        }}
+                                      ></circle>
+                                    </svg>
+                                    <span className="web-vital-score-text">{currentDeviceData.core_web_vitals.lcp.score}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="web-vital-item">
+                                <div className="web-vital-icon">⚡</div>
+                                <div className="web-vital-info">
+                                  <div className="web-vital-name">FID</div>
+                                  <div className="web-vital-description">Интерактивность</div>
+                                </div>
+                                <div className="web-vital-value">
+                                  <span className="web-vital-number">{currentDeviceData.core_web_vitals.fid.displayValue}</span>
+                                  <div className="web-vital-score-circle">
+                                    <svg width="40" height="40">
+                                      <circle cx="20" cy="20" r="18" className="web-vital-bg"></circle>
+                                      <circle 
+                                        cx="20" cy="20" r="18" 
+                                        className={`web-vital-fill ${currentDeviceData.core_web_vitals.fid.score >= 75 ? 'good' : currentDeviceData.core_web_vitals.fid.score >= 50 ? 'average' : 'poor'}`}
+                                        style={{
+                                          strokeDasharray: `${2 * Math.PI * 18}`,
+                                          strokeDashoffset: `${2 * Math.PI * 18 * (1 - currentDeviceData.core_web_vitals.fid.score / 100)}`
+                                        }}
+                                      ></circle>
+                                    </svg>
+                                    <span className="web-vital-score-text">{currentDeviceData.core_web_vitals.fid.score}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="web-vital-item">
+                                <div className="web-vital-icon">📐</div>
+                                <div className="web-vital-info">
+                                  <div className="web-vital-name">CLS</div>
+                                  <div className="web-vital-description">Стабильность</div>
+                                </div>
+                                <div className="web-vital-value">
+                                  <span className="web-vital-number">{currentDeviceData.core_web_vitals.cls.displayValue}</span>
+                                  <div className="web-vital-score-circle">
+                                    <svg width="40" height="40">
+                                      <circle cx="20" cy="20" r="18" className="web-vital-bg"></circle>
+                                      <circle 
+                                        cx="20" cy="20" r="18" 
+                                        className={`web-vital-fill ${currentDeviceData.core_web_vitals.cls.score >= 75 ? 'good' : currentDeviceData.core_web_vitals.cls.score >= 50 ? 'average' : 'poor'}`}
+                                        style={{
+                                          strokeDasharray: `${2 * Math.PI * 18}`,
+                                          strokeDashoffset: `${2 * Math.PI * 18 * (1 - currentDeviceData.core_web_vitals.cls.score / 100)}`
+                                        }}
+                                      ></circle>
+                                    </svg>
+                                    <span className="web-vital-score-text">{currentDeviceData.core_web_vitals.cls.score}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Двухколоночная структура как раньше */}
                 <div className="seo-audit-columns">
                   {/* Левая колонка */}
                   <div className="seo-audit-column-left">
@@ -687,11 +1007,63 @@ const SeoAudit: React.FC = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Action Plan - Персонализированные рекомендации */}
+                {result.data.actionPlan && result.data.actionPlan.length > 0 && (
+                  <div className="seo-audit-action-plan">
+                    <h3>🎯 Персональный план действий</h3>
+                    <div className="action-plan-grid">
+                      {result.data.actionPlan.slice(0, 6).map((action, index) => (
+                        <div key={index} className={`action-plan-item priority-${action.priority}`}>
+                          <div className="action-plan-header">
+                            <span className={`action-priority-badge ${action.priority}`}>
+                              {action.priority === 'critical' ? '🔥 Критическое' : 
+                               action.priority === 'important' ? '⚡ Важное' : '💡 Рекомендуемое'}
+                            </span>
+                            <span className="action-category">{action.category}</span>
+                          </div>
+                          <h4 className="action-task">{action.task}</h4>
+                          <p className="action-description">{action.description}</p>
+                          <div className="action-metrics">
+                            <div className="action-metric">
+                              <span className="action-metric-label">Влияние:</span>
+                              <span className={`action-metric-value impact-${action.impact}`}>
+                                {action.impact === 'high' ? 'Высокое' : action.impact === 'medium' ? 'Среднее' : 'Низкое'}
+                              </span>
+                            </div>
+                            <div className="action-metric">
+                              <span className="action-metric-label">Сложность:</span>
+                              <span className={`action-metric-value effort-${action.effort}`}>
+                                {action.effort === 'low' ? 'Легко' : action.effort === 'medium' ? 'Средне' : 'Сложно'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="action-improvement">
+                            <span className="action-improvement-label">Ожидаемый результат:</span>
+                            <span className="action-improvement-value">{action.expectedImprovement}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         )}
       </div>
+
+      {/* Модальные окна */}
+      <AuthRequiredModal 
+        isOpen={isAuthRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        onLoginClick={openAuthModal}
+      />
+      
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+      />
     </div>
   );
 };

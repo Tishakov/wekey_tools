@@ -411,6 +411,629 @@
   border-top: 1px solid #333335;
 }
 
+/* === LEVEL 2 ВИЗУАЛЬНЫЕ КОМПОНЕНТЫ - КИЛЛЕР ФИЧА === */
+
+/* Health Score Dashboard */
+.seo-audit-dashboard {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 30px;
+}
+
+.seo-audit-health-score {
+  background: linear-gradient(135deg, #1C1D1F 0%, #28282A 100%);
+  border: 1px solid #333335;
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.seo-audit-health-score::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #10B981 100%);
+}
+
+.health-score-main {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.health-score-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.health-score-svg {
+  transform: rotate(-90deg);
+}
+
+.health-score-bg {
+  fill: none;
+  stroke: #333335;
+  stroke-width: 8;
+}
+
+.health-score-fill {
+  fill: none;
+  stroke: #09CEA7;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.health-score-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.health-score-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FAFAFA;
+  line-height: 1;
+}
+
+.health-score-label {
+  font-size: 12px;
+  color: #808184;
+  margin-top: 4px;
+}
+
+.health-score-status h3 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: #FAFAFA;
+}
+
+.health-score-description {
+  margin: 0;
+  font-size: 16px;
+  color: #D1D5DB;
+  line-height: 1.5;
+}
+
+.health-score-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.score-category {
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.score-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.score-category-icon {
+  font-size: 16px;
+}
+
+.score-category-name {
+  flex: 1;
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #D1D5DB;
+}
+
+.score-category-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FAFAFA;
+}
+
+.score-category-bar {
+  height: 6px;
+  background: #333335;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-category-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease-in-out;
+}
+
+.score-category-fill.technical {
+  background: linear-gradient(90deg, #3B82F6, #06B6D4);
+}
+
+.score-category-fill.content {
+  background: linear-gradient(90deg, #8B5CF6, #A855F7);
+}
+
+.score-category-fill.performance {
+  background: linear-gradient(90deg, #10B981, #059669);
+}
+
+/* Core Web Vitals Dashboard */
+.core-web-vitals-dashboard {
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.core-web-vitals-dashboard h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #FAFAFA;
+}
+
+/* Performance Header с переключателем */
+.performance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.device-toggle {
+  display: flex;
+  background: #28282A;
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid #333335;
+}
+
+.device-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #808184;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.device-toggle-btn:hover {
+  color: #D1D5DB;
+  background: #333335;
+}
+
+.device-toggle-btn.active {
+  background: #09CEA7;
+  color: #1C1D1F;
+  font-weight: 600;
+}
+
+.device-toggle-btn.disabled,
+.device-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #555;
+}
+
+/* Основная скорость загрузки */
+.performance-score-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #28282A;
+  border-radius: 12px;
+  border: 1px solid #333335;
+}
+
+.performance-score-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.performance-score-bg {
+  fill: none;
+  stroke: #333335;
+  stroke-width: 8;
+}
+
+.performance-score-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.performance-score-fill.excellent {
+  stroke: #10B981;
+}
+
+.performance-score-fill.good {
+  stroke: #3B82F6;
+}
+
+.performance-score-fill.average {
+  stroke: #F59E0B;
+}
+
+.performance-score-fill.poor {
+  stroke: #EF4444;
+}
+
+.performance-score-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.performance-score-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FAFAFA;
+  line-height: 1;
+}
+
+.performance-score-label {
+  font-size: 12px;
+  color: #808184;
+  margin-top: 2px;
+}
+
+.performance-score-status h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #FAFAFA;
+}
+
+.performance-score-status p {
+  margin: 0;
+  font-size: 14px;
+  color: #D1D5DB;
+  line-height: 1.4;
+}
+
+/* Web Vitals Section */
+.web-vitals-section {
+  margin-top: 24px;
+}
+
+.web-vitals-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #FAFAFA;
+}
+
+.web-vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.web-vital-item {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.web-vital-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.web-vital-info {
+  margin-bottom: 12px;
+}
+
+.web-vital-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FAFAFA;
+  margin-bottom: 2px;
+}
+
+.web-vital-description {
+  font-size: 12px;
+  color: #808184;
+}
+
+.web-vital-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.web-vital-number {
+  font-size: 14px;
+  font-weight: 600;
+  color: #D1D5DB;
+}
+
+.web-vital-score-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.web-vital-bg {
+  fill: none;
+  stroke: #333335;
+  stroke-width: 3;
+}
+
+.web-vital-fill {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.web-vital-fill.good {
+  stroke: #10B981;
+}
+
+.web-vital-fill.average {
+  stroke: #F59E0B;
+}
+
+.web-vital-fill.poor {
+  stroke: #EF4444;
+}
+
+.web-vital-score-text {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 600;
+  color: #FAFAFA;
+}
+
+/* Action Plan */
+.seo-audit-action-plan {
+  margin-bottom: 32px;
+  padding: 30px;
+}
+
+.seo-audit-action-plan h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #FAFAFA;
+}
+
+.action-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.action-plan-item {
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-plan-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.action-plan-item.priority-critical {
+  border-left: 4px solid #EF4444;
+}
+
+.action-plan-item.priority-important {
+  border-left: 4px solid #F59E0B;
+}
+
+.action-plan-item.priority-recommended {
+  border-left: 4px solid #10B981;
+}
+
+.action-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.action-priority-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.action-priority-badge.critical {
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+}
+
+.action-priority-badge.important {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FCD34D;
+}
+
+.action-priority-badge.recommended {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6EE7B7;
+}
+
+.action-category {
+  font-size: 11px;
+  color: #808184;
+  background: #28282A;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.action-task {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FAFAFA;
+  line-height: 1.3;
+}
+
+.action-description {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  color: #D1D5DB;
+  line-height: 1.4;
+}
+
+.action-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.action-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-metric-label {
+  font-size: 11px;
+  color: #808184;
+}
+
+.action-metric-value {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.action-metric-value.impact-high,
+.action-metric-value.effort-low {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6EE7B7;
+}
+
+.action-metric-value.impact-medium,
+.action-metric-value.effort-medium {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FCD34D;
+}
+
+.action-metric-value.impact-low,
+.action-metric-value.effort-high {
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+}
+
+.action-improvement {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #28282A;
+  border-radius: 6px;
+  border-left: 3px solid #09CEA7;
+}
+
+.action-improvement-label {
+  font-size: 11px;
+  color: #808184;
+  font-weight: 500;
+}
+
+.action-improvement-value {
+  font-size: 12px;
+  color: #09CEA7;
+  font-weight: 500;
+}
+
+/* Адаптивность для визуальных компонентов */
+@media (max-width: 1024px) {
+  .health-score-main {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .performance-score-main {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .web-vitals-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-plan-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .seo-audit-dashboard {
+    gap: 16px;
+  }
+  
+  .seo-audit-health-score {
+    padding: 20px;
+  }
+  
+  .health-score-main {
+    gap: 16px;
+  }
+  
+  .performance-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .device-toggle {
+    justify-content: center;
+  }
+  
+  .performance-score-main {
+    padding: 16px;
+  }
+  
+  .action-metrics {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 /* Адаптивность */
 @media (max-width: 1024px) {
   .seo-audit-columns {
