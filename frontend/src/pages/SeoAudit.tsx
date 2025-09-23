@@ -1183,7 +1183,38 @@ const SeoAudit: React.FC = () => {
                     {/* Robots.txt проверка - Level 2 */}
                     {result.data.robotsCheck && (
                       <div className="seo-audit-section">
-                        <h3>🤖 Robots.txt</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('robots-txt')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('robots-txt') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🤖 Robots.txt
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('robots-txt') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('robots-txt') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -1226,6 +1257,7 @@ const SeoAudit: React.FC = () => {
                               </div>
                             )}
                           </div>
+                        </div>
                         </div>
                       </div>
                     )}
