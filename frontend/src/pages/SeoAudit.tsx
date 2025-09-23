@@ -1490,7 +1490,38 @@ const SeoAudit: React.FC = () => {
                     {/* W3C Markup Validator - Level 3 */}
                     {result.data.w3cValidator && (
                       <div className="seo-audit-section">
-                        <h3>🔍 W3C Валидация</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('w3c-validation')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('w3c-validation') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🔍 W3C Валидация
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('w3c-validation') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('w3c-validation') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -1596,13 +1627,45 @@ const SeoAudit: React.FC = () => {
                             )}
                           </div>
                         </div>
+                        </div>
                       </div>
                     )}
 
                     {/* Mobile-Friendly Test - Level 3 */}
                     {result.data.mobileFriendly && (
                       <div className="seo-audit-section">
-                        <h3>📱 Мобильная адаптивность</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('mobile-friendly')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('mobile-friendly') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          📱 Мобильная адаптивность
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('mobile-friendly') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('mobile-friendly') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -1649,13 +1712,45 @@ const SeoAudit: React.FC = () => {
                             )}
                           </div>
                         </div>
+                        </div>
                       </div>
                     )}
 
                     {/* SSL Labs Analysis - Level 3 */}
                     {result.data.sslLabs && (
                       <div className="seo-audit-section">
-                        <h3>🛡️ SSL Labs анализ</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('ssl-labs')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('ssl-labs') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🛡️ SSL Labs анализ
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('ssl-labs') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('ssl-labs') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -1744,12 +1839,44 @@ const SeoAudit: React.FC = () => {
                             )}
                           </div>
                         </div>
+                        </div>
                       </div>
                     )}
 
                     {/* Техническое SEO */}
                     <div className="seo-audit-section">
-                      <h3>⚙️ Техническая настройка</h3>
+                      <h3 
+                        className="seo-audit-section-header" 
+                        onClick={() => toggleSection('technical-settings')}
+                        style={{ 
+                          cursor: 'pointer', 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center',
+                          marginBottom: collapsedSections.has('technical-settings') ? '0px' : undefined,
+                          transition: 'margin-bottom 0.4s ease-in-out'
+                        }}
+                      >
+                        ⚙️ Техническая настройка
+                        <img 
+                          src="/icons/arrow_circle.svg" 
+                          alt="" 
+                          style={{ 
+                            width: '20px', 
+                            height: '20px',
+                            transform: collapsedSections.has('technical-settings') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.4s ease-in-out'
+                          }}
+                        />
+                      </h3>
+                      <div 
+                        className="seo-audit-section-content"
+                        style={{
+                          overflow: 'hidden',
+                          maxHeight: collapsedSections.has('technical-settings') ? '0px' : '1000px',
+                          transition: 'max-height 0.4s ease-in-out',
+                        }}
+                      >
                       
                       <div className="seo-audit-item">
                         <div className="seo-audit-item-header">
@@ -1772,12 +1899,44 @@ const SeoAudit: React.FC = () => {
                           )}
                         </div>
                       </div>
+                      </div>
                     </div>
 
                     {/* SSL и безопасность - Level 2 */}
                     {result.data.ssl && (
                       <div className="seo-audit-section">
-                        <h3>🔒 SSL и безопасность</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('ssl-security')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('ssl-security') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🔒 SSL и безопасность
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('ssl-security') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('ssl-security') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -1807,6 +1966,7 @@ const SeoAudit: React.FC = () => {
                               <p className="seo-audit-tip">💡 HTTPS является обязательным фактором ранжирования в Google. Настройте SSL-сертификат.</p>
                             )}
                           </div>
+                        </div>
                         </div>
                       </div>
                     )}
