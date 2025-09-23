@@ -1265,7 +1265,38 @@ const SeoAudit: React.FC = () => {
                     {/* Sitemap.xml проверка - Level 2 */}
                     {result.data.sitemapCheck && (
                       <div className="seo-audit-section">
-                        <h3>🗺️ Sitemap</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('sitemap')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('sitemap') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🗺️ Sitemap
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('sitemap') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('sitemap') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -1306,6 +1337,7 @@ const SeoAudit: React.FC = () => {
                               </div>
                             )}
                           </div>
+                        </div>
                         </div>
                       </div>
                     )}
