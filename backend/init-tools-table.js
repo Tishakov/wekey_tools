@@ -217,6 +217,14 @@ const toolsConfig = [
     icon: '/icons/tool_audit_site.svg',
     path: '/site-audit',
     category: 'analytics'
+  },
+  {
+    id: 'seo-audit',
+    title: 'Аудит SEO',
+    description: 'Детальный анализ SEO-оптимизации сайта',
+    icon: '/icons/tool_seo_site.svg',
+    path: '/seo-audit',
+    category: 'analytics'
   }
 ];
 
