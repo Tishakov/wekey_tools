@@ -112,25 +112,68 @@ function analyzeSEO($, html, url) {
     }
   });
 
-  // 8. Анализ заголовков H1-H6
+  // 8. Расширенный анализ заголовков H1-H6
   seo.headings = {
-    h1: { count: $('h1').length, texts: [] },
-    h2: { count: $('h2').length, texts: [] },
-    h3: { count: $('h3').length, texts: [] },
-    h4: { count: $('h4').length, texts: [] },
-    h5: { count: $('h5').length, texts: [] },
-    h6: { count: $('h6').length, texts: [] }
+    h1: { count: $('h1').length, texts: [], issues: [] },
+    h2: { count: $('h2').length, texts: [], issues: [] },
+    h3: { count: $('h3').length, texts: [], issues: [] },
+    h4: { count: $('h4').length, texts: [], issues: [] },
+    h5: { count: $('h5').length, texts: [], issues: [] },
+    h6: { count: $('h6').length, texts: [], issues: [] },
+    structure: { isValid: true, issues: [] }
   };
 
-  // Собираем тексты заголовков (первые 3 для каждого уровня)
+  // Собираем тексты заголовков и анализируем их
   ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
-    $(tag).slice(0, 3).each((i, el) => {
+    $(tag).each((i, el) => {
       const text = $(el).text().trim();
       if (text) {
-        seo.headings[tag].texts.push(text);
+        // Берем первые 5 заголовков для отображения
+        if (seo.headings[tag].texts.length < 5) {
+          seo.headings[tag].texts.push({
+            text: text,
+            length: text.length,
+            hasKeywords: title ? text.toLowerCase().includes(title.toLowerCase().split(' ')[0]) : false
+          });
+        }
       }
     });
+    
+    // Анализ проблем для каждого уровня заголовков
+    if (tag === 'h1') {
+      if (seo.headings.h1.count === 0) {
+        seo.headings.h1.issues.push('Отсутствует H1 заголовок');
+      } else if (seo.headings.h1.count > 1) {
+        seo.headings.h1.issues.push(`Слишком много H1 заголовков (${seo.headings.h1.count})`);
+      }
+      
+      // Проверка длины H1
+      if (seo.headings.h1.texts.length > 0) {
+        const h1Length = seo.headings.h1.texts[0].length;
+        if (h1Length < 20) {
+          seo.headings.h1.issues.push('H1 слишком короткий (рекомендуется 20-70 символов)');
+        } else if (h1Length > 70) {
+          seo.headings.h1.issues.push('H1 слишком длинный (рекомендуется 20-70 символов)');
+        }
+      }
+    }
   });
+
+  // Проверка иерархии заголовков
+  const headingLevels = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  let previousLevel = 0;
+  
+  for (let i = 0; i < headingLevels.length; i++) {
+    const currentCount = seo.headings[headingLevels[i]].count;
+    if (currentCount > 0) {
+      const currentLevel = i + 1;
+      if (currentLevel > previousLevel + 1 && previousLevel > 0) {
+        seo.headings.structure.isValid = false;
+        seo.headings.structure.issues.push(`Пропущен уровень заголовка H${previousLevel + 1} перед H${currentLevel}`);
+      }
+      previousLevel = currentLevel;
+    }
+  }
 
   // 9. Canonical URL
   seo.canonical = {
@@ -221,12 +264,65 @@ function analyzeSEO($, html, url) {
     nofollow: $('a[rel*="nofollow"]').length
   };
 
-  // 15. Анализ производительности (размер HTML и оценки)
+  // 15. Продвинутый анализ производительности и контента
+  const textContent = $('body').text().replace(/\s+/g, ' ').trim();
+  const wordCount = textContent.split(' ').filter(word => word.length > 0).length;
+  const htmlSize = Buffer.byteLength(html, 'utf8');
+  
   seo.performance = {
-    htmlSize: Buffer.byteLength(html, 'utf8'),
+    htmlSize: htmlSize,
+    htmlSizeKB: Math.round(htmlSize / 1024 * 100) / 100,
+    wordCount: wordCount,
+    textToHtmlRatio: Math.round((textContent.length / html.length) * 100),
     title_length_score: seo.title.isOptimal ? 100 : (seo.title.length === 0 ? 0 : Math.max(0, 100 - Math.abs(45 - seo.title.length) * 2)),
     description_length_score: seo.metaDescription.isOptimal ? 100 : (seo.metaDescription.length === 0 ? 0 : Math.max(0, 100 - Math.abs(140 - seo.metaDescription.length))),
-    h1_score: seo.headings.h1.count === 1 ? 100 : (seo.headings.h1.count === 0 ? 0 : 50)
+    h1_score: seo.headings.h1.count === 1 ? 100 : (seo.headings.h1.count === 0 ? 0 : 50),
+    content_score: wordCount >= 300 ? 100 : Math.round((wordCount / 300) * 100),
+    images_alt_score: seo.images.total === 0 ? 100 : Math.round(((seo.images.total - seo.images.withoutAlt) / seo.images.total) * 100)
+  };
+
+  // 16. Анализ ключевых слов и плотности (базовый)
+  if (title && wordCount > 0) {
+    const titleWords = title.toLowerCase().split(' ').filter(word => word.length > 3);
+    seo.keywordAnalysis = {
+      titleKeywords: titleWords.slice(0, 3),
+      keywordDensity: {},
+      recommendations: []
+    };
+    
+    // Анализ плотности ключевых слов из заголовка
+    titleWords.forEach(keyword => {
+      const regex = new RegExp(keyword, 'gi');
+      const matches = (textContent.match(regex) || []).length;
+      const density = Math.round((matches / wordCount) * 10000) / 100;
+      seo.keywordAnalysis.keywordDensity[keyword] = {
+        count: matches,
+        density: density
+      };
+      
+      if (density < 0.5) {
+        seo.keywordAnalysis.recommendations.push(`Ключевое слово "${keyword}" встречается редко (${density}%)`);
+      } else if (density > 3) {
+        seo.keywordAnalysis.recommendations.push(`Ключевое слово "${keyword}" может быть переспамлено (${density}%)`);
+      }
+    });
+  }
+
+  // 17. Технический SEO анализ
+  seo.technical = {
+    https: url.startsWith('https://'),
+    urlStructure: {
+      length: url.length,
+      hasParameters: url.includes('?'),
+      hasFragment: url.includes('#'),
+      isClean: !url.includes('?') && !url.includes('#') && url.length < 100
+    },
+    pageLoadHints: {
+      hasLazyLoading: $('img[loading="lazy"]').length > 0,
+      hasPreconnect: $('link[rel="preconnect"]').length > 0,
+      hasPrefetch: $('link[rel="prefetch"], link[rel="preload"]').length > 0,
+      hasMinifiedCSS: $('link[rel="stylesheet"]').filter((i, el) => $(el).attr('href').includes('.min.')).length > 0
+    }
   };
 
   return seo;

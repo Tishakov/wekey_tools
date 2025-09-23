@@ -326,6 +326,91 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Стили для продвинутого анализа */
+.seo-audit-heading-item {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333335;
+}
+
+.seo-audit-heading-item:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.seo-audit-headings-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.seo-audit-heading-level {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1C1D1F;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #333335;
+}
+
+.seo-audit-heading-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #09CEA7;
+}
+
+.seo-audit-heading-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: #FAFAFA;
+  background: #333335;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Анализ ключевых слов */
+.seo-audit-keyword-item {
+  margin-bottom: 12px;
+}
+
+.seo-audit-keyword-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.seo-audit-keyword-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #FAFAFA;
+}
+
+.seo-audit-keyword-stats {
+  font-size: 12px;
+  color: #808184;
+}
+
+.seo-audit-keyword-bar {
+  height: 4px;
+  background: #333335;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.seo-audit-keyword-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.seo-audit-recommendations {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #333335;
+}
+
 /* Адаптивность */
 @media (max-width: 1024px) {
   .seo-audit-columns {
