@@ -1082,7 +1082,38 @@ const SeoAudit: React.FC = () => {
                     {/* Продвинутый анализ заголовков */}
                     {result.data.headings && (
                       <div className="seo-audit-section">
-                        <h3>📋 Структура заголовков</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('headings-structure')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('headings-structure') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          📋 Структура заголовков
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('headings-structure') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('headings-structure') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         {/* H1 анализ */}
                         <div className="seo-audit-item">
@@ -1144,6 +1175,7 @@ const SeoAudit: React.FC = () => {
                               })}
                             </div>
                           </div>
+                        </div>
                         </div>
                       </div>
                     )}
