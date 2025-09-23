@@ -372,6 +372,32 @@ interface SeoAuditResult {
         anchorDiversity: number;
       };
     };
+    sitelinks?: {
+      score: number;
+      maxScore: number;
+      status: string;
+      issues: string[];
+      recommendations: string[];
+      navigation: {
+        hasMainMenu: boolean;
+        menuItemsCount: number;
+        menuStructure: string;
+      };
+      urlStructure: {
+        hasCleanUrls: boolean;
+        hasLogicalHierarchy: boolean;
+        avgUrlDepth: number;
+      };
+      linkingProfile: {
+        internalLinksCount: number;
+        navigationLinksCount: number;
+        topSections: Array<{
+          name: string;
+          linkCount: number;
+          urlExample: string;
+        }>;
+      };
+    };
   };
 }
 
@@ -2191,7 +2217,7 @@ const SeoAudit: React.FC = () => {
                       <div className="action-plan-controls">
                         <button
                           className="show-more-button"
-                          onClick={() => setActionPlanToShow(prev => prev === 6 ? result.data.actionPlan!.length : 6)}
+                          onClick={() => setActionPlanToShow(prev => prev === 6 ? (result.data?.actionPlan?.length || 6) : 6)}
                         >
                           {actionPlanToShow === 6 
                             ? `Показать все рекомендации (${result.data.actionPlan.length})` 
