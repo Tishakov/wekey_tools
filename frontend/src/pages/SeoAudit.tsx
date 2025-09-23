@@ -413,6 +413,20 @@ const SeoAudit: React.FC = () => {
   const [w3cErrorsToShow, setW3cErrorsToShow] = useState(5);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [actionPlanToShow, setActionPlanToShow] = useState(6);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+
+  // Функция переключения аккордеона
+  const toggleSection = (sectionId: string) => {
+    setCollapsedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  };
 
   // Определяем текущие данные устройства с fallback
   const getCurrentDeviceData = () => {
@@ -903,7 +917,38 @@ const SeoAudit: React.FC = () => {
                     {/* SEO Summary */}
                     {result.data.performance && (
                       <div className="seo-audit-section">
-                        <h3>📊 Общая оценка SEO</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('seo-summary')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('seo-summary') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          📊 Общая оценка SEO
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('seo-summary') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('seo-summary') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         <div className="seo-audit-scores">
                           <div className="seo-audit-score-item">
                             <span className="seo-audit-score-label">Заголовок</span>
@@ -944,6 +989,7 @@ const SeoAudit: React.FC = () => {
                             </div>
                             <span className="seo-audit-score-value">{result.data.performance.h1_score}/100</span>
                           </div>
+                        </div>
                         </div>
                       </div>
                     )}
