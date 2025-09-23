@@ -28,7 +28,7 @@ module.exports = (sequelize) => {
           'add-symbol', 'find-replace', 'text-generator',
           'synonym-generator', 'word-declension', 'text-by-columns',
           'char-counter', 'match-types', 'number-generator',
-          'password-generator', 'emoji'
+          'password-generator', 'emoji', 'site-audit'
         ]]
       }
     },

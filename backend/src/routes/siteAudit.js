@@ -30,17 +30,164 @@ router.post('/site-audit', async (req, res) => {
     const auditResult = {
       url: fullUrl,
       contact: analyzeContact($, html, fullUrl),
-      seo: { title: $('title').text() || '' },
+      seo: analyzeSEO($, html, fullUrl),
       technologies: { framework: 'jQuery' },
       analytics: { googleAnalytics: true }
     };
 
-    res.json({ success: true, audit: auditResult });
+    res.json({ success: true, results: auditResult });
 
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+function analyzeSEO($, html, url) {
+  const seo = {};
+
+  // 1. Заголовки страниц
+  const title = $('title').text().trim();
+  seo.title = {
+    content: title,
+    length: title.length,
+    isOptimal: title.length >= 30 && title.length <= 60
+  };
+
+  // 2. Meta описания
+  const description = $('meta[name="description"]').attr('content') || '';
+  seo.metaDescription = {
+    content: description,
+    length: description.length,
+    isOptimal: description.length >= 120 && description.length <= 160
+  };
+
+  // 3. Keywords meta тег
+  const keywords = $('meta[name="keywords"]').attr('content') || '';
+  seo.keywords = {
+    content: keywords,
+    count: keywords ? keywords.split(',').map(k => k.trim()).filter(k => k).length : 0
+  };
+
+  // 4. Open Graph разметка
+  seo.openGraph = {
+    title: $('meta[property="og:title"]').attr('content') || '',
+    description: $('meta[property="og:description"]').attr('content') || '',
+    image: $('meta[property="og:image"]').attr('content') || '',
+    url: $('meta[property="og:url"]').attr('content') || '',
+    type: $('meta[property="og:type"]').attr('content') || '',
+    siteName: $('meta[property="og:site_name"]').attr('content') || ''
+  };
+
+  // 5. Twitter Cards
+  seo.twitterCard = {
+    card: $('meta[name="twitter:card"]').attr('content') || '',
+    title: $('meta[name="twitter:title"]').attr('content') || '',
+    description: $('meta[name="twitter:description"]').attr('content') || '',
+    image: $('meta[name="twitter:image"]').attr('content') || '',
+    site: $('meta[name="twitter:site"]').attr('content') || ''
+  };
+
+  // 6. Структурированные данные (JSON-LD)
+  const jsonLdScripts = $('script[type="application/ld+json"]');
+  seo.structuredData = {
+    count: jsonLdScripts.length,
+    types: []
+  };
+  
+  jsonLdScripts.each((i, el) => {
+    try {
+      const data = JSON.parse($(el).html());
+      if (data['@type']) {
+        seo.structuredData.types.push(data['@type']);
+      }
+    } catch (e) {
+      // Ignore invalid JSON-LD
+    }
+  });
+
+  // 7. Микроразметка (Schema.org)
+  seo.microdata = {
+    itemscope: $('[itemscope]').length,
+    itemtype: []
+  };
+  
+  $('[itemtype]').each((i, el) => {
+    const itemtype = $(el).attr('itemtype');
+    if (itemtype && !seo.microdata.itemtype.includes(itemtype)) {
+      seo.microdata.itemtype.push(itemtype);
+    }
+  });
+
+  // 8. Анализ заголовков H1-H6
+  seo.headings = {
+    h1: { count: $('h1').length, texts: [] },
+    h2: { count: $('h2').length, texts: [] },
+    h3: { count: $('h3').length, texts: [] },
+    h4: { count: $('h4').length, texts: [] },
+    h5: { count: $('h5').length, texts: [] },
+    h6: { count: $('h6').length, texts: [] }
+  };
+
+  // Собираем тексты заголовков (первые 3 для каждого уровня)
+  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
+    $(tag).slice(0, 3).each((i, el) => {
+      const text = $(el).text().trim();
+      if (text) {
+        seo.headings[tag].texts.push(text);
+      }
+    });
+  });
+
+  // 9. Canonical URL
+  seo.canonical = {
+    url: $('link[rel="canonical"]').attr('href') || '',
+    isPresent: $('link[rel="canonical"]').length > 0
+  };
+
+  // 10. Robots meta тег
+  const robotsMeta = $('meta[name="robots"]').attr('content') || '';
+  seo.robots = {
+    content: robotsMeta,
+    noindex: robotsMeta.includes('noindex'),
+    nofollow: robotsMeta.includes('nofollow'),
+    noarchive: robotsMeta.includes('noarchive'),
+    nosnippet: robotsMeta.includes('nosnippet')
+  };
+
+  // 11. Hreflang теги
+  seo.hreflang = [];
+  $('link[rel="alternate"][hreflang]').each((i, el) => {
+    seo.hreflang.push({
+      lang: $(el).attr('hreflang'),
+      href: $(el).attr('href')
+    });
+  });
+
+  // 12. Sitemap обнаружение
+  seo.sitemap = {
+    found: false,
+    urls: []
+  };
+  
+  // Поиск ссылок на sitemap в robots.txt упоминаниях или прямых ссылках
+  $('a[href*="sitemap"]').each((i, el) => {
+    const href = $(el).attr('href');
+    if (href && (href.includes('sitemap.xml') || href.includes('sitemap'))) {
+      seo.sitemap.urls.push(href);
+      seo.sitemap.found = true;
+    }
+  });
+
+  // Дополнительные SEO метрики
+  seo.additional = {
+    viewport: $('meta[name="viewport"]').attr('content') || '',
+    charset: $('meta[charset]').attr('charset') || '',
+    lang: $('html').attr('lang') || '',
+    favicon: $('link[rel*="icon"]').length > 0
+  };
+
+  return seo;
+}
 
 function analyzeContact($, html, url) {
   const contact = { phones: [], emails: [] };

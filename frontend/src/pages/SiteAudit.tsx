@@ -48,23 +48,76 @@ interface AuditResult {
       mouseflow?: boolean;
     };
     seo: {
-      title?: string;
-      titleLength?: number;
-      description?: string;
-      descriptionLength?: number;
-      keywords?: string;
-      structuredData?: boolean;
-      microdata?: boolean;
-      openGraph?: boolean;
-      openGraphData?: Record<string, string>;
-      twitterCards?: boolean;
-      twitterData?: Record<string, string>;
-      headings?: Record<string, number>;
-      canonical?: string;
-      robots?: string;
-      hreflang?: boolean;
-      hreflangData?: Array<{ hreflang: string; href: string }>;
-      sitemap?: boolean;
+      title?: {
+        content: string;
+        length: number;
+        isOptimal: boolean;
+      };
+      metaDescription?: {
+        content: string;
+        length: number;
+        isOptimal: boolean;
+      };
+      keywords?: {
+        content: string;
+        count: number;
+      };
+      openGraph?: {
+        title: string;
+        description: string;
+        image: string;
+        url: string;
+        type: string;
+        siteName: string;
+      };
+      twitterCard?: {
+        card: string;
+        title: string;
+        description: string;
+        image: string;
+        site: string;
+      };
+      structuredData?: {
+        count: number;
+        types: string[];
+      };
+      microdata?: {
+        itemscope: number;
+        itemtype: string[];
+      };
+      headings?: {
+        h1: { count: number; texts: string[] };
+        h2: { count: number; texts: string[] };
+        h3: { count: number; texts: string[] };
+        h4: { count: number; texts: string[] };
+        h5: { count: number; texts: string[] };
+        h6: { count: number; texts: string[] };
+      };
+      canonical?: {
+        url: string;
+        isPresent: boolean;
+      };
+      robots?: {
+        content: string;
+        noindex: boolean;
+        nofollow: boolean;
+        noarchive: boolean;
+        nosnippet: boolean;
+      };
+      hreflang?: Array<{
+        lang: string;
+        href: string;
+      }>;
+      sitemap?: {
+        found: boolean;
+        urls: string[];
+      };
+      additional?: {
+        viewport: string;
+        charset: string;
+        lang: string;
+        favicon: boolean;
+      };
     };
     visual: {
       imagesCount?: number;
@@ -176,7 +229,7 @@ const SiteAudit: React.FC = () => {
       setResult({
         url: normalizedUrl,
         loading: false,
-        data: data.audit
+        data: data.results
       });
 
     } catch (error) {
@@ -396,31 +449,31 @@ const SiteAudit: React.FC = () => {
                       {result.data.seo.title && (
                         <div className="info-item">
                           <span className="info-label">Заголовок:</span>
-                          <span className="info-value">{result.data.seo.title}</span>
-                          <span className="info-meta">({result.data.seo.titleLength} символов)</span>
+                          <span className="info-value">{result.data.seo.title.content}</span>
+                          <span className="info-meta">({result.data.seo.title.length} символов)</span>
                         </div>
                       )}
-                      {result.data.seo.description && (
+                      {result.data.seo.metaDescription && (
                         <div className="info-item">
                           <span className="info-label">Описание:</span>
-                          <span className="info-value">{result.data.seo.description}</span>
-                          <span className="info-meta">({result.data.seo.descriptionLength} символов)</span>
+                          <span className="info-value">{result.data.seo.metaDescription.content}</span>
+                          <span className="info-meta">({result.data.seo.metaDescription.length} символов)</span>
                         </div>
                       )}
                     </div>
                     <div className="seo-features">
-                      {result.data.seo.openGraph && <span className="feature-tag">Open Graph</span>}
-                      {result.data.seo.twitterCards && <span className="feature-tag">Twitter Cards</span>}
-                      {result.data.seo.structuredData && <span className="feature-tag">Структурированные данные</span>}
-                      {result.data.seo.canonical && <span className="feature-tag">Canonical URL</span>}
-                      {result.data.seo.sitemap && <span className="feature-tag">Sitemap</span>}
-                      {result.data.seo.hreflang && <span className="feature-tag">Hreflang</span>}
+                      {result.data.seo.openGraph?.title && <span className="feature-tag">Open Graph</span>}
+                      {result.data.seo.twitterCard?.card && <span className="feature-tag">Twitter Cards</span>}
+                      {(result.data.seo.structuredData?.count ?? 0) > 0 && <span className="feature-tag">Структурированные данные ({result.data.seo.structuredData?.count})</span>}
+                      {result.data.seo.canonical?.isPresent && <span className="feature-tag">Canonical URL</span>}
+                      {result.data.seo.sitemap?.found && <span className="feature-tag">Sitemap</span>}
+                      {(result.data.seo.hreflang?.length ?? 0) > 0 && <span className="feature-tag">Hreflang ({result.data.seo.hreflang?.length})</span>}
                     </div>
                     {result.data.seo.headings && (
                       <div className="headings-info">
                         <span className="info-label">Заголовки:</span>
-                        {Object.entries(result.data.seo.headings).map(([tag, count]) => (
-                          <span key={tag} className="heading-count">{tag.toUpperCase()}: {count}</span>
+                        {Object.entries(result.data.seo.headings).map(([tag, data]) => (
+                          <span key={tag} className="heading-count">{tag.toUpperCase()}: {data.count}</span>
                         ))}
                       </div>
                     )}
