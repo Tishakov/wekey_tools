@@ -16,14 +16,13 @@ export const getDefaultLanguage = (): SupportedLanguage => 'ru';
 
 // Хук для работы с языком из URL
 export const useLanguageFromUrl = () => {
-  console.log('🔄 [useLanguageFromUrl] Hook called with pathname:', window.location.pathname);
-  
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { i18n } = useTranslation();
   const lastRedirectRef = useRef<string>('');
 
+  console.log('🔄 [useLanguageFromUrl] Hook called with pathname:', location.pathname);
   console.log('🔄 [useLanguageFromUrl] Extracted lang:', lang, 'from pathname:', location.pathname);
 
   // Определяем текущий язык из URL или используем язык по умолчанию
@@ -34,9 +33,10 @@ export const useLanguageFromUrl = () => {
   // Принудительно устанавливаем язык при первой загрузке, если он отличается
   useEffect(() => {
     if (lang && isSupportedLanguage(lang) && i18n.language !== lang) {
+      console.log('🔄 [useLanguageFromUrl] Changing i18n language to:', lang);
       i18n.changeLanguage(lang);
     }
-  }, []); // Выполняется только при первом рендере
+  }, [lang, i18n]); // Добавляем зависимости
 
   useEffect(() => {
     // Защита от циклических редиректов

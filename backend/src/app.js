@@ -99,6 +99,7 @@ try {
   const analyticsRoutes = require('./routes/analytics');
   const toolsRoutes = require('./routes/tools');
   const siteAuditRoutes = require('./routes/siteAudit');
+  const seoAuditRoutes = require('./routes/seoAudit');
 
   app.use('/api/auth', authRoutes);
   app.use('/auth', oauthRoutes); // OAuth маршруты без /api префикса
@@ -108,6 +109,7 @@ try {
   app.use('/api/users', usersRoutes);
   app.use('/api', toolsRoutes); // Подключаем управление инструментами
   app.use('/api/tools', siteAuditRoutes); // Подключаем анализ сайтов
+  app.use('/api/tools', seoAuditRoutes); // Подключаем SEO аудит
   
   console.log('✅ All routes registered successfully');
 } catch (error) {

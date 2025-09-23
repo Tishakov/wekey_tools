@@ -32,6 +32,7 @@ import RemoveLineBreaksTool from './pages/RemoveLineBreaksTool';
 import TextByColumnsTool from './pages/TextByColumnsTool';
 import MatchTypesTool from './pages/MatchTypesTool';
 import SiteAudit from './pages/SiteAudit';
+import SeoAudit from './pages/SeoAudit';
 import AdminPanel from './pages/AdminPanel';
 import './styles/tool-pages.css';
 
@@ -90,6 +91,7 @@ function App() {
             <Route path="text-by-columns" element={<TextByColumnsTool />} />
             <Route path="match-types" element={<MatchTypesTool />} />
             <Route path="site-audit" element={<SiteAudit />} />
+            <Route path="seo-audit" element={<SeoAudit />} />
           </Route>
         </Routes>
       </Router>

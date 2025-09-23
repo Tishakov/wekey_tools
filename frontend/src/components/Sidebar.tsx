@@ -48,7 +48,8 @@ const Sidebar: React.FC = () => {
     'number-generator',      // Генератор чисел
     'password-generator',    // Генератор паролей
     'emoji',                 // Эмодзи
-    'site-audit'             // Аудит сайта
+    'site-audit',            // Аудит сайта
+    'seo-audit'              // SEO Аудит
   ];
   
   // Список инструментов с ИИ интеграцией

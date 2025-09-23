@@ -42,7 +42,8 @@
       "add-symbol": "Add Symbol",
       "duplicate-finder": "Duplicate Finder",
       "cross-analytics": "Cross Analytics",
-      "site-audit": "Site Audit"
+      "site-audit": "Site Audit",
+      "seo-audit": "SEO Audit"
     },
     "descriptions": {
       "case-changer": "Tool for changing text case",
@@ -79,7 +80,8 @@
       "add-symbol": "Add symbols to text",
       "duplicate-finder": "Find duplicate content",
       "cross-analytics": "Cross-platform analytics",
-      "site-audit": "Comprehensive analysis of website technologies and analytics"
+      "site-audit": "Comprehensive analysis of website technologies and analytics",
+      "seo-audit": "Detailed SEO optimization analysis"
     }
   },
   "common": {

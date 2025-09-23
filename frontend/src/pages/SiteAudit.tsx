@@ -47,78 +47,6 @@ interface AuditResult {
       fullstory?: boolean;
       mouseflow?: boolean;
     };
-    seo: {
-      title?: {
-        content: string;
-        length: number;
-        isOptimal: boolean;
-      };
-      metaDescription?: {
-        content: string;
-        length: number;
-        isOptimal: boolean;
-      };
-      keywords?: {
-        content: string;
-        count: number;
-      };
-      openGraph?: {
-        title: string;
-        description: string;
-        image: string;
-        url: string;
-        type: string;
-        siteName: string;
-      };
-      twitterCard?: {
-        card: string;
-        title: string;
-        description: string;
-        image: string;
-        site: string;
-      };
-      structuredData?: {
-        count: number;
-        types: string[];
-      };
-      microdata?: {
-        itemscope: number;
-        itemtype: string[];
-      };
-      headings?: {
-        h1: { count: number; texts: string[] };
-        h2: { count: number; texts: string[] };
-        h3: { count: number; texts: string[] };
-        h4: { count: number; texts: string[] };
-        h5: { count: number; texts: string[] };
-        h6: { count: number; texts: string[] };
-      };
-      canonical?: {
-        url: string;
-        isPresent: boolean;
-      };
-      robots?: {
-        content: string;
-        noindex: boolean;
-        nofollow: boolean;
-        noarchive: boolean;
-        nosnippet: boolean;
-      };
-      hreflang?: Array<{
-        lang: string;
-        href: string;
-      }>;
-      sitemap?: {
-        found: boolean;
-        urls: string[];
-      };
-      additional?: {
-        viewport: string;
-        charset: string;
-        lang: string;
-        favicon: boolean;
-      };
-    };
     visual: {
       imagesCount?: number;
       imagesWithoutAlt?: number;
@@ -441,44 +369,21 @@ const SiteAudit: React.FC = () => {
 
                   {/* Правая колонка */}
                   <div className="audit-column-right">
-                {/* SEO */}
-                {result.data.seo && (
-                  <div className="audit-section">
-                    <h3>🔍 SEO</h3>
-                    <div className="seo-info">
-                      {result.data.seo.title && (
-                        <div className="info-item">
-                          <span className="info-label">Заголовок:</span>
-                          <span className="info-value">{result.data.seo.title.content}</span>
-                          <span className="info-meta">({result.data.seo.title.length} символов)</span>
-                        </div>
-                      )}
-                      {result.data.seo.metaDescription && (
-                        <div className="info-item">
-                          <span className="info-label">Описание:</span>
-                          <span className="info-value">{result.data.seo.metaDescription.content}</span>
-                          <span className="info-meta">({result.data.seo.metaDescription.length} символов)</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="seo-features">
-                      {result.data.seo.openGraph?.title && <span className="feature-tag">Open Graph</span>}
-                      {result.data.seo.twitterCard?.card && <span className="feature-tag">Twitter Cards</span>}
-                      {(result.data.seo.structuredData?.count ?? 0) > 0 && <span className="feature-tag">Структурированные данные ({result.data.seo.structuredData?.count})</span>}
-                      {result.data.seo.canonical?.isPresent && <span className="feature-tag">Canonical URL</span>}
-                      {result.data.seo.sitemap?.found && <span className="feature-tag">Sitemap</span>}
-                      {(result.data.seo.hreflang?.length ?? 0) > 0 && <span className="feature-tag">Hreflang ({result.data.seo.hreflang?.length})</span>}
-                    </div>
-                    {result.data.seo.headings && (
-                      <div className="headings-info">
-                        <span className="info-label">Заголовки:</span>
-                        {Object.entries(result.data.seo.headings).map(([tag, data]) => (
-                          <span key={tag} className="heading-count">{tag.toUpperCase()}: {data.count}</span>
-                        ))}
-                      </div>
-                    )}
+                {/* SEO Recommendation */}
+                <div className="audit-section">
+                  <h3>🔍 SEO-анализ</h3>
+                  <div className="seo-recommendation">
+                    <p className="recommendation-text">
+                      Для подробного SEO-анализа сайта воспользуйтесь нашим специализированным инструментом
+                    </p>
+                    <Link 
+                      to={createLink('/seo-audit')} 
+                      className="recommendation-button"
+                    >
+                      🚀 Запустить SEO Аудит
+                    </Link>
                   </div>
-                )}
+                </div>
 
                 {/* Визуальные элементы */}
                 {result.data.visual && (

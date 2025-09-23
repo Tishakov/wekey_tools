@@ -226,6 +226,15 @@ export const toolsConfig: Tool[] = [
     path: '/site-audit',
     category: 'analytics',
     status: 'ready'
+  },
+  {
+    id: 'seo-audit',
+    title: 'Аудит SEO',
+    description: 'Детальный анализ SEO-оптимизации сайта',
+    icon: '/icons/tool_seo_site.svg',
+    path: '/seo-audit',
+    category: 'analytics',
+    status: 'ready'
   }
 ];
 
