@@ -185,6 +185,43 @@ interface SeoAuditResult {
         cls: { value: number; score: number; displayValue: string };
       };
     };
+    robotsCheck?: {
+      found: boolean;
+      url?: string;
+      status?: number;
+      hasUserAgent?: boolean;
+      hasDisallow?: boolean;
+      hasSitemap?: boolean;
+      issues?: string[];
+      warnings?: string[];
+      error?: string;
+    };
+    sitemapCheck?: {
+      found: boolean;
+      urls?: Array<{
+        url: string;
+        status: number;
+        size: string;
+      }>;
+      issues?: string[];
+      warnings?: string[];
+    };
+    ssl?: {
+      hasSSL: boolean;
+      status?: number;
+      issues?: string[];
+      warnings?: string[];
+      error?: string;
+    };
+    resourcesSpeed?: {
+      loadTime: number | null;
+      htmlSize?: number;
+      htmlSizeKB?: number;
+      responseStatus?: number;
+      issues?: string[];
+      warnings?: string[];
+      error?: string;
+    };
   };
 }
 
@@ -612,8 +649,8 @@ const SeoAudit: React.FC = () => {
                   </div>
                 )}
 
-                {/* Двухколоночная структура как раньше */}
-                <div className="seo-audit-columns">
+                {/* Сбалансированная двухколоночная структура */}
+                <div className="seo-audit-flex-columns">
                   {/* Левая колонка */}
                   <div className="seo-audit-column-left">
                     {/* SEO Summary */}
@@ -776,11 +813,106 @@ const SeoAudit: React.FC = () => {
                         </div>
                       </div>
                     )}
-                  </div>
 
-                  {/* Правая колонка */}
-                  <div className="seo-audit-column-right">
-                    {/* Социальные сети */}
+                    {/* Robots.txt проверка - Level 2 */}
+                    {result.data.robotsCheck && (
+                      <div className="seo-audit-section">
+                        <h3>🤖 Robots.txt</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${result.data.robotsCheck.found ? 'good' : 'warning'}`}>
+                              {result.data.robotsCheck.found ? '✅' : '❌'}
+                            </span>
+                            <span className="seo-audit-title">Файл robots.txt</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            {result.data.robotsCheck.found ? (
+                              <div>
+                                <p className="seo-audit-value">✅ Файл найден</p>
+                                <div className="seo-audit-technical-details">
+                                  <p>📍 URL: <code>{result.data.robotsCheck.url}</code></p>
+                                  <p>🎯 User-agent: {result.data.robotsCheck.hasUserAgent ? '✅' : '❌'}</p>
+                                  <p>🚫 Disallow правила: {result.data.robotsCheck.hasDisallow ? '✅' : '❌'}</p>
+                                  <p>🗺️ Sitemap указан: {result.data.robotsCheck.hasSitemap ? '✅' : '❌'}</p>
+                                </div>
+                                {result.data.robotsCheck.issues && result.data.robotsCheck.issues.length > 0 && (
+                                  <div className="seo-audit-issues">
+                                    <h4>❌ Проблемы:</h4>
+                                    {result.data.robotsCheck.issues.map((issue, i) => (
+                                      <p key={i} className="seo-audit-issue">{issue}</p>
+                                    ))}
+                                  </div>
+                                )}
+                                {result.data.robotsCheck.warnings && result.data.robotsCheck.warnings.length > 0 && (
+                                  <div className="seo-audit-warnings">
+                                    <h4>⚠️ Предупреждения:</h4>
+                                    {result.data.robotsCheck.warnings.map((warning, i) => (
+                                      <p key={i} className="seo-audit-warning">{warning}</p>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="seo-audit-value">Файл robots.txt не найден</p>
+                                <p className="seo-audit-tip">💡 Создайте файл robots.txt для управления индексацией поисковыми системами.</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sitemap.xml проверка - Level 2 */}
+                    {result.data.sitemapCheck && (
+                      <div className="seo-audit-section">
+                        <h3>🗺️ Sitemap</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${result.data.sitemapCheck.found ? 'good' : 'warning'}`}>
+                              {result.data.sitemapCheck.found ? '✅' : '❌'}
+                            </span>
+                            <span className="seo-audit-title">Карта сайта</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            {result.data.sitemapCheck.found ? (
+                              <div>
+                                <p className="seo-audit-value">✅ Sitemap найден</p>
+                                {result.data.sitemapCheck.urls && result.data.sitemapCheck.urls.length > 0 && (
+                                  <div className="sitemap-urls">
+                                    <h4>📂 Найденные sitemap файлы:</h4>
+                                    {result.data.sitemapCheck.urls.map((sitemap, i) => (
+                                      <div key={i} className="sitemap-url">
+                                        <span className="url">{sitemap.url}</span>
+                                        <span className="status">Статус: {sitemap.status}</span>
+                                        <span className="size">Размер: {sitemap.size}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {result.data.sitemapCheck.issues && result.data.sitemapCheck.issues.length > 0 && (
+                                  <div className="seo-audit-issues">
+                                    <h4>❌ Проблемы:</h4>
+                                    {result.data.sitemapCheck.issues.map((issue, i) => (
+                                      <p key={i} className="seo-audit-issue">{issue}</p>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="seo-audit-value">Sitemap не найден</p>
+                                <p className="seo-audit-tip">💡 Создайте sitemap.xml для лучшей индексации страниц сайта.</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Социальные сети - перенесено из правой колонки для баланса */}
                     <div className="seo-audit-section">
                       <h3>📱 Социальные сети</h3>
                       
@@ -814,7 +946,10 @@ const SeoAudit: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                  </div>
 
+                  {/* Правая колонка */}
+                  <div className="seo-audit-column-right">
                     {/* Техническое SEO */}
                     <div className="seo-audit-section">
                       <h3>⚙️ Техническая настройка</h3>
@@ -1000,6 +1135,104 @@ const SeoAudit: React.FC = () => {
                                   <p key={index} className="seo-audit-tip">{rec}</p>
                                 ))}
                               </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SSL и безопасность - Level 2 */}
+                    {result.data.ssl && (
+                      <div className="seo-audit-section">
+                        <h3>🔒 SSL и безопасность</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${result.data.ssl.hasSSL ? 'good' : 'error'}`}>
+                              {result.data.ssl.hasSSL ? '✅' : '🔴'}
+                            </span>
+                            <span className="seo-audit-title">HTTPS протокол</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            <p className="seo-audit-value">
+                              🛡️ Протокол: <span className={result.data.ssl.hasSSL ? 'text-success' : 'text-error'}>
+                                {result.data.ssl.hasSSL ? 'HTTPS (Безопасно)' : 'HTTP (Небезопасно)'}
+                              </span>
+                            </p>
+                            {result.data.ssl.status && (
+                              <p className="seo-audit-meta">📊 Код ответа: {result.data.ssl.status}</p>
+                            )}
+                            {result.data.ssl.issues && result.data.ssl.issues.length > 0 && (
+                              <div className="seo-audit-issues">
+                                <h4>❌ Проблемы безопасности:</h4>
+                                {result.data.ssl.issues.map((issue, i) => (
+                                  <p key={i} className="seo-audit-issue">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+                            {!result.data.ssl.hasSSL && (
+                              <p className="seo-audit-tip">💡 HTTPS является обязательным фактором ранжирования в Google. Настройте SSL-сертификат.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Скорость ресурсов - Level 2 */}
+                    {result.data.resourcesSpeed && (
+                      <div className="seo-audit-section">
+                        <h3>⚡ Скорость загрузки</h3>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${
+                              result.data.resourcesSpeed.loadTime && result.data.resourcesSpeed.loadTime < 1500 ? 'good' : 
+                              result.data.resourcesSpeed.loadTime && result.data.resourcesSpeed.loadTime < 3000 ? 'warning' : 'error'
+                            }`}>
+                              {result.data.resourcesSpeed.loadTime && result.data.resourcesSpeed.loadTime < 1500 ? '✅' : 
+                               result.data.resourcesSpeed.loadTime && result.data.resourcesSpeed.loadTime < 3000 ? '⚠️' : '🔴'}
+                            </span>
+                            <span className="seo-audit-title">Время загрузки HTML</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            {result.data.resourcesSpeed.loadTime && (
+                              <p className="seo-audit-value">⏱️ Время загрузки: {result.data.resourcesSpeed.loadTime}ms</p>
+                            )}
+                            {result.data.resourcesSpeed.htmlSizeKB && (
+                              <p className="seo-audit-meta">📦 Размер HTML: {result.data.resourcesSpeed.htmlSizeKB}KB</p>
+                            )}
+                            <div className="resources-grid">
+                              {result.data.resourcesSpeed.loadTime && (
+                                <div className="resource-metric">
+                                  <span className="metric-label">⏱️ HTML</span>
+                                  <span className="metric-value">{result.data.resourcesSpeed.loadTime}ms</span>
+                                </div>
+                              )}
+                              {result.data.resourcesSpeed.htmlSizeKB && (
+                                <div className="resource-metric">
+                                  <span className="metric-label">📦 Размер</span>
+                                  <span className="metric-value">{result.data.resourcesSpeed.htmlSizeKB}KB</span>
+                                </div>
+                              )}
+                            </div>
+                            {result.data.resourcesSpeed.issues && result.data.resourcesSpeed.issues.length > 0 && (
+                              <div className="seo-audit-issues">
+                                <h4>❌ Проблемы производительности:</h4>
+                                {result.data.resourcesSpeed.issues.map((issue, i) => (
+                                  <p key={i} className="seo-audit-issue">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+                            {result.data.resourcesSpeed.warnings && result.data.resourcesSpeed.warnings.length > 0 && (
+                              <div className="seo-audit-warnings">
+                                <h4>⚠️ Рекомендации:</h4>
+                                {result.data.resourcesSpeed.warnings.map((warning, i) => (
+                                  <p key={i} className="seo-audit-warning">{warning}</p>
+                                ))}
+                              </div>
+                            )}
+                            {result.data.resourcesSpeed.loadTime && result.data.resourcesSpeed.loadTime > 3000 && (
+                              <p className="seo-audit-tip">💡 Время загрузки больше 3 секунд критично влияет на пользователей и SEO. Рекомендуется оптимизация.</p>
                             )}
                           </div>
                         </div>

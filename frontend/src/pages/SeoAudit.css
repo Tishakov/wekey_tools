@@ -74,10 +74,10 @@
   overflow: hidden;
 }
 
-/* Двухколоночная структура */
+/* Улучшенная двухколоночная структура с auto-fit */
 .seo-audit-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 20px;
   padding: 30px;
   align-items: start;
@@ -89,6 +89,37 @@
   flex-direction: column;
   gap: 20px;
   min-height: fit-content;
+}
+
+/* Альтернативная Masonry структура для будущего использования */
+.seo-audit-masonry {
+  column-count: 2;
+  column-gap: 20px;
+  padding: 30px;
+}
+
+.seo-audit-masonry .seo-audit-section {
+  break-inside: avoid;
+  margin-bottom: 20px;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Flexbox альтернатива для лучшего баланса */
+.seo-audit-flex-columns {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  align-items: flex-start;
+}
+
+.seo-audit-flex-columns .seo-audit-column-left,
+.seo-audit-flex-columns .seo-audit-column-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
 }
 
 /* Кастомный скроллбар для seo-audit-content */
@@ -1034,11 +1065,12 @@
   }
 }
 
-/* Адаптивность */
+/* Адаптивность для колонок */
 @media (max-width: 1024px) {
-  .seo-audit-columns {
+  .seo-audit-columns,
+  .seo-audit-flex-columns {
     grid-template-columns: 1fr;
-    gap: 20px;
+    flex-direction: column;
   }
   
   .seo-audit-url-container {
@@ -1077,7 +1109,323 @@
     padding: 16px;
   }
   
-  .seo-audit-columns {
+  .seo-audit-columns,
+  .seo-audit-flex-columns {
     padding: 20px;
+  }
+}
+
+/* === LEVEL 2 ТЕХНИЧЕСКИЕ ПРОВЕРКИ - В ТЁМНОЙ ТЕМЕ === */
+
+/* Section headers для Level 2 блоков */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FAFAFA;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Статусные бейджи в тёмной теме */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+}
+
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Audit items для Level 2 */
+.audit-item {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.audit-item:last-child {
+  margin-bottom: 0;
+}
+
+.audit-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333335;
+}
+
+.audit-item-header span:first-child {
+  font-size: 13px;
+  font-weight: 500;
+  color: #D1D5DB;
+}
+
+.audit-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #FAFAFA;
+  font-family: 'Courier New', monospace;
+}
+
+/* Директивы robots.txt в тёмной теме */
+.directives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #1C1D1F;
+  border-radius: 6px;
+  border: 1px solid #333335;
+}
+
+.directive-ok {
+  color: #10B981;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.directive-missing {
+  color: #EF4444;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Sitemap URLs в тёмной теме */
+.sitemap-urls {
+  margin-top: 16px;
+}
+
+.sitemap-urls h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #D1D5DB;
+}
+
+.sitemap-url {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border-left: 3px solid #10B981;
+}
+
+.sitemap-url .url {
+  font-family: 'Courier New', monospace;
+  color: #09CEA7;
+  font-weight: 500;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.sitemap-url .status,
+.sitemap-url .size {
+  font-size: 12px;
+  color: #808184;
+}
+
+/* Статусы в тёмной теме */
+.text-success {
+  color: #10B981 !important;
+  font-weight: 500;
+}
+
+.text-error {
+  color: #EF4444 !important;
+  font-weight: 500;
+}
+
+/* Метрики ресурсов в тёмной теме */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.resource-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.resource-metric:hover {
+  background: #28282A;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: #D1D5DB;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 14px;
+  color: #FAFAFA;
+  font-weight: 600;
+}
+
+/* Issues и warnings в тёмной теме */
+.seo-audit-issues {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+}
+
+.seo-audit-issues h4 {
+  margin: 0 0 8px 0;
+  color: #EF4444;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.seo-audit-issue {
+  margin: 4px 0;
+  color: #F87171;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.seo-audit-warnings {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 6px;
+}
+
+.seo-audit-warnings h4 {
+  margin: 0 0 8px 0;
+  color: #F59E0B;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.seo-audit-warning {
+  margin: 4px 0;
+  color: #FCD34D;
+  font-size: 13px;
+  line-height: 1.4;
+  padding-left: 20px;
+  position: relative;
+}
+
+.seo-audit-warning::before {
+  content: "⚠️";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Technical details styling */
+.seo-audit-technical-details {
+  margin-top: 8px;
+  padding: 8px;
+  background: #1C1D1F;
+  border-radius: 4px;
+  border-left: 2px solid #09CEA7;
+}
+
+.seo-audit-technical-details p {
+  margin: 4px 0;
+  font-size: 12px;
+  color: #D1D5DB;
+}
+
+.seo-audit-technical-details code {
+  background: #333335;
+  color: #09CEA7;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* Missing/recommendation states */
+.seo-audit-missing {
+  padding: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.seo-audit-recommendation {
+  margin: 0;
+  color: #FCD34D;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Адаптивность для Level 2 */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .resources-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .directives-list {
+    gap: 6px;
+  }
+  
+  .sitemap-url {
+    padding: 10px;
+  }
+  
+  .audit-item {
+    padding: 12px;
+  }
+  
+  .audit-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }

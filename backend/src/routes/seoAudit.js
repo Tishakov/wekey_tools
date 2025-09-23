@@ -135,14 +135,20 @@ router.post('/seo-audit', async (req, res) => {
       fullUrl = 'https://' + url;
     }
 
-    // Параллельно запускаем HTML анализ и PageSpeed
-    const [htmlAnalysis, pageSpeedData] = await Promise.allSettled([
+    // Параллельно запускаем все проверки
+    const [htmlAnalysis, pageSpeedData, robotsCheck, sslCheck, resourcesCheck] = await Promise.allSettled([
       analyzeHTML(fullUrl),
-      getPageSpeedData(fullUrl)
+      getPageSpeedData(fullUrl),
+      checkRobotsTxt(fullUrl),
+      checkSSL(fullUrl),
+      checkResourcesSpeed(fullUrl)
     ]);
 
     let seoResult = {};
     let performanceData = null;
+    let robotsData = null;
+    let sslData = null;
+    let resourcesData = null;
 
     if (htmlAnalysis.status === 'fulfilled') {
       seoResult = htmlAnalysis.value;
@@ -154,8 +160,41 @@ router.post('/seo-audit', async (req, res) => {
       performanceData = pageSpeedData.value;
     }
 
+    if (robotsCheck.status === 'fulfilled') {
+      robotsData = robotsCheck.value;
+    }
+
+    if (sslCheck.status === 'fulfilled') {
+      sslData = sslCheck.value;
+    }
+
+    if (resourcesCheck.status === 'fulfilled') {
+      resourcesData = resourcesCheck.value;
+    } else {
+      console.error('Resources check failed:', resourcesCheck.reason);
+      resourcesData = { 
+        error: resourcesCheck.reason?.message || 'Unknown error',
+        loadTime: null,
+        issues: ['Ошибка при проверке скорости загрузки'],
+        warnings: []
+      };
+    }
+
+    // Проверяем sitemap после получения robots.txt
+    let sitemapData = null;
+    try {
+      sitemapData = await checkSitemap(fullUrl, robotsData);
+    } catch (error) {
+      console.error('Sitemap check failed:', error);
+    }
+
     // Объединяем данные и добавляем персонализированные рекомендации
-    const enhancedResult = enhanceWithInsights(seoResult, performanceData);
+    const enhancedResult = enhanceWithInsights(seoResult, performanceData, {
+      robots: robotsData,
+      sitemap: sitemapData,
+      ssl: sslData,
+      resources: resourcesData
+    });
 
     res.json({ success: true, results: enhancedResult });
 
@@ -474,17 +513,34 @@ function analyzeSEO($, html, url) {
 }
 
 // Функция для создания персонализированных инсайтов и приоритизации
-function enhanceWithInsights(seoData, performanceData) {
+function enhanceWithInsights(seoData, performanceData, additionalData = {}) {
   const enhanced = { ...seoData };
   
   // Добавляем данные производительности
   enhanced.webVitals = performanceData;
   
+  // Добавляем новые проверки
+  if (additionalData.robots) {
+    enhanced.robotsCheck = additionalData.robots;
+  }
+  
+  if (additionalData.sitemap) {
+    enhanced.sitemapCheck = additionalData.sitemap;
+  }
+  
+  if (additionalData.ssl) {
+    enhanced.ssl = additionalData.ssl;
+  }
+  
+  if (additionalData.resources) {
+    enhanced.resourcesSpeed = additionalData.resources;
+  }
+
   // Создаем общий SEO Health Score
-  enhanced.overallScore = calculateOverallScore(seoData, performanceData);
+  enhanced.overallScore = calculateOverallScore(seoData, performanceData, additionalData);
   
   // Генерируем персонализированные рекомендации с приоритетами
-  enhanced.actionPlan = generateActionPlan(seoData, performanceData);
+  enhanced.actionPlan = generateActionPlan(seoData, performanceData, additionalData);
   
   // Добавляем инсайты для визуализации
   enhanced.visualData = generateVisualData(seoData, performanceData);
@@ -493,7 +549,7 @@ function enhanceWithInsights(seoData, performanceData) {
 }
 
 // Расчет общего SEO Health Score
-function calculateOverallScore(seoData, performanceData) {
+function calculateOverallScore(seoData, performanceData, additionalData = {}) {
   const scores = {
     technical: 0,
     content: 0,
@@ -561,7 +617,7 @@ function calculateOverallScore(seoData, performanceData) {
 }
 
 // Генерация Action Plan с приоритетами
-function generateActionPlan(seoData, performanceData) {
+function generateActionPlan(seoData, performanceData, additionalData = {}) {
   const actions = [];
   
   // Критические проблемы (влияют на ранжирование)
@@ -648,6 +704,79 @@ function generateActionPlan(seoData, performanceData) {
       impact: 'low',
       effort: 'low',
       expectedImprovement: '+20-40% CTR в социальных сетях'
+    });
+  }
+
+  // Новые проверки robots.txt и sitemap
+  if (additionalData.robots && !additionalData.robots.found) {
+    actions.push({
+      priority: 'important',
+      category: 'Technical',
+      task: 'Создать файл robots.txt',
+      description: 'Robots.txt не найден. Это важно для управления индексацией.',
+      impact: 'medium',
+      effort: 'low',
+      expectedImprovement: '+5-10% контроль индексации'
+    });
+  }
+
+  if (additionalData.robots?.issues?.length > 0) {
+    actions.push({
+      priority: 'recommended',
+      category: 'Technical',
+      task: 'Исправить ошибки в robots.txt',
+      description: `Найдены проблемы: ${additionalData.robots.issues.join(', ')}`,
+      impact: 'low',
+      effort: 'low',
+      expectedImprovement: '+3-5% SEO оптимизация'
+    });
+  }
+
+  if (additionalData.sitemap && !additionalData.sitemap.found) {
+    actions.push({
+      priority: 'important',
+      category: 'Technical',
+      task: 'Создать sitemap.xml',
+      description: 'Sitemap.xml не найден. Поможет поисковикам лучше индексировать сайт.',
+      impact: 'medium',
+      effort: 'medium',
+      expectedImprovement: '+10-15% скорость индексации'
+    });
+  }
+
+  if (additionalData.ssl && !additionalData.ssl.hasSSL) {
+    actions.push({
+      priority: 'critical',
+      category: 'Security',
+      task: 'Настроить HTTPS',
+      description: 'Сайт не использует HTTPS. Это критично для безопасности и SEO.',
+      impact: 'high',
+      effort: 'high',
+      expectedImprovement: '+15-25% доверие пользователей и SEO'
+    });
+  }
+
+  if (additionalData.resources?.loadTime > 3000) {
+    actions.push({
+      priority: 'important',
+      category: 'Performance',
+      task: 'Оптимизировать скорость загрузки',
+      description: `Время загрузки ${additionalData.resources.loadTime}ms слишком медленное.`,
+      impact: 'high',
+      effort: 'high',
+      expectedImprovement: '+20-30% пользовательский опыт'
+    });
+  }
+
+  if (additionalData.resources?.cssFiles > 10 || additionalData.resources?.jsFiles > 15) {
+    actions.push({
+      priority: 'recommended',
+      category: 'Performance',
+      task: 'Оптимизировать количество ресурсов',
+      description: `Слишком много CSS/JS файлов (${additionalData.resources.cssFiles}/${additionalData.resources.jsFiles}).`,
+      impact: 'medium',
+      effort: 'medium',
+      expectedImprovement: '+10-15% скорость загрузки'
     });
   }
   
@@ -1077,6 +1206,216 @@ function detectPageType($, url) {
   }
   
   return 'page';
+}
+
+// Функция для проверки robots.txt
+async function checkRobotsTxt(baseUrl) {
+  try {
+    const robotsUrl = new URL('/robots.txt', baseUrl).href;
+    const response = await fetch(robotsUrl, {
+      headers: { 'User-Agent': 'Wekey-SEO-Bot/1.0' },
+      timeout: 10000
+    });
+
+    if (!response.ok) {
+      return {
+        found: false,
+        url: robotsUrl,
+        status: response.status,
+        issues: ['Файл robots.txt не найден']
+      };
+    }
+
+    const content = await response.text();
+    const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+    
+    const analysis = {
+      found: true,
+      url: robotsUrl,
+      status: 200,
+      size: content.length,
+      lines: lines.length,
+      hasUserAgent: false,
+      hasDisallow: false,
+      hasSitemap: false,
+      issues: [],
+      warnings: []
+    };
+
+    // Анализ содержимого
+    lines.forEach(line => {
+      const lowerLine = line.toLowerCase();
+      if (lowerLine.startsWith('user-agent:')) {
+        analysis.hasUserAgent = true;
+      }
+      if (lowerLine.startsWith('disallow:')) {
+        analysis.hasDisallow = true;
+      }
+      if (lowerLine.startsWith('sitemap:')) {
+        analysis.hasSitemap = true;
+      }
+    });
+
+    // Проверки и рекомендации
+    if (!analysis.hasUserAgent) {
+      analysis.issues.push('Отсутствует директива User-agent');
+    }
+    if (!analysis.hasDisallow) {
+      analysis.warnings.push('Нет правил Disallow (возможно, весь сайт открыт для индексации)');
+    }
+    if (!analysis.hasSitemap) {
+      analysis.warnings.push('Не указан путь к sitemap.xml');
+    }
+    if (content.length > 500000) { // 500KB
+      analysis.warnings.push('Файл robots.txt очень большой (>500KB)');
+    }
+
+    return analysis;
+  } catch (error) {
+    return {
+      found: false,
+      url: robotsUrl || `${baseUrl}/robots.txt`,
+      error: error.message,
+      issues: ['Ошибка при загрузке robots.txt: ' + error.message]
+    };
+  }
+}
+
+// Функция для проверки sitemap.xml
+async function checkSitemap(baseUrl, robotsData = null) {
+  const results = {
+    found: false,
+    urls: [],
+    issues: [],
+    warnings: []
+  };
+
+  const sitemapUrls = [];
+  
+  // Добавляем URL из robots.txt
+  if (robotsData?.hasSitemap) {
+    // Здесь можно парсить sitemap URLs из robots.txt
+    sitemapUrls.push(new URL('/sitemap.xml', baseUrl).href);
+  } else {
+    // Стандартные места для sitemap
+    sitemapUrls.push(
+      new URL('/sitemap.xml', baseUrl).href,
+      new URL('/sitemap_index.xml', baseUrl).href,
+      new URL('/sitemap.txt', baseUrl).href
+    );
+  }
+
+  for (const sitemapUrl of sitemapUrls) {
+    try {
+      const response = await fetch(sitemapUrl, {
+        headers: { 'User-Agent': 'Wekey-SEO-Bot/1.0' },
+        timeout: 10000
+      });
+
+      if (response.ok) {
+        results.found = true;
+        results.urls.push({
+          url: sitemapUrl,
+          status: response.status,
+          size: response.headers.get('content-length') || 'unknown'
+        });
+        break; // Нашли первый рабочий sitemap
+      }
+    } catch (error) {
+      // Игнорируем ошибки для отдельных sitemap URLs
+    }
+  }
+
+  if (!results.found) {
+    results.issues.push('Sitemap.xml не найден в стандартных местах');
+  }
+
+  return results;
+}
+
+// Функция для проверки SSL сертификата
+async function checkSSL(url) {
+  try {
+    const urlObj = new URL(url);
+    
+    if (urlObj.protocol !== 'https:') {
+      return {
+        hasSSL: false,
+        issues: ['Сайт не использует HTTPS'],
+        warnings: ['Рекомендуется переход на HTTPS для безопасности и SEO']
+      };
+    }
+
+    // Простая проверка доступности HTTPS
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'Wekey-SEO-Bot/1.0' },
+      timeout: 10000
+    });
+
+    return {
+      hasSSL: true,
+      status: response.status,
+      issues: [],
+      warnings: response.status !== 200 ? [`HTTPS ответил с кодом ${response.status}`] : []
+    };
+
+  } catch (error) {
+    return {
+      hasSSL: url.startsWith('https://'),
+      error: error.message,
+      issues: ['Ошибка при проверке SSL: ' + error.message],
+      warnings: []
+    };
+  }
+}
+
+// Функция для проверки скорости загрузки ресурсов
+async function checkResourcesSpeed(url) {
+  try {
+    const start = Date.now();
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'Wekey-SEO-Bot/1.0' },
+      timeout: 15000
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const loadTime = Date.now() - start;
+    const html = await response.text();
+    const htmlSize = Buffer.byteLength(html, 'utf8');
+    
+    const analysis = {
+      loadTime: loadTime,
+      htmlSize: htmlSize,
+      htmlSizeKB: Math.round(htmlSize / 1024 * 100) / 100,
+      responseStatus: response.status,
+      issues: [],
+      warnings: []
+    };
+
+    // Анализ времени загрузки
+    if (loadTime > 3000) {
+      analysis.issues.push(`Медленная загрузка HTML (${loadTime}ms > 3000ms)`);
+    } else if (loadTime > 1500) {
+      analysis.warnings.push(`Загрузка HTML можно ускорить (${loadTime}ms)`);
+    }
+
+    // Анализ размера HTML
+    if (htmlSize > 1024 * 1024) { // > 1MB
+      analysis.warnings.push(`Большой размер HTML (${analysis.htmlSizeKB}KB)`);
+    }
+
+    return analysis;
+  } catch (error) {
+    return {
+      error: error.message,
+      loadTime: null,
+      issues: ['Ошибка при анализе скорости ресурсов: ' + error.message],
+      warnings: []
+    };
+  }
 }
 
 module.exports = router;
