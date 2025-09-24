@@ -809,14 +809,14 @@ const SeoAudit: React.FC = () => {
                                 <div className="web-vital-value">
                                   <span className="web-vital-number">{currentDeviceData.core_web_vitals.lcp.displayValue}</span>
                                   <div className="web-vital-score-circle">
-                                    <svg width="40" height="40">
-                                      <circle cx="20" cy="20" r="18" className="web-vital-bg"></circle>
+                                    <svg width="50" height="50">
+                                      <circle cx="25" cy="25" r="22" className="web-vital-bg"></circle>
                                       <circle 
-                                        cx="20" cy="20" r="18" 
+                                        cx="25" cy="25" r="22" 
                                         className={`web-vital-fill ${currentDeviceData.core_web_vitals.lcp.score >= 75 ? 'good' : currentDeviceData.core_web_vitals.lcp.score >= 50 ? 'average' : 'poor'}`}
                                         style={{
-                                          strokeDasharray: `${2 * Math.PI * 18}`,
-                                          strokeDashoffset: `${2 * Math.PI * 18 * (1 - currentDeviceData.core_web_vitals.lcp.score / 100)}`
+                                          strokeDasharray: `${2 * Math.PI * 22}`,
+                                          strokeDashoffset: `${2 * Math.PI * 22 * (1 - currentDeviceData.core_web_vitals.lcp.score / 100)}`
                                         }}
                                       ></circle>
                                     </svg>
@@ -848,14 +848,14 @@ const SeoAudit: React.FC = () => {
                                 <div className="web-vital-value">
                                   <span className="web-vital-number">{currentDeviceData.core_web_vitals.fid.displayValue}</span>
                                   <div className="web-vital-score-circle">
-                                    <svg width="40" height="40">
-                                      <circle cx="20" cy="20" r="18" className="web-vital-bg"></circle>
+                                    <svg width="50" height="50">
+                                      <circle cx="25" cy="25" r="22" className="web-vital-bg"></circle>
                                       <circle 
-                                        cx="20" cy="20" r="18" 
+                                        cx="25" cy="25" r="22" 
                                         className={`web-vital-fill ${currentDeviceData.core_web_vitals.fid.score >= 75 ? 'good' : currentDeviceData.core_web_vitals.fid.score >= 50 ? 'average' : 'poor'}`}
                                         style={{
-                                          strokeDasharray: `${2 * Math.PI * 18}`,
-                                          strokeDashoffset: `${2 * Math.PI * 18 * (1 - currentDeviceData.core_web_vitals.fid.score / 100)}`
+                                          strokeDasharray: `${2 * Math.PI * 22}`,
+                                          strokeDashoffset: `${2 * Math.PI * 22 * (1 - currentDeviceData.core_web_vitals.fid.score / 100)}`
                                         }}
                                       ></circle>
                                     </svg>
@@ -887,14 +887,14 @@ const SeoAudit: React.FC = () => {
                                 <div className="web-vital-value">
                                   <span className="web-vital-number">{currentDeviceData.core_web_vitals.cls.displayValue}</span>
                                   <div className="web-vital-score-circle">
-                                    <svg width="40" height="40">
-                                      <circle cx="20" cy="20" r="18" className="web-vital-bg"></circle>
+                                    <svg width="50" height="50">
+                                      <circle cx="25" cy="25" r="22" className="web-vital-bg"></circle>
                                       <circle 
-                                        cx="20" cy="20" r="18" 
+                                        cx="25" cy="25" r="22" 
                                         className={`web-vital-fill ${currentDeviceData.core_web_vitals.cls.score >= 75 ? 'good' : currentDeviceData.core_web_vitals.cls.score >= 50 ? 'average' : 'poor'}`}
                                         style={{
-                                          strokeDasharray: `${2 * Math.PI * 18}`,
-                                          strokeDashoffset: `${2 * Math.PI * 18 * (1 - currentDeviceData.core_web_vitals.cls.score / 100)}`
+                                          strokeDasharray: `${2 * Math.PI * 22}`,
+                                          strokeDashoffset: `${2 * Math.PI * 22 * (1 - currentDeviceData.core_web_vitals.cls.score / 100)}`
                                         }}
                                       ></circle>
                                     </svg>

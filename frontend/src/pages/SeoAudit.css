@@ -145,7 +145,7 @@
 .seo-audit-flex-columns {
   display: flex;
   gap: 20px;
-  padding: 30px;
+  padding: 20px;
   align-items: flex-start;
 }
 
@@ -234,10 +234,6 @@
 }
 
 /* Основной контент результатов */
-.seo-audit-content {
-  margin-top: 24px;
-}
-
 /* Секции */
 .seo-audit-section {
   background: #1C1D1F;
@@ -537,7 +533,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 30px;
+  padding: 20px;
 }
 
 .seo-audit-health-score {
@@ -936,7 +932,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .web-vital-number {
@@ -981,15 +977,14 @@
 
 .web-vital-score-text {
   position: absolute;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   color: #FAFAFA;
 }
 
 /* Action Plan */
 .seo-audit-action-plan {
-  margin-bottom: 32px;
-  padding: 30px;
+  padding: 20px;
 }
 
 .seo-audit-action-plan h3 {
@@ -1147,12 +1142,12 @@
 }
 
 .action-plan-controls {
-  margin-top: 20px;
+  margin-top: 40px;
   text-align: center;
 }
 
 .action-plan-controls .show-more-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #1C1D1F;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -1161,11 +1156,6 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.action-plan-controls .show-more-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* Адаптивность для визуальных компонентов */
@@ -1433,7 +1423,7 @@
 .resources-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
+  gap: 5px;
   margin-bottom: 16px;
 }
 
@@ -1674,7 +1664,7 @@
 .w3c-stats {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 5px;
   margin: 16px 0;
 }
 
@@ -1844,7 +1834,7 @@
 .security-summary {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 5px;
   margin: 16px 0;
 }
 
@@ -2074,7 +2064,7 @@
 .link-stats-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 5px;
   margin-bottom: 12px;
 }
 
