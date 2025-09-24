@@ -666,3 +666,115 @@
   color: #1C1D1F;
   text-decoration: none;
 }
+
+/* Технологии - новый расширенный блок */
+.technologies-section {
+  border: 2px solid #09CEA7;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(9, 206, 167, 0.05) 0%, rgba(40, 40, 42, 0.05) 100%);
+}
+
+.technologies-section h3 {
+  color: #09CEA7;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.tech-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tech-category {
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 15px;
+  transition: all 0.2s ease;
+}
+
+.tech-category:hover {
+  border-color: #09CEA7;
+  box-shadow: 0 2px 8px rgba(9, 206, 167, 0.1);
+}
+
+.tech-category-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #BCBBBD;
+  margin-bottom: 12px;
+}
+
+.tech-category-icon {
+  font-size: 1.2rem;
+  display: inline-block;
+  min-width: 24px;
+}
+
+.tech-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-item {
+  background: linear-gradient(135deg, #09CEA7 0%, #0BA085 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tech-item-main {
+  background: linear-gradient(135deg, #5E35F2 0%, #F22987 100%);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 3px 8px rgba(94, 53, 242, 0.3);
+}
+
+.tech-name {
+  font-weight: inherit;
+}
+
+.tech-version {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.tech-empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: #888;
+  border: 2px dashed #333335;
+  border-radius: 8px;
+}
+
+.tech-empty p {
+  margin-bottom: 8px;
+  color: #BCBBBD;
+  font-size: 1rem;
+}
+
+.tech-empty small {
+  color: #888;
+  font-size: 0.9rem;
+}

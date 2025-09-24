@@ -22,9 +22,14 @@ interface AuditResult {
     };
     technologies: {
       cms?: string;
-      framework?: string;
-      language?: string;
-      cdn?: string;
+      cmsVersion?: string;
+      framework?: string[];
+      language?: string[];
+      cdn?: string[];
+      webServer?: string;
+      database?: string;
+      analytics?: string[];
+      security?: string[];
       hosting?: string;
     };
     analytics: {
@@ -52,6 +57,7 @@ interface AuditResult {
     visual: {
       imagesCount?: number;
       imagesWithoutAlt?: number;
+      imagesWithEmptyAlt?: number;
       cssFiles?: number;
       jsFiles?: number;
       inlineStyles?: number;
@@ -62,13 +68,10 @@ interface AuditResult {
       svgs?: number;
     };
     hosting: {
-      server?: string;
-      webServer?: string;
       ssl?: boolean;
-      cdn?: boolean;
-      cdnProvider?: string;
+      webServer?: string;
       cloudflare?: boolean;
-      amazon?: boolean;
+      cdn?: boolean;
       securityHeaders?: Record<string, boolean>;
     };
     social: {
@@ -88,6 +91,7 @@ interface AuditResult {
     performance: {
       loadTime?: number;
       pageSize?: number;
+      pageSizeKB?: number;
       requests?: number;
     };
   };
@@ -278,37 +282,120 @@ const SiteAudit: React.FC = () => {
 
                 {/* Технологии */}
                 {result.data.technologies && (
-                  <div className="audit-section">
-                    <h3>🔧 Технологии</h3>
-                    <div className="tech-grid">
+                  <div className="audit-section technologies-section">
+                    <h3>🔧 Технологии и разработка</h3>
+                    <div className="tech-categories">
+                      
+                      {/* CMS */}
                       {result.data.technologies.cms && (
-                        <div className="tech-item">
-                          <span className="tech-icon">📝</span>
-                          <span className="tech-label">CMS:</span>
-                          <span className="tech-value">{result.data.technologies.cms}</span>
+                        <div className="tech-category">
+                          <h4 className="tech-category-title">
+                            <span className="tech-category-icon">📝</span>
+                            Система управления контентом
+                          </h4>
+                          <div className="tech-items">
+                            <div className="tech-item-main">
+                              <span className="tech-name">{result.data.technologies.cms}</span>
+                              {result.data.technologies.cmsVersion && (
+                                <span className="tech-version">v{result.data.technologies.cmsVersion}</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       )}
-                      {result.data.technologies.framework && (
-                        <div className="tech-item">
-                          <span className="tech-icon">⚛️</span>
-                          <span className="tech-label">Web Framework:</span>
-                          <span className="tech-value">{result.data.technologies.framework}</span>
+
+                      {/* Web Frameworks */}
+                      {result.data.technologies.framework && result.data.technologies.framework.length > 0 && (
+                        <div className="tech-category">
+                          <h4 className="tech-category-title">
+                            <span className="tech-category-icon">⚛️</span>
+                            Веб-фреймворки и библиотеки
+                          </h4>
+                          <div className="tech-items">
+                            {result.data.technologies.framework.map((framework, index) => (
+                              <div key={index} className="tech-item">
+                                <span className="tech-name">{framework}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
-                      {result.data.technologies.language && (
-                        <div className="tech-item">
-                          <span className="tech-icon">💻</span>
-                          <span className="tech-label">Язык программирования:</span>
-                          <span className="tech-value">{result.data.technologies.language}</span>
+
+                      {/* Programming Languages */}
+                      {result.data.technologies.language && result.data.technologies.language.length > 0 && (
+                        <div className="tech-category">
+                          <h4 className="tech-category-title">
+                            <span className="tech-category-icon">💻</span>
+                            Языки программирования
+                          </h4>
+                          <div className="tech-items">
+                            {result.data.technologies.language.map((language, index) => (
+                              <div key={index} className="tech-item">
+                                <span className="tech-name">{language}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
-                      {result.data.technologies.cdn && (
-                        <div className="tech-item">
-                          <span className="tech-icon">🌐</span>
-                          <span className="tech-label">CDN:</span>
-                          <span className="tech-value">{result.data.technologies.cdn}</span>
+
+                      {/* CDN */}
+                      {result.data.technologies.cdn && result.data.technologies.cdn.length > 0 && (
+                        <div className="tech-category">
+                          <h4 className="tech-category-title">
+                            <span className="tech-category-icon">🌐</span>
+                            CDN и сети доставки контента
+                          </h4>
+                          <div className="tech-items">
+                            {result.data.technologies.cdn.map((cdn, index) => (
+                              <div key={index} className="tech-item">
+                                <span className="tech-name">{cdn}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
+
+                      {/* Web Server */}
+                      {result.data.technologies.webServer && (
+                        <div className="tech-category">
+                          <h4 className="tech-category-title">
+                            <span className="tech-category-icon">🖥️</span>
+                            Веб-сервер
+                          </h4>
+                          <div className="tech-items">
+                            <div className="tech-item">
+                              <span className="tech-name">{result.data.technologies.webServer}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Hosting */}
+                      {result.data.technologies.hosting && (
+                        <div className="tech-category">
+                          <h4 className="tech-category-title">
+                            <span className="tech-category-icon">☁️</span>
+                            Хостинг-платформа
+                          </h4>
+                          <div className="tech-items">
+                            <div className="tech-item">
+                              <span className="tech-name">{result.data.technologies.hosting}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Если технологий не найдено */}
+                      {!result.data.technologies.cms && 
+                       (!result.data.technologies.framework || result.data.technologies.framework.length === 0) &&
+                       (!result.data.technologies.language || result.data.technologies.language.length === 0) &&
+                       !result.data.technologies.webServer && (
+                        <div className="tech-empty">
+                          <p>🔍 Не удалось определить используемые технологии</p>
+                          <small>Сайт может использовать нестандартную конфигурацию или статическую генерацию</small>
+                        </div>
+                      )}
+
                     </div>
                   </div>
                 )}
@@ -362,8 +449,21 @@ const SiteAudit: React.FC = () => {
                       </div>
                       <div className="performance-item">
                         <span className="performance-label">Размер страницы:</span>
-                        <span className="performance-value">{result.data.performance.pageSize ? (result.data.performance.pageSize / 1024).toFixed(2) : '0'} KB</span>
+                        <span className="performance-value">
+                          {result.data.performance.pageSizeKB 
+                            ? `${result.data.performance.pageSizeKB} KB` 
+                            : result.data.performance.pageSize 
+                              ? `${(result.data.performance.pageSize / 1024).toFixed(2)} KB`
+                              : '0 KB'
+                          }
+                        </span>
                       </div>
+                      {result.data.performance.requests && (
+                        <div className="performance-item">
+                          <span className="performance-label">Запросов:</span>
+                          <span className="performance-value">{result.data.performance.requests}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -439,10 +539,10 @@ const SiteAudit: React.FC = () => {
                   <div className="audit-section">
                     <h3>🔒 Хостинг и безопасность</h3>
                     <div className="hosting-grid">
-                      {result.data.hosting.server && (
+                      {result.data.hosting.webServer && (
                         <div className="hosting-item">
                           <span className="hosting-label">Сервер:</span>
-                          <span className="hosting-value">{result.data.hosting.server}</span>
+                          <span className="hosting-value">{result.data.hosting.webServer}</span>
                         </div>
                       )}
                       {result.data.hosting.webServer && (
