@@ -51,38 +51,92 @@ const getKeywordColor = (density: number): string => {
 
 // Функция для расчета воспринимаемой скорости загрузки
 const getPerceivedLoadTime = (webVitalsData: any, result: any): string => {
-  // Приоритет метрик для воспринимаемой скорости:
-  // 1. LCP из текущего устройства (device-specific)
-  // 2. FCP из текущего устройства 
-  // 3. Время загрузки HTML (общее)
-  // 4. FID как fallback
+  // Формула для расчета воспринимаемой скорости загрузки
+  // Учитывает разные этапы загрузки с весовыми коэффициентами
   
-  // 1. Используем LCP из device-specific данных (самое точное для устройства)
-  if (webVitalsData?.core_web_vitals?.lcp?.value) {
-    const lcpValue = webVitalsData.core_web_vitals.lcp.value; // в миллисекундах
-    const seconds = (lcpValue / 1000).toFixed(1);
-    return `${seconds} секунд`;
-  }
+  const metrics = {
+    htmlLoadTime: 0,     // Время загрузки HTML (базовая метрика)
+    fcp: 0,              // First Contentful Paint (когда появляется первый контент)
+    lcp: 0,              // Largest Contentful Paint (когда загружается основной контент)
+    fid: 0,              // First Input Delay (когда страница становится интерактивной)
+    cls: 0               // Cumulative Layout Shift (стабильность макета)
+  };
   
-  // 2. Используем FCP если есть (более релевантно для воспринимаемой скорости)
-  if (webVitalsData?.core_web_vitals?.fcp?.value) {
-    const fcpValue = webVitalsData.core_web_vitals.fcp.value; // в миллисекундах
-    const seconds = (fcpValue / 1000).toFixed(1);
-    return `${seconds} секунд`;
-  }
-  
-  // 3. Fallback на общее время загрузки HTML
+  // Собираем доступные метрики (в секундах)
   if (result?.data?.resourcesSpeed?.loadTime) {
-    const htmlLoadTime = result.data.resourcesSpeed.loadTime; // в миллисекундах
-    const seconds = (htmlLoadTime / 1000).toFixed(1);
-    return `${seconds} секунд`;
+    metrics.htmlLoadTime = result.data.resourcesSpeed.loadTime / 1000;
   }
   
-  // 4. Последний fallback на FID
+  if (webVitalsData?.core_web_vitals?.fcp?.value) {
+    metrics.fcp = webVitalsData.core_web_vitals.fcp.value / 1000;
+  }
+  
+  if (webVitalsData?.core_web_vitals?.lcp?.value) {
+    metrics.lcp = webVitalsData.core_web_vitals.lcp.value / 1000;
+  }
+  
   if (webVitalsData?.core_web_vitals?.fid?.value) {
-    const fidValue = webVitalsData.core_web_vitals.fid.value; // в миллисекундах
-    const seconds = (fidValue / 1000).toFixed(1);
-    return `${seconds} секунд`;
+    metrics.fid = webVitalsData.core_web_vitals.fid.value / 1000;
+  }
+  
+  if (webVitalsData?.core_web_vitals?.cls?.value) {
+    metrics.cls = webVitalsData.core_web_vitals.cls.value;
+  }
+  
+  // Расчет воспринимаемой скорости по формуле:
+  // Weighted Average = (HTML*0.1 + FCP*0.4 + LCP*0.3 + FID*0.15 + CLS_penalty*0.05)
+  
+  let perceivedTime = 0;
+  let totalWeight = 0;
+  
+  // HTML Load Time (10% веса) - базовая загрузка
+  if (metrics.htmlLoadTime > 0) {
+    perceivedTime += metrics.htmlLoadTime * 0.1;
+    totalWeight += 0.1;
+  }
+  
+  // First Contentful Paint (40% веса) - когда пользователь видит первый контент
+  if (metrics.fcp > 0) {
+    perceivedTime += metrics.fcp * 0.4;
+    totalWeight += 0.4;
+  } else if (metrics.htmlLoadTime > 0) {
+    // Если FCP нет, используем HTML + 0.5s как приблизительный FCP
+    perceivedTime += (metrics.htmlLoadTime + 0.5) * 0.4;
+    totalWeight += 0.4;
+  }
+  
+  // Largest Contentful Paint (30% веса) - основной контент загружен
+  if (metrics.lcp > 0 && metrics.lcp < 40) { // Игнорируем аномально большие LCP
+    perceivedTime += Math.min(metrics.lcp, 10) * 0.3; // Ограничиваем влияние LCP до 10с
+    totalWeight += 0.3;
+  } else if (metrics.fcp > 0) {
+    // Если LCP слишком большой или отсутствует, используем FCP + 1s
+    perceivedTime += (metrics.fcp + 1) * 0.3;
+    totalWeight += 0.3;
+  }
+  
+  // First Input Delay (15% веса) - интерактивность
+  if (metrics.fid > 0) {
+    perceivedTime += Math.min(metrics.fid, 0.3) * 0.15; // FID обычно очень маленький
+    totalWeight += 0.15;
+  }
+  
+  // CLS влияет как штраф (5% веса)
+  if (metrics.cls > 0) {
+    const clsPenalty = Math.min(metrics.cls * 2, 1); // CLS > 0.5 = штраф до 1 секунды
+    perceivedTime += clsPenalty * 0.05;
+    totalWeight += 0.05;
+  }
+  
+  // Нормализуем результат
+  if (totalWeight > 0) {
+    perceivedTime = perceivedTime / totalWeight;
+    
+    // Дополнительные корректировки на основе здравого смысла
+    if (perceivedTime < 0.5) perceivedTime = 0.5; // Минимум 0.5с
+    if (perceivedTime > 15) perceivedTime = 15;   // Максимум 15с для отображения
+    
+    return `${perceivedTime.toFixed(1)} секунд`;
   }
   
   return 'N/A';
@@ -90,18 +144,78 @@ const getPerceivedLoadTime = (webVitalsData: any, result: any): string => {
 
 // Функция для определения цвета блока скорости загрузки
 const getLoadTimeColorClass = (webVitalsData: any, result: any): string => {
-  let timeInSeconds = 0;
+  // Используем ту же логику расчета, что и в getPerceivedLoadTime
+  const metrics = {
+    htmlLoadTime: 0,
+    fcp: 0,
+    lcp: 0,
+    fid: 0,
+    cls: 0
+  };
   
-  // Получаем время в секундах из тех же источников, что и getPerceivedLoadTime
-  if (webVitalsData?.core_web_vitals?.lcp?.value) {
-    timeInSeconds = webVitalsData.core_web_vitals.lcp.value / 1000;
-  } else if (webVitalsData?.core_web_vitals?.fcp?.value) {
-    timeInSeconds = webVitalsData.core_web_vitals.fcp.value / 1000;
-  } else if (result?.data?.resourcesSpeed?.loadTime) {
-    timeInSeconds = result.data.resourcesSpeed.loadTime / 1000;
-  } else if (webVitalsData?.core_web_vitals?.fid?.value) {
-    timeInSeconds = webVitalsData.core_web_vitals.fid.value / 1000;
+  if (result?.data?.resourcesSpeed?.loadTime) {
+    metrics.htmlLoadTime = result.data.resourcesSpeed.loadTime / 1000;
   }
+  
+  if (webVitalsData?.core_web_vitals?.fcp?.value) {
+    metrics.fcp = webVitalsData.core_web_vitals.fcp.value / 1000;
+  }
+  
+  if (webVitalsData?.core_web_vitals?.lcp?.value) {
+    metrics.lcp = webVitalsData.core_web_vitals.lcp.value / 1000;
+  }
+  
+  if (webVitalsData?.core_web_vitals?.fid?.value) {
+    metrics.fid = webVitalsData.core_web_vitals.fid.value / 1000;
+  }
+  
+  if (webVitalsData?.core_web_vitals?.cls?.value) {
+    metrics.cls = webVitalsData.core_web_vitals.cls.value;
+  }
+  
+  // Расчет воспринимаемого времени
+  let perceivedTime = 0;
+  let totalWeight = 0;
+  
+  if (metrics.htmlLoadTime > 0) {
+    perceivedTime += metrics.htmlLoadTime * 0.1;
+    totalWeight += 0.1;
+  }
+  
+  if (metrics.fcp > 0) {
+    perceivedTime += metrics.fcp * 0.4;
+    totalWeight += 0.4;
+  } else if (metrics.htmlLoadTime > 0) {
+    perceivedTime += (metrics.htmlLoadTime + 0.5) * 0.4;
+    totalWeight += 0.4;
+  }
+  
+  if (metrics.lcp > 0 && metrics.lcp < 40) {
+    perceivedTime += Math.min(metrics.lcp, 10) * 0.3;
+    totalWeight += 0.3;
+  } else if (metrics.fcp > 0) {
+    perceivedTime += (metrics.fcp + 1) * 0.3;
+    totalWeight += 0.3;
+  }
+  
+  if (metrics.fid > 0) {
+    perceivedTime += Math.min(metrics.fid, 0.3) * 0.15;
+    totalWeight += 0.15;
+  }
+  
+  if (metrics.cls > 0) {
+    const clsPenalty = Math.min(metrics.cls * 2, 1);
+    perceivedTime += clsPenalty * 0.05;
+    totalWeight += 0.05;
+  }
+  
+  if (totalWeight > 0) {
+    perceivedTime = perceivedTime / totalWeight;
+    if (perceivedTime < 0.5) perceivedTime = 0.5;
+    if (perceivedTime > 15) perceivedTime = 15;
+  }
+  
+  const timeInSeconds = perceivedTime;
   
   // Определяем цветовой класс на основе времени загрузки
   if (timeInSeconds <= 1.5) {
