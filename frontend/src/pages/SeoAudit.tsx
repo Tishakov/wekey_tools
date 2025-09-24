@@ -49,6 +49,37 @@ const getKeywordColor = (density: number): string => {
   }
 };
 
+// Функция для расчета воспринимаемой скорости загрузки
+const getPerceivedLoadTime = (webVitalsData: any, result: any): string => {
+  // Приоритет метрик для воспринимаемой скорости:
+  // 1. Время загрузки HTML (самое релевантное)
+  // 2. FCP (First Contentful Paint) если есть
+  // 3. FID как fallback
+  
+  // 1. Проверяем время загрузки HTML
+  if (result?.data?.resourcesSpeed?.loadTime) {
+    const htmlLoadTime = result.data.resourcesSpeed.loadTime; // в миллисекундах
+    const seconds = (htmlLoadTime / 1000).toFixed(1);
+    return `${seconds} секунд`;
+  }
+  
+  // 2. Используем FCP если есть (более релевантно для воспринимаемой скорости)
+  if (webVitalsData?.core_web_vitals?.fcp?.value) {
+    const fcpValue = webVitalsData.core_web_vitals.fcp.value; // в миллисекундах
+    const seconds = (fcpValue / 1000).toFixed(1);
+    return `${seconds} секунд`;
+  }
+  
+  // 3. Fallback на FID
+  if (webVitalsData?.core_web_vitals?.fid?.value) {
+    const fidValue = webVitalsData.core_web_vitals.fid.value; // в миллисекундах
+    const seconds = (fidValue / 1000).toFixed(1);
+    return `${seconds} секунд`;
+  }
+  
+  return 'N/A';
+};
+
 // Типы для Google PageSpeed данных
 interface GoogleOpportunityItem {
   url: string;
@@ -945,6 +976,10 @@ const SeoAudit: React.FC = () => {
                                  currentDeviceData.performance_score >= 70 ? 'Неплохая скорость, но есть возможности для улучшения.' : 
                                  currentDeviceData.performance_score >= 50 ? 'Скорость ниже среднего. Рекомендуется оптимизация.' : 'Критически медленная загрузка. Нужны срочные улучшения!'}
                               </p>
+                              <div className="perceived-load-time">
+                                <span className="perceived-load-label">⚡ Скорость загрузки:</span>
+                                <span className="perceived-load-value">{getPerceivedLoadTime(currentDeviceData, result)}</span>
+                              </div>
                             </div>
                           </div>
                         )}

@@ -669,8 +669,6 @@
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s ease-in-out;
-  transform: rotate(-90deg);
-  transform-origin: center;
 }
 
 .health-score-fill.excellent {
@@ -922,10 +920,34 @@
 }
 
 .performance-score-status p {
-  margin: 0;
+  margin: 0 0 12px 0;
   font-size: 14px;
   color: #D1D5DB;
   line-height: 1.4;
+}
+
+.perceived-load-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 6px;
+  margin-top: 8px;
+  max-width: 270px;
+}
+
+.perceived-load-label {
+  font-size: 13px;
+  color: #10B981;
+  font-weight: 500;
+}
+
+.perceived-load-value {
+  font-size: 14px;
+  color: #10B981;
+  font-weight: 600;
 }
 
 /* Web Vitals Section */
