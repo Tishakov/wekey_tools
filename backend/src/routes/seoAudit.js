@@ -8,7 +8,9 @@ const PAGESPEED_API_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPage
 const GOOGLE_API_KEY = process.env.GOOGLE_PAGESPEED_API_KEY; // Добавьте ключ в .env файл
 
 // Функция для получения PageSpeed данных с retry логикой
-async function getPageSpeedData(url) {
+async function getPageSpeedData(url, waitForFullData = false) {
+  console.log(`🎯 getPageSpeedData вызвана для ${url}, waitForFullData: ${waitForFullData}`);
+  
   try {
     // Добавляем API ключ если доступен
     const keyParam = GOOGLE_API_KEY ? `&key=${GOOGLE_API_KEY}` : '';
@@ -18,11 +20,11 @@ async function getPageSpeedData(url) {
     console.log('🚀 Начинаем получение PageSpeed данных...');
     
     // Функция для выполнения запроса с retry
-    const fetchWithRetry = async (url, strategy, maxRetries = 2) => {
+    const fetchWithRetry = async (url, strategy, maxRetries = 4) => {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           console.log(`📡 Попытка ${attempt}/${maxRetries} для ${strategy}...`);
-          const response = await fetch(url, { timeout: 25000 }); // Увеличиваем timeout до 25 секунд
+          const response = await fetch(url, { timeout: 60000 }); // Увеличиваем timeout до 60 секунд
           if (response.ok) {
             console.log(`✅ ${strategy} данные получены успешно`);
             return response;
@@ -30,13 +32,19 @@ async function getPageSpeedData(url) {
             console.log(`⚠️ ${strategy} попытка ${attempt} не удалась: ${response.status}`);
           }
         } catch (error) {
-          console.log(`❌ ${strategy} попытка ${attempt} ошибка: ${error.message}`);
+          if (error.message.includes('400')) {
+            console.log(`⚠️ ${strategy} попытка ${attempt} не удалась: 400 (Bad Request) - возможно, сайт недоступен или блокирует Google`);
+          } else if (error.message.includes('timeout')) {
+            console.log(`❌ ${strategy} попытка ${attempt} ошибка: network timeout`);
+          } else {
+            console.log(`❌ ${strategy} попытка ${attempt} ошибка: ${error.message}`);
+          }
         }
         
         // Ждем между попытками (кроме последней)
         if (attempt < maxRetries) {
-          console.log(`⏳ Ожидание 3 секунды перед следующей попыткой ${strategy}...`);
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          console.log(`⏳ Ожидание 8 секунд перед следующей попыткой ${strategy}...`);
+          await new Promise(resolve => setTimeout(resolve, 8000));
         }
       }
       return null;
@@ -89,45 +97,67 @@ async function getPageSpeedData(url) {
     const mobileSuccess = results.metadata.requestStatus.mobile === 'success';
     const desktopSuccess = results.metadata.requestStatus.desktop === 'success';
     
-    if (mobileSuccess && desktopSuccess) {
-      // Оба запроса успешны - используем только Google API данные
-      results.metadata.source = 'google_api';
-      console.log('🎉 Все PageSpeed данные получены от Google API');
-    } else if (mobileSuccess || desktopSuccess) {
-      // Частичный успех - добавляем недостающие данные как demo
-      if (!results.mobile) {
-        console.log('⚠️ Mobile PageSpeed API failed, using demo data');
-        results.mobile = generateDemoWebVitals('mobile');
-        results.metadata.requestStatus.mobile = 'demo';
+    if (waitForFullData) {
+      // Режим ожидания полных данных - не используем демо-данные
+      if (mobileSuccess && desktopSuccess) {
+        results.metadata.source = 'google_api';
+        console.log('🎉 Все PageSpeed данные получены от Google API');
+      } else {
+        // Если не все данные получены - возвращаем ошибку
+        const missingData = [];
+        if (!mobileSuccess) missingData.push('mobile');
+        if (!desktopSuccess) missingData.push('desktop');
+        
+        console.log(`❌ Не удалось получить PageSpeed данные для: ${missingData.join(', ')}`);
+        throw new Error(`Google PageSpeed API недоступен для: ${missingData.join(', ')}. Попробуйте позже.`);
       }
-      
-      if (!results.desktop) {
-        console.log('⚠️ Desktop PageSpeed API failed, using demo data');
+    } else {
+      // Обычный режим - можем использовать демо-данные как fallback
+      if (mobileSuccess && desktopSuccess) {
+        results.metadata.source = 'google_api';
+        console.log('🎉 Все PageSpeed данные получены от Google API');
+      } else if (mobileSuccess || desktopSuccess) {
+        // Частичный успех - добавляем недостающие данные как demo
+        if (!results.mobile) {
+          console.log('⚠️ Mobile PageSpeed API failed, using demo data');
+          results.mobile = generateDemoWebVitals('mobile');
+          results.metadata.requestStatus.mobile = 'demo';
+        }
+        
+        if (!results.desktop) {
+          console.log('⚠️ Desktop PageSpeed API failed, using demo data');
+          results.desktop = generateDemoWebVitals('desktop');
+          results.metadata.requestStatus.desktop = 'demo';
+        }
+        
+        results.metadata.source = 'mixed';
+        console.log('⚡ Смешанные данные: часть от Google API, часть demo');
+      } else {
+        // Все запросы failed - используем только demo данные
+        console.log('💥 Все PageSpeed запросы не удались, используем demo данные');
+        results.mobile = generateDemoWebVitals('mobile');
         results.desktop = generateDemoWebVitals('desktop');
+        results.metadata.source = 'demo_data';
+        results.metadata.requestStatus.mobile = 'demo';
         results.metadata.requestStatus.desktop = 'demo';
       }
-      
-      results.metadata.source = 'mixed';
-      console.log('⚡ Смешанные данные: часть от Google API, часть demo');
-    } else {
-      // Все запросы failed - используем только demo данные
-      console.log('💥 Все PageSpeed запросы не удались, используем demo данные');
-      results.mobile = generateDemoWebVitals('mobile');
-      results.desktop = generateDemoWebVitals('desktop');
-      results.metadata.source = 'demo_data';
-      results.metadata.requestStatus.mobile = 'demo';
-      results.metadata.requestStatus.desktop = 'demo';
     }
     
     return results;
   } catch (error) {
     console.log('PageSpeed API error:', error.message);
-    // Возвращаем демо-данные при ошибке
-    return { 
-      mobile: generateDemoWebVitals('mobile'), 
-      desktop: generateDemoWebVitals('desktop'), 
-      error: error.message 
-    };
+    
+    if (waitForFullData) {
+      // Если пользователь хочет ждать полные данные - пробрасываем ошибку дальше
+      throw error;
+    } else {
+      // В режиме разработки или при явном разрешении демо-данных
+      return { 
+        mobile: generateDemoWebVitals('mobile'), 
+        desktop: generateDemoWebVitals('desktop'), 
+        error: error.message 
+      };
+    }
   }
 }
 
@@ -159,7 +189,8 @@ function extractCoreWebVitals(data, strategy) {
           displayValue: audits['cumulative-layout-shift']?.displayValue || 'N/A'
         }
       },
-      opportunities: audits['largest-contentful-paint']?.details?.items?.slice(0, 3) || [],
+      // Заменяем простые opportunities на детальные рекомендации Google PageSpeed
+      googleOpportunities: extractGoogleOpportunities(data, strategy),
       diagnostics: {
         dom_size: audits['dom-size']?.numericValue || 0,
         unused_css: audits['unused-css-rules']?.details?.overallSavingsBytes || 0,
@@ -169,6 +200,173 @@ function extractCoreWebVitals(data, strategy) {
   } catch (error) {
     console.log('Error extracting Core Web Vitals:', error);
     return null;
+  }
+}
+
+// Извлекаем детальные рекомендации Google PageSpeed для seo-audit-section карточек
+function extractGoogleOpportunities(data, strategy) {
+  try {
+    const lighthouse = data.lighthouseResult;
+    const audits = lighthouse.audits;
+    const opportunities = [];
+
+    // 1. Оптимизация изображений - детальный анализ
+    if (audits['modern-image-formats'] || audits['uses-optimized-images'] || audits['uses-webp-images']) {
+      const imageOptimization = {
+        id: 'image-optimization',
+        category: 'images',
+        title: '🖼️ Оптимизация изображений',
+        priority: 'high',
+        savings: 0,
+        items: [],
+        recommendations: []
+      };
+
+      // Современные форматы изображений
+      if (audits['modern-image-formats']?.details?.items) {
+        const modernFormats = audits['modern-image-formats'];
+        imageOptimization.savings += modernFormats.details.overallSavingsBytes || 0;
+        imageOptimization.items.push(...modernFormats.details.items.map(item => ({
+          type: 'modern-format',
+          url: item.node?.lhId || item.url || 'Unknown',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedBytes || 0,
+          recommendation: `Конвертировать в WebP или AVIF (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
+        })));
+      }
+
+      // Оптимизированные изображения
+      if (audits['uses-optimized-images']?.details?.items) {
+        const optimizedImages = audits['uses-optimized-images'];
+        imageOptimization.savings += optimizedImages.details.overallSavingsBytes || 0;
+        imageOptimization.items.push(...optimizedImages.details.items.map(item => ({
+          type: 'optimization',
+          url: item.node?.lhId || item.url || 'Unknown',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedBytes || 0,
+          recommendation: `Сжать изображение (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
+        })));
+      }
+
+      // WebP формат
+      if (audits['uses-webp-images']?.details?.items) {
+        const webpImages = audits['uses-webp-images'];
+        imageOptimization.savings += webpImages.details.overallSavingsBytes || 0;
+        imageOptimization.items.push(...webpImages.details.items.map(item => ({
+          type: 'webp-format',
+          url: item.node?.lhId || item.url || 'Unknown',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedBytes || 0,
+          recommendation: `Использовать WebP формат (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
+        })));
+      }
+
+      if (imageOptimization.items.length > 0) {
+        imageOptimization.summary = `Найдено ${imageOptimization.items.length} изображений для оптимизации`;
+        imageOptimization.totalSavings = `${Math.round(imageOptimization.savings / 1024)}KB`;
+        opportunities.push(imageOptimization);
+      }
+    }
+
+    // 2. CSS оптимизация - детальный анализ  
+    if (audits['unused-css-rules'] || audits['render-blocking-resources']) {
+      const cssOptimization = {
+        id: 'css-optimization',
+        category: 'css',
+        title: '🎨 Оптимизация CSS',
+        priority: 'medium',
+        savings: 0,
+        items: [],
+        recommendations: []
+      };
+
+      // Неиспользуемый CSS
+      if (audits['unused-css-rules']?.details?.items) {
+        const unusedCSS = audits['unused-css-rules'];
+        cssOptimization.savings += unusedCSS.details.overallSavingsBytes || 0;
+        cssOptimization.items.push(...unusedCSS.details.items.map(item => ({
+          type: 'unused-css',
+          url: item.url || 'Inline CSS',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedBytes || 0,
+          wastedPercent: item.wastedPercent || 0,
+          recommendation: `Удалить неиспользуемый CSS (${Math.round(item.wastedPercent || 0)}% не используется)`
+        })));
+      }
+
+      // Блокирующие CSS ресурсы
+      if (audits['render-blocking-resources']?.details?.items) {
+        const blockingCSS = audits['render-blocking-resources'].details.items.filter(item => 
+          item.url && item.url.includes('.css')
+        );
+        cssOptimization.items.push(...blockingCSS.map(item => ({
+          type: 'render-blocking',
+          url: item.url || 'Unknown CSS',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedMs || 0,
+          recommendation: `Оптимизировать критический CSS или загружать асинхронно`
+        })));
+      }
+
+      if (cssOptimization.items.length > 0) {
+        cssOptimization.summary = `Найдено ${cssOptimization.items.length} CSS файлов для оптимизации`;
+        cssOptimization.totalSavings = `${Math.round(cssOptimization.savings / 1024)}KB`;
+        opportunities.push(cssOptimization);
+      }
+    }
+
+    // 3. Производительность JavaScript
+    if (audits['unused-javascript'] || audits['unminified-javascript']) {
+      const jsOptimization = {
+        id: 'js-optimization', 
+        category: 'performance',
+        title: '⚡ Оптимизация JavaScript',
+        priority: 'high',
+        savings: 0,
+        items: [],
+        recommendations: []
+      };
+
+      // Неиспользуемый JavaScript
+      if (audits['unused-javascript']?.details?.items) {
+        const unusedJS = audits['unused-javascript'];
+        jsOptimization.savings += unusedJS.details.overallSavingsBytes || 0;
+        jsOptimization.items.push(...unusedJS.details.items.map(item => ({
+          type: 'unused-js',
+          url: item.url || 'Inline JS',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedBytes || 0,
+          wastedPercent: item.wastedPercent || 0,
+          recommendation: `Удалить неиспользуемый JavaScript (${Math.round(item.wastedPercent || 0)}% не используется)`
+        })));
+      }
+
+      // Несжатый JavaScript
+      if (audits['unminified-javascript']?.details?.items) {
+        const unminifiedJS = audits['unminified-javascript'];
+        jsOptimization.savings += unminifiedJS.details.overallSavingsBytes || 0;
+        jsOptimization.items.push(...unminifiedJS.details.items.map(item => ({
+          type: 'unminified-js',
+          url: item.url || 'Unknown JS',
+          currentSize: item.totalBytes || 0,
+          potentialSavings: item.wastedBytes || 0,
+          recommendation: `Минимизировать JavaScript (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
+        })));
+      }
+
+      if (jsOptimization.items.length > 0) {
+        jsOptimization.summary = `Найдено ${jsOptimization.items.length} JS файлов для оптимизации`;
+        jsOptimization.totalSavings = `${Math.round(jsOptimization.savings / 1024)}KB`;
+        opportunities.push(jsOptimization);
+      }
+    }
+
+    console.log(`📊 Извлечено ${opportunities.length} детальных рекомендаций Google PageSpeed для ${strategy}`);
+    return opportunities;
+
+  } catch (error) {
+    console.log('Error extracting Google opportunities:', error);
+    return [];
   }
 }
 
@@ -199,7 +397,82 @@ function generateDemoWebVitals(strategy) {
         displayValue: isMobile ? (Math.random() * 0.15 + 0.1).toFixed(3) : (Math.random() * 0.1 + 0.05).toFixed(3)
       }
     },
-    opportunities: [],
+    // Демо Google рекомендации для разработки
+    googleOpportunities: [
+      {
+        id: 'image-optimization',
+        category: 'images',
+        title: '🖼️ Оптимизация изображений',
+        priority: 'high',
+        savings: Math.floor(Math.random() * 200000) + 50000,
+        summary: `Найдено ${Math.floor(Math.random() * 8) + 3} изображений для оптимизации`,
+        totalSavings: `${Math.floor(Math.random() * 200) + 50}KB`,
+        items: [
+          {
+            type: 'modern-format',
+            url: 'https://cher17.fra1.cdn.digitaloceanspaces.com/public/slides/media/12407/hero-banner-main.jpg',
+            currentSize: 156000,
+            potentialSavings: 89000,
+            recommendation: 'Конвертировать в WebP или AVIF (экономия: 89KB)'
+          },
+          {
+            type: 'optimization',
+            url: 'https://cher17.fra1.cdn.digitaloceanspaces.com/public/products/media/8945/product-catalog-image.png',
+            currentSize: 245000,
+            potentialSavings: 156000,
+            recommendation: 'Сжать изображение (экономия: 156KB)'
+          },
+          {
+            type: 'webp-format',
+            url: 'https://cher17.fra1.cdn.digitaloceanspaces.com/public/collections/media/5623/collection-preview.jpg',
+            currentSize: 89000,
+            potentialSavings: 45000,
+            recommendation: 'Использовать WebP формат (экономия: 45KB)'
+          },
+          {
+            type: 'modern-format',
+            url: 'https://cher17.fra1.cdn.digitaloceanspaces.com/public/banners/media/3421/sale-banner-desktop.jpg',
+            currentSize: 178000,
+            potentialSavings: 98000,
+            recommendation: 'Конвертировать в WebP или AVIF (экономия: 98KB)'
+          }
+        ]
+      },
+      {
+        id: 'css-optimization',
+        category: 'css',
+        title: '🎨 Оптимизация CSS',
+        priority: 'medium',
+        savings: Math.floor(Math.random() * 100000) + 20000,
+        summary: `Найдено ${Math.floor(Math.random() * 5) + 2} CSS файлов для оптимизации`,
+        totalSavings: `${Math.floor(Math.random() * 100) + 20}KB`,
+        items: [
+          {
+            type: 'unused-css',
+            url: 'https://cher17.com/assets/css/main-styles.css',
+            currentSize: 89000,
+            potentialSavings: 45000,
+            wastedPercent: 51,
+            recommendation: 'Удалить неиспользуемый CSS (51% не используется)'
+          },
+          {
+            type: 'render-blocking',
+            url: 'https://cher17.com/assets/css/bootstrap.min.css',
+            currentSize: 156000,
+            potentialSavings: 0,
+            recommendation: 'Оптимизировать критический CSS или загружать асинхронно'
+          },
+          {
+            type: 'unused-css',
+            url: 'https://cher17.com/wp-content/themes/cher17/style.css',
+            currentSize: 67000,
+            potentialSavings: 32000,
+            wastedPercent: 48,
+            recommendation: 'Удалить неиспользуемый CSS (48% не используется)'
+          }
+        ]
+      }
+    ],
     diagnostics: {
       dom_size: Math.floor(Math.random() * 1000) + 800,
       unused_css: Math.floor(Math.random() * 50000) + 20000,
@@ -225,7 +498,7 @@ router.post('/seo-audit', async (req, res) => {
     // Параллельно запускаем все проверки включая Mobile-Friendly, SSL Labs, W3C Validator и Security Headers
     const [htmlAnalysis, pageSpeedData, robotsCheck, sslCheck, resourcesCheck, mobileCheck, sslLabsCheck, w3cCheck, securityHeadersCheck] = await Promise.allSettled([
       analyzeHTML(fullUrl),
-      getPageSpeedData(fullUrl),
+      getPageSpeedData(fullUrl, waitForFullData), // Передаем параметр для контроля демо-данных
       checkRobotsTxt(fullUrl),
       checkSSL(fullUrl),
       checkResourcesSpeed(fullUrl),
@@ -253,20 +526,21 @@ router.post('/seo-audit', async (req, res) => {
 
     if (pageSpeedData.status === 'fulfilled') {
       performanceData = pageSpeedData.value;
+      console.log('✅ PageSpeed данные получены успешно');
+    } else {
+      console.log('❌ PageSpeed данные не удалось получить:', pageSpeedData.reason);
       
-      // Проверяем, если пользователь хочет ждать полные данные
-      if (waitForFullData && performanceData) {
-        const hasFullData = (
-          performanceData.metadata?.requestStatus?.mobile === 'success' &&
-          performanceData.metadata?.requestStatus?.desktop === 'success'
-        );
-        
-        if (!hasFullData) {
-          console.log('⏳ Не все PageSpeed данные получены, но пользователь хочет полные данные...');
-          // Можем здесь добавить дополнительную логику если нужно
-        } else {
-          console.log('✅ Все PageSpeed данные готовы!');
-        }
+      if (waitForFullData) {
+        // Если пользователь хочет ждать полные данные - возвращаем ошибку
+        return res.status(503).json({
+          success: false,
+          error: 'Google PageSpeed API временно недоступен. Попробуйте позже.',
+          details: 'Мы не показываем демо-данные. Пожалуйста, повторите запрос через несколько минут.',
+          retryAfter: 60 // Рекомендуем повторить через минуту
+        });
+      } else {
+        // В режиме разработки или при явном разрешении демо-данных
+        performanceData = null;
       }
     }
 

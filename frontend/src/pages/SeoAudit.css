@@ -66,7 +66,7 @@
 /* Контейнер результатов */
 .seo-audit-results-container {
   width: 100%;
-  max-width: 910px;
+  max-width: 910px; /* Соответствует основной ширине рабочей области */
   background-color: #28282A;
   border: 1px solid #333335;
   border-radius: 8px;
@@ -144,7 +144,7 @@
 /* Flexbox альтернатива для лучшего баланса */
 .seo-audit-flex-columns {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   padding: 20px;
   align-items: flex-start;
 }
@@ -156,6 +156,23 @@
   flex-direction: column;
   gap: 20px;
   min-height: 0;
+}
+
+/* Адаптивность только для мобильных телефонов */
+@media (max-width: 600px) {
+  .seo-audit-flex-columns {
+    flex-direction: column;
+  }
+  
+  .seo-audit-action-plan {
+    padding: 15px;
+    max-width: none;
+  }
+  
+  .action-plan-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
 }
 
 /* Кастомный скроллбар для seo-audit-content */
@@ -216,6 +233,38 @@
   font-weight: 500;
 }
 
+/* Развлекательный блок во время загрузки */
+.loading-entertainment {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #333335;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.entertainment-text {
+  font-size: 14px;
+  color: #D1D5DB;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.entertainment-gif {
+  max-width: 500px;
+  margin-top: 20px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 600px) {
+  .entertainment-gif {
+    max-width: 150px;
+  }
+}
+
 .seo-audit-error-state {
   padding: 24px;
   background: #2D1B1B;
@@ -238,6 +287,29 @@
 .seo-audit-error-state .error-help {
   font-size: 14px;
   color: #D1D5DB;
+}
+
+.seo-audit-error-state .error-content {
+  margin: 16px 0;
+}
+
+.seo-audit-error-state .error-main {
+  font-size: 16px;
+  font-weight: 500;
+  color: #FAFAFA;
+  margin-bottom: 12px;
+}
+
+.seo-audit-error-state .error-details {
+  font-size: 14px;
+  color: #D1D5DB;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.seo-audit-error-state .error-help p {
+  margin: 4px 0;
+  font-size: 14px;
 }
 
 /* Основной контент результатов */
@@ -992,6 +1064,9 @@
 /* Action Plan */
 .seo-audit-action-plan {
   padding: 20px;
+  max-width: 910px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .seo-audit-action-plan h3 {
@@ -1002,8 +1077,9 @@
 
 .action-plan-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 430px));
   gap: 20px;
+  justify-content: center;
 }
 
 .action-plan-item {
@@ -2338,4 +2414,144 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Google PageSpeed карточки стили */
+.google-pagespeed-badge {
+  display: inline-block;
+  background: linear-gradient(45deg, #4285F4, #34A853);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
+}
+
+.google-pagespeed-items {
+  margin-top: 16px;
+}
+
+.google-pagespeed-items h4 {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagespeed-optimization-item {
+  background: var(--section-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.pagespeed-optimization-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.optimization-item-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.optimization-filename {
+  font-weight: 600;
+  color: #E5E7EB;
+  font-size: 13px;
+  font-family: 'SF Mono', Consolas, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 4px 8px;
+  border-radius: 6px;
+  flex: 1;
+}
+
+.optimization-details {
+  padding-left: 0;
+}
+
+.optimization-savings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.current-size, .optimized-size, .unused-percent {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.current-size {
+  color: #FCA5A5;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.optimized-size {
+  color: #6EE7B7;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.unused-percent {
+  color: #FCD34D;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.arrow {
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+.optimization-recommendation {
+  font-size: 12px;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.more-items {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+/* Темная тема для Google PageSpeed */
+[data-theme="dark"] .google-pagespeed-badge {
+  background: linear-gradient(45deg, #5294FF, #4CAF50);
+}
+
+/* Темная тема - основные стили уже адаптированы */
+
+[data-theme="dark"] .pagespeed-optimization-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .pagespeed-optimization-item:hover {
+  border-color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.06);
 }

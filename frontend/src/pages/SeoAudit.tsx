@@ -46,6 +46,35 @@ const getKeywordColor = (density: number): string => {
   }
 };
 
+// Типы для Google PageSpeed данных
+interface GoogleOpportunityItem {
+  url: string;
+  currentSize: number;
+  potentialSavings: number;
+  wastedPercent: number;
+  recommendation: string;
+}
+
+interface GoogleOpportunity {
+  category: 'images' | 'css' | 'performance';
+  title: string;
+  totalSavings: number;
+  items: GoogleOpportunityItem[];
+}
+
+interface WebVitalsData {
+  performance_score: number;
+  strategy?: string;
+  timestamp?: string;
+  source?: "google_api" | "demo_data";
+  core_web_vitals: {
+    lcp: { value: number; score: number; displayValue: string; };
+    fid: { value: number; score: number; displayValue: string; };
+    cls: { value: number; score: number; displayValue: string; };
+  };
+  googleOpportunities?: GoogleOpportunity[];
+}
+
 interface SeoAuditResult {
   url: string;
   loading: boolean;
@@ -166,28 +195,8 @@ interface SeoAuditResult {
     };
     // Новые поля Level 2 - Enhanced PageSpeed Integration
     webVitals?: {
-      mobile?: {
-        performance_score: number;
-        strategy?: string;
-        timestamp?: string;
-        source?: 'google_api' | 'demo_data';
-        core_web_vitals: {
-          lcp: { value: number; score: number; displayValue: string };
-          fid: { value: number; score: number; displayValue: string };
-          cls: { value: number; score: number; displayValue: string };
-        };
-      };
-      desktop?: {
-        performance_score: number;
-        strategy?: string;
-        timestamp?: string;
-        source?: 'google_api' | 'demo_data';
-        core_web_vitals: {
-          lcp: { value: number; score: number; displayValue: string };
-          fid: { value: number; score: number; displayValue: string };
-          cls: { value: number; score: number; displayValue: string };
-        };
-      };
+      mobile?: WebVitalsData;
+      desktop?: WebVitalsData;
       metadata?: {
         timestamp: string;
         source: 'google_api' | 'demo_data' | 'unknown';
@@ -537,6 +546,13 @@ const SeoAudit: React.FC = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        if (response.status === 503 && errorData.error) {
+          // Специальная обработка для недоступности Google PageSpeed API
+          throw new Error(errorData.error + (errorData.details ? '\n\n' + errorData.details : ''));
+        }
+        
         throw new Error(`Ошибка сервера: ${response.status}`);
       }
 
@@ -544,6 +560,10 @@ const SeoAudit: React.FC = () => {
 
       console.log('🔍 SEO Audit results:', data.results);
       console.log('🔍 Web Vitals:', data.results?.webVitals);
+      console.log('🔍 Google Opportunities Mobile:', data.results?.webVitals?.mobile?.googleOpportunities);
+      console.log('🔍 Google Opportunities Desktop:', data.results?.webVitals?.desktop?.googleOpportunities);
+      console.log('🔍 Data Source Mobile:', data.results?.webVitals?.mobile?.source);
+      console.log('🔍 Data Source Desktop:', data.results?.webVitals?.desktop?.source);
 
       setResult({
         url: normalizedUrl,
@@ -630,16 +650,39 @@ const SeoAudit: React.FC = () => {
               <div className="seo-audit-loading-state">
                 <div className="loading-spinner"></div>
                 <p>Получаю полные данные от Google PageSpeed для {result.url}...</p>
-                <p className="loading-note">Ожидание реальных данных производительности может занять до 30-45 секунд</p>
-                <p className="loading-extra-note">🔄 Мы ждем полную информацию вместо демо-данных</p>
+                <p className="loading-note">Ожидание реальных данных производительности может занять до 2-3 минут</p>
+                <p className="loading-extra-note">🔄 Мы ждем полную информацию вместо демо-данных (4 попытки по 60 сек)</p>
+                
+                {/* Развлекательный блок во время ожидания */}
+                <div className="loading-entertainment">
+                  <p className="entertainment-text">Вы можете пока понаблюдать, как грузовик врезается в столб</p>
+                  <img 
+                    src="/gif/truck.gif" 
+                    alt="Грузовик врезается в столб" 
+                    className="entertainment-gif"
+                  />
+                </div>
               </div>
             )}
 
             {result.error && (
               <div className="seo-audit-error-state">
                 <h3>❌ Ошибка SEO анализа</h3>
-                <p>{result.error}</p>
-                <p className="error-help">Проверьте правильность URL и доступность сайта</p>
+                <div className="error-content">
+                  {result.error.split('\n\n').map((paragraph, index) => (
+                    <p key={index} className={index === 0 ? 'error-main' : 'error-details'}>
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+                {!result.error.includes('Google PageSpeed API') ? (
+                  <p className="error-help">Проверьте правильность URL и доступность сайта</p>
+                ) : (
+                  <div className="error-help">
+                    <p>⏳ Google PageSpeed API иногда перегружен в часы пик</p>
+                    <p>💡 Попробуйте через несколько минут для получения точных данных</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -2125,10 +2168,474 @@ const SeoAudit: React.FC = () => {
                       </div>
                         </div>
                     )}
+
+                    {/* Анализ ссылочного профиля */}
+                    {result.data.linkProfile && (
+                      <div className="seo-audit-section">
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('link-profile')}
+                          style={{ 
+                            cursor: 'pointer',
+                            marginBottom: collapsedSections.has('link-profile') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🔗 Ссылочный профиль
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              marginLeft: 'auto',
+                              transform: collapsedSections.has('link-profile') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }} 
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('link-profile') ? '0px' : '3000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
+                        
+                        <div className="seo-audit-info-block">
+                          <p><strong>Анализ ссылочного профиля</strong> помогает оценить качество внутренней и внешней перелинковки сайта:</p>
+                          <ul>
+                            <li><strong>Внутренние ссылки</strong> - ссылки между страницами вашего сайта, улучшают навигацию и распределение веса</li>
+                            <li><strong>Внешние ссылки</strong> - ссылки на другие сайты, должны быть качественными и релевантными</li>
+                            <li><strong>Анкорный текст</strong> - текст ссылок, влияет на понимание контента поисковыми системами</li>
+                          </ul>
+                        </div>
+                        
+                        <div className="seo-audit-item">
+                          <div className="seo-audit-item-header">
+                            <span className={`seo-audit-status ${
+                              result.data.linkProfile.score >= 80 ? 'good' : 
+                              result.data.linkProfile.score >= 50 ? 'warning' : 'error'
+                            }`}>
+                              {result.data.linkProfile.score >= 80 ? '🏆' : 
+                               result.data.linkProfile.score >= 50 ? '👍' : '📈'}
+                            </span>
+                            <span className="seo-audit-title">Качество ссылок</span>
+                          </div>
+                          <div className="seo-audit-content-block">
+                            <p className="seo-audit-value">
+                              📊 Оценка ссылочного профиля: <span className={
+                                result.data.linkProfile.score >= 80 ? 'text-success' : 
+                                result.data.linkProfile.score >= 50 ? 'text-warning' : 'text-error'
+                              }>{result.data.linkProfile.score}/100</span>
+                            </p>
+
+                            <div className="link-analysis-container">
+                              <div className="link-stats-main">
+                                <h5>🏠 Внутренние ссылки:</h5>
+                                <div className="link-stats-grid">
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🔗 Всего внутренних ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.internal.total}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">📄 Уникальных страниц:</span>
+                                    <span className="stat-value">{result.data.linkProfile.internal.unique}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">� Анкорных текстов:</span>
+                                    <span className="stat-value">{Object.keys(result.data.linkProfile.internal.anchorTexts).length}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">⚖️ Распределение ссылок:</span>
+                                    <span className="stat-value">Хорошо</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="link-stats-external">
+                                <h5>🌐 Внешние ссылки:</h5>
+                                <div className="link-stats-grid">
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🌐 Всего внешних ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.external.total}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🏢 Разных сайтов:</span>
+                                    <span className="stat-value">{Object.keys(result.data.linkProfile.external.domains).length}</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">🚫 Nofollow ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.external.nofollow} ({result.data.linkProfile.ratios.nofollowRatio}%)</span>
+                                  </div>
+                                  <div className="link-stat-item">
+                                    <span className="stat-label">✅ Dofollow ссылок:</span>
+                                    <span className="stat-value">{result.data.linkProfile.external.dofollow}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="link-ratios">
+                                <h5>📊 Ключевые соотношения</h5>
+                                <p className="link-stat-description">
+                                  <small>Рекомендуемое соотношение внутренних к внешним ссылкам: 3:1 или больше</small>
+                                </p>
+                                <div className="ratio-item">
+                                  <span className="ratio-label">⚖️ Баланс внутренних к внешним ссылкам:</span>
+                                  <span className={`ratio-value ${result.data.linkProfile.ratios.internalToExternal >= 3 ? 'text-success' : 
+                                                                 result.data.linkProfile.ratios.internalToExternal >= 1.5 ? 'text-warning' : 'text-error'}`}>
+                                    {result.data.linkProfile.ratios.internalToExternal}:1
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {Object.keys(result.data.linkProfile.external.domains).length > 0 && (
+                              <div className="external-domains">
+                                <h5>🌍 Топ внешних доменов:</h5>
+                                <div className="domains-list">
+                                  {Object.entries(result.data.linkProfile.external.domains)
+                                    .sort(([,a], [,b]) => b - a)
+                                    .slice(0, 5)
+                                    .map(([domain, count]) => (
+                                    <div key={domain} className="domain-item">
+                                      <span className="domain-name">{domain}</span>
+                                      <span className="domain-count">{count} ссылок</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {result.data.linkProfile.external.social.length > 0 && (
+                              <div className="social-links">
+                                <h5>📱 Социальные сети:</h5>
+                                <div className="social-list">
+                                  {result.data.linkProfile.external.social.slice(0, 3).map((social, index) => (
+                                    <span key={index} className="social-badge">{social}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {result.data.linkProfile.issues.length > 0 && (
+                              <div className="link-profile-issues">
+                                <h5>⚠️ Проблемы:</h5>
+                                {result.data.linkProfile.issues.map((issue, index) => (
+                                  <p key={index} className="seo-audit-error">{issue}</p>
+                                ))}
+                              </div>
+                            )}
+
+                            {result.data.linkProfile.recommendations.length > 0 && (
+                              <div className="link-profile-recommendations">
+                                <h5>💡 Рекомендации:</h5>
+                                {result.data.linkProfile.recommendations.map((rec, index) => (
+                                  <p key={index} className="seo-audit-tip">{rec}</p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Правая колонка */}
                   <div className="seo-audit-column-right">
+                    {/* Google PageSpeed рекомендации - Оптимизация изображений */}
+                    {(result.data.webVitals?.mobile?.googleOpportunities || result.data.webVitals?.desktop?.googleOpportunities) && (
+                      (() => {
+                        const currentOpportunities = currentDeviceData?.googleOpportunities || [];
+                        const imageOptimization = currentOpportunities.find((opp: any) => opp.category === 'images');
+                        
+                        return imageOptimization ? (
+                          <div className="seo-audit-section">
+                            <h3 
+                              className="seo-audit-section-header" 
+                              onClick={() => toggleSection('google-images')}
+                              style={{ 
+                                cursor: 'pointer', 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: collapsedSections.has('google-images') ? '0px' : undefined,
+                                transition: 'margin-bottom 0.4s ease-in-out'
+                              }}
+                            >
+                              <span>
+                                {imageOptimization.title} 
+                                <span className="google-pagespeed-badge">PageSpeed</span>
+                              </span>
+                              <img 
+                                src="/icons/arrow_circle.svg" 
+                                alt="" 
+                                style={{ 
+                                  width: '20px', 
+                                  height: '20px',
+                                  transform: collapsedSections.has('google-images') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.4s ease-in-out'
+                                }}
+                              />
+                            </h3>
+                            <div 
+                              className="seo-audit-section-content"
+                              style={{
+                                overflow: 'hidden',
+                                maxHeight: collapsedSections.has('google-images') ? '0px' : '1000px',
+                                transition: 'max-height 0.4s ease-in-out',
+                              }}
+                            >
+                              <div className="seo-audit-item">
+                                <div className="seo-audit-item-header">
+                                  <span className={`seo-audit-status warning`}>
+                                    🟡
+                                  </span>
+                                  <span className="seo-audit-title">Неоптимизированные изображения</span>
+                                </div>
+                                <div className="seo-audit-content-block">
+                                  <p className="seo-audit-meta">
+                                    💾 Потенциальная экономия: {imageOptimization.totalSavings}
+                                  </p>
+
+                                  {/* Детальный список изображений */}
+                                  <div className="google-pagespeed-items">
+                                    <h4>📋 Изображения для оптимизации:</h4>
+                                    {imageOptimization.items?.slice(0, 5).map((item: any, index: any) => (
+                                      <div key={index} className="pagespeed-optimization-item">
+                                        <div className="optimization-item-header">
+                                          <span className="optimization-filename">
+                                            {item.url.split('/').pop() || item.url}
+                                          </span>
+                                        </div>
+                                        <div className="optimization-details">
+                                          <div className="optimization-savings">
+                                            <span className="current-size">Текущий: {Math.round(item.currentSize / 1024)}KB</span>
+                                            <span className="arrow">→</span>
+                                            <span className="optimized-size">Экономия: {Math.round(item.potentialSavings / 1024)}KB</span>
+                                          </div>
+                                          <p className="optimization-recommendation">{item.recommendation}</p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    {imageOptimization.items && imageOptimization.items.length > 5 && (
+                                      <p className="more-items">И еще {imageOptimization.items.length - 5} изображений...</p>
+                                    )}
+                                  </div>
+
+                                  <p className="seo-audit-tip">
+                                    💡 Оптимизация изображений может значительно улучшить скорость загрузки страницы. 
+                                    Используйте современные форматы (WebP, AVIF) и сжимайте изображения перед загрузкой.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })()
+                    )}
+
+                    {/* Google PageSpeed рекомендации - CSS оптимизация */}
+                    {(result.data.webVitals?.mobile?.googleOpportunities || result.data.webVitals?.desktop?.googleOpportunities) && (
+                      (() => {
+                        const currentOpportunities = currentDeviceData?.googleOpportunities || [];
+                        const cssOptimization = currentOpportunities.find((opp: any) => opp.category === 'css');
+                        
+                        return cssOptimization ? (
+                          <div className="seo-audit-section">
+                            <h3 
+                              className="seo-audit-section-header" 
+                              onClick={() => toggleSection('google-css')}
+                              style={{ 
+                                cursor: 'pointer', 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: collapsedSections.has('google-css') ? '0px' : undefined,
+                                transition: 'margin-bottom 0.4s ease-in-out'
+                              }}
+                            >
+                              <span>
+                                {cssOptimization.title} 
+                                <span className="google-pagespeed-badge">PageSpeed</span>
+                              </span>
+                              <img 
+                                src="/icons/arrow_circle.svg" 
+                                alt="" 
+                                style={{ 
+                                  width: '20px', 
+                                  height: '20px',
+                                  transform: collapsedSections.has('google-css') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.4s ease-in-out'
+                                }}
+                              />
+                            </h3>
+                            <div 
+                              className="seo-audit-section-content"
+                              style={{
+                                overflow: 'hidden',
+                                maxHeight: collapsedSections.has('google-css') ? '0px' : '1000px',
+                                transition: 'max-height 0.4s ease-in-out',
+                              }}
+                            >
+                              <div className="seo-audit-item">
+                                <div className="seo-audit-item-header">
+                                  <span className={`seo-audit-status warning`}>
+                                    🟡
+                                  </span>
+                                  <span className="seo-audit-title">CSS требует оптимизации</span>
+                                </div>
+                                <div className="seo-audit-content-block">
+                                  <p className="seo-audit-meta">
+                                    💾 Потенциальная экономия: {cssOptimization.totalSavings}
+                                  </p>
+
+                                  {/* Детальный список CSS файлов */}
+                                  <div className="google-pagespeed-items">
+                                    <h4>📋 CSS файлы для оптимизации:</h4>
+                                    {cssOptimization.items?.slice(0, 3).map((item: any, index: any) => (
+                                      <div key={index} className="pagespeed-optimization-item">
+                                        <div className="optimization-item-header">
+                                          <span className="optimization-filename">
+                                            {item.url === 'Inline CSS' ? item.url : (item.url.split('/').pop() || item.url)}
+                                          </span>
+                                        </div>
+                                        <div className="optimization-details">
+                                          <div className="optimization-savings">
+                                            <span className="current-size">Размер: {Math.round(item.currentSize / 1024)}KB</span>
+                                            {item.wastedPercent && (
+                                              <>
+                                                <span className="arrow">→</span>
+                                                <span className="unused-percent">Не используется: {Math.round(item.wastedPercent)}%</span>
+                                              </>
+                                            )}
+                                          </div>
+                                          <p className="optimization-recommendation">{item.recommendation}</p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    {cssOptimization.items && cssOptimization.items.length > 3 && (
+                                      <p className="more-items">И еще {cssOptimization.items.length - 3} CSS файлов...</p>
+                                    )}
+                                  </div>
+
+                                  <p className="seo-audit-tip">
+                                    💡 Оптимизация CSS ускоряет первую отрисовку страницы. 
+                                    Удалите неиспользуемые стили и минимизируйте CSS файлы.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })()
+                    )}
+
+                    {/* Google PageSpeed рекомендации - JavaScript оптимизация */}
+                    {(result.data.webVitals?.mobile?.googleOpportunities || result.data.webVitals?.desktop?.googleOpportunities) && (
+                      (() => {
+                        const currentOpportunities = currentDeviceData?.googleOpportunities || [];
+                        const jsOptimization = currentOpportunities.find((opp: any) => opp.category === 'performance');
+                        
+                        return jsOptimization ? (
+                          <div className="seo-audit-section">
+                            <h3 
+                              className="seo-audit-section-header" 
+                              onClick={() => toggleSection('google-js')}
+                              style={{ 
+                                cursor: 'pointer', 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: collapsedSections.has('google-js') ? '0px' : undefined,
+                                transition: 'margin-bottom 0.4s ease-in-out'
+                              }}
+                            >
+                              <span>
+                                {jsOptimization.title} 
+                                <span className="google-pagespeed-badge">PageSpeed</span>
+                              </span>
+                              <img 
+                                src="/icons/arrow_circle.svg" 
+                                alt="" 
+                                style={{ 
+                                  width: '20px', 
+                                  height: '20px',
+                                  transform: collapsedSections.has('google-js') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.4s ease-in-out'
+                                }}
+                              />
+                            </h3>
+                            <div 
+                              className="seo-audit-section-content"
+                              style={{
+                                overflow: 'hidden',
+                                maxHeight: collapsedSections.has('google-js') ? '0px' : '1000px',
+                                transition: 'max-height 0.4s ease-in-out',
+                              }}
+                            >
+                              <div className="seo-audit-item">
+                                <div className="seo-audit-item-header">
+                                  <span className={`seo-audit-status warning`}>
+                                    🟡
+                                  </span>
+                                  <span className="seo-audit-title">JavaScript требует оптимизации</span>
+                                </div>
+                                <div className="seo-audit-content-block">
+                                  <p className="seo-audit-meta">
+                                    💾 Потенциальная экономия: {jsOptimization.totalSavings}
+                                  </p>
+
+                                  {/* Детальный список JS файлов */}
+                                  <div className="google-pagespeed-items">
+                                    <h4>📋 JavaScript файлы для оптимизации:</h4>
+                                    {jsOptimization.items?.slice(0, 3).map((item: any, index: any) => (
+                                      <div key={index} className="pagespeed-optimization-item">
+                                        <div className="optimization-item-header">
+                                          <span className="optimization-filename">
+                                            {item.url === 'Inline JS' ? item.url : (item.url.split('/').pop() || item.url)}
+                                          </span>
+                                        </div>
+                                        <div className="optimization-details">
+                                          <div className="optimization-savings">
+                                            <span className="current-size">Размер: {Math.round(item.currentSize / 1024)}KB</span>
+                                            {item.wastedPercent && (
+                                              <>
+                                                <span className="arrow">→</span>
+                                                <span className="unused-percent">Не используется: {Math.round(item.wastedPercent)}%</span>
+                                              </>
+                                            )}
+                                            {item.potentialSavings && (
+                                              <>
+                                                <span className="arrow">→</span>
+                                                <span className="optimized-size">Экономия: {Math.round(item.potentialSavings / 1024)}KB</span>
+                                              </>
+                                            )}
+                                          </div>
+                                          <p className="optimization-recommendation">{item.recommendation}</p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    {jsOptimization.items && jsOptimization.items.length > 3 && (
+                                      <p className="more-items">И еще {jsOptimization.items.length - 3} JS файлов...</p>
+                                    )}
+                                  </div>
+
+                                  <p className="seo-audit-tip">
+                                    💡 Оптимизация JavaScript уменьшает время выполнения скриптов и улучшает интерактивность. 
+                                    Удалите неиспользуемый код и минимизируйте JS файлы.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })()
+                    )}
+                    
+                  {/* Остальные секции правой колонки */}
                     {/* Изображения и ссылки */}
                     {result.data.images && (
                       <div className="seo-audit-section">
@@ -2307,206 +2814,7 @@ const SeoAudit: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Анализ ссылочного профиля */}
-                    {result.data.linkProfile && (
-                      <div className="seo-audit-section">
-                        <h3 
-                          className="seo-audit-section-header" 
-                          onClick={() => toggleSection('link-profile')}
-                          style={{ 
-                            cursor: 'pointer',
-                            marginBottom: collapsedSections.has('link-profile') ? '0px' : undefined,
-                            transition: 'margin-bottom 0.4s ease-in-out'
-                          }}
-                        >
-                          🔗 Ссылочный профиль
-                          <img 
-                            src="/icons/arrow_circle.svg" 
-                            alt="" 
-                            style={{ 
-                              width: '20px', 
-                              height: '20px',
-                              marginLeft: 'auto',
-                              transform: collapsedSections.has('link-profile') ? 'rotate(-90deg)' : 'rotate(0deg)',
-                              transition: 'transform 0.4s ease-in-out'
-                            }} 
-                          />
-                        </h3>
-                        <div 
-                          className="seo-audit-section-content"
-                          style={{
-                            overflow: 'hidden',
-                            maxHeight: collapsedSections.has('link-profile') ? '0px' : '3000px',
-                            transition: 'max-height 0.4s ease-in-out',
-                          }}
-                        >
-                        
-                        <div className="seo-audit-info-block">
-                          <p><strong>Анализ ссылочного профиля</strong> помогает оценить качество внутренней и внешней перелинковки сайта:</p>
-                          <ul>
-                            <li><strong>Внутренние ссылки</strong> - ссылки между страницами вашего сайта, улучшают навигацию и распределение веса</li>
-                            <li><strong>Внешние ссылки</strong> - ссылки на другие сайты, должны быть качественными и релевантными</li>
-                            <li><strong>Анкорный текст</strong> - текст ссылок, влияет на понимание контента поисковыми системами</li>
-                          </ul>
-                        </div>
-                        
-                        <div className="seo-audit-item">
-                          <div className="seo-audit-item-header">
-                            <span className={`seo-audit-status ${
-                              result.data.linkProfile.score >= 80 ? 'good' : 
-                              result.data.linkProfile.score >= 50 ? 'warning' : 'error'
-                            }`}>
-                              {result.data.linkProfile.score >= 80 ? '🏆' : 
-                               result.data.linkProfile.score >= 50 ? '👍' : '📈'}
-                            </span>
-                            <span className="seo-audit-title">Качество ссылок</span>
-                          </div>
-                          <div className="seo-audit-content-block">
-                            <p className="seo-audit-value">
-                              📊 Оценка ссылочного профиля: <span className={
-                                result.data.linkProfile.score >= 80 ? 'text-success' : 
-                                result.data.linkProfile.score >= 50 ? 'text-warning' : 'text-error'
-                              }>
-                                {result.data.linkProfile.score}/{result.data.linkProfile.maxScore}
-                              </span>
-                            </p>
-                            
-                            <div className="seo-audit-score-item">
-                              <span className="seo-audit-score-label">Ссылочный профиль</span>
-                              <div className="seo-audit-score-bar">
-                                <div 
-                                  className="seo-audit-score-fill" 
-                                  style={{ 
-                                    width: `${result.data.linkProfile.score}%`,
-                                    backgroundColor: getProgressColor(result.data.linkProfile.score)
-                                  }}
-                                ></div>
-                              </div>
-                              <span className="seo-audit-score-value">{result.data.linkProfile.score}/100</span>
-                            </div>
-
-                            <div className="link-profile-stats">
-                              <div className="link-stat-section">
-                                <h5>🔗 Внутренние ссылки</h5>
-                                <p className="link-stat-description">
-                                  <small>Внутренние ссылки соединяют страницы вашего сайта и помогают поисковым системам понять структуру сайта</small>
-                                </p>
-                                <div className="link-stats-grid">
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">📊 Всего внутренних ссылок:</span>
-                                    <span className={`stat-value ${result.data.linkProfile.internal.total >= 10 ? 'text-success' : 'text-warning'}`}>
-                                      {result.data.linkProfile.internal.total}
-                                    </span>
-                                  </div>
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">🔗 Уникальных URL адресов:</span>
-                                    <span className="stat-value">{result.data.linkProfile.internal.unique.length}</span>
-                                  </div>
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">📝 Разных текстов ссылок:</span>
-                                    <span className="stat-value">{result.data.linkProfile.ratios.anchorDiversity}</span>
-                                  </div>
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">⭐ Общее качество:</span>
-                                    <span className={`stat-value quality-${result.data.linkProfile.internal.quality}`}>
-                                      {result.data.linkProfile.internal.quality === 'excellent' ? '🏆 Отлично' :
-                                       result.data.linkProfile.internal.quality === 'good' ? '✅ Хорошо' :
-                                       result.data.linkProfile.internal.quality === 'fair' ? '⚠️ Средне' : '❌ Плохо'}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="link-stat-section">
-                                <h5>🌐 Внешние ссылки</h5>
-                                <p className="link-stat-description">
-                                  <small>Ссылки на внешние сайты должны быть релевантными и вести на качественные ресурсы</small>
-                                </p>
-                                <div className="link-stats-grid">
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">🌐 Всего внешних ссылок:</span>
-                                    <span className="stat-value">{result.data.linkProfile.external.total}</span>
-                                  </div>
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">🏢 Разных сайтов:</span>
-                                    <span className="stat-value">{Object.keys(result.data.linkProfile.external.domains).length}</span>
-                                  </div>
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">🚫 Nofollow ссылок:</span>
-                                    <span className="stat-value">{result.data.linkProfile.external.nofollow} ({result.data.linkProfile.ratios.nofollowRatio}%)</span>
-                                  </div>
-                                  <div className="link-stat-item">
-                                    <span className="stat-label">✅ Dofollow ссылок:</span>
-                                    <span className="stat-value">{result.data.linkProfile.external.dofollow}</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="link-ratios">
-                                <h5>📊 Ключевые соотношения</h5>
-                                <p className="link-stat-description">
-                                  <small>Рекомендуемое соотношение внутренних к внешним ссылкам: 3:1 или больше</small>
-                                </p>
-                                <div className="ratio-item">
-                                  <span className="ratio-label">⚖️ Баланс внутренних к внешним ссылкам:</span>
-                                  <span className={`ratio-value ${result.data.linkProfile.ratios.internalToExternal >= 3 ? 'text-success' : 
-                                                                 result.data.linkProfile.ratios.internalToExternal >= 1.5 ? 'text-warning' : 'text-error'}`}>
-                                    {result.data.linkProfile.ratios.internalToExternal}:1
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {Object.keys(result.data.linkProfile.external.domains).length > 0 && (
-                              <div className="external-domains">
-                                <h5>🌍 Топ внешних доменов:</h5>
-                                <div className="domains-list">
-                                  {Object.entries(result.data.linkProfile.external.domains)
-                                    .sort(([,a], [,b]) => b - a)
-                                    .slice(0, 5)
-                                    .map(([domain, count]) => (
-                                    <div key={domain} className="domain-item">
-                                      <span className="domain-name">{domain}</span>
-                                      <span className="domain-count">{count} ссылок</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {result.data.linkProfile.external.social.length > 0 && (
-                              <div className="social-links">
-                                <h5>📱 Социальные сети:</h5>
-                                <div className="social-list">
-                                  {result.data.linkProfile.external.social.slice(0, 3).map((social, index) => (
-                                    <span key={index} className="social-badge">{social}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {result.data.linkProfile.issues.length > 0 && (
-                              <div className="link-profile-issues">
-                                <h5>⚠️ Проблемы:</h5>
-                                {result.data.linkProfile.issues.map((issue, index) => (
-                                  <p key={index} className="seo-audit-error">{issue}</p>
-                                ))}
-                              </div>
-                            )}
-
-                            {result.data.linkProfile.recommendations.length > 0 && (
-                              <div className="link-profile-recommendations">
-                                <h5>💡 Рекомендации:</h5>
-                                {result.data.linkProfile.recommendations.map((rec, index) => (
-                                  <p key={index} className="seo-audit-tip">{rec}</p>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                        </div>
-                    )}
+                    {/* УДАЛЕН ДУБЛИКАТ - ССЫЛОЧНЫЙ ПРОФИЛЬ ПЕРЕНЕСЕН В ЛЕВУЮ КОЛОНКУ */}
 
                     {/* Анализ потенциала Sitelinks */}
                     {result.data.sitelinks && (
