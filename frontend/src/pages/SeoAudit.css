@@ -143,15 +143,14 @@
 
 /* Flexbox альтернатива для лучшего баланса */
 .seo-audit-flex-columns {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 16px;
   padding: 20px;
-  align-items: flex-start;
+  align-items: start;
 }
 
-.seo-audit-flex-columns .seo-audit-column-left,
-.seo-audit-flex-columns .seo-audit-column-right {
-  flex: 1;
+.seo-audit-flex-columns > div {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -161,7 +160,7 @@
 /* Адаптивность только для мобильных телефонов */
 @media (max-width: 600px) {
   .seo-audit-flex-columns {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
   
   .seo-audit-action-plan {
@@ -1077,7 +1076,7 @@
 
 .action-plan-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 430px));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
   justify-content: center;
 }
