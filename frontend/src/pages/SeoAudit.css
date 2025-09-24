@@ -2473,6 +2473,30 @@
   gap: 6px;
 }
 
+.google-pagespeed-items-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.google-pagespeed-items-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.google-pagespeed-items-scroll::-webkit-scrollbar-track {
+  background: #1C1D1F;
+  border-radius: 3px;
+}
+
+.google-pagespeed-items-scroll::-webkit-scrollbar-thumb {
+  background: #333335;
+  border-radius: 3px;
+}
+
+.google-pagespeed-items-scroll::-webkit-scrollbar-thumb:hover {
+  background: #404042;
+}
+
 .pagespeed-optimization-item {
   background: var(--section-bg);
   border: 1px solid var(--border-color);
