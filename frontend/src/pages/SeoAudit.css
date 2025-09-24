@@ -236,8 +236,8 @@
 .loading-entertainment {
   margin-top: 20px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #333335;
+  /* background: rgba(255, 255, 255, 0.02); */
+  /* border: 1px solid #333335; */
   border-radius: 8px;
   text-align: center;
 }
@@ -377,16 +377,22 @@
 }
 
 .seo-audit-value {
-  margin: 0 0 6px 0;
+  margin: 0 0 10px 0;
   font-size: 13px;
   color: #FAFAFA;
   line-height: 1.4;
 }
 
 .seo-audit-meta {
-  margin: 0 0 6px 0;
-  font-size: 12px;
-  color: #808184;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #E5E7EB;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
 }
 
 .seo-audit-tip {
@@ -2097,7 +2103,7 @@
 }
 
 .seo-audit-error {
-  font-size: 13px;
+  font-size: 12px;
   color: #EF4444;
   margin: 4px 0;
   line-height: 1.4;

@@ -2241,7 +2241,7 @@ const SeoAudit: React.FC = () => {
                                   </div>
                                   <div className="link-stat-item">
                                     <span className="stat-label">📄 Уникальных страниц:</span>
-                                    <span className="stat-value">{result.data.linkProfile.internal.unique}</span>
+                                    <span className="stat-value">{Array.isArray(result.data.linkProfile.internal.unique) ? result.data.linkProfile.internal.unique.length : result.data.linkProfile.internal.unique}</span>
                                   </div>
                                   <div className="link-stat-item">
                                     <span className="stat-label">� Анкорных текстов:</span>
@@ -2290,6 +2290,37 @@ const SeoAudit: React.FC = () => {
                                 </div>
                               </div>
                             </div>
+
+                            {Array.isArray(result.data.linkProfile.internal.unique) && result.data.linkProfile.internal.unique.length > 0 && (
+                              <div className="internal-pages">
+                                <h5>🏠 Топ внутренних страниц:</h5>
+                                <div className="domains-list">
+                                  {result.data.linkProfile.internal.unique
+                                    .slice(0, 5)
+                                    .map((page, index) => {
+                                      let displayPath = page;
+                                      try {
+                                        if (page.startsWith('/')) {
+                                          displayPath = page;
+                                        } else if (page.startsWith('http')) {
+                                          displayPath = new URL(page).pathname;
+                                        } else {
+                                          displayPath = `/${page}`;
+                                        }
+                                      } catch (e) {
+                                        displayPath = page;
+                                      }
+                                      
+                                      return (
+                                        <div key={index} className="domain-item">
+                                          <span className="domain-name">{displayPath}</span>
+                                          <span className="domain-count">внутр. ссылка</span>
+                                        </div>
+                                      );
+                                    })}
+                                </div>
+                              </div>
+                            )}
 
                             {Object.keys(result.data.linkProfile.external.domains).length > 0 && (
                               <div className="external-domains">
@@ -2407,7 +2438,18 @@ const SeoAudit: React.FC = () => {
                                       <div key={index} className="pagespeed-optimization-item">
                                         <div className="optimization-item-header">
                                           <span className="optimization-filename">
-                                            {item.url.split('/').pop() || item.url}
+                                            {(() => {
+                                              // Если это полный URL, извлекаем имя файла
+                                              if (item.url.includes('/')) {
+                                                const filename = item.url.split('/').pop();
+                                                return filename || item.url;
+                                              }
+                                              // Если это lighthouse ID, показываем его как есть но с префиксом
+                                              if (item.url.match(/^\d+-\d+-/)) {
+                                                return `Изображение ${item.url}`;
+                                              }
+                                              return item.url;
+                                            })()}
                                           </span>
                                         </div>
                                         <div className="optimization-details">
@@ -2499,7 +2541,19 @@ const SeoAudit: React.FC = () => {
                                       <div key={index} className="pagespeed-optimization-item">
                                         <div className="optimization-item-header">
                                           <span className="optimization-filename">
-                                            {item.url === 'Inline CSS' ? item.url : (item.url.split('/').pop() || item.url)}
+                                            {(() => {
+                                              if (item.url === 'Inline CSS') return item.url;
+                                              // Если это полный URL, извлекаем имя файла
+                                              if (item.url.includes('/')) {
+                                                const filename = item.url.split('/').pop();
+                                                return filename || item.url;
+                                              }
+                                              // Если это lighthouse ID, показываем его как есть но с префиксом
+                                              if (item.url.match(/^\d+-\d+-/)) {
+                                                return `CSS файл ${item.url}`;
+                                              }
+                                              return item.url;
+                                            })()}
                                           </span>
                                         </div>
                                         <div className="optimization-details">
@@ -2595,7 +2649,19 @@ const SeoAudit: React.FC = () => {
                                       <div key={index} className="pagespeed-optimization-item">
                                         <div className="optimization-item-header">
                                           <span className="optimization-filename">
-                                            {item.url === 'Inline JS' ? item.url : (item.url.split('/').pop() || item.url)}
+                                            {(() => {
+                                              if (item.url === 'Inline JS') return item.url;
+                                              // Если это полный URL, извлекаем имя файла
+                                              if (item.url.includes('/')) {
+                                                const filename = item.url.split('/').pop();
+                                                return filename || item.url;
+                                              }
+                                              // Если это lighthouse ID, показываем его как есть но с префиксом
+                                              if (item.url.match(/^\d+-\d+-/)) {
+                                                return `JS файл ${item.url}`;
+                                              }
+                                              return item.url;
+                                            })()}
                                           </span>
                                         </div>
                                         <div className="optimization-details">

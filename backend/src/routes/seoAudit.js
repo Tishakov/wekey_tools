@@ -228,7 +228,7 @@ function extractGoogleOpportunities(data, strategy) {
         imageOptimization.savings += modernFormats.details.overallSavingsBytes || 0;
         imageOptimization.items.push(...modernFormats.details.items.map(item => ({
           type: 'modern-format',
-          url: item.node?.lhId || item.url || 'Unknown',
+          url: item.url || item.node?.lhId || 'Unknown',
           currentSize: item.totalBytes || 0,
           potentialSavings: item.wastedBytes || 0,
           recommendation: `Конвертировать в WebP или AVIF (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
@@ -241,7 +241,7 @@ function extractGoogleOpportunities(data, strategy) {
         imageOptimization.savings += optimizedImages.details.overallSavingsBytes || 0;
         imageOptimization.items.push(...optimizedImages.details.items.map(item => ({
           type: 'optimization',
-          url: item.node?.lhId || item.url || 'Unknown',
+          url: item.url || item.node?.lhId || 'Unknown',
           currentSize: item.totalBytes || 0,
           potentialSavings: item.wastedBytes || 0,
           recommendation: `Сжать изображение (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
@@ -254,7 +254,7 @@ function extractGoogleOpportunities(data, strategy) {
         imageOptimization.savings += webpImages.details.overallSavingsBytes || 0;
         imageOptimization.items.push(...webpImages.details.items.map(item => ({
           type: 'webp-format',
-          url: item.node?.lhId || item.url || 'Unknown',
+          url: item.url || item.node?.lhId || 'Unknown',
           currentSize: item.totalBytes || 0,
           potentialSavings: item.wastedBytes || 0,
           recommendation: `Использовать WebP формат (экономия: ${Math.round((item.wastedBytes || 0) / 1024)}KB)`
