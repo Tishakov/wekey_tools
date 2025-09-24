@@ -1674,38 +1674,41 @@ function generateActionPlan(seoData, performanceData, additionalData = {}) {
     console.log(`🔍 Processing ${opportunities.length} PageSpeed opportunities for action plan`);
     
     opportunities.forEach(opportunity => {
-      console.log(`📊 Opportunity: ${opportunity.category}, savings: ${opportunity.savings}KB, title: ${opportunity.title}`);
-      if (opportunity.category === 'images' && opportunity.savings > 50) { // > 50KB экономии
+      // Конвертируем байты в KB для корректного отображения
+      const savingsKB = Math.round(opportunity.savings / 1024);
+      console.log(`📊 Opportunity: ${opportunity.category}, savings: ${savingsKB}KB (${opportunity.savings} bytes), title: ${opportunity.title}`);
+      
+      if (opportunity.category === 'images' && savingsKB > 50) { // > 50KB экономии
         actions.push({
-          priority: opportunity.savings > 200 ? 'critical' : 'important', // > 200KB = критично
+          priority: savingsKB > 200 ? 'critical' : 'important', // > 200KB = критично
           category: 'Performance',
           task: 'Оптимизировать изображения',
-          description: `Сжатие и конвертация изображений может сэкономить ${Math.round(opportunity.savings)}KB. Найдено ${opportunity.items?.length || 0} изображений для оптимизации.`,
+          description: `Сжатие и конвертация изображений может сэкономить ${savingsKB}KB. Найдено ${opportunity.items?.length || 0} изображений для оптимизации.`,
           impact: 'high',
           effort: 'medium',
           expectedImprovement: '+20-35% скорость загрузки страницы'
         });
       }
       
-      if (opportunity.category === 'css' && opportunity.savings > 30) { // > 30KB экономии
+      if (opportunity.category === 'css' && savingsKB > 30) { // > 30KB экономии
         actions.push({
-          priority: opportunity.savings > 100 ? 'important' : 'recommended', // > 100KB = важно
+          priority: savingsKB > 100 ? 'important' : 'recommended', // > 100KB = важно
           category: 'Performance',
           task: 'Оптимизировать CSS файлы',
-          description: `Удаление неиспользуемого CSS может сэкономить ${Math.round(opportunity.savings)}KB. Найдено ${opportunity.items?.length || 0} CSS файлов для оптимизации.`,
+          description: `Удаление неиспользуемого CSS может сэкономить ${savingsKB}KB. Найдено ${opportunity.items?.length || 0} CSS файлов для оптимизации.`,
           impact: 'medium',
           effort: 'high',
           expectedImprovement: '+10-20% скорость первой отрисовки'
         });
       }
       
-      if ((opportunity.category === 'performance' || opportunity.category === 'javascript') && opportunity.savings > 20) { // > 20KB экономии
-        console.log(`🎯 JavaScript optimization found: ${opportunity.savings}KB savings, category: ${opportunity.category}`);
+      if ((opportunity.category === 'performance' || opportunity.category === 'javascript') && savingsKB > 20) { // > 20KB экономии
+        console.log(`🎯 JavaScript optimization found: ${savingsKB}KB savings, category: ${opportunity.category}`);
         actions.push({
-          priority: opportunity.savings > 80 ? 'important' : 'recommended', // > 80KB = важно
+          priority: savingsKB > 80 ? 'important' : 'recommended', // > 80KB = важно
           category: 'Performance', 
           task: 'Оптимизировать JavaScript файлы',
-          description: `Минификация и удаление неиспользуемого JS может сэкономить ${Math.round(opportunity.savings)}KB. Найдено ${opportunity.items?.length || 0} JS файлов для оптимизации.`,
+          description: `Минификация и удаление неиспользуемого JS может сэкономить ${savingsKB}KB. Найдено ${opportunity.items?.length || 0} JS файлов для оптимизации.`,
           impact: 'medium',
           effort: 'high',
           expectedImprovement: '+15-25% время интерактивности'
