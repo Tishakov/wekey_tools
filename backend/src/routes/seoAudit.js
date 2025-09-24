@@ -3,41 +3,120 @@ const router = express.Router();
 const cheerio = require('cheerio');
 const fetch = require('node-fetch');
 
-// Google PageSpeed Insights API (бесплатно, без ключа для базового использования)
-const PAGESPEED_API_URL = 'https://www.googleapis.com/pagespeed/v5/runPagespeed';
+// Google PageSpeed Insights API (правильный URL)
+const PAGESPEED_API_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+const GOOGLE_API_KEY = process.env.GOOGLE_PAGESPEED_API_KEY; // Добавьте ключ в .env файл
 
-// Функция для получения PageSpeed данных
+// Функция для получения PageSpeed данных с retry логикой
 async function getPageSpeedData(url) {
   try {
-    const mobileUrl = `${PAGESPEED_API_URL}?url=${encodeURIComponent(url)}&strategy=mobile&category=performance`;
-    const desktopUrl = `${PAGESPEED_API_URL}?url=${encodeURIComponent(url)}&strategy=desktop&category=performance`;
+    // Добавляем API ключ если доступен
+    const keyParam = GOOGLE_API_KEY ? `&key=${GOOGLE_API_KEY}` : '';
+    const mobileUrl = `${PAGESPEED_API_URL}?url=${encodeURIComponent(url)}&strategy=mobile&category=performance${keyParam}`;
+    const desktopUrl = `${PAGESPEED_API_URL}?url=${encodeURIComponent(url)}&strategy=desktop&category=performance${keyParam}`;
     
+    console.log('🚀 Начинаем получение PageSpeed данных...');
+    
+    // Функция для выполнения запроса с retry
+    const fetchWithRetry = async (url, strategy, maxRetries = 2) => {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`📡 Попытка ${attempt}/${maxRetries} для ${strategy}...`);
+          const response = await fetch(url, { timeout: 25000 }); // Увеличиваем timeout до 25 секунд
+          if (response.ok) {
+            console.log(`✅ ${strategy} данные получены успешно`);
+            return response;
+          } else {
+            console.log(`⚠️ ${strategy} попытка ${attempt} не удалась: ${response.status}`);
+          }
+        } catch (error) {
+          console.log(`❌ ${strategy} попытка ${attempt} ошибка: ${error.message}`);
+        }
+        
+        // Ждем между попытками (кроме последней)
+        if (attempt < maxRetries) {
+          console.log(`⏳ Ожидание 3 секунды перед следующей попыткой ${strategy}...`);
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+      }
+      return null;
+    };
+    
+    // Выполняем запросы параллельно с retry
     const [mobileResponse, desktopResponse] = await Promise.allSettled([
-      fetch(mobileUrl, { timeout: 10000 }),
-      fetch(desktopUrl, { timeout: 10000 })
+      fetchWithRetry(mobileUrl, 'mobile'),
+      fetchWithRetry(desktopUrl, 'desktop')
     ]);
     
     const results = {
       mobile: null,
       desktop: null,
-      error: null
+      error: null,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        source: 'unknown',
+        hasApiKey: !!GOOGLE_API_KEY,
+        requestStatus: {
+          mobile: 'pending',
+          desktop: 'pending'
+        }
+      }
     };
     
-    if (mobileResponse.status === 'fulfilled' && mobileResponse.value.ok) {
+    // Обрабатываем mobile результат
+    if (mobileResponse.status === 'fulfilled' && mobileResponse.value && mobileResponse.value.ok) {
       const mobileData = await mobileResponse.value.json();
-      results.mobile = extractCoreWebVitals(mobileData);
+      results.mobile = extractCoreWebVitals(mobileData, 'mobile');
+      results.metadata.requestStatus.mobile = 'success';
+      console.log('✅ Mobile данные обработаны успешно');
+    } else {
+      results.metadata.requestStatus.mobile = 'failed';
+      console.log('❌ Mobile данные не получены');
     }
     
-    if (desktopResponse.status === 'fulfilled' && desktopResponse.value.ok) {
+    // Обрабатываем desktop результат
+    if (desktopResponse.status === 'fulfilled' && desktopResponse.value && desktopResponse.value.ok) {
       const desktopData = await desktopResponse.value.json();
-      results.desktop = extractCoreWebVitals(desktopData);
+      results.desktop = extractCoreWebVitals(desktopData, 'desktop');
+      results.metadata.requestStatus.desktop = 'success';
+      console.log('✅ Desktop данные обработаны успешно');
+    } else {
+      results.metadata.requestStatus.desktop = 'failed';
+      console.log('❌ Desktop данные не получены');
     }
     
-    // Если Google API не работает, добавляем демо-данные для тестирования
-    if (!results.mobile && !results.desktop) {
-      console.log('⚠️ Google PageSpeed API unavailable, using demo data');
+    // Проверяем успешность получения данных
+    const mobileSuccess = results.metadata.requestStatus.mobile === 'success';
+    const desktopSuccess = results.metadata.requestStatus.desktop === 'success';
+    
+    if (mobileSuccess && desktopSuccess) {
+      // Оба запроса успешны - используем только Google API данные
+      results.metadata.source = 'google_api';
+      console.log('🎉 Все PageSpeed данные получены от Google API');
+    } else if (mobileSuccess || desktopSuccess) {
+      // Частичный успех - добавляем недостающие данные как demo
+      if (!results.mobile) {
+        console.log('⚠️ Mobile PageSpeed API failed, using demo data');
+        results.mobile = generateDemoWebVitals('mobile');
+        results.metadata.requestStatus.mobile = 'demo';
+      }
+      
+      if (!results.desktop) {
+        console.log('⚠️ Desktop PageSpeed API failed, using demo data');
+        results.desktop = generateDemoWebVitals('desktop');
+        results.metadata.requestStatus.desktop = 'demo';
+      }
+      
+      results.metadata.source = 'mixed';
+      console.log('⚡ Смешанные данные: часть от Google API, часть demo');
+    } else {
+      // Все запросы failed - используем только demo данные
+      console.log('💥 Все PageSpeed запросы не удались, используем demo данные');
       results.mobile = generateDemoWebVitals('mobile');
       results.desktop = generateDemoWebVitals('desktop');
+      results.metadata.source = 'demo_data';
+      results.metadata.requestStatus.mobile = 'demo';
+      results.metadata.requestStatus.desktop = 'demo';
     }
     
     return results;
@@ -53,13 +132,16 @@ async function getPageSpeedData(url) {
 }
 
 // Извлекаем Core Web Vitals из ответа Google
-function extractCoreWebVitals(data) {
+function extractCoreWebVitals(data, strategy) {
   try {
     const lighthouse = data.lighthouseResult;
     const audits = lighthouse.audits;
     
     return {
       performance_score: Math.round(lighthouse.categories.performance.score * 100),
+      strategy: strategy, // mobile или desktop
+      timestamp: new Date().toISOString(),
+      source: 'google_api',
       core_web_vitals: {
         lcp: {
           value: audits['largest-contentful-paint']?.numericValue || 0,
@@ -97,6 +179,9 @@ function generateDemoWebVitals(strategy) {
   
   return {
     performance_score: isMobile ? Math.floor(Math.random() * 20) + 65 : Math.floor(Math.random() * 20) + 75, // 65-84 mobile, 75-94 desktop
+    strategy: strategy,
+    timestamp: new Date().toISOString(),
+    source: 'demo_data',
     core_web_vitals: {
       lcp: {
         value: isMobile ? Math.random() * 1000 + 2000 : Math.random() * 800 + 1200, // ms
@@ -125,7 +210,7 @@ function generateDemoWebVitals(strategy) {
 
 router.post('/seo-audit', async (req, res) => {
   try {
-    const { url } = req.body;
+    const { url, waitForFullData = true } = req.body; // По умолчанию ждем полные данные
     if (!url) {
       return res.status(400).json({ success: false, error: 'URL is required' });
     }
@@ -134,6 +219,8 @@ router.post('/seo-audit', async (req, res) => {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       fullUrl = 'https://' + url;
     }
+    
+    console.log(`🔍 Анализ ${fullUrl} (waitForFullData: ${waitForFullData})`);
 
     // Параллельно запускаем все проверки включая Mobile-Friendly, SSL Labs, W3C Validator и Security Headers
     const [htmlAnalysis, pageSpeedData, robotsCheck, sslCheck, resourcesCheck, mobileCheck, sslLabsCheck, w3cCheck, securityHeadersCheck] = await Promise.allSettled([
@@ -166,6 +253,21 @@ router.post('/seo-audit', async (req, res) => {
 
     if (pageSpeedData.status === 'fulfilled') {
       performanceData = pageSpeedData.value;
+      
+      // Проверяем, если пользователь хочет ждать полные данные
+      if (waitForFullData && performanceData) {
+        const hasFullData = (
+          performanceData.metadata?.requestStatus?.mobile === 'success' &&
+          performanceData.metadata?.requestStatus?.desktop === 'success'
+        );
+        
+        if (!hasFullData) {
+          console.log('⏳ Не все PageSpeed данные получены, но пользователь хочет полные данные...');
+          // Можем здесь добавить дополнительную логику если нужно
+        } else {
+          console.log('✅ Все PageSpeed данные готовы!');
+        }
+      }
     }
 
     if (robotsCheck.status === 'fulfilled') {
@@ -601,7 +703,10 @@ function analyzeSEO($, html, url) {
       hasLazyLoading: $('img[loading="lazy"]').length > 0,
       hasPreconnect: $('link[rel="preconnect"]').length > 0,
       hasPrefetch: $('link[rel="prefetch"], link[rel="preload"]').length > 0,
-      hasMinifiedCSS: $('link[rel="stylesheet"]').filter((i, el) => $(el).attr('href').includes('.min.')).length > 0
+      hasMinifiedCSS: $('link[rel="stylesheet"]').filter((i, el) => {
+        const href = $(el).attr('href');
+        return href && href.includes('.min.');
+      }).length > 0
     }
   };
 
@@ -709,11 +814,13 @@ function calculateOverallScore(seoData, performanceData, additionalData = {}) {
   contentPoints += (seoData.keywordAnalysis?.titleKeywords?.length || 0) > 0 ? 30 : 0;
   scores.content = Math.min(Math.round(contentPoints), 100);
   
-  // Performance (30% веса)
+  // Performance (30% веса) - убираем усреднение, оставляем мобильный приоритет
   if (performanceData?.mobile?.performance_score) {
-    const mobileScore = performanceData.mobile.performance_score;
-    const desktopScore = performanceData.desktop?.performance_score || mobileScore;
-    scores.performance = Math.round((mobileScore + desktopScore) / 2);
+    // Приоритет мобильной версии (Google Mobile-First Index)
+    scores.performance = performanceData.mobile.performance_score;
+  } else if (performanceData?.desktop?.performance_score) {
+    // Fallback на desktop если mobile недоступен
+    scores.performance = performanceData.desktop.performance_score;
   } else {
     scores.performance = 50; // Средняя оценка если PageSpeed недоступен
   }

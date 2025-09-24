@@ -209,6 +209,13 @@
   color: #808184;
 }
 
+.seo-audit-loading-state .loading-extra-note {
+  font-size: 13px;
+  color: #4CAF50;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
 .seo-audit-error-state {
   padding: 24px;
   background: #2D1B1B;
@@ -2221,4 +2228,114 @@
 
 .link-profile-recommendations {
   margin-top: 20px;
+}
+
+/* ===== ENHANCED PAGESPEED INTEGRATION STYLES ===== */
+
+/* Индикация источника данных */
+.data-source-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.source-badge {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.source-badge.google_api {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+}
+
+.source-badge.demo_data {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: white;
+}
+
+.source-badge.unknown {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+}
+
+.api-key-status {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.timestamp {
+  font-size: 10px;
+  color: #6B7280;
+}
+
+/* Индикация источника на кнопках устройств */
+.device-source {
+  font-size: 9px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+.device-source.demo_data {
+  color: #F59E0B;
+}
+
+/* Кнопка обновления */
+.refresh-performance-btn {
+  background: none;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.refresh-performance-btn:hover {
+  background: #F3F4F6;
+  border-color: #D1D5DB;
+  transform: rotate(180deg);
+}
+
+.refresh-performance-btn:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+/* Улучшенные стили для device toggle */
+.device-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.device-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .data-source-indicator {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .device-toggle {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .device-toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

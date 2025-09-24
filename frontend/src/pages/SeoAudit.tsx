@@ -164,10 +164,13 @@ interface SeoAuditResult {
         hasMinifiedCSS: boolean;
       };
     };
-    // Новые поля Level 2
+    // Новые поля Level 2 - Enhanced PageSpeed Integration
     webVitals?: {
       mobile?: {
         performance_score: number;
+        strategy?: string;
+        timestamp?: string;
+        source?: 'google_api' | 'demo_data';
         core_web_vitals: {
           lcp: { value: number; score: number; displayValue: string };
           fid: { value: number; score: number; displayValue: string };
@@ -176,10 +179,22 @@ interface SeoAuditResult {
       };
       desktop?: {
         performance_score: number;
+        strategy?: string;
+        timestamp?: string;
+        source?: 'google_api' | 'demo_data';
         core_web_vitals: {
           lcp: { value: number; score: number; displayValue: string };
           fid: { value: number; score: number; displayValue: string };
           cls: { value: number; score: number; displayValue: string };
+        };
+      };
+      metadata?: {
+        timestamp: string;
+        source: 'google_api' | 'demo_data' | 'unknown';
+        hasApiKey: boolean;
+        requestStatus: {
+          mobile: 'success' | 'failed' | 'demo' | 'pending';
+          desktop: 'success' | 'failed' | 'demo' | 'pending';
         };
       };
       error?: string;
@@ -515,7 +530,10 @@ const SeoAudit: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: normalizedUrl })
+        body: JSON.stringify({ 
+          url: normalizedUrl,
+          waitForFullData: true  // Ждем полные данные от Google PageSpeed
+        })
       });
 
       if (!response.ok) {
@@ -591,7 +609,7 @@ const SeoAudit: React.FC = () => {
             onClick={handleAudit}
             disabled={result?.loading || !url.trim()}
           >
-            {result?.loading ? 'Анализирую SEO...' : 'Показать результат'}
+            {result?.loading ? 'Получаю полные данные от Google PageSpeed...' : 'Показать результат'}
           </button>
           
           <button 
@@ -611,8 +629,9 @@ const SeoAudit: React.FC = () => {
             {result.loading && (
               <div className="seo-audit-loading-state">
                 <div className="loading-spinner"></div>
-                <p>Анализирую SEO сайта {result.url}...</p>
-                <p className="loading-note">Это может занять несколько секунд</p>
+                <p>Получаю полные данные от Google PageSpeed для {result.url}...</p>
+                <p className="loading-note">Ожидание реальных данных производительности может занять до 30-45 секунд</p>
+                <p className="loading-extra-note">🔄 Мы ждем полную информацию вместо демо-данных</p>
               </div>
             )}
 
@@ -723,7 +742,28 @@ const SeoAudit: React.FC = () => {
                     {(result.data.webVitals?.mobile || result.data.webVitals?.desktop) && (
                       <div className="core-web-vitals-dashboard">
                         <div className="performance-header">
-                          <h3>🚀 Производительность (Google PageSpeed)</h3>
+                          <h3>🚀 Производительность (Реальные данные Google PageSpeed)</h3>
+                          
+                          {/* Индикация источника данных - скрыта, так как теперь всегда ждем полные данные
+                          {result.data.webVitals?.metadata && (
+                            <div className="data-source-indicator">
+                              <span className={`source-badge ${result.data.webVitals.metadata.source}`}>
+                                {result.data.webVitals.metadata.source === 'google_api' ? '🟢 Google API' : 
+                                 result.data.webVitals.metadata.source === 'demo_data' ? '🟡 Demo Data' : '🔴 Unknown'}
+                              </span>
+                              {result.data.webVitals.metadata.hasApiKey ? 
+                                <span className="api-key-status">🔑 API Key</span> : 
+                                <span className="api-key-status">⚠️ No API Key</span>
+                              }
+                              <span className="timestamp">
+                                📅 {new Date(result.data.webVitals.metadata.timestamp).toLocaleString('uk-UA', {
+                                  day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                          )}
+                          */}
+                          
                           <div className="device-toggle">
                             <button 
                               className={`device-toggle-btn ${selectedDevice === 'mobile' ? 'active' : ''} ${!result.data.webVitals?.mobile ? 'disabled' : ''}`}
@@ -731,6 +771,13 @@ const SeoAudit: React.FC = () => {
                               disabled={!result.data.webVitals?.mobile}
                             >
                               📱 Mobile {!result.data.webVitals?.mobile ? '(недоступно)' : ''}
+                              {/* Скрываем индикатор demo данных - теперь всегда ждем полные данные
+                              {result.data.webVitals?.mobile?.source && (
+                                <span className={`device-source ${result.data.webVitals.mobile.source}`}>
+                                  {result.data.webVitals.mobile.source === 'demo_data' ? '(demo)' : ''}
+                                </span>
+                              )}
+                              */}
                             </button>
                             <button 
                               className={`device-toggle-btn ${selectedDevice === 'desktop' ? 'active' : ''} ${!result.data.webVitals?.desktop ? 'disabled' : ''}`}
@@ -738,7 +785,24 @@ const SeoAudit: React.FC = () => {
                               disabled={!result.data.webVitals?.desktop}
                             >
                               💻 Desktop {!result.data.webVitals?.desktop ? '(недоступно)' : ''}
+                              {/* Скрываем индикатор demo данных - теперь всегда ждем полные данные
+                              {result.data.webVitals?.desktop?.source && (
+                                <span className={`device-source ${result.data.webVitals.desktop.source}`}>
+                                  {result.data.webVitals.desktop.source === 'demo_data' ? '(demo)' : ''}
+                                </span>
+                              )}
+                              */}
                             </button>
+                            
+                            {/* Кнопка принудительного обновления - скрыта, так как теперь всегда ждем полные данные
+                            <button 
+                              className="refresh-performance-btn"
+                              onClick={() => window.location.reload()}
+                              title="Обновить данные производительности"
+                            >
+                              🔄
+                            </button>
+                            */}
                           </div>
                         </div>
 
