@@ -422,6 +422,39 @@ interface SeoAuditResult {
         }>;
       };
     };
+    schemaValidation?: {
+      schemas: Array<{
+        type: string;
+        isValid: boolean;
+        errors: Array<{
+          property: string;
+          issue: string;
+          severity: 'error' | 'warning';
+        }>;
+        warnings: Array<{
+          property: string;
+          issue: string;
+          severity: 'error' | 'warning';
+        }>;
+        missingProperties: string[];
+        recommendations: string[];
+      }>;
+      richSnippetsOpportunities: Array<{
+        type: string;
+        priority: 'high' | 'medium' | 'low';
+        confidence: 'high' | 'medium' | 'low';
+        description: string;
+        expectedResult: string;
+        impact: string;
+        implementation: string;
+        detectedElements?: any[];
+        detectedSteps?: any[];
+      }>;
+      score: number;
+      maxScore: number;
+      issues: string[];
+      recommendations: string[];
+    };
   };
 }
 
@@ -3206,6 +3239,181 @@ const SeoAudit: React.FC = () => {
                         </div>
                       </div>
                         </div>
+                    )}
+
+                    {/* Schema.org валидация и Rich Snippets возможности */}
+                    {result.data.schemaValidation && (
+                      <div className="seo-audit-section">
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('schema-validation')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('schema-validation') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🔍 Schema.org валидация
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('schema-validation') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('schema-validation') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
+                          <div className="seo-audit-score">
+                            <span className="score-label">Оценка структурированных данных:</span>
+                            <span className={`score-value ${result.data.schemaValidation.score >= 80 ? 'score-good' : result.data.schemaValidation.score >= 60 ? 'score-warning' : 'score-error'}`}>
+                              {result.data.schemaValidation.score}/{result.data.schemaValidation.maxScore}
+                            </span>
+                          </div>
+
+                          {/* Существующие схемы */}
+                          {result.data.schemaValidation.schemas && result.data.schemaValidation.schemas.length > 0 && (
+                            <div className="schema-validation-existing">
+                              <h4>📋 Найденные схемы ({result.data.schemaValidation.schemas.length}):</h4>
+                              <div className="schema-list">
+                                {result.data.schemaValidation.schemas.map((schema, index) => (
+                                  <div key={index} className={`schema-item ${schema.isValid ? 'schema-valid' : 'schema-invalid'}`}>
+                                    <div className="schema-header">
+                                      <span className="schema-type">{schema.type}</span>
+                                      <span className={`schema-status ${schema.isValid ? 'status-valid' : 'status-invalid'}`}>
+                                        {schema.isValid ? '✅ Валидна' : '❌ Есть ошибки'}
+                                      </span>
+                                    </div>
+                                    
+                                    {schema.errors && schema.errors.length > 0 && (
+                                      <div className="schema-errors">
+                                        <strong>Ошибки:</strong>
+                                        {schema.errors.slice(0, 3).map((error, i) => (
+                                          <div key={i} className="schema-error">
+                                            <strong>{error.property}:</strong> {error.issue}
+                                          </div>
+                                        ))}
+                                        {schema.errors.length > 3 && (
+                                          <div className="schema-more">+ еще {schema.errors.length - 3} ошибок</div>
+                                        )}
+                                      </div>
+                                    )}
+                                    
+                                    {schema.warnings && schema.warnings.length > 0 && (
+                                      <div className="schema-warnings">
+                                        <strong>Предупреждения:</strong>
+                                        {schema.warnings.slice(0, 2).map((warning, i) => (
+                                          <div key={i} className="schema-warning">
+                                            <strong>{warning.property}:</strong> {warning.issue}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                    
+                                    {schema.missingProperties && schema.missingProperties.length > 0 && (
+                                      <div className="schema-missing">
+                                        <strong>Рекомендуемые свойства:</strong>
+                                        <div className="missing-properties">
+                                          {schema.missingProperties.slice(0, 4).map((prop, i) => (
+                                            <span key={i} className="missing-property">{prop}</span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Rich Snippets возможности */}
+                          {result.data.schemaValidation.richSnippetsOpportunities && result.data.schemaValidation.richSnippetsOpportunities.length > 0 && (
+                            <div className="rich-snippets-opportunities">
+                              <h4>🎯 Возможности Rich Snippets ({result.data.schemaValidation.richSnippetsOpportunities.length}):</h4>
+                              <div className="opportunities-grid">
+                                {result.data.schemaValidation.richSnippetsOpportunities.map((opportunity, index) => (
+                                  <div key={index} className={`opportunity-item priority-${opportunity.priority}`}>
+                                    <div className="opportunity-header">
+                                      <div className="opportunity-type">
+                                        <span className="opportunity-name">{opportunity.type}</span>
+                                        <span className={`opportunity-priority priority-${opportunity.priority}`}>
+                                          {opportunity.priority === 'high' ? '🔥' : opportunity.priority === 'medium' ? '⚡' : '💡'} 
+                                          {opportunity.priority}
+                                        </span>
+                                      </div>
+                                      <span className={`opportunity-confidence confidence-${opportunity.confidence}`}>
+                                        {opportunity.confidence} confidence
+                                      </span>
+                                    </div>
+                                    
+                                    <div className="opportunity-description">
+                                      {opportunity.description}
+                                    </div>
+                                    
+                                    <div className="opportunity-impact">
+                                      <strong>Ожидаемый результат:</strong> {opportunity.expectedResult}
+                                    </div>
+                                    
+                                    {opportunity.impact && (
+                                      <div className="opportunity-metrics">
+                                        <strong>Влияние:</strong> {opportunity.impact}
+                                      </div>
+                                    )}
+                                    
+                                    <div className="opportunity-implementation">
+                                      <strong>Как внедрить:</strong> {opportunity.implementation}
+                                    </div>
+                                    
+                                    {opportunity.detectedElements && opportunity.detectedElements.length > 0 && (
+                                      <div className="opportunity-elements">
+                                        <strong>Найдено элементов:</strong>
+                                        <div className="detected-elements">
+                                          {opportunity.detectedElements.slice(0, 2).map((element, i) => (
+                                            <div key={i} className="detected-element">
+                                              {element.text || element.element || JSON.stringify(element).substring(0, 50)}...
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Общие рекомендации */}
+                          {result.data.schemaValidation.recommendations && result.data.schemaValidation.recommendations.length > 0 && (
+                            <div className="schema-general-recommendations">
+                              <h4>💡 Общие рекомендации:</h4>
+                              {result.data.schemaValidation.recommendations.slice(0, 4).map((rec, i) => (
+                                <p key={i} className="seo-audit-tip">{rec}</p>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {result.data.schemaValidation.score < 70 && (
+                            <div className="schema-importance-note">
+                              <p className="seo-audit-tip">
+                                🌟 Структурированные данные критически важны для Rich Snippets! 
+                                Они могут увеличить CTR на 30-150% в зависимости от типа контента.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

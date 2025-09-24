@@ -984,6 +984,24 @@ function analyzeSEO($, html, url) {
     }
   };
 
+  // Schema.org валидация
+  try {
+    console.log('🔍 Starting Schema.org analysis...');
+    seo.schemaValidation = analyzeSchemaOrg($, url);
+    console.log('✅ Schema.org analysis completed:', seo.schemaValidation ? 'success' : 'empty');
+  } catch (error) {
+    console.error('❌ Schema.org validation error:', error.message);
+    console.error('Stack:', error.stack);
+    seo.schemaValidation = {
+      schemas: [],
+      richSnippetsOpportunities: [],
+      score: 0,
+      maxScore: 100,
+      issues: ['Ошибка анализа Schema.org: ' + error.message],
+      recommendations: ['Проверьте структурированные данные']
+    };
+  }
+
   return seo;
 }
 
@@ -1028,10 +1046,10 @@ function enhanceWithInsights(seoData, performanceData, additionalData = {}) {
   }
 
   // Создаем общий SEO Health Score
-  enhanced.overallScore = calculateOverallScore(seoData, performanceData, additionalData);
+  enhanced.overallScore = calculateOverallScore(seoData, performanceData, { ...additionalData, schemaValidation: seoData.schemaValidation, sitelinks: seoData.sitelinks });
   
   // Генерируем персонализированные рекомендации с приоритетами
-  enhanced.actionPlan = generateActionPlan(seoData, performanceData, additionalData);
+  enhanced.actionPlan = generateActionPlan(seoData, performanceData, { ...additionalData, schemaValidation: seoData.schemaValidation });
   
   // Добавляем инсайты для визуализации
   enhanced.visualData = generateVisualData(seoData, performanceData);
@@ -1059,8 +1077,18 @@ function calculateOverallScore(seoData, performanceData, additionalData = {}) {
   technicalPoints += seoData.canonical?.isPresent ? 8 : 0;
   technicalPoints += (seoData.openGraph?.title ? 5 : 0);
   
-  // Структурированные данные (15 баллов)
-  if (seoData.structuredData?.count > 0) {
+  // Schema.org валидация (20 баллов) - Обновленная логика
+  if (additionalData.schemaValidation) {
+    const schemaVal = additionalData.schemaValidation;
+    
+    // Базовая оценка Schema.org (0-100 -> 0-15 баллов)
+    technicalPoints += Math.round(schemaVal.score / 100 * 15);
+    
+    // Бонус за Rich Snippets возможности высокого приоритета (+5 баллов макс)
+    const highPriorityOpportunities = schemaVal.richSnippetsOpportunities?.filter(opp => opp.priority === 'high')?.length || 0;
+    technicalPoints += Math.min(highPriorityOpportunities * 2, 5);
+  } else if (seoData.structuredData?.count > 0) {
+    // Fallback для старой логики
     technicalPoints += Math.min(seoData.structuredData.count * 3, 15);
   }
   
@@ -1077,15 +1105,31 @@ function calculateOverallScore(seoData, performanceData, additionalData = {}) {
     // >10 ошибок = 0 баллов
   }
   
-  // Security Headers (10 баллов)
+  // Security Headers (8 баллов)
   if (additionalData.securityHeaders?.score) {
-    technicalPoints += Math.round(additionalData.securityHeaders.score / 10);
+    technicalPoints += Math.round(additionalData.securityHeaders.score / 10 * 0.8);
+  }
+  
+  // SSL Labs качество (7 баллов)
+  if (additionalData.sslLabs?.grade) {
+    const sslGrade = additionalData.sslLabs.grade;
+    if (sslGrade === 'A+') {
+      technicalPoints += 7;
+    } else if (sslGrade === 'A') {
+      technicalPoints += 6;
+    } else if (sslGrade === 'B') {
+      technicalPoints += 4;
+    } else if (sslGrade === 'C') {
+      technicalPoints += 2;
+    }
+    // D, F = 0 баллов
   }
   
   // Robots.txt + Sitemap (5 баллов)
   technicalPoints += additionalData.robots?.found ? 2.5 : 0;
   technicalPoints += additionalData.sitemap?.found ? 2.5 : 0;
   
+  // Максимум Technical: 110 баллов (60 базовые + 20 Schema.org + 10 W3C + 8 Security + 7 SSL + 5 robots/sitemap)
   scores.technical = Math.min(Math.round(technicalPoints), 100);
   
   // Content Quality (30% веса) - Расширенный анализ
@@ -1152,6 +1196,13 @@ function calculateOverallScore(seoData, performanceData, additionalData = {}) {
     }
   }
   
+  // Sitelinks потенциал (10 баллов)
+  if (additionalData.sitelinks) {
+    const sitelinksScore = additionalData.sitelinks.score || 0;
+    contentPoints += Math.round(sitelinksScore / 100 * 10);
+  }
+  
+  // Максимум Content: 130 баллов (50 контент + 30 SEO + 15 alt + 20 links + 10 структура + 10 sitelinks - урезано до 100)
   scores.content = Math.min(Math.round(contentPoints), 100);
   
   // Performance (30% веса) - Детальный анализ Core Web Vitals
@@ -1284,8 +1335,44 @@ function generateActionPlan(seoData, performanceData, additionalData = {}) {
     });
   }
   
-  // Рекомендуемые улучшения
-  if ((seoData.structuredData?.count || 0) === 0) {
+  // Рекомендуемые улучшения на основе Schema.org валидации
+  if (additionalData.schemaValidation) {
+    const schemaVal = additionalData.schemaValidation;
+    
+    // Добавляем задачи на основе Rich Snippets возможностей
+    if (schemaVal.richSnippetsOpportunities && schemaVal.richSnippetsOpportunities.length > 0) {
+      // Берем топ-3 возможности с высоким приоритетом
+      const topOpportunities = schemaVal.richSnippetsOpportunities
+        .filter(opp => opp.priority === 'high' || opp.priority === 'medium')
+        .slice(0, 3);
+      
+      topOpportunities.forEach(opportunity => {
+        actions.push({
+          priority: opportunity.priority === 'high' ? 'important' : 'recommended',
+          category: 'SEO',
+          task: `Добавить ${opportunity.type} schema`,
+          description: opportunity.description,
+          impact: opportunity.priority === 'high' ? 'high' : 'medium',
+          effort: 'medium',
+          expectedImprovement: opportunity.impact || '+15-30% rich snippets вероятность'
+        });
+      });
+    }
+    
+    // Общая задача если Score низкий
+    if (schemaVal.score < 50 && schemaVal.schemas.length === 0) {
+      actions.push({
+        priority: 'recommended',
+        category: 'SEO',
+        task: 'Внедрить базовые структурированные данные',
+        description: `Текущая оценка Schema.org: ${schemaVal.score}/100. Обнаружено ${schemaVal.richSnippetsOpportunities.length} возможностей для улучшения.`,
+        impact: 'medium',
+        effort: 'medium',
+        expectedImprovement: '+20-40% улучшение отображения в поиске'
+      });
+    }
+  } else if ((seoData.structuredData?.count || 0) === 0) {
+    // Fallback для старой логики
     actions.push({
       priority: 'recommended',
       category: 'SEO',
@@ -2033,92 +2120,382 @@ function validateSchemas(analysis) {
   let totalErrors = 0;
   let totalWarnings = 0;
   
-  analysis.schemas.forEach(schema => {
-    if (schema.errors) {
-      totalErrors += schema.errors.length;
-      analysis.validation.errors = [...analysis.validation.errors, ...schema.errors];
+  // Детальная валидация каждой схемы
+  analysis.schemas.forEach((schema, index) => {
+    const validation = validateIndividualSchema(schema);
+    schema.validation = validation;
+    
+    if (validation.errors) {
+      totalErrors += validation.errors.length;
+      analysis.validation.errors = [...analysis.validation.errors, ...validation.errors.map(error => ({
+        schemaIndex: index,
+        schemaType: schema['@type'] || schema.type || 'Unknown',
+        ...error
+      }))];
     }
-    if (schema.warnings) {
-      totalWarnings += schema.warnings.length;
-      analysis.validation.warnings = [...analysis.validation.warnings, ...schema.warnings];
+    
+    if (validation.warnings) {
+      totalWarnings += validation.warnings.length;
+      analysis.validation.warnings = [...analysis.validation.warnings, ...validation.warnings.map(warning => ({
+        schemaIndex: index,
+        schemaType: schema['@type'] || schema.type || 'Unknown',
+        ...warning
+      }))];
     }
   });
   
   analysis.validation.isValid = totalErrors === 0;
+  analysis.validation.totalErrors = totalErrors;
+  analysis.validation.totalWarnings = totalWarnings;
+  analysis.validation.validSchemas = analysis.schemas.filter(s => s.validation?.isValid).length;
   
-  // Общие рекомендации
+  // Расширенные рекомендации
+  generateSchemaRecommendations(analysis);
+}
+
+// Валидация отдельной схемы
+function validateIndividualSchema(schema) {
+  const validation = {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    missingProperties: [],
+    recommendations: []
+  };
+  
+  const schemaType = schema['@type'] || schema.type;
+  if (!schemaType) {
+    validation.errors.push({
+      property: '@type',
+      message: 'Отсутствует обязательное свойство @type',
+      severity: 'error'
+    });
+    validation.isValid = false;
+    return validation;
+  }
+  
+  // Валидация по типам схем
+  switch (schemaType.toLowerCase()) {
+    case 'organization':
+      validateOrganizationSchema(schema, validation);
+      break;
+    case 'website':
+      validateWebsiteSchema(schema, validation);
+      break;
+    case 'article':
+    case 'newsarticle':
+    case 'blogposting':
+      validateArticleSchema(schema, validation);
+      break;
+    case 'product':
+      validateProductSchema(schema, validation);
+      break;
+    case 'localbusiness':
+      validateLocalBusinessSchema(schema, validation);
+      break;
+    case 'breadcrumblist':
+      validateBreadcrumbSchema(schema, validation);
+      break;
+    case 'faqpage':
+      validateFAQSchema(schema, validation);
+      break;
+    case 'howto':
+      validateHowToSchema(schema, validation);
+      break;
+    default:
+      validateGenericSchema(schema, validation);
+  }
+  
+  return validation;
+}
+
+// Генерация рекомендаций по схемам
+function generateSchemaRecommendations(analysis) {
+  const recommendations = [];
+  
   if (analysis.count === 0) {
-    analysis.validation.recommendations.push('Добавьте структурированные данные для улучшения отображения в поиске');
-  } else if (analysis.count < 3) {
-    analysis.validation.recommendations.push('Рассмотрите добавление большего количества типов structured data');
+    recommendations.push({
+      type: 'missing_schema',
+      priority: 'high',
+      message: 'Добавьте базовые структурированные данные (Organization, Website)',
+      impact: 'Улучшение отображения в поиске на 25-40%'
+    });
   }
   
   if (!analysis.coverage.hasJsonLd && analysis.coverage.hasMicrodata) {
-    analysis.validation.recommendations.push('Рекомендуется использовать JSON-LD вместо Microdata');
+    recommendations.push({
+      type: 'format_upgrade',
+      priority: 'medium',
+      message: 'Переключитесь с Microdata на JSON-LD формат',
+      impact: 'Более простое поддержание и лучшая совместимость'
+    });
   }
+  
+  if (analysis.validation.totalErrors > 0) {
+    recommendations.push({
+      type: 'fix_errors',
+      priority: 'critical',
+      message: `Исправьте ${analysis.validation.totalErrors} ошибок в схемах`,
+      impact: 'Неверные схемы игнорируются поисковыми системами'
+    });
+  }
+  
+  if (analysis.validation.totalWarnings > 3) {
+    recommendations.push({
+      type: 'optimize_schemas',
+      priority: 'medium',
+      message: `Оптимизируйте схемы (${analysis.validation.totalWarnings} предупреждений)`,
+      impact: 'Повышение качества structured data'
+    });
+  }
+  
+  analysis.validation.recommendations = [...analysis.validation.recommendations, ...recommendations];
+}
+
+// Валидация схемы Organization
+function validateOrganizationSchema(schema, validation) {
+  const requiredProps = ['name', 'url'];
+  const recommendedProps = ['logo', 'contactPoint', 'address', 'sameAs'];
+  
+  requiredProps.forEach(prop => {
+    if (!schema[prop]) {
+      validation.errors.push({
+        property: prop,
+        message: `Обязательное свойство '${prop}' отсутствует`,
+        severity: 'error'
+      });
+      validation.isValid = false;
+    }
+  });
+  
+  recommendedProps.forEach(prop => {
+    if (!schema[prop]) {
+      validation.missingProperties.push(prop);
+      validation.warnings.push({
+        property: prop,
+        message: `Рекомендуемое свойство '${prop}' отсутствует`,
+        severity: 'warning',
+        impact: prop === 'logo' ? 'Логотип в Knowledge Panel' : 'Дополнительная информация в поиске'
+      });
+    }
+  });
+}
+
+// Валидация схемы Article
+function validateArticleSchema(schema, validation) {
+  const requiredProps = ['headline', 'author', 'datePublished'];
+  const recommendedProps = ['image', 'publisher', 'dateModified', 'mainEntityOfPage'];
+  
+  requiredProps.forEach(prop => {
+    if (!schema[prop]) {
+      validation.errors.push({
+        property: prop,
+        message: `Обязательное свойство '${prop}' отсутствует для Article`,
+        severity: 'error'
+      });
+      validation.isValid = false;
+    }
+  });
+  
+  // Проверка формата даты
+  if (schema.datePublished && !isValidDateFormat(schema.datePublished)) {
+    validation.errors.push({
+      property: 'datePublished',
+      message: 'Неверный формат даты (используйте ISO 8601)',
+      severity: 'error'
+    });
+    validation.isValid = false;
+  }
+  
+  recommendedProps.forEach(prop => {
+    if (!schema[prop]) {
+      validation.missingProperties.push(prop);
+      validation.warnings.push({
+        property: prop,
+        message: `Рекомендуемое свойство '${prop}' отсутствует`,
+        severity: 'warning',
+        impact: prop === 'image' ? 'Изображение в результатах поиска' : 'Дополнительные метаданные'
+      });
+    }
+  });
+}
+
+// Валидация схемы Product
+function validateProductSchema(schema, validation) {
+  const requiredProps = ['name'];
+  const recommendedProps = ['image', 'description', 'offers', 'aggregateRating', 'brand'];
+  
+  requiredProps.forEach(prop => {
+    if (!schema[prop]) {
+      validation.errors.push({
+        property: prop,
+        message: `Обязательное свойство '${prop}' отсутствует для Product`,
+        severity: 'error'
+      });
+      validation.isValid = false;
+    }
+  });
+  
+  // Специальная проверка offers
+  if (schema.offers) {
+    if (!schema.offers.price && !schema.offers.priceRange) {
+      validation.warnings.push({
+        property: 'offers.price',
+        message: 'У предложения отсутствует цена',
+        severity: 'warning',
+        impact: 'Цена не будет отображаться в результатах поиска'
+      });
+    }
+    
+    if (!schema.offers.availability) {
+      validation.warnings.push({
+        property: 'offers.availability',
+        message: 'Не указана доступность товара',
+        severity: 'warning',
+        impact: 'Статус наличия не будет показан'
+      });
+    }
+  } else {
+    validation.missingProperties.push('offers');
+    validation.warnings.push({
+      property: 'offers',
+      message: 'Отсутствует информация о предложении (цена, наличие)',
+      severity: 'warning',
+      impact: 'Товар не будет показан с ценой в результатах поиска'
+    });
+  }
+  
+  recommendedProps.forEach(prop => {
+    if (!schema[prop] && prop !== 'offers') {
+      validation.missingProperties.push(prop);
+      validation.warnings.push({
+        property: prop,
+        message: `Рекомендуемое свойство '${prop}' отсутствует`,
+        severity: 'warning',
+        impact: prop === 'aggregateRating' ? 'Звездочки рейтинга в поиске' : 'Дополнительная информация о товаре'
+      });
+    }
+  });
+}
+
+// Валидация других типов схем (упрощенная)
+function validateWebsiteSchema(schema, validation) {
+  if (!schema.name && !schema.url) {
+    validation.errors.push({
+      property: 'name|url',
+      message: 'Website схема должна содержать name или url',
+      severity: 'error'
+    });
+    validation.isValid = false;
+  }
+}
+
+function validateLocalBusinessSchema(schema, validation) {
+  const requiredProps = ['name', 'address'];
+  requiredProps.forEach(prop => {
+    if (!schema[prop]) {
+      validation.errors.push({
+        property: prop,
+        message: `Обязательное свойство '${prop}' отсутствует для LocalBusiness`,
+        severity: 'error'
+      });
+      validation.isValid = false;
+    }
+  });
+}
+
+function validateBreadcrumbSchema(schema, validation) {
+  if (!schema.itemListElement || !Array.isArray(schema.itemListElement)) {
+    validation.errors.push({
+      property: 'itemListElement',
+      message: 'BreadcrumbList должен содержать массив itemListElement',
+      severity: 'error'
+    });
+    validation.isValid = false;
+  }
+}
+
+function validateFAQSchema(schema, validation) {
+  if (!schema.mainEntity || !Array.isArray(schema.mainEntity)) {
+    validation.errors.push({
+      property: 'mainEntity',
+      message: 'FAQPage должен содержать массив вопросов в mainEntity',
+      severity: 'error'
+    });
+    validation.isValid = false;
+  }
+}
+
+function validateHowToSchema(schema, validation) {
+  if (!schema.step || !Array.isArray(schema.step)) {
+    validation.errors.push({
+      property: 'step',
+      message: 'HowTo должен содержать массив шагов в step',
+      severity: 'error'
+    });
+    validation.isValid = false;
+  }
+}
+
+function validateGenericSchema(schema, validation) {
+  // Базовая валидация для неизвестных типов
+  if (!schema.name && !schema.headline && !schema.title) {
+    validation.warnings.push({
+      property: 'name',
+      message: 'Рекомендуется добавить name, headline или title',
+      severity: 'warning'
+    });
+  }
+}
+
+// Вспомогательная функция проверки формата даты
+function isValidDateFormat(dateString) {
+  const iso8601Regex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z))?$/;
+  return iso8601Regex.test(dateString);
 }
 
 // Генерация возможностей для Rich Snippets
 function generateRichSnippetsOpportunities(analysis, $, url) {
   const opportunities = [];
-  
-  // Определяем тип контента страницы
-  const pageType = detectPageType($, url);
-  
   const existingTypes = analysis.types.map(t => t.toLowerCase());
   
-  // Рекомендации на основе типа страницы
-  switch (pageType) {
-    case 'article':
-      if (!existingTypes.includes('article')) {
-        opportunities.push({
-          type: 'Article',
-          priority: 'high',
-          description: 'Добавьте Article schema для отображения в Google News и богатых сниппетах',
-          expectedResult: 'Дата публикации, автор, изображение в результатах поиска'
-        });
-      }
-      break;
-      
-    case 'product':
-      if (!existingTypes.includes('product')) {
-        opportunities.push({
-          type: 'Product',
-          priority: 'high',
-          description: 'Добавьте Product schema с ценами и рейтингами',
-          expectedResult: 'Цена, наличие, звездный рейтинг в результатах поиска'
-        });
-      }
-      break;
-      
-    case 'homepage':
-      if (!existingTypes.includes('organization') && !existingTypes.includes('website')) {
-        opportunities.push({
-          type: 'Organization',
-          priority: 'medium',
-          description: 'Добавьте Organization schema для Knowledge Panel',
-          expectedResult: 'Информация о компании в правой панели Google'
-        });
-        
-        opportunities.push({
-          type: 'WebSite',
-          priority: 'medium',
-          description: 'Добавьте WebSite schema с sitelinks searchbox',
-          expectedResult: 'Поисковая строка под результатом в Google'
-        });
-      }
-      break;
-  }
+  // 1. Анализ FAQ возможностей
+  const faqOpportunity = detectFAQOpportunity($, existingTypes);
+  if (faqOpportunity) opportunities.push(faqOpportunity);
   
-  // Универсальные рекомендации
-  if (!existingTypes.includes('breadcrumblist') && $('nav ol, .breadcrumb, .breadcrumbs').length > 0) {
-    opportunities.push({
-      type: 'BreadcrumbList',
-      priority: 'low',
-      description: 'Добавьте BreadcrumbList schema к существующим хлебным крошкам',
-      expectedResult: 'Навигационные крошки в результатах поиска'
-    });
-  }
+  // 2. Анализ HowTo возможностей  
+  const howToOpportunity = detectHowToOpportunity($, existingTypes);
+  if (howToOpportunity) opportunities.push(howToOpportunity);
+  
+  // 3. Анализ Product возможностей
+  const productOpportunity = detectProductOpportunity($, existingTypes);
+  if (productOpportunity) opportunities.push(productOpportunity);
+  
+  // 4. Анализ Article возможностей
+  const articleOpportunity = detectArticleOpportunity($, existingTypes);
+  if (articleOpportunity) opportunities.push(articleOpportunity);
+  
+  // 5. Анализ LocalBusiness возможностей
+  const localBusinessOpportunity = detectLocalBusinessOpportunity($, existingTypes);
+  if (localBusinessOpportunity) opportunities.push(localBusinessOpportunity);
+  
+  // 6. Анализ Organization/Website возможностей
+  const organizationOpportunities = detectOrganizationOpportunities($, existingTypes);
+  opportunities.push(...organizationOpportunities);
+  
+  // 7. Анализ BreadcrumbList возможностей
+  const breadcrumbOpportunity = detectBreadcrumbOpportunity($, existingTypes);
+  if (breadcrumbOpportunity) opportunities.push(breadcrumbOpportunity);
+  
+  // 8. Анализ Video возможностей
+  const videoOpportunity = detectVideoOpportunity($, existingTypes);
+  if (videoOpportunity) opportunities.push(videoOpportunity);
+  
+  // 9. Анализ Event возможностей
+  const eventOpportunity = detectEventOpportunity($, existingTypes);
+  if (eventOpportunity) opportunities.push(eventOpportunity);
+  
+  analysis.richSnippetsOpportunities = opportunities;
   
   // FAQ возможности
   const faqElements = $('details, .faq, .accordion, h3:contains("?"), h2:contains("?")');
@@ -2132,6 +2509,465 @@ function generateRichSnippetsOpportunities(analysis, $, url) {
   }
   
   analysis.richSnippetsOpportunities = opportunities;
+}
+
+// Детекция FAQ возможностей
+function detectFAQOpportunity($, existingTypes) {
+  if (existingTypes.includes('faqpage')) return null;
+  
+  // Ищем паттерны FAQ
+  const faqPatterns = [
+    'h2:contains("?"), h3:contains("?"), h4:contains("?")', // Заголовки с вопросами
+    '.faq, .faqs, .questions, .qa', // CSS классы FAQ
+    '[class*="faq"], [class*="question"]', // Частичные классы
+    'dt, dd' // Definition lists часто используются для FAQ
+  ];
+  
+  let faqElements = 0;
+  let questionElements = [];
+  
+  faqPatterns.forEach(pattern => {
+    const elements = $(pattern);
+    faqElements += elements.length;
+    
+    elements.each((i, el) => {
+      const text = $(el).text().trim();
+      if (text.includes('?') || text.toLowerCase().includes('как') || text.toLowerCase().includes('что')) {
+        questionElements.push({
+          element: el.tagName,
+          text: text.substring(0, 100) + '...',
+          hasAnswer: $(el).next().length > 0
+        });
+      }
+    });
+  });
+  
+  if (faqElements >= 3 || questionElements.length >= 2) {
+    return {
+      type: 'FAQPage',
+      priority: 'high',
+      confidence: questionElements.length >= 3 ? 'high' : 'medium',
+      description: `Найдено ${questionElements.length} потенциальных вопросов. Добавьте FAQPage schema`,
+      expectedResult: 'Отображение вопросов и ответов прямо в результатах поиска (Featured Snippets)',
+      impact: 'CTR +30-50%, Featured Snippets вероятность +60%',
+      detectedElements: questionElements.slice(0, 3),
+      implementation: 'Оберните каждую пару вопрос-ответ в Question schema с acceptedAnswer'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция HowTo возможностей
+function detectHowToOpportunity($, existingTypes) {
+  if (existingTypes.includes('howto')) return null;
+  
+  // Ищем пошаговые инструкции
+  const howToPatterns = [
+    'ol li', // Нумерованные списки
+    '.step, .steps', // CSS классы шагов
+    '[class*="step"]', // Частичные классы
+    'h2:matches("Шаг \\d+"), h3:matches("Этап \\d+")', // Заголовки с номерами
+  ];
+  
+  let stepElements = 0;
+  let detectedSteps = [];
+  
+  // Проверяем нумерованные списки
+  $('ol').each((i, ol) => {
+    const items = $(ol).find('li');
+    if (items.length >= 3) {
+      stepElements += items.length;
+      items.each((j, li) => {
+        if (j < 3) { // Первые 3 шага для примера
+          detectedSteps.push({
+            stepNumber: j + 1,
+            text: $(li).text().trim().substring(0, 80) + '...',
+            hasImage: $(li).find('img').length > 0
+          });
+        }
+      });
+    }
+  });
+  
+  // Проверяем заголовки с шагами
+  $('h1, h2, h3, h4').each((i, el) => {
+    const text = $(el).text().toLowerCase();
+    if (text.includes('шаг') || text.includes('этап') || /\d+\./.test(text)) {
+      stepElements++;
+      if (detectedSteps.length < 3) {
+        detectedSteps.push({
+          stepNumber: detectedSteps.length + 1,
+          text: $(el).text().trim().substring(0, 80) + '...',
+          hasImage: $(el).siblings().find('img').length > 0
+        });
+      }
+    }
+  });
+  
+  if (stepElements >= 3) {
+    return {
+      type: 'HowTo',
+      priority: 'high',
+      confidence: stepElements >= 5 ? 'high' : 'medium',
+      description: `Найдено ${stepElements} шагов инструкции. Добавьте HowTo schema`,
+      expectedResult: 'Пошаговое отображение в результатах поиска с изображениями',
+      impact: 'CTR +25-40%, Rich Results отображение',
+      detectedSteps: detectedSteps,
+      implementation: 'Создайте HowTo schema с массивом HowToStep для каждого шага'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция Product возможностей
+function detectProductOpportunity($, existingTypes) {
+  if (existingTypes.includes('product')) return null;
+  
+  const productIndicators = {
+    price: $('[class*="price"], .cost, .amount, [data-price]').length,
+    rating: $('[class*="rating"], [class*="star"], .review-score').length,
+    availability: $('[class*="stock"], [class*="available"], .in-stock, .out-of-stock').length,
+    brand: $('[class*="brand"], .manufacturer').length,
+    description: $('[class*="description"], .product-info').length
+  };
+  
+  const productScore = Object.values(productIndicators).reduce((sum, count) => sum + (count > 0 ? 1 : 0), 0);
+  
+  if (productScore >= 2) {
+    return {
+      type: 'Product',
+      priority: 'high',
+      confidence: productScore >= 4 ? 'high' : 'medium',
+      description: `Найдены элементы товара (${productScore}/5). Добавьте Product schema`,
+      expectedResult: 'Цена, рейтинг, наличие и изображения в результатах поиска',
+      impact: 'E-commerce CTR +40-60%, Google Shopping integration',
+      detectedElements: {
+        hasPrice: productIndicators.price > 0,
+        hasRating: productIndicators.rating > 0,
+        hasAvailability: productIndicators.availability > 0,
+        hasBrand: productIndicators.brand > 0,
+        hasDescription: productIndicators.description > 0
+      },
+      implementation: 'Добавьте Product schema с offers, aggregateRating и brand'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция Article возможностей
+function detectArticleOpportunity($, existingTypes) {
+  if (existingTypes.includes('article') || existingTypes.includes('blogposting') || existingTypes.includes('newsarticle')) return null;
+  
+  const articleIndicators = {
+    headline: $('h1').length > 0,
+    author: $('[class*="author"], .byline, [rel="author"]').length > 0,
+    publishDate: $('[datetime], [class*="date"], .published').length > 0,
+    content: $('article, .content, .post-content, main').length > 0,
+    image: $('img[src]').length > 0
+  };
+  
+  const wordCount = $('body').text().trim().split(/\s+/).length;
+  const isArticle = wordCount > 200 && (articleIndicators.headline || articleIndicators.content);
+  
+  if (isArticle) {
+    return {
+      type: 'Article',
+      priority: 'medium',
+      confidence: Object.values(articleIndicators).filter(Boolean).length >= 3 ? 'high' : 'medium',
+      description: `Статья с ${wordCount} словами. Добавьте Article schema`,
+      expectedResult: 'Дата публикации, автор и изображение в результатах поиска',
+      impact: 'News/Blog CTR +20-35%, Google News eligibility',
+      detectedElements: articleIndicators,
+      implementation: 'Добавьте Article schema с headline, author, datePublished и image'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция LocalBusiness возможностей
+function detectLocalBusinessOpportunity($, existingTypes) {
+  if (existingTypes.includes('localbusiness')) return null;
+  
+  const businessIndicators = {
+    address: $('[class*="address"], .location, .contact-info').length > 0,
+    phone: $('a[href^="tel:"], [class*="phone"], .telephone').length > 0,
+    hours: $('[class*="hours"], [class*="schedule"], .opening-hours').length > 0,
+    location: $('[class*="location"], [class*="map"]').length > 0
+  };
+  
+  const businessScore = Object.values(businessIndicators).filter(Boolean).length;
+  
+  if (businessScore >= 2) {
+    return {
+      type: 'LocalBusiness',
+      priority: 'high',
+      confidence: businessScore >= 3 ? 'high' : 'medium',
+      description: `Найдены элементы локального бизнеса (${businessScore}/4). Добавьте LocalBusiness schema`,
+      expectedResult: 'Информация о бизнесе в Google Maps и локальных результатах',
+      impact: 'Local SEO +50-70%, Google My Business integration',
+      detectedElements: businessIndicators,
+      implementation: 'Добавьте LocalBusiness schema с address, telephone и openingHours'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция Organization возможностей
+function detectOrganizationOpportunities($, existingTypes) {
+  const opportunities = [];
+  
+  if (!existingTypes.includes('organization')) {
+    const hasLogo = $('img[alt*="logo"], .logo img, [class*="logo"] img').length > 0;
+    const hasContactInfo = $('[class*="contact"], .footer').length > 0;
+    
+    if (hasLogo || hasContactInfo) {
+      opportunities.push({
+        type: 'Organization',
+        priority: 'medium',
+        confidence: hasLogo && hasContactInfo ? 'high' : 'medium',
+        description: 'Добавьте Organization schema для Knowledge Panel',
+        expectedResult: 'Логотип и информация о компании в результатах поиска',
+        impact: 'Brand recognition +30%, Knowledge Panel eligibility',
+        implementation: 'Добавьте Organization schema с name, logo, url и contactPoint'
+      });
+    }
+  }
+  
+  if (!existingTypes.includes('website')) {
+    opportunities.push({
+      type: 'WebSite',
+      priority: 'low',
+      confidence: 'high',
+      description: 'Добавьте WebSite schema с поиском по сайту',
+      expectedResult: 'Поисковая строка под результатом в Google',
+      impact: 'Site search usage +40%, Brand queries boost',
+      implementation: 'Добавьте WebSite schema с potentialAction SearchAction'
+    });
+  }
+  
+  return opportunities;
+}
+
+// Детекция BreadcrumbList возможностей
+function detectBreadcrumbOpportunity($, existingTypes) {
+  if (existingTypes.includes('breadcrumblist')) return null;
+  
+  const breadcrumbElements = $('nav ol, .breadcrumb, .breadcrumbs, [class*="breadcrumb"]').length;
+  
+  if (breadcrumbElements > 0) {
+    return {
+      type: 'BreadcrumbList',
+      priority: 'low',
+      confidence: 'high',
+      description: 'Найдены хлебные крошки. Добавьте BreadcrumbList schema',
+      expectedResult: 'Навигационные крошки в результатах поиска',
+      impact: 'Navigation clarity +25%, SERP real estate',
+      implementation: 'Добавьте BreadcrumbList schema к существующей навигации'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция Video возможностей
+function detectVideoOpportunity($, existingTypes) {
+  if (existingTypes.includes('videoobject')) return null;
+  
+  const videoElements = $('video, iframe[src*="youtube"], iframe[src*="vimeo"], [class*="video"]').length;
+  
+  if (videoElements > 0) {
+    return {
+      type: 'VideoObject',
+      priority: 'medium',
+      confidence: 'high',
+      description: `Найдено ${videoElements} видео. Добавьте VideoObject schema`,
+      expectedResult: 'Превью видео с продолжительностью в результатах поиска',
+      impact: 'Video CTR +50-80%, Video carousel eligibility',
+      implementation: 'Добавьте VideoObject schema с name, description, thumbnailUrl и duration'
+    };
+  }
+  
+  return null;
+}
+
+// Детекция Event возможностей  
+function detectEventOpportunity($, existingTypes) {
+  if (existingTypes.includes('event')) return null;
+  
+  const eventIndicators = {
+    date: $('[datetime], [class*="date"], .event-date').length > 0,
+    location: $('[class*="location"], [class*="venue"], .address').length > 0,
+    title: $('h1, h2').filter(function() {
+      return $(this).text().toLowerCase().includes('событие') || 
+             $(this).text().toLowerCase().includes('мероприятие') ||
+             $(this).text().toLowerCase().includes('концерт') ||
+             $(this).text().toLowerCase().includes('конференция');
+    }).length > 0
+  };
+  
+  const eventScore = Object.values(eventIndicators).filter(Boolean).length;
+  
+  if (eventScore >= 2) {
+    return {
+      type: 'Event',
+      priority: 'medium',
+      confidence: eventScore >= 3 ? 'high' : 'medium',
+      description: `Найдены элементы события (${eventScore}/3). Добавьте Event schema`,
+      expectedResult: 'Дата, время и место проведения в результатах поиска',
+      impact: 'Event discovery +60%, Google Events integration',
+      implementation: 'Добавьте Event schema с name, startDate, location и organizer'
+    };
+  }
+  
+  return null;  
+}
+
+// Основная функция анализа Schema.org
+function analyzeSchemaOrg($, url) {
+  const analysis = {
+    schemas: [],
+    richSnippetsOpportunities: [],
+    score: 0,
+    maxScore: 100,
+    issues: [],
+    recommendations: []
+  };
+
+  // 1. Поиск и анализ существующих схем
+  const schemaScripts = $('script[type="application/ld+json"]');
+  const existingTypes = [];
+
+  schemaScripts.each((i, script) => {
+    try {
+      const jsonData = JSON.parse($(script).html());
+      const schemas = Array.isArray(jsonData) ? jsonData : [jsonData];
+      
+      schemas.forEach(schema => {
+        if (schema['@type']) {
+          const schemaType = schema['@type'].toLowerCase();
+          existingTypes.push(schemaType);
+          
+          const validationResult = validateIndividualSchema(schema, schemaType);
+          analysis.schemas.push({
+            type: schema['@type'],
+            isValid: validationResult.isValid,
+            errors: validationResult.errors,
+            warnings: validationResult.warnings,
+            missingProperties: validationResult.missingProperties,
+            recommendations: validationResult.recommendations
+          });
+        }
+      });
+    } catch (e) {
+      analysis.issues.push('Найдена некорректная JSON-LD схема');
+    }
+  });
+
+  // 2. Анализ Microdata
+  const microdataItems = $('[itemscope]');
+  microdataItems.each((i, item) => {
+    const itemType = $(item).attr('itemtype');
+    if (itemType) {
+      const schemaType = itemType.split('/').pop().toLowerCase();
+      if (!existingTypes.includes(schemaType)) {
+        existingTypes.push(schemaType);
+        analysis.schemas.push({
+          type: itemType.split('/').pop(),
+          isValid: true,
+          errors: [],
+          warnings: ['Microdata найдена, рекомендуется JSON-LD'],
+          missingProperties: [],
+          recommendations: ['Рекомендуется миграция на JSON-LD для лучшей поддержки']
+        });
+      }
+    }
+  });
+
+  // 3. Поиск возможностей Rich Snippets
+  const opportunities = [];
+
+  // FAQ возможности
+  const faqOpportunity = detectFAQOpportunity($, existingTypes);
+  if (faqOpportunity) opportunities.push(faqOpportunity);
+
+  // HowTo возможности
+  const howToOpportunity = detectHowToOpportunity($, existingTypes);
+  if (howToOpportunity) opportunities.push(howToOpportunity);
+
+  // Product возможности
+  const productOpportunity = detectProductOpportunity($, existingTypes);
+  if (productOpportunity) opportunities.push(productOpportunity);
+
+  // Article возможности
+  const articleOpportunity = detectArticleOpportunity($, existingTypes);
+  if (articleOpportunity) opportunities.push(articleOpportunity);
+
+  // LocalBusiness возможности
+  const localBusinessOpportunity = detectLocalBusinessOpportunity($, existingTypes);
+  if (localBusinessOpportunity) opportunities.push(localBusinessOpportunity);
+
+  // Organization возможности
+  const organizationOpportunities = detectOrganizationOpportunities($, existingTypes);
+  opportunities.push(...organizationOpportunities);
+
+  // Breadcrumb возможности
+  const breadcrumbOpportunity = detectBreadcrumbOpportunity($, existingTypes);
+  if (breadcrumbOpportunity) opportunities.push(breadcrumbOpportunity);
+
+  // Video возможности
+  const videoOpportunity = detectVideoOpportunity($, existingTypes);
+  if (videoOpportunity) opportunities.push(videoOpportunity);
+
+  // Event возможности
+  const eventOpportunity = detectEventOpportunity($, existingTypes);
+  if (eventOpportunity) opportunities.push(eventOpportunity);
+
+  analysis.richSnippetsOpportunities = opportunities;
+
+  // 4. Расчет общего балла
+  let score = 50; // Базовый балл
+
+  // Бонусы за существующие схемы
+  analysis.schemas.forEach(schema => {
+    if (schema.isValid) {
+      score += 15;
+    } else {
+      score += 5;
+    }
+  });
+
+  // Штрафы за отсутствие ключевых схем
+  if (!existingTypes.includes('organization') && !existingTypes.includes('localbusiness')) {
+    score -= 10;
+    analysis.issues.push('Отсутствует базовая информация о компании (Organization/LocalBusiness)');
+  }
+
+  if (!existingTypes.includes('website')) {
+    score -= 5;
+    analysis.issues.push('Отсутствует WebSite schema для поиска по сайту');
+  }
+
+  analysis.score = Math.min(Math.max(score, 0), 100);
+
+  // 5. Общие рекомендации
+  if (analysis.schemas.length === 0) {
+    analysis.recommendations.push('Добавьте структурированные данные для улучшения отображения в поиске');
+  }
+
+  if (opportunities.length > 0) {
+    analysis.recommendations.push(`Обнаружено ${opportunities.length} возможностей для Rich Snippets`);
+  }
+
+  if (analysis.score < 70) {
+    analysis.recommendations.push('Расширьте использование структурированных данных для лучшего SEO');
+  }
+
+  return analysis;
 }
 
 // Определение типа страницы
