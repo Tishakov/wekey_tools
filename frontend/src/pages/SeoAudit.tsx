@@ -648,7 +648,7 @@ const SeoAudit: React.FC = () => {
             onClick={handleAudit}
             disabled={result?.loading || !url.trim()}
           >
-            {result?.loading ? 'Получаю полные данные от Google PageSpeed...' : 'Показать результат'}
+            {result?.loading ? 'Получаю полные данные...' : 'Показать результат'}
           </button>
           
           <button 
@@ -668,9 +668,8 @@ const SeoAudit: React.FC = () => {
             {result.loading && (
               <div className="seo-audit-loading-state">
                 <div className="loading-spinner"></div>
-                <p>Получаю полные данные от Google PageSpeed для {result.url}...</p>
-                <p className="loading-note">Ожидание реальных данных производительности может занять до 2-3 минут</p>
-                <p className="loading-extra-note">🔄 Мы ждем полную информацию вместо демо-данных (4 попытки по 60 сек)</p>
+                <p>Получаю полные данные</p>
+                <p className="loading-note">Ожидание реальных данных может занять до 2-3 минут</p>
                 
                 {/* Развлекательный блок во время ожидания */}
                 <div className="loading-entertainment">

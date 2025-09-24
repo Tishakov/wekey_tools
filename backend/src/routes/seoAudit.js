@@ -1471,6 +1471,149 @@ function generateActionPlan(seoData, performanceData, additionalData = {}) {
       expectedImprovement: '+15-25% релевантность для поисковых запросов'
     });
   }
+
+  // Google PageSpeed Insights рекомендации
+  if (performanceData?.mobile?.googleOpportunities || performanceData?.desktop?.googleOpportunities) {
+    const opportunities = performanceData.mobile?.googleOpportunities || performanceData.desktop?.googleOpportunities || [];
+    console.log(`🔍 Processing ${opportunities.length} PageSpeed opportunities for action plan`);
+    
+    opportunities.forEach(opportunity => {
+      console.log(`📊 Opportunity: ${opportunity.category}, savings: ${opportunity.savings}KB, title: ${opportunity.title}`);
+      if (opportunity.category === 'images' && opportunity.savings > 50) { // > 50KB экономии
+        actions.push({
+          priority: opportunity.savings > 200 ? 'critical' : 'important', // > 200KB = критично
+          category: 'Performance',
+          task: 'Оптимизировать изображения',
+          description: `Сжатие и конвертация изображений может сэкономить ${Math.round(opportunity.savings)}KB. Найдено ${opportunity.items?.length || 0} изображений для оптимизации.`,
+          impact: 'high',
+          effort: 'medium',
+          expectedImprovement: '+20-35% скорость загрузки страницы'
+        });
+      }
+      
+      if (opportunity.category === 'css' && opportunity.savings > 30) { // > 30KB экономии
+        actions.push({
+          priority: opportunity.savings > 100 ? 'important' : 'recommended', // > 100KB = важно
+          category: 'Performance',
+          task: 'Оптимизировать CSS файлы',
+          description: `Удаление неиспользуемого CSS может сэкономить ${Math.round(opportunity.savings)}KB. Найдено ${opportunity.items?.length || 0} CSS файлов для оптимизации.`,
+          impact: 'medium',
+          effort: 'high',
+          expectedImprovement: '+10-20% скорость первой отрисовки'
+        });
+      }
+      
+      if ((opportunity.category === 'performance' || opportunity.category === 'javascript') && opportunity.savings > 20) { // > 20KB экономии
+        console.log(`🎯 JavaScript optimization found: ${opportunity.savings}KB savings, category: ${opportunity.category}`);
+        actions.push({
+          priority: opportunity.savings > 80 ? 'important' : 'recommended', // > 80KB = важно
+          category: 'Performance', 
+          task: 'Оптимизировать JavaScript файлы',
+          description: `Минификация и удаление неиспользуемого JS может сэкономить ${Math.round(opportunity.savings)}KB. Найдено ${opportunity.items?.length || 0} JS файлов для оптимизации.`,
+          impact: 'medium',
+          effort: 'high',
+          expectedImprovement: '+15-25% время интерактивности'
+        });
+      }
+    });
+  }
+
+  // Общие рекомендации на основе оценки производительности PageSpeed
+  const performanceScore = performanceData?.mobile?.performance_score || performanceData?.desktop?.performance_score;
+  if (performanceScore && performanceScore < 90) {
+    if (performanceScore < 50) {
+      actions.push({
+        priority: 'critical',
+        category: 'PageSpeed Insights',
+        task: 'Критически улучшить производительность',
+        description: `Оценка PageSpeed: ${performanceScore}/100. Страница загружается крайне медленно и нуждается в комплексной оптимизации.`,
+        impact: 'high', 
+        effort: 'high',
+        expectedImprovement: '+40-60% скорость загрузки и SEO'
+      });
+    } else if (performanceScore < 70) {
+      actions.push({
+        priority: 'important',
+        category: 'PageSpeed Insights',
+        task: 'Улучшить общую производительность',
+        description: `Оценка PageSpeed: ${performanceScore}/100. Необходима оптимизация ресурсов и сервера.`,
+        impact: 'high',
+        effort: 'medium',
+        expectedImprovement: '+25-40% общая производительность'
+      });
+    } else {
+      actions.push({
+        priority: 'recommended',
+        category: 'PageSpeed Insights',
+        task: 'Довести производительность до отличного уровня',
+        description: `Оценка PageSpeed: ${performanceScore}/100. Близко к цели - несколько улучшений дадут отличный результат.`,
+        impact: 'medium',
+        effort: 'low',
+        expectedImprovement: '+10-20% финальная оптимизация'
+      });
+    }
+  }
+
+  // Специфические Core Web Vitals рекомендации на основе PageSpeed данных
+  if (performanceData?.mobile?.core_web_vitals) {
+    const cwv = performanceData.mobile.core_web_vitals;
+    
+    // LCP детализированные рекомендации
+    if (cwv.lcp?.score < 50 && cwv.lcp?.displayValue) {
+      const lcpValue = parseFloat(cwv.lcp.displayValue);
+      if (lcpValue > 4.0) {
+        actions.push({
+          priority: 'critical',
+          category: 'Core Web Vitals',
+          task: 'Критически улучшить LCP',
+          description: `LCP ${cwv.lcp.displayValue} критически медленный. Необходимо оптимизировать главный контент и изображения.`,
+          impact: 'high',
+          effort: 'high',
+          expectedImprovement: '+30-50% пользовательский опыт и SEO'
+        });
+      } else if (lcpValue > 2.5) {
+        actions.push({
+          priority: 'important',
+          category: 'Core Web Vitals',
+          task: 'Улучшить Largest Contentful Paint',
+          description: `LCP ${cwv.lcp.displayValue} требует оптимизации. Цель: менее 2.5s для хорошего рейтинга.`,
+          impact: 'high',
+          effort: 'medium',
+          expectedImprovement: '+20-30% Core Web Vitals оценка'
+        });
+      }
+    }
+    
+    // FID/INP детализированные рекомендации  
+    if (cwv.fid?.score < 50 || cwv.inp?.score < 50) {
+      const fidValue = cwv.fid?.displayValue || cwv.inp?.displayValue;
+      actions.push({
+        priority: 'important',
+        category: 'Core Web Vitals',
+        task: 'Улучшить интерактивность страницы',
+        description: `Время отклика на взаимодействие: ${fidValue}. Оптимизируйте JavaScript выполнение.`,
+        impact: 'high',
+        effort: 'high',
+        expectedImprovement: '+25-40% интерактивность и UX'
+      });
+    }
+    
+    // CLS детализированные рекомендации
+    if (cwv.cls?.score < 50) {
+      const clsValue = parseFloat(cwv.cls?.displayValue || '0');
+      if (clsValue > 0.25) {
+        actions.push({
+          priority: 'important',
+          category: 'Core Web Vitals',
+          task: 'Исправить нестабильность макета',
+          description: `CLS ${cwv.cls.displayValue} вызывает сдвиги макета. Зафиксируйте размеры изображений и блоков.`,
+          impact: 'medium',
+          effort: 'medium',
+          expectedImprovement: '+15-25% стабильность интерфейса'
+        });
+      }
+    }
+  }
   
   return actions.sort((a, b) => {
     const priorityOrder = { critical: 3, important: 2, recommended: 1 };
