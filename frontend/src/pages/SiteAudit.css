@@ -46,6 +46,70 @@
   border-color: #09CEA7;
 }
 
+/* Protocol Selector Styles for Site Audit */
+.site-audit-protocol-selector {
+  position: relative;
+}
+
+.site-audit-protocol-toggle {
+  width: 100px;
+  background-color: #252526;
+  border: none;
+  border-right: 1px solid #333335;
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0 15px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 6px 0 0 6px;
+  box-sizing: border-box;
+}
+
+.site-audit-protocol-toggle:hover {
+  background-color: #2a2a2c;
+}
+
+.site-audit-protocol-arrow {
+  font-size: 10px;
+  margin-left: 5px;
+  transition: transform 0.2s ease;
+}
+
+.site-audit-protocol-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #1C1D1F;
+  border: 1px solid #333335;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.site-audit-protocol-option {
+  padding: 12px 15px;
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.site-audit-protocol-option:hover {
+  background-color: #252526;
+}
+
+.site-audit-protocol-option.selected {
+  background-color: #09CEA7;
+  color: #ffffff;
+}
+
 /* Audit URL Field - аналог url-input-field */
 .audit-url-field {
   flex: 1;
@@ -62,6 +126,36 @@
 
 .audit-url-field::placeholder {
   color: #707070;
+}
+
+/* Input field wrapper with paste button */
+.input-field-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-field-wrapper .audit-url-field {
+  flex: 1;
+}
+
+.input-field-wrapper .paste-button {
+  padding: 8px 12px;
+  margin: 0px 8px 0px 0px;
+  background-color: #333335;
+  border: 1px solid #404042;
+  border-radius: 6px;
+}
+
+.input-field-wrapper .paste-button:hover {
+  background-color: #404042;
+  border-color: #505052;
+}
+
+.input-field-wrapper .paste-button img {
+  width: 16px;
+  height: 16px;
 }
 
 /* Audit Results Container - уникальный класс */

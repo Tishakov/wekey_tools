@@ -545,6 +545,10 @@ const SeoAudit: React.FC = () => {
   const [imageOptimizationToShow, setImageOptimizationToShow] = useState(5);
   const [cssOptimizationToShow, setCssOptimizationToShow] = useState(3);
   const [jsOptimizationToShow, setJsOptimizationToShow] = useState(3);
+  
+  // Protocol selector states
+  const [protocol, setProtocol] = useState('https://');
+  const [protocolDropdownOpen, setProtocolDropdownOpen] = useState(false);
 
   // Функция переключения аккордеона
   const toggleSection = (sectionId: string) => {
@@ -582,6 +586,55 @@ const SeoAudit: React.FC = () => {
   };
 
   const currentDeviceData = getCurrentDeviceData();
+
+  // Protocol handling functions
+  const handleUrlChange = (value: string) => {
+    // Автоматическое определение протокола
+    if (value.startsWith('https://')) {
+      handleProtocolSelect('https://');
+      setUrl(value.substring(8));
+    } else if (value.startsWith('http://')) {
+      handleProtocolSelect('http://');
+      setUrl(value.substring(7));
+    } else {
+      setUrl(value);
+    }
+  };
+
+  const handleProtocolToggle = () => {
+    setProtocolDropdownOpen(!protocolDropdownOpen);
+  };
+
+  const handleProtocolSelect = (selectedProtocol: string) => {
+    setProtocol(selectedProtocol);
+    setProtocolDropdownOpen(false);
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      handleUrlChange(text);
+    } catch (err) {
+      console.error('Ошибка при вставке:', err);
+    }
+  };
+
+  // Закрытие выпадающего списка при клике вне его области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (protocolDropdownOpen) {
+        const protocolSelector = document.querySelector('.seo-audit-protocol-selector');
+        if (protocolSelector && !protocolSelector.contains(event.target as Node)) {
+          setProtocolDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [protocolDropdownOpen]);
 
   // Функция для показа дополнительных W3C ошибок
   const showMoreW3cErrors = () => {
@@ -638,15 +691,12 @@ const SeoAudit: React.FC = () => {
     setJsOptimizationToShow(3);
     setActionPlanToShow(6);
 
-    // Нормализация URL
-    let normalizedUrl = url.trim();
-    if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
-      normalizedUrl = 'https://' + normalizedUrl;
-    }
+    // Формирование полного URL с выбранным протоколом
+    const fullUrl = protocol + url.trim();
 
     try {
       setResult({
-        url: normalizedUrl,
+        url: fullUrl,
         loading: true
       });
 
@@ -664,7 +714,7 @@ const SeoAudit: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          url: normalizedUrl,
+          url: fullUrl,
           waitForFullData: true  // Ждем полные данные от Google PageSpeed
         })
       });
@@ -690,7 +740,7 @@ const SeoAudit: React.FC = () => {
       console.log('🔍 Data Source Desktop:', data.results?.webVitals?.desktop?.source);
 
       setResult({
-        url: normalizedUrl,
+        url: fullUrl,
         loading: false,
         data: data.results
       });
@@ -698,7 +748,7 @@ const SeoAudit: React.FC = () => {
     } catch (error) {
       console.error('Ошибка при SEO анализе:', error);
       setResult({
-        url: normalizedUrl,
+        url: fullUrl,
         loading: false,
         error: error instanceof Error ? error.message : 'Неизвестная ошибка'
       });
@@ -733,14 +783,45 @@ const SeoAudit: React.FC = () => {
         <div className="seo-audit-row">
           <div className="seo-audit-url-container">
             <div className="seo-audit-url-wrapper">
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="Введите адрес сайта для SEO анализа"
-                className="seo-audit-url-field"
-                onKeyPress={(e) => e.key === 'Enter' && handleAudit()}
-              />
+              <div className="seo-audit-protocol-selector">
+                <button 
+                  className="seo-audit-protocol-toggle"
+                  onClick={handleProtocolToggle}
+                  type="button"
+                >
+                  <span>{protocol}</span>
+                  <span className="seo-audit-protocol-arrow">▼</span>
+                </button>
+                {protocolDropdownOpen && (
+                  <div className="seo-audit-protocol-dropdown">
+                    <div 
+                      className={`seo-audit-protocol-option ${protocol === 'https://' ? 'selected' : ''}`}
+                      onClick={() => handleProtocolSelect('https://')}
+                    >
+                      https://
+                    </div>
+                    <div 
+                      className={`seo-audit-protocol-option ${protocol === 'http://' ? 'selected' : ''}`}
+                      onClick={() => handleProtocolSelect('http://')}
+                    >
+                      http://
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="input-field-wrapper">
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  placeholder="example.com"
+                  className="seo-audit-url-field"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAudit()}
+                />
+                <button className="paste-button" onClick={handlePaste}>
+                  <img src="/icons/button_paste.svg" alt="" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

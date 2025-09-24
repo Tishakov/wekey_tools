@@ -105,6 +105,10 @@ const SiteAudit: React.FC = () => {
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<AuditResult | null>(null);
   const [launchCount, setLaunchCount] = useState(0);
+  
+  // Protocol selector states
+  const [protocol, setProtocol] = useState('https://');
+  const [protocolDropdownOpen, setProtocolDropdownOpen] = useState(false);
 
   // Загружаем счетчик запусков
   useEffect(() => {
@@ -119,6 +123,55 @@ const SiteAudit: React.FC = () => {
     loadLaunchCount();
   }, []);
 
+  // Protocol handling functions
+  const handleUrlChange = (value: string) => {
+    // Автоматическое определение протокола
+    if (value.startsWith('https://')) {
+      handleProtocolSelect('https://');
+      setUrl(value.substring(8));
+    } else if (value.startsWith('http://')) {
+      handleProtocolSelect('http://');
+      setUrl(value.substring(7));
+    } else {
+      setUrl(value);
+    }
+  };
+
+  const handleProtocolToggle = () => {
+    setProtocolDropdownOpen(!protocolDropdownOpen);
+  };
+
+  const handleProtocolSelect = (selectedProtocol: string) => {
+    setProtocol(selectedProtocol);
+    setProtocolDropdownOpen(false);
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      handleUrlChange(text);
+    } catch (err) {
+      console.error('Ошибка при вставке:', err);
+    }
+  };
+
+  // Закрытие выпадающего списка при клике вне его области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (protocolDropdownOpen) {
+        const protocolSelector = document.querySelector('.site-audit-protocol-selector');
+        if (protocolSelector && !protocolSelector.contains(event.target as Node)) {
+          setProtocolDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [protocolDropdownOpen]);
+
   const handleAudit = async () => {
     if (!requireAuth()) return;
 
@@ -127,15 +180,12 @@ const SiteAudit: React.FC = () => {
       return;
     }
 
-    // Нормализация URL
-    let normalizedUrl = url.trim();
-    if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
-      normalizedUrl = 'https://' + normalizedUrl;
-    }
+    // Формирование полного URL с выбранным протоколом
+    const fullUrl = protocol + url.trim();
 
     try {
       setResult({
-        url: normalizedUrl,
+        url: fullUrl,
         loading: true
       });
 
@@ -151,7 +201,7 @@ const SiteAudit: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: normalizedUrl })
+        body: JSON.stringify({ url: fullUrl })
       });
 
       if (!response.ok) {
@@ -161,7 +211,7 @@ const SiteAudit: React.FC = () => {
       const data = await response.json();
 
       setResult({
-        url: normalizedUrl,
+        url: fullUrl,
         loading: false,
         data: data.results
       });
@@ -169,7 +219,7 @@ const SiteAudit: React.FC = () => {
     } catch (error) {
       console.error('Ошибка при анализе сайта:', error);
       setResult({
-        url: normalizedUrl,
+        url: fullUrl,
         loading: false,
         error: error instanceof Error ? error.message : 'Неизвестная ошибка'
       });
@@ -204,14 +254,45 @@ const SiteAudit: React.FC = () => {
         <div className="audit-row">
           <div className="audit-url-container">
             <div className="audit-url-wrapper">
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="Введите адрес нужной страницы"
-                className="audit-url-field"
-                onKeyPress={(e) => e.key === 'Enter' && handleAudit()}
-              />
+              <div className="site-audit-protocol-selector">
+                <button 
+                  className="site-audit-protocol-toggle"
+                  onClick={handleProtocolToggle}
+                  type="button"
+                >
+                  <span>{protocol}</span>
+                  <span className="site-audit-protocol-arrow">▼</span>
+                </button>
+                {protocolDropdownOpen && (
+                  <div className="site-audit-protocol-dropdown">
+                    <div 
+                      className={`site-audit-protocol-option ${protocol === 'https://' ? 'selected' : ''}`}
+                      onClick={() => handleProtocolSelect('https://')}
+                    >
+                      https://
+                    </div>
+                    <div 
+                      className={`site-audit-protocol-option ${protocol === 'http://' ? 'selected' : ''}`}
+                      onClick={() => handleProtocolSelect('http://')}
+                    >
+                      http://
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="input-field-wrapper">
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  placeholder="example.com"
+                  className="audit-url-field"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAudit()}
+                />
+                <button className="paste-button" onClick={handlePaste}>
+                  <img src="/icons/button_paste.svg" alt="" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
