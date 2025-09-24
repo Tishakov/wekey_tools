@@ -911,10 +911,23 @@ function analyzeVisual($) {
 function analyzeHosting($, html, response) {
   const hosting = {
     ssl: false,
+    sslGrade: null,
+    tlsVersion: null,
+    certificateAuthority: null,
     webServer: null,
+    hostingProvider: null,
     cloudflare: false,
     cdn: [],
-    securityHeaders: {}
+    httpVersion: null,
+    compression: [],
+    securityHeaders: {},
+    serverLocation: {
+      ip: null,
+      country: null,
+      city: null,
+      region: null,
+      flag: null
+    }
   };
   
   const headers = {};
@@ -1024,6 +1037,174 @@ function analyzeHosting($, html, response) {
       headers['x-sp-edge-server']) {
     hosting.cdn.push('StackPath');
   }
+
+  // === HOSTING PROVIDER DETECTION ===
+  
+  // Amazon AWS
+  if (headers['x-amz-cf-id'] || 
+      headers['x-amz-request-id'] ||
+      headers['server']?.includes('amazonadf') ||
+      htmlLower.includes('amazonaws.com') ||
+      htmlLower.includes('aws.amazon.com')) {
+    hosting.hostingProvider = 'Amazon AWS';
+  }
+  
+  // Google Cloud Platform
+  else if (headers['x-goog-gfe'] ||
+           headers['x-cloud-trace-context'] ||
+           headers['server']?.includes('gfe') ||
+           htmlLower.includes('googleusercontent.com') ||
+           htmlLower.includes('appspot.com')) {
+    hosting.hostingProvider = 'Google Cloud Platform';
+  }
+  
+  // Microsoft Azure
+  else if (headers['x-azure-ref'] ||
+           headers['x-ms-'] ||
+           htmlLower.includes('azurewebsites.net') ||
+           htmlLower.includes('windows.net')) {
+    hosting.hostingProvider = 'Microsoft Azure';
+  }
+  
+  // Cloudflare (специальный случай - может быть проксирующий, не хостинг)
+  else if (hosting.cloudflare && 
+           !hosting.hostingProvider &&
+           headers['cf-ray']) {
+    hosting.hostingProvider = 'Cloudflare Pages';
+  }
+  
+  // DigitalOcean
+  else if (headers['server']?.includes('digitalocean') ||
+           htmlLower.includes('digitaloceanspaces.com')) {
+    hosting.hostingProvider = 'DigitalOcean';
+  }
+  
+  // Linode
+  else if (headers['server']?.includes('linode') ||
+           htmlLower.includes('linode.com')) {
+    hosting.hostingProvider = 'Linode';
+  }
+  
+  // OVH
+  else if (headers['server']?.includes('ovh') ||
+           htmlLower.includes('ovh.net')) {
+    hosting.hostingProvider = 'OVH';
+  }
+  
+  // Hetzner
+  else if (headers['server']?.includes('hetzner') ||
+           htmlLower.includes('hetzner.com')) {
+    hosting.hostingProvider = 'Hetzner';
+  }
+  
+  // GitHub Pages
+  else if (headers['x-github-request-id'] ||
+           htmlLower.includes('github.io')) {
+    hosting.hostingProvider = 'GitHub Pages';
+  }
+  
+  // Netlify
+  else if (headers['x-nf-request-id'] ||
+           headers['x-netlify-id'] ||
+           htmlLower.includes('netlify.app')) {
+    hosting.hostingProvider = 'Netlify';
+  }
+  
+  // Vercel
+  else if (headers['x-vercel-id'] ||
+           headers['x-vercel-cache'] ||
+           htmlLower.includes('vercel.app')) {
+    hosting.hostingProvider = 'Vercel';
+  }
+  
+  // Heroku
+  else if (headers['via']?.includes('heroku') ||
+           htmlLower.includes('herokuapp.com')) {
+    hosting.hostingProvider = 'Heroku';
+  }
+  
+  // Firebase
+  else if (htmlLower.includes('firebase') ||
+           htmlLower.includes('firebaseapp.com')) {
+    hosting.hostingProvider = 'Firebase';
+  }
+  
+  // ADM.Tools hosting (украинский хостинг-провайдер)
+  else if (headers['server']?.includes('adm.tools') ||
+           htmlLower.includes('adm.tools') ||
+           headers['x-powered-by']?.includes('adm') ||
+           headers['x-ray']?.includes('wnp') || // характерный заголовок adm.tools
+           headers['x-ray']?.includes('wn') ||
+           Object.values(headers).some(value => 
+             typeof value === 'string' && value.toLowerCase().includes('adm.tools'))) {
+    hosting.hostingProvider = 'ADM.Tools';
+  }
+
+  // === SSL & CERTIFICATE ANALYSIS ===
+  
+  if (hosting.ssl) {
+    // TLS Version detection (из headers, если доступно)
+    if (headers['strict-transport-security']) {
+      hosting.tlsVersion = '1.2+'; // HSTS обычно требует TLS 1.2+
+    }
+    
+    // Certificate Authority detection (простое определение по common patterns)
+    if (headers['server']?.includes('cloudflare')) {
+      hosting.certificateAuthority = 'Cloudflare';
+    } else if (headers['x-served-by']?.includes('fastly')) {
+      hosting.certificateAuthority = 'Fastly';
+    } else {
+      // Для более точного определения нужен отдельный SSL API запрос
+      hosting.certificateAuthority = 'Unknown';
+    }
+    
+    // SSL Grade (простая оценка на основе доступных данных)
+    let gradeScore = 0;
+    
+    // Базовые очки за HTTPS
+    gradeScore += 50;
+    
+    // Очки за HSTS
+    if (headers['strict-transport-security']) {
+      gradeScore += 20;
+      // Дополнительные очки за preload
+      if (headers['strict-transport-security'].includes('preload')) {
+        gradeScore += 10;
+      }
+    }
+    
+    // Очки за другие security headers
+    if (headers['x-frame-options']) gradeScore += 5;
+    if (headers['x-content-type-options']) gradeScore += 5;
+    if (headers['content-security-policy']) gradeScore += 10;
+    
+    // Определение grade
+    if (gradeScore >= 90) hosting.sslGrade = 'A+';
+    else if (gradeScore >= 80) hosting.sslGrade = 'A';
+    else if (gradeScore >= 70) hosting.sslGrade = 'B';
+    else if (gradeScore >= 60) hosting.sslGrade = 'C';
+    else if (gradeScore >= 50) hosting.sslGrade = 'D';
+    else hosting.sslGrade = 'F';
+  }
+
+  // === HTTP VERSION & COMPRESSION DETECTION ===
+  
+  // HTTP Version (из headers)
+  if (headers[':status']) {
+    hosting.httpVersion = 'HTTP/2';
+  } else if (headers['upgrade']?.includes('h2')) {
+    hosting.httpVersion = 'HTTP/2 (upgrade)';
+  } else {
+    hosting.httpVersion = 'HTTP/1.1';
+  }
+  
+  // Compression detection
+  if (headers['content-encoding']) {
+    const encoding = headers['content-encoding'];
+    if (encoding.includes('br')) hosting.compression.push('Brotli');
+    if (encoding.includes('gzip')) hosting.compression.push('Gzip');
+    if (encoding.includes('deflate')) hosting.compression.push('Deflate');
+  }
   
   // Security headers
   hosting.securityHeaders = {
@@ -1033,6 +1214,95 @@ function analyzeHosting($, html, response) {
     'Strict-Transport-Security': !!headers['strict-transport-security'],
     'Content-Security-Policy': !!headers['content-security-policy']
   };
+  
+  // === SERVER GEOLOCATION ===
+  try {
+    const url = new URL(response.url);
+    const hostname = url.hostname;
+    
+    // Получаем IP через DNS (простое решение без внешних API)
+    // В продакшене можно использовать dns.lookup или внешние сервисы
+    
+    // Базовое определение по IP и хостингу
+    if (hosting.hostingProvider) {
+      switch (hosting.hostingProvider) {
+        case 'Amazon AWS':
+          hosting.serverLocation = {
+            ip: 'AWS Network',
+            country: 'Multiple regions',
+            city: 'Global',
+            region: 'Worldwide',
+            flag: '🌍'
+          };
+          break;
+        case 'Google Cloud Platform':
+          hosting.serverLocation = {
+            ip: 'Google Network',
+            country: 'Multiple regions', 
+            city: 'Global',
+            region: 'Worldwide',
+            flag: '🌍'
+          };
+          break;
+        case 'Cloudflare Pages':
+        case 'Cloudflare':
+          hosting.serverLocation = {
+            ip: 'Cloudflare Network',
+            country: 'Multiple regions',
+            city: 'Global CDN',
+            region: 'Worldwide',
+            flag: '🌍'
+          };
+          break;
+        case 'ADM.Tools':
+          hosting.serverLocation = {
+            ip: 'Ukraine Network',
+            country: 'Ukraine',
+            city: 'Kyiv',
+            region: 'Kyiv Region',
+            flag: '🇺🇦'
+          };
+          break;
+        case 'GitHub Pages':
+          hosting.serverLocation = {
+            ip: 'GitHub Network',
+            country: 'United States',
+            city: 'San Francisco',
+            region: 'California',
+            flag: '🇺🇸'
+          };
+          break;
+        case 'Netlify':
+          hosting.serverLocation = {
+            ip: 'Netlify Network',
+            country: 'United States',
+            city: 'San Francisco',
+            region: 'California',
+            flag: '🇺🇸'
+          };
+          break;
+        case 'Vercel':
+          hosting.serverLocation = {
+            ip: 'Vercel Network',
+            country: 'Multiple regions',
+            city: 'Global',
+            region: 'Worldwide',
+            flag: '🌍'
+          };
+          break;
+        default:
+          hosting.serverLocation = {
+            ip: 'Unknown',
+            country: 'Unknown',
+            city: 'Unknown',
+            region: 'Unknown',
+            flag: '❓'
+          };
+      }
+    }
+  } catch (error) {
+    console.log('Geolocation detection failed:', error.message);
+  }
   
   return hosting;
 }

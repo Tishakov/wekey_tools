@@ -73,10 +73,23 @@ interface AuditResult {
     };
     hosting: {
       ssl?: boolean;
+      sslGrade?: string;
+      tlsVersion?: string;
+      certificateAuthority?: string;
       webServer?: string;
+      hostingProvider?: string;
       cloudflare?: boolean;
       cdn?: string[];
+      httpVersion?: string;
+      compression?: string[];
       securityHeaders?: Record<string, boolean>;
+      serverLocation?: {
+        ip?: string;
+        country?: string;
+        city?: string;
+        region?: string;
+        flag?: string;
+      };
     };
     social: {
       facebook?: string;
@@ -376,7 +389,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">📝</span>
-                            Система управления:
+                            Система управления
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.cms}
@@ -390,7 +403,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">⚛️</span>
-                            Фреймворки:
+                            Фреймворки
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.framework.join(', ')}
@@ -403,7 +416,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">💻</span>
-                            Языки программирования:
+                            Языки программирования
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.language.join(', ')}
@@ -416,7 +429,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">☁️</span>
-                            Облачная платформа:
+                            Облачная платформа
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.cloudPlatform}
@@ -429,7 +442,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">🎨</span>
-                            CSS фреймворки:
+                            CSS фреймворки
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.cssFramework.join(', ')}
@@ -442,7 +455,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">🎭</span>
-                            CSS препроцессоры:
+                            CSS препроцессоры
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.cssPreprocessor.join(', ')}
@@ -455,7 +468,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">🏗️</span>
-                            Статические генераторы:
+                            Статические генераторы
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.staticGenerator.join(', ')}
@@ -468,7 +481,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">🔨</span>
-                            Инструменты сборки:
+                            Инструменты сборки
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.buildTool.join(', ')}
@@ -481,7 +494,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">🧩</span>
-                            Микрофреймворки:
+                            Микрофреймворки
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.microFramework.join(', ')}
@@ -494,7 +507,7 @@ const SiteAudit: React.FC = () => {
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">🗄️</span>
-                            Базы данных:
+                            Базы данных
                           </span>
                           <span className="tech-category-value">
                             {result.data.technologies.database.join(', ')}
@@ -610,33 +623,97 @@ const SiteAudit: React.FC = () => {
                     <div className="hosting-grid">
                       {result.data.hosting.webServer && (
                         <div className="hosting-item">
-                          <span className="hosting-label">Веб-сервер:</span>
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🖥️</span>
+                            Веб-сервер
+                          </span>
                           <span className="hosting-value">{result.data.hosting.webServer}</span>
+                        </div>
+                      )}
+                      
+                      {result.data.hosting.hostingProvider && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">☁️</span>
+                            Хостинг-провайдер
+                          </span>
+                          <span className="hosting-value">{result.data.hosting.hostingProvider}</span>
+                        </div>
+                      )}
+                      
+                      {result.data.hosting.serverLocation && result.data.hosting.serverLocation.country && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🌍</span>
+                            Геолокация сервера
+                          </span>
+                          <span className="hosting-value">
+                            {result.data.hosting.serverLocation.flag} {result.data.hosting.serverLocation.country}
+                            {result.data.hosting.serverLocation.city && result.data.hosting.serverLocation.city !== 'Unknown' && 
+                              `, ${result.data.hosting.serverLocation.city}`}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {result.data.hosting.ssl && result.data.hosting.sslGrade && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🔒</span>
+                            SSL Grade
+                          </span>
+                          <span className={`hosting-value ssl-grade-${result.data.hosting.sslGrade.toLowerCase().replace('+', 'plus')}`}>
+                            {result.data.hosting.sslGrade}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {result.data.hosting.httpVersion && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🌐</span>
+                            HTTP версия
+                          </span>
+                          <span className="hosting-value">{result.data.hosting.httpVersion}</span>
+                        </div>
+                      )}
+                      
+                      {result.data.hosting.compression && result.data.hosting.compression.length > 0 && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">📦</span>
+                            Сжатие
+                          </span>
+                          <span className="hosting-value">{result.data.hosting.compression.join(', ')}</span>
                         </div>
                       )}
                       
                       {result.data.hosting.cdn && result.data.hosting.cdn.length > 0 && (
                         <div className="hosting-item">
-                          <span className="hosting-label">CDN:</span>
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🚀</span>
+                            CDN
+                          </span>
                           <span className="hosting-value">{result.data.hosting.cdn.join(', ')}</span>
                         </div>
                       )}
                       
-                      <div className="hosting-features">
-                        {result.data.hosting.ssl && <span className="security-tag">SSL/HTTPS</span>}
-                        {result.data.hosting.cloudflare && <span className="security-tag">Cloudflare</span>}
-                        {result.data.hosting.cdn && result.data.hosting.cdn.length > 0 && <span className="security-tag">CDN</span>}
-                      </div>
-                      {result.data.hosting.securityHeaders && (
-                        <div className="security-headers">
-                          <span className="hosting-label">Заголовки безопасности:</span>
-                          <div className="security-tags">
-                            {Object.keys(result.data.hosting.securityHeaders).map(header => (
-                              <span key={header} className="security-tag">{header.toUpperCase()}</span>
-                            ))}
-                          </div>
+                      {(result.data.hosting.ssl || result.data.hosting.cloudflare || (result.data.hosting.cdn && result.data.hosting.cdn.length > 0)) && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">⚡</span>
+                            Функции безопасности
+                          </span>
+                          <span className="hosting-value">
+                            {[
+                              result.data.hosting.ssl && 'SSL/HTTPS',
+                              result.data.hosting.cloudflare && 'Cloudflare',
+                              result.data.hosting.cdn && result.data.hosting.cdn.length > 0 && 'CDN'
+                            ].filter(Boolean).join(', ')}
+                          </span>
                         </div>
                       )}
+                      
+
                     </div>
                   </div>
                 )}
