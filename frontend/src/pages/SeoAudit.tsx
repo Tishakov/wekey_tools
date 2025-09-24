@@ -565,6 +565,7 @@ const SeoAudit: React.FC = () => {
     setImageOptimizationToShow(5);
     setCssOptimizationToShow(3);
     setJsOptimizationToShow(3);
+    setActionPlanToShow(6);
 
     // Нормализация URL
     let normalizedUrl = url.trim();
@@ -3455,15 +3456,13 @@ const SeoAudit: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                    {result.data.actionPlan.length > 6 && (
+                    {result.data.actionPlan.length > 6 && actionPlanToShow === 6 && (
                       <div className="action-plan-controls">
                         <button
                           className="show-more-button"
-                          onClick={() => setActionPlanToShow(prev => prev === 6 ? (result.data?.actionPlan?.length || 6) : 6)}
+                          onClick={() => setActionPlanToShow(result.data?.actionPlan?.length || 6)}
                         >
-                          {actionPlanToShow === 6 
-                            ? `Показать все рекомендации (${result.data.actionPlan.length})` 
-                            : 'Показать топ-6'}
+                          Показать все рекомендации ({result.data.actionPlan.length})
                         </button>
                       </div>
                     )}
