@@ -438,6 +438,9 @@ const SeoAudit: React.FC = () => {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [actionPlanToShow, setActionPlanToShow] = useState(6);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+  const [imageOptimizationToShow, setImageOptimizationToShow] = useState(5);
+  const [cssOptimizationToShow, setCssOptimizationToShow] = useState(3);
+  const [jsOptimizationToShow, setJsOptimizationToShow] = useState(3);
 
   // Функция переключения аккордеона
   const toggleSection = (sectionId: string) => {
@@ -481,6 +484,19 @@ const SeoAudit: React.FC = () => {
     setW3cErrorsToShow(prev => prev + 5);
   };
 
+  // Функции для показа дополнительных PageSpeed элементов
+  const showMoreImageOptimization = () => {
+    setImageOptimizationToShow(prev => prev + 5);
+  };
+
+  const showMoreCssOptimization = () => {
+    setCssOptimizationToShow(prev => prev + 3);
+  };
+
+  const showMoreJsOptimization = () => {
+    setJsOptimizationToShow(prev => prev + 3);
+  };
+
   // Функции для управления tooltip
   const showTooltip = (tooltipId: string) => {
     setActiveTooltip(tooltipId);
@@ -511,8 +527,11 @@ const SeoAudit: React.FC = () => {
       return;
     }
 
-    // Сбрасываем количество показываемых W3C ошибок при новом аудите
+    // Сбрасываем количество показываемых элементов при новом аудите
     setW3cErrorsToShow(5);
+    setImageOptimizationToShow(5);
+    setCssOptimizationToShow(3);
+    setJsOptimizationToShow(3);
 
     // Нормализация URL
     let normalizedUrl = url.trim();
@@ -655,7 +674,7 @@ const SeoAudit: React.FC = () => {
                 
                 {/* Развлекательный блок во время ожидания */}
                 <div className="loading-entertainment">
-                  <p className="entertainment-text">Вы можете пока понаблюдать, как грузовик врезается в столб</p>
+                  <p className="entertainment-text">Вы можете пока понаблюдать, как грузовик врезается в столб:</p>
                   <img 
                     src="/gif/truck.gif" 
                     alt="Грузовик врезается в столб" 
@@ -2434,7 +2453,8 @@ const SeoAudit: React.FC = () => {
                                   {/* Детальный список изображений */}
                                   <div className="google-pagespeed-items">
                                     <h4>📋 Изображения для оптимизации:</h4>
-                                    {imageOptimization.items?.slice(0, 5).map((item: any, index: any) => (
+                                    <div className="pagespeed-items-container">
+                                      {imageOptimization.items?.slice(0, imageOptimizationToShow).map((item: any, index: any) => (
                                       <div key={index} className="pagespeed-optimization-item">
                                         <div className="optimization-item-header">
                                           <span className="optimization-filename">
@@ -2462,9 +2482,18 @@ const SeoAudit: React.FC = () => {
                                         </div>
                                       </div>
                                     ))}
-                                    {imageOptimization.items && imageOptimization.items.length > 5 && (
-                                      <p className="more-items">И еще {imageOptimization.items.length - 5} изображений...</p>
+                                    {imageOptimization.items && imageOptimization.items.length > imageOptimizationToShow && (
+                                      <div className="w3c-show-more">
+                                        <p className="more-items">И еще {imageOptimization.items.length - imageOptimizationToShow} изображений...</p>
+                                        <button 
+                                          className="show-more-button"
+                                          onClick={showMoreImageOptimization}
+                                        >
+                                          Показать еще 5
+                                        </button>
+                                      </div>
                                     )}
+                                    </div>
                                   </div>
 
                                   <p className="seo-audit-tip">
@@ -2537,42 +2566,52 @@ const SeoAudit: React.FC = () => {
                                   {/* Детальный список CSS файлов */}
                                   <div className="google-pagespeed-items">
                                     <h4>📋 CSS файлы для оптимизации:</h4>
-                                    {cssOptimization.items?.slice(0, 3).map((item: any, index: any) => (
-                                      <div key={index} className="pagespeed-optimization-item">
-                                        <div className="optimization-item-header">
-                                          <span className="optimization-filename">
-                                            {(() => {
-                                              if (item.url === 'Inline CSS') return item.url;
-                                              // Если это полный URL, извлекаем имя файла
-                                              if (item.url.includes('/')) {
-                                                const filename = item.url.split('/').pop();
-                                                return filename || item.url;
-                                              }
-                                              // Если это lighthouse ID, показываем его как есть но с префиксом
-                                              if (item.url.match(/^\d+-\d+-/)) {
-                                                return `CSS файл ${item.url}`;
-                                              }
-                                              return item.url;
-                                            })()}
-                                          </span>
-                                        </div>
-                                        <div className="optimization-details">
-                                          <div className="optimization-savings">
-                                            <span className="current-size">Размер: {Math.round(item.currentSize / 1024)}KB</span>
-                                            {item.wastedPercent && (
-                                              <>
-                                                <span className="arrow">→</span>
-                                                <span className="unused-percent">Не используется: {Math.round(item.wastedPercent)}%</span>
-                                              </>
-                                            )}
+                                    <div className="google-pagespeed-items-scroll">
+                                      {cssOptimization.items?.slice(0, cssOptimizationToShow).map((item: any, index: any) => (
+                                        <div key={index} className="pagespeed-optimization-item">
+                                          <div className="optimization-item-header">
+                                            <span className="optimization-filename">
+                                              {(() => {
+                                                if (item.url === 'Inline CSS') return item.url;
+                                                // Если это полный URL, извлекаем имя файла
+                                                if (item.url.includes('/')) {
+                                                  const filename = item.url.split('/').pop();
+                                                  return filename || item.url;
+                                                }
+                                                // Если это lighthouse ID, показываем его как есть но с префиксом
+                                                if (item.url.match(/^\d+-\d+-/)) {
+                                                  return `CSS файл ${item.url}`;
+                                                }
+                                                return item.url;
+                                              })()}
+                                            </span>
                                           </div>
-                                          <p className="optimization-recommendation">{item.recommendation}</p>
+                                          <div className="optimization-details">
+                                            <div className="optimization-savings">
+                                              <span className="current-size">Размер: {Math.round(item.currentSize / 1024)}KB</span>
+                                              {item.wastedPercent && (
+                                                <>
+                                                  <span className="arrow">→</span>
+                                                  <span className="unused-percent">Не используется: {Math.round(item.wastedPercent)}%</span>
+                                                </>
+                                              )}
+                                            </div>
+                                            <p className="optimization-recommendation">{item.recommendation}</p>
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
-                                    {cssOptimization.items && cssOptimization.items.length > 3 && (
-                                      <p className="more-items">И еще {cssOptimization.items.length - 3} CSS файлов...</p>
-                                    )}
+                                      ))}
+                                      {cssOptimization.items && cssOptimization.items.length > cssOptimizationToShow && (
+                                        <div className="w3c-show-more">
+                                          <p className="more-items">И еще {cssOptimization.items.length - cssOptimizationToShow} CSS файлов...</p>
+                                          <button 
+                                            className="show-more-button"
+                                            onClick={showMoreCssOptimization}
+                                          >
+                                            Показать еще 3
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
 
                                   <p className="seo-audit-tip">
@@ -2645,48 +2684,58 @@ const SeoAudit: React.FC = () => {
                                   {/* Детальный список JS файлов */}
                                   <div className="google-pagespeed-items">
                                     <h4>📋 JavaScript файлы для оптимизации:</h4>
-                                    {jsOptimization.items?.slice(0, 3).map((item: any, index: any) => (
-                                      <div key={index} className="pagespeed-optimization-item">
-                                        <div className="optimization-item-header">
-                                          <span className="optimization-filename">
-                                            {(() => {
-                                              if (item.url === 'Inline JS') return item.url;
-                                              // Если это полный URL, извлекаем имя файла
-                                              if (item.url.includes('/')) {
-                                                const filename = item.url.split('/').pop();
-                                                return filename || item.url;
-                                              }
-                                              // Если это lighthouse ID, показываем его как есть но с префиксом
-                                              if (item.url.match(/^\d+-\d+-/)) {
-                                                return `JS файл ${item.url}`;
-                                              }
-                                              return item.url;
-                                            })()}
-                                          </span>
-                                        </div>
-                                        <div className="optimization-details">
-                                          <div className="optimization-savings">
-                                            <span className="current-size">Размер: {Math.round(item.currentSize / 1024)}KB</span>
-                                            {item.wastedPercent && (
-                                              <>
-                                                <span className="arrow">→</span>
-                                                <span className="unused-percent">Не используется: {Math.round(item.wastedPercent)}%</span>
-                                              </>
-                                            )}
-                                            {item.potentialSavings && (
-                                              <>
-                                                <span className="arrow">→</span>
-                                                <span className="optimized-size">Экономия: {Math.round(item.potentialSavings / 1024)}KB</span>
-                                              </>
-                                            )}
+                                    <div className="google-pagespeed-items-scroll">
+                                      {jsOptimization.items?.slice(0, jsOptimizationToShow).map((item: any, index: any) => (
+                                        <div key={index} className="pagespeed-optimization-item">
+                                          <div className="optimization-item-header">
+                                            <span className="optimization-filename">
+                                              {(() => {
+                                                if (item.url === 'Inline JS') return item.url;
+                                                // Если это полный URL, извлекаем имя файла
+                                                if (item.url.includes('/')) {
+                                                  const filename = item.url.split('/').pop();
+                                                  return filename || item.url;
+                                                }
+                                                // Если это lighthouse ID, показываем его как есть но с префиксом
+                                                if (item.url.match(/^\d+-\d+-/)) {
+                                                  return `JS файл ${item.url}`;
+                                                }
+                                                return item.url;
+                                              })()}
+                                            </span>
                                           </div>
-                                          <p className="optimization-recommendation">{item.recommendation}</p>
+                                          <div className="optimization-details">
+                                            <div className="optimization-savings">
+                                              <span className="current-size">Размер: {Math.round(item.currentSize / 1024)}KB</span>
+                                              {item.wastedPercent && (
+                                                <>
+                                                  <span className="arrow">→</span>
+                                                  <span className="unused-percent">Не используется: {Math.round(item.wastedPercent)}%</span>
+                                                </>
+                                              )}
+                                              {item.potentialSavings && (
+                                                <>
+                                                  <span className="arrow">→</span>
+                                                  <span className="optimized-size">Экономия: {Math.round(item.potentialSavings / 1024)}KB</span>
+                                                </>
+                                              )}
+                                            </div>
+                                            <p className="optimization-recommendation">{item.recommendation}</p>
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
-                                    {jsOptimization.items && jsOptimization.items.length > 3 && (
-                                      <p className="more-items">И еще {jsOptimization.items.length - 3} JS файлов...</p>
-                                    )}
+                                      ))}
+                                      {jsOptimization.items && jsOptimization.items.length > jsOptimizationToShow && (
+                                        <div className="w3c-show-more">
+                                          <p className="more-items">И еще {jsOptimization.items.length - jsOptimizationToShow} JS файлов...</p>
+                                          <button 
+                                            className="show-more-button"
+                                            onClick={showMoreJsOptimization}
+                                          >
+                                            Показать еще 3
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
 
                                   <p className="seo-audit-tip">
