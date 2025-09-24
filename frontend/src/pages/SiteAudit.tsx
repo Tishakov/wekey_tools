@@ -27,10 +27,16 @@ interface AuditResult {
       language?: string[];
       cdn?: string[];
       webServer?: string;
-      database?: string;
+      database?: string[];
       analytics?: string[];
       security?: string[];
       hosting?: string;
+      cssFramework?: string[];
+      cssPreprocessor?: string[];
+      staticGenerator?: string[];
+      buildTool?: string[];
+      microFramework?: string[];
+      ecommerce?: string[];
     };
     analytics: {
       googleAnalytics?: boolean;
@@ -363,106 +369,177 @@ const SiteAudit: React.FC = () => {
 
                 {/* Технологии */}
                 {result.data.technologies && (
-                  <div className="audit-section technologies-section">
+                  <div className="audit-section">
                     <h3>🔧 Технологии и разработка</h3>
                     <div className="tech-categories">
                       
                       {/* CMS */}
                       {result.data.technologies.cms && (
                         <div className="tech-category">
-                          <h4 className="tech-category-title">
+                          <span className="tech-category-title">
                             <span className="tech-category-icon">📝</span>
-                            Система управления контентом
-                          </h4>
-                          <div className="tech-items">
-                            <div className="tech-item-main">
-                              <span className="tech-name">{result.data.technologies.cms}</span>
-                              {result.data.technologies.cmsVersion && (
-                                <span className="tech-version">v{result.data.technologies.cmsVersion}</span>
-                              )}
-                            </div>
-                          </div>
+                            Система управления:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.cms}
+                            {result.data.technologies.cmsVersion && ` v${result.data.technologies.cmsVersion}`}
+                          </span>
                         </div>
                       )}
 
                       {/* Web Frameworks */}
                       {result.data.technologies.framework && result.data.technologies.framework.length > 0 && (
                         <div className="tech-category">
-                          <h4 className="tech-category-title">
+                          <span className="tech-category-title">
                             <span className="tech-category-icon">⚛️</span>
-                            Веб-фреймворки и библиотеки
-                          </h4>
-                          <div className="tech-items">
-                            {result.data.technologies.framework.map((framework, index) => (
-                              <div key={index} className="tech-item">
-                                <span className="tech-name">{framework}</span>
-                              </div>
-                            ))}
-                          </div>
+                            Фреймворки:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.framework.join(', ')}
+                          </span>
                         </div>
                       )}
 
                       {/* Programming Languages */}
                       {result.data.technologies.language && result.data.technologies.language.length > 0 && (
                         <div className="tech-category">
-                          <h4 className="tech-category-title">
+                          <span className="tech-category-title">
                             <span className="tech-category-icon">💻</span>
-                            Языки программирования
-                          </h4>
-                          <div className="tech-items">
-                            {result.data.technologies.language.map((language, index) => (
-                              <div key={index} className="tech-item">
-                                <span className="tech-name">{language}</span>
-                              </div>
-                            ))}
-                          </div>
+                            Языки программирования:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.language.join(', ')}
+                          </span>
                         </div>
                       )}
 
                       {/* CDN */}
                       {result.data.technologies.cdn && result.data.technologies.cdn.length > 0 && (
                         <div className="tech-category">
-                          <h4 className="tech-category-title">
+                          <span className="tech-category-title">
                             <span className="tech-category-icon">🌐</span>
-                            CDN и сети доставки контента
-                          </h4>
-                          <div className="tech-items">
-                            {result.data.technologies.cdn.map((cdn, index) => (
-                              <div key={index} className="tech-item">
-                                <span className="tech-name">{cdn}</span>
-                              </div>
-                            ))}
-                          </div>
+                            CDN:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.cdn.join(', ')}
+                          </span>
                         </div>
                       )}
 
                       {/* Web Server */}
                       {result.data.technologies.webServer && (
                         <div className="tech-category">
-                          <h4 className="tech-category-title">
+                          <span className="tech-category-title">
                             <span className="tech-category-icon">🖥️</span>
-                            Веб-сервер
-                          </h4>
-                          <div className="tech-items">
-                            <div className="tech-item">
-                              <span className="tech-name">{result.data.technologies.webServer}</span>
-                            </div>
-                          </div>
+                            Веб-сервер:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.webServer}
+                          </span>
                         </div>
                       )}
 
                       {/* Hosting */}
                       {result.data.technologies.hosting && (
                         <div className="tech-category">
-                          <h4 className="tech-category-title">
+                          <span className="tech-category-title">
                             <span className="tech-category-icon">☁️</span>
-                            Хостинг-платформа
-                          </h4>
-                          <div className="tech-items">
-                            <div className="tech-item">
-                              <span className="tech-name">{result.data.technologies.hosting}</span>
-                            </div>
-                          </div>
+                            Хостинг:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.hosting}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* CSS Frameworks */}
+                      {result.data.technologies.cssFramework && result.data.technologies.cssFramework.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🎨</span>
+                            CSS фреймворки:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.cssFramework.join(', ')}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* CSS Preprocessors */}
+                      {result.data.technologies.cssPreprocessor && result.data.technologies.cssPreprocessor.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🎭</span>
+                            CSS препроцессоры:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.cssPreprocessor.join(', ')}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Static Site Generators */}
+                      {result.data.technologies.staticGenerator && result.data.technologies.staticGenerator.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🏗️</span>
+                            Статические генераторы:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.staticGenerator.join(', ')}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Build Tools */}
+                      {result.data.technologies.buildTool && result.data.technologies.buildTool.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🔨</span>
+                            Инструменты сборки:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.buildTool.join(', ')}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Micro Frameworks */}
+                      {result.data.technologies.microFramework && result.data.technologies.microFramework.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🧩</span>
+                            Микрофреймворки:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.microFramework.join(', ')}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Database */}
+                      {result.data.technologies.database && result.data.technologies.database.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🗄️</span>
+                            Базы данных:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.database.join(', ')}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* E-commerce */}
+                      {result.data.technologies.ecommerce && result.data.technologies.ecommerce.length > 0 && (
+                        <div className="tech-category">
+                          <span className="tech-category-title">
+                            <span className="tech-category-icon">🛒</span>
+                            E-commerce платформы:
+                          </span>
+                          <span className="tech-category-value">
+                            {result.data.technologies.ecommerce.join(', ')}
+                          </span>
                         </div>
                       )}
 

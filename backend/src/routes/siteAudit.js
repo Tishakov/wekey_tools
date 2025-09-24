@@ -124,10 +124,16 @@ function analyzeTechnologies($, html, response) {
     language: [],
     cdn: [],
     webServer: null,
-    database: null,
+    database: [],
     analytics: [],
     security: [],
-    hosting: null
+    hosting: null,
+    cssFramework: [],
+    cssPreprocessor: [],
+    staticGenerator: [],
+    buildTool: [],
+    microFramework: [],
+    ecommerce: []
   };
 
   const htmlLower = html.toLowerCase();
@@ -269,6 +275,94 @@ function analyzeTechnologies($, html, response) {
            htmlLower.includes('catalog/view/theme/')) {
     technologies.cms = 'OpenCart';
   }
+  
+  // Strapi
+  else if (htmlLower.includes('strapi') ||
+           headers['x-powered-by']?.includes('strapi')) {
+    technologies.cms = 'Strapi';
+  }
+  
+  // Ghost
+  else if (htmlLower.includes('ghost') ||
+           htmlLower.includes('ghost.org') ||
+           headers['x-powered-by']?.includes('ghost')) {
+    technologies.cms = 'Ghost';
+  }
+  
+  // Webflow
+  else if (htmlLower.includes('webflow') ||
+           htmlLower.includes('webflow.com') ||
+           htmlLower.includes('webflow.css')) {
+    technologies.cms = 'Webflow';
+  }
+  
+  // Contentful
+  else if (htmlLower.includes('contentful') ||
+           htmlLower.includes('ctfassets.net')) {
+    technologies.cms = 'Contentful';
+  }
+  
+  // Sanity
+  else if (htmlLower.includes('sanity') ||
+           htmlLower.includes('sanity.io') ||
+           htmlLower.includes('sanitycdn.com')) {
+    technologies.cms = 'Sanity';
+  }
+  
+  // Prismic
+  else if (htmlLower.includes('prismic') ||
+           htmlLower.includes('prismic.io') ||
+           htmlLower.includes('prismicio.com')) {
+    technologies.cms = 'Prismic';
+  }
+  
+  // Umbraco
+  else if (htmlLower.includes('umbraco') ||
+           htmlLower.includes('/umbraco/')) {
+    technologies.cms = 'Umbraco';
+  }
+  
+  // TYPO3
+  else if (htmlLower.includes('typo3') ||
+           htmlLower.includes('typo3temp') ||
+           htmlLower.includes('typo3conf')) {
+    technologies.cms = 'TYPO3';
+  }
+  
+  // Craft CMS
+  else if (htmlLower.includes('craftcms') ||
+           htmlLower.includes('craft cms') ||
+           htmlLower.includes('cpresources')) {
+    technologies.cms = 'Craft CMS';
+  }
+
+  // === E-COMMERCE PLATFORMS ===
+  
+  // BigCommerce
+  if (htmlLower.includes('bigcommerce') ||
+      htmlLower.includes('bigcommerce.com') ||
+      headers['x-bc-storefront-req-id']) {
+    technologies.ecommerce.push('BigCommerce');
+  }
+  
+  // Zen Cart
+  if (htmlLower.includes('zen-cart') ||
+      htmlLower.includes('zencart') ||
+      htmlLower.includes('zen_cart')) {
+    technologies.ecommerce.push('Zen Cart');
+  }
+  
+  // osCommerce
+  if (htmlLower.includes('oscommerce') ||
+      htmlLower.includes('osc_')) {
+    technologies.ecommerce.push('osCommerce');
+  }
+  
+  // CS-Cart
+  if (htmlLower.includes('cs-cart') ||
+      htmlLower.includes('cscart')) {
+    technologies.ecommerce.push('CS-Cart');
+  }
 
   // === FRAMEWORKS DETECTION ===
   
@@ -305,14 +399,6 @@ function analyzeTechnologies($, html, response) {
     technologies.framework.push('jQuery');
   }
   
-  // Bootstrap
-  if (htmlLower.includes('bootstrap') ||
-      htmlLower.includes('bootstrap.css') ||
-      htmlLower.includes('bootstrap.min.css') ||
-      $('link[href*="bootstrap"]').length > 0) {
-    technologies.framework.push('Bootstrap');
-  }
-  
   // Laravel (PHP)
   if (htmlLower.includes('laravel') ||
       htmlLower.includes('laravel_session') ||
@@ -332,6 +418,183 @@ function analyzeTechnologies($, html, response) {
       htmlLower.includes('__nuxt') ||
       htmlLower.includes('_nuxt/')) {
     technologies.framework.push('Nuxt.js');
+  }
+  
+  // Svelte/SvelteKit
+  if (htmlLower.includes('svelte') ||
+      htmlLower.includes('sveltekit') ||
+      $('script[src*="svelte"]').length > 0) {
+    technologies.framework.push('Svelte');
+  }
+  
+  // Alpine.js
+  if (htmlLower.includes('alpine.js') ||
+      htmlLower.includes('alpinejs') ||
+      htmlLower.includes('x-data') ||
+      $('script[src*="alpine"]').length > 0) {
+    technologies.framework.push('Alpine.js');
+  }
+  
+  // Stimulus
+  if (htmlLower.includes('stimulus') ||
+      htmlLower.includes('data-controller') ||
+      $('script[src*="stimulus"]').length > 0) {
+    technologies.framework.push('Stimulus');
+  }
+  
+  // Lit
+  if (htmlLower.includes('lit-element') ||
+      htmlLower.includes('lit-html') ||
+      htmlLower.includes('@lit/') ||
+      $('script[src*="lit"]').length > 0) {
+    technologies.framework.push('Lit');
+  }
+  
+  // Ember.js
+  if (htmlLower.includes('ember') ||
+      htmlLower.includes('ember.js') ||
+      $('script[src*="ember"]').length > 0) {
+    technologies.framework.push('Ember.js');
+  }
+  
+  // Backbone.js
+  if (htmlLower.includes('backbone') ||
+      htmlLower.includes('backbone.js') ||
+      $('script[src*="backbone"]').length > 0) {
+    technologies.framework.push('Backbone.js');
+  }
+
+  // === CSS FRAMEWORKS ===
+  
+  // Tailwind CSS (переносим Bootstrap сюда тоже)
+  if (htmlLower.includes('tailwind') ||
+      htmlLower.includes('tailwindcss') ||
+      $('link[href*="tailwind"]').length > 0) {
+    technologies.cssFramework.push('Tailwind CSS');
+  }
+  
+  // Bootstrap (переносим из framework)
+  if (htmlLower.includes('bootstrap') ||
+      htmlLower.includes('bootstrap.css') ||
+      htmlLower.includes('bootstrap.min.css') ||
+      $('link[href*="bootstrap"]').length > 0) {
+    technologies.cssFramework.push('Bootstrap');
+  }
+  
+  // Bulma
+  if (htmlLower.includes('bulma') ||
+      htmlLower.includes('bulma.css') ||
+      $('link[href*="bulma"]').length > 0) {
+    technologies.cssFramework.push('Bulma');
+  }
+  
+  // Foundation
+  if (htmlLower.includes('foundation') ||
+      htmlLower.includes('foundation.css') ||
+      $('link[href*="foundation"]').length > 0) {
+    technologies.cssFramework.push('Foundation');
+  }
+  
+  // Materialize
+  if (htmlLower.includes('materialize') ||
+      htmlLower.includes('materialize.css') ||
+      $('link[href*="materialize"]').length > 0) {
+    technologies.cssFramework.push('Materialize');
+  }
+
+  // === CSS PREPROCESSORS ===
+  
+  // Sass/SCSS
+  if (htmlLower.includes('.scss') ||
+      htmlLower.includes('sass') ||
+      $('link[href*=".scss"], link[href*="sass"]').length > 0) {
+    technologies.cssPreprocessor.push('Sass/SCSS');
+  }
+  
+  // Less
+  if (htmlLower.includes('.less') ||
+      htmlLower.includes('less.js') ||
+      $('link[href*=".less"], script[src*="less"]').length > 0) {
+    technologies.cssPreprocessor.push('Less');
+  }
+  
+  // Stylus
+  if (htmlLower.includes('.styl') ||
+      htmlLower.includes('stylus') ||
+      $('link[href*=".styl"]').length > 0) {
+    technologies.cssPreprocessor.push('Stylus');
+  }
+
+  // === STATIC SITE GENERATORS ===
+  
+  // Gatsby
+  if (htmlLower.includes('gatsby') ||
+      htmlLower.includes('___gatsby') ||
+      htmlLower.includes('gatsby-') ||
+      $('script[src*="gatsby"]').length > 0) {
+    technologies.staticGenerator.push('Gatsby');
+  }
+  
+  // Hugo
+  if (htmlLower.includes('hugo') ||
+      htmlLower.includes('generated by hugo') ||
+      $('meta[name="generator"][content*="Hugo"]').length > 0) {
+    technologies.staticGenerator.push('Hugo');
+  }
+  
+  // Jekyll
+  if (htmlLower.includes('jekyll') ||
+      htmlLower.includes('generated by jekyll') ||
+      $('meta[name="generator"][content*="Jekyll"]').length > 0) {
+    technologies.staticGenerator.push('Jekyll');
+  }
+  
+  // Eleventy (11ty)
+  if (htmlLower.includes('eleventy') ||
+      htmlLower.includes('11ty') ||
+      $('meta[name="generator"][content*="Eleventy"]').length > 0) {
+    technologies.staticGenerator.push('Eleventy');
+  }
+  
+  // Astro
+  if (htmlLower.includes('astro') ||
+      htmlLower.includes('astro-island') ||
+      $('meta[name="generator"][content*="Astro"]').length > 0) {
+    technologies.staticGenerator.push('Astro');
+  }
+  
+  // GridSome
+  if (htmlLower.includes('gridsome') ||
+      $('meta[name="generator"][content*="Gridsome"]').length > 0) {
+    technologies.staticGenerator.push('GridSome');
+  }
+
+  // === BUILD TOOLS ===
+  
+  // Webpack
+  if (htmlLower.includes('webpack') ||
+      htmlLower.includes('webpackJsonp') ||
+      htmlLower.includes('__webpack_require__')) {
+    technologies.buildTool.push('Webpack');
+  }
+  
+  // Vite
+  if (htmlLower.includes('vite') ||
+      htmlLower.includes('/@vite/') ||
+      htmlLower.includes('vite:')) {
+    technologies.buildTool.push('Vite');
+  }
+  
+  // Parcel
+  if (htmlLower.includes('parcel') ||
+      htmlLower.includes('.parcel-')) {
+    technologies.buildTool.push('Parcel');
+  }
+  
+  // Rollup
+  if (htmlLower.includes('rollup') ||
+      htmlLower.includes('rollupjs')) {
+    technologies.buildTool.push('Rollup');
   }
 
   // === LANGUAGE DETECTION ===
@@ -382,6 +645,117 @@ function analyzeTechnologies($, html, response) {
       htmlLower.includes('jsp')) {
     technologies.language.push('Java');
   }
+  
+  // Go (Golang)
+  if (headers['x-powered-by']?.includes('go') ||
+      headers['server']?.includes('go') ||
+      htmlLower.includes('golang')) {
+    technologies.language.push('Go');
+  }
+  
+  // Rust
+  if (headers['x-powered-by']?.includes('rust') ||
+      headers['server']?.includes('actix') ||
+      headers['server']?.includes('warp') ||
+      htmlLower.includes('rust')) {
+    technologies.language.push('Rust');
+  }
+  
+  // C#
+  if (htmlLower.includes('c#') ||
+      headers['x-powered-by']?.includes('c#') ||
+      htmlLower.includes('.net')) {
+    technologies.language.push('C#');
+  }
+  
+  // Kotlin
+  if (htmlLower.includes('kotlin') ||
+      headers['x-powered-by']?.includes('kotlin')) {
+    technologies.language.push('Kotlin');
+  }
+  
+  // Swift
+  if (htmlLower.includes('swift') ||
+      headers['x-powered-by']?.includes('swift') ||
+      headers['server']?.includes('vapor')) {
+    technologies.language.push('Swift');
+  }
+  
+  // TypeScript
+  if (htmlLower.includes('typescript') ||
+      htmlLower.includes('.ts') ||
+      $('script[src*=".ts"]').length > 0) {
+    technologies.language.push('TypeScript');
+  }
+
+  // === MICRO FRAMEWORKS ===
+  
+  // Express.js
+  if (headers['x-powered-by']?.includes('express') ||
+      htmlLower.includes('express')) {
+    technologies.microFramework.push('Express.js');
+  }
+  
+  // Fastify
+  if (headers['x-powered-by']?.includes('fastify') ||
+      htmlLower.includes('fastify')) {
+    technologies.microFramework.push('Fastify');
+  }
+  
+  // Django
+  if (headers['x-powered-by']?.includes('django') ||
+      htmlLower.includes('django') ||
+      headers['set-cookie']?.includes('csrftoken')) {
+    technologies.microFramework.push('Django');
+  }
+  
+  // Flask
+  if (headers['x-powered-by']?.includes('flask') ||
+      htmlLower.includes('flask')) {
+    technologies.microFramework.push('Flask');
+  }
+  
+  // Spring Boot
+  if (htmlLower.includes('spring') ||
+      htmlLower.includes('spring-boot') ||
+      headers['x-powered-by']?.includes('spring')) {
+    technologies.microFramework.push('Spring Boot');
+  }
+  
+  // Rails
+  if (headers['x-powered-by']?.includes('ruby') ||
+      htmlLower.includes('rails') ||
+      headers['set-cookie']?.includes('_session_id')) {
+    technologies.microFramework.push('Ruby on Rails');
+  }
+
+  // === DATABASE DETECTION ===
+  
+  // MongoDB
+  if (htmlLower.includes('mongodb') ||
+      htmlLower.includes('mongo') ||
+      headers['x-powered-by']?.includes('mongo')) {
+    technologies.database.push('MongoDB');
+  }
+  
+  // PostgreSQL
+  if (htmlLower.includes('postgresql') ||
+      htmlLower.includes('postgres') ||
+      headers['x-powered-by']?.includes('postgres')) {
+    technologies.database.push('PostgreSQL');
+  }
+  
+  // MySQL
+  if (htmlLower.includes('mysql') ||
+      headers['x-powered-by']?.includes('mysql')) {
+    technologies.database.push('MySQL');
+  }
+  
+  // Redis
+  if (htmlLower.includes('redis') ||
+      headers['x-powered-by']?.includes('redis')) {
+    technologies.database.push('Redis');
+  }
 
   // === CDN DETECTION ===
   
@@ -422,6 +796,34 @@ function analyzeTechnologies($, html, response) {
   if (htmlLower.includes('maxcdn.com') ||
       htmlLower.includes('keycdn.com')) {
     technologies.cdn.push('MaxCDN');
+  }
+  
+  // Fastly
+  if (htmlLower.includes('fastly.com') ||
+      headers['fastly-debug-digest'] ||
+      headers['x-served-by']?.includes('fastly')) {
+    technologies.cdn.push('Fastly');
+  }
+  
+  // Azure CDN
+  if (htmlLower.includes('azureedge.net') ||
+      htmlLower.includes('azure.com') ||
+      headers['x-azure-ref']) {
+    technologies.cdn.push('Azure CDN');
+  }
+  
+  // BunnyCDN
+  if (htmlLower.includes('bunnycdn.com') ||
+      htmlLower.includes('b-cdn.net') ||
+      headers['bunny-cache-status']) {
+    technologies.cdn.push('BunnyCDN');
+  }
+  
+  // StackPath
+  if (htmlLower.includes('stackpath.com') ||
+      htmlLower.includes('stackpathcdn.com') ||
+      headers['x-sp-edge-server']) {
+    technologies.cdn.push('StackPath');
   }
 
   // === WEB SERVER DETECTION ===

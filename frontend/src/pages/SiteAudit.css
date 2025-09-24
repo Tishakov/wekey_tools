@@ -761,19 +761,7 @@
   text-decoration: none;
 }
 
-/* Технологии - новый расширенный блок */
-.technologies-section {
-  border: 2px solid #09CEA7;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(9, 206, 167, 0.05) 0%, rgba(40, 40, 42, 0.05) 100%);
-}
-
-.technologies-section h3 {
-  color: #09CEA7;
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
+/* Технологии - убраны специальные стили, используется стандартный audit-section */
 
 .tech-categories {
   display: flex;
@@ -782,32 +770,32 @@
 }
 
 .tech-category {
-  background-color: #1C1D1F;
-  border: 1px solid #333335;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #28282A;
   border-radius: 8px;
-  padding: 15px;
-  transition: all 0.2s ease;
-}
-
-.tech-category:hover {
-  border-color: #09CEA7;
-  box-shadow: 0 2px 8px rgba(9, 206, 167, 0.1);
 }
 
 .tech-category-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1rem;
+  gap: 8px;
+  font-size: 12px;
   font-weight: 600;
-  color: #BCBBBD;
-  margin-bottom: 12px;
+  color: #888888;
 }
 
 .tech-category-icon {
-  font-size: 1.2rem;
+  font-size: 14px;
   display: inline-block;
-  min-width: 24px;
+}
+
+.tech-category-value {
+  color: #BCBBBD;
+  font-weight: 600;
+  font-size: 12px;
 }
 
 .tech-items {
