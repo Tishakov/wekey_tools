@@ -2068,7 +2068,36 @@ const SeoAudit: React.FC = () => {
                     {/* Изображения и ссылки */}
                     {result.data.images && (
                       <div className="seo-audit-section">
-                        <h3>🖼️ Контент и медиа</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('content-media')}
+                          style={{ 
+                            cursor: 'pointer',
+                            marginBottom: collapsedSections.has('content-media') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🖼️ Контент и медиа
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              marginLeft: 'auto',
+                              transform: collapsedSections.has('content-media') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }} 
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('content-media') ? '0px' : '2000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -2146,6 +2175,7 @@ const SeoAudit: React.FC = () => {
                           </div>
                         )}
                       </div>
+                        </div>
                     )}
 
                     {/* Анализ ключевых слов */}
@@ -2216,7 +2246,36 @@ const SeoAudit: React.FC = () => {
                     {/* Анализ ссылочного профиля */}
                     {result.data.linkProfile && (
                       <div className="seo-audit-section">
-                        <h3>🔗 Ссылочный профиль</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('link-profile')}
+                          style={{ 
+                            cursor: 'pointer',
+                            marginBottom: collapsedSections.has('link-profile') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🔗 Ссылочный профиль
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              marginLeft: 'auto',
+                              transform: collapsedSections.has('link-profile') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }} 
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('link-profile') ? '0px' : '3000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-info-block">
                           <p><strong>Анализ ссылочного профиля</strong> помогает оценить качество внутренней и внешней перелинковки сайта:</p>
@@ -2382,12 +2441,42 @@ const SeoAudit: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                        </div>
                     )}
 
                     {/* Анализ потенциала Sitelinks */}
                     {result.data.sitelinks && (
                       <div className="seo-audit-section">
-                        <h3>🔗 Потенциал для Sitelinks</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('sitelinks')}
+                          style={{ 
+                            cursor: 'pointer',
+                            marginBottom: collapsedSections.has('sitelinks') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🔗 Потенциал для Sitelinks
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              marginLeft: 'auto',
+                              transform: collapsedSections.has('sitelinks') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }} 
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('sitelinks') ? '0px' : '2500px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -2490,12 +2579,42 @@ const SeoAudit: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                        </div>
                     )}
 
                     {/* Security Headers Analysis - Level 3 */}
                     {result.data.securityHeaders && (
                       <div className="seo-audit-section">
-                        <h3>🛡️ Заголовки безопасности</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('security-headers')}
+                          style={{ 
+                            cursor: 'pointer',
+                            marginBottom: collapsedSections.has('security-headers') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🛡️ Заголовки безопасности
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              marginLeft: 'auto',
+                              transform: collapsedSections.has('security-headers') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }} 
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('security-headers') ? '0px' : '2000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -2600,6 +2719,7 @@ const SeoAudit: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                        </div>
                     )}
                   </div>
                 </div>
