@@ -70,7 +70,6 @@
   background-color: #28282A;
   border: 1px solid #333335;
   border-radius: 8px;
-  margin-top: 20px;
   overflow: hidden;
 }
 
@@ -667,10 +666,31 @@
 
 .health-score-fill {
   fill: none;
-  stroke: #09CEA7;
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.health-score-fill.excellent {
+  stroke: #10B981; /* 90-100%: excellent - зеленый */
+}
+
+.health-score-fill.good {
+  stroke: #22C55E; /* 75-89%: good - светло-зеленый */
+}
+
+.health-score-fill.average {
+  stroke: #F59E0B; /* 50-74%: average - желтый */
+}
+
+.health-score-fill.poor {
+  stroke: #F97316; /* 25-49%: poor - оранжевый */
+}
+
+.health-score-fill.critical {
+  stroke: #EF4444; /* 0-24%: critical - красный */
 }
 
 .health-score-text {
@@ -855,19 +875,23 @@
 }
 
 .performance-score-fill.excellent {
-  stroke: #10B981;
+  stroke: #10B981; /* 90-100%: excellent - зеленый */
 }
 
 .performance-score-fill.good {
-  stroke: #3B82F6;
+  stroke: #22C55E; /* 75-89%: good - светло-зеленый */
 }
 
 .performance-score-fill.average {
-  stroke: #F59E0B;
+  stroke: #F59E0B; /* 50-74%: average - желтый */
 }
 
 .performance-score-fill.poor {
-  stroke: #EF4444;
+  stroke: #F97316; /* 25-49%: poor - оранжевый */
+}
+
+.performance-score-fill.critical {
+  stroke: #EF4444; /* 0-24%: critical - красный */
 }
 
 .performance-score-text {

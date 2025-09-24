@@ -11,24 +11,27 @@ import './SeoAudit.css';
 import '../styles/tool-pages.css';
 
 // Функция для расчета цвета на основе процента
+// 90-100%: excellent (зеленый)
+// 75-89%: good (светло-зеленый)
+// 50-74%: average (желтый)
+// 25-49%: poor (оранжевый)
+// 0-24%: critical (красный)
 const getProgressColor = (percentage: number): string => {
-  if (percentage <= 30) {
-    // 0-30%: красный
-    return '#EF4444';
-  } else if (percentage <= 60) {
-    // 30-60%: переход от красного к желтому
-    const progress = (percentage - 30) / 30; // 0-1
-    const red = Math.round(239 - (239 - 245) * progress);
-    const green = Math.round(68 + (158 - 68) * progress);
-    const blue = Math.round(68 + (11 - 68) * progress);
-    return `rgb(${red}, ${green}, ${blue})`;
+  if (percentage >= 90) {
+    // 90-100%: excellent - зеленый
+    return '#10B981';
+  } else if (percentage >= 75) {
+    // 75-89%: good - светло-зеленый
+    return '#22C55E';
+  } else if (percentage >= 50) {
+    // 50-74%: average - желтый
+    return '#F59E0B';
+  } else if (percentage >= 25) {
+    // 25-49%: poor - оранжевый
+    return '#F97316';
   } else {
-    // 60-100%: переход от желтого к зеленому
-    const progress = (percentage - 60) / 40; // 0-1
-    const red = Math.round(245 - (245 - 16) * progress);
-    const green = Math.round(158 + (185 - 158) * progress);
-    const blue = Math.round(11 + (129 - 11) * progress);
-    return `rgb(${red}, ${green}, ${blue})`;
+    // 0-24%: critical - красный
+    return '#EF4444';
   }
 };
 
@@ -752,7 +755,12 @@ const SeoAudit: React.FC = () => {
                               cx="60" 
                               cy="60" 
                               r="50" 
-                              className="health-score-fill"
+                              className={`health-score-fill ${
+                                result.data.overallScore.overall >= 90 ? 'excellent' : 
+                                result.data.overallScore.overall >= 75 ? 'good' : 
+                                result.data.overallScore.overall >= 50 ? 'average' : 
+                                result.data.overallScore.overall >= 25 ? 'poor' : 'critical'
+                              }`}
                               style={{
                                 strokeDasharray: `${2 * Math.PI * 50}`,
                                 strokeDashoffset: `${2 * Math.PI * 50 * (1 - result.data.overallScore.overall / 100)}`
@@ -911,8 +919,9 @@ const SeoAudit: React.FC = () => {
                                   cx="60" cy="60" r="50" 
                                   className={`performance-score-fill ${
                                     currentDeviceData.performance_score >= 90 ? 'excellent' : 
-                                    currentDeviceData.performance_score >= 70 ? 'good' : 
-                                    currentDeviceData.performance_score >= 50 ? 'average' : 'poor'
+                                    currentDeviceData.performance_score >= 75 ? 'good' : 
+                                    currentDeviceData.performance_score >= 50 ? 'average' : 
+                                    currentDeviceData.performance_score >= 25 ? 'poor' : 'critical'
                                   }`}
                                   style={{
                                     strokeDasharray: `${2 * Math.PI * 50}`,
@@ -2900,8 +2909,38 @@ const SeoAudit: React.FC = () => {
                     {/* Анализ ключевых слов */}
                     {result.data.keywordAnalysis && (
                       <div className="seo-audit-section">
-                        <h3>🎯 Анализ ключевых слов</h3>
-                        
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('keyword-analysis')}
+                          style={{ 
+                            cursor: 'pointer', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: collapsedSections.has('keyword-analysis') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          🎯 Анализ ключевых слов
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              transform: collapsedSections.has('keyword-analysis') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }}
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('keyword-analysis') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
                             <span className="seo-audit-status good">📊</span>
@@ -2958,6 +2997,7 @@ const SeoAudit: React.FC = () => {
                               </div>
                             )}
                           </div>
+                        </div>
                         </div>
                       </div>
                     )}
