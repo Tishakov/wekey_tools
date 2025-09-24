@@ -65,7 +65,10 @@ interface AuditResult {
       cssFiles?: number;
       jsFiles?: number;
       inlineStyles?: number;
-      fonts?: string[];
+      fonts?: Array<{name: string}>;
+      colors?: string[];
+      logo?: string;
+      favicon?: string;
       icons?: string[];
       videos?: number;
       audio?: number;
@@ -768,47 +771,86 @@ const SiteAudit: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Визуальные элементы */}
+                {/* Визуальные ресурсы */}
                 {result.data.visual && (
                   <div className="audit-section">
-                    <h3>🎨 Визуальные элементы</h3>
-                    <div className="visual-grid">
-                      {result.data.visual.imagesCount && (
-                        <div className="visual-item">
-                          <span className="visual-icon">🖼️</span>
-                          <span className="visual-label">Изображения:</span>
-                          <span className="visual-value">{result.data.visual.imagesCount}</span>
-                          {(result.data.visual.imagesWithoutAlt ?? 0) > 0 && (
-                            <span className="visual-warning">({result.data.visual.imagesWithoutAlt} без alt)</span>
-                          )}
+                    <h3>🎨 Визуальные ресурсы</h3>
+                    <div className="visual-resources">
+                      {/* Шрифты */}
+                      {result.data.visual.fonts && result.data.visual.fonts.length > 0 && (
+                        <div className="visual-resource-card">
+                          <div className="resource-header">
+                            <span className="resource-icon">�</span>
+                            <span className="resource-title">Шрифты</span>
+                          </div>
+                          <div className="resource-content">
+                            {result.data.visual.fonts.map((font, index) => (
+                              <span key={index} className="font-item">{font.name}</span>
+                            ))}
+                          </div>
                         </div>
                       )}
-                      {result.data.visual.cssFiles && (
-                        <div className="visual-item">
-                          <span className="visual-icon">🎨</span>
-                          <span className="visual-label">CSS файлы:</span>
-                          <span className="visual-value">{result.data.visual.cssFiles}</span>
+                      
+                      {/* Цвета */}
+                      {result.data.visual.colors && result.data.visual.colors.length > 0 && (
+                        <div className="visual-resource-card">
+                          <div className="resource-header">
+                            <span className="resource-icon">🎨</span>
+                            <span className="resource-title">Цвета</span>
+                          </div>
+                          <div className="resource-content">
+                            <div className="color-palette">
+                              {result.data.visual.colors.map((color, index) => (
+                                <div key={index} className="color-item">
+                                  <div 
+                                    className="color-swatch" 
+                                    style={{ backgroundColor: color }}
+                                  ></div>
+                                  <span className="color-code">{color}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       )}
-                      {result.data.visual.jsFiles && (
-                        <div className="visual-item">
-                          <span className="visual-icon">⚡</span>
-                          <span className="visual-label">JS файлы:</span>
-                          <span className="visual-value">{result.data.visual.jsFiles}</span>
+                      
+                      {/* Логотип */}
+                      {result.data.visual.logo && (
+                        <div className="visual-resource-card">
+                          <div className="resource-header">
+                            <span className="resource-icon">🏷️</span>
+                            <span className="resource-title">Логотип</span>
+                          </div>
+                          <div className="resource-content">
+                            <img 
+                              src={result.data.visual.logo} 
+                              alt="Logo" 
+                              className="logo-preview"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
                         </div>
                       )}
-                      {result.data.visual.fonts && (
-                        <div className="visual-item">
-                          <span className="visual-icon">🔤</span>
-                          <span className="visual-label">Шрифты:</span>
-                          <span className="visual-value">{result.data.visual.fonts.join(', ')}</span>
-                        </div>
-                      )}
-                      {result.data.visual.icons && (
-                        <div className="visual-item">
-                          <span className="visual-icon">⭐</span>
-                          <span className="visual-label">Иконки:</span>
-                          <span className="visual-value">{result.data.visual.icons.join(', ')}</span>
+                      
+                      {/* Фавиконка */}
+                      {result.data.visual.favicon && (
+                        <div className="visual-resource-card">
+                          <div className="resource-header">
+                            <span className="resource-icon">🔖</span>
+                            <span className="resource-title">Фавиконка</span>
+                          </div>
+                          <div className="resource-content">
+                            <img 
+                              src={result.data.visual.favicon} 
+                              alt="Favicon" 
+                              className="favicon-preview"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
                         </div>
                       )}
                     </div>

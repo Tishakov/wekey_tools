@@ -37,7 +37,7 @@ router.post('/site-audit', async (req, res) => {
       basic: analyzeBasic($, html),
       technologies: analyzeTechnologies($, html, response),
       analytics: analyzeAnalytics($, html),
-      visual: analyzeVisual($),
+      visual: analyzeVisual($, fullUrl),
       hosting: analyzeHosting($, html, response),
       domain: analyzeDomain(fullUrl, response),
       social: analyzeSocial($),
@@ -859,7 +859,7 @@ function analyzeAnalytics($, html) {
 }
 
 // Анализ визуальных элементов
-function analyzeVisual($) {
+function analyzeVisual($, baseUrl) {
   const images = $('img');
   const visual = {
     imagesCount: images.length,
@@ -886,14 +886,16 @@ function analyzeVisual($) {
   });
   
   // Анализ шрифтов
-  const fontSources = [];
-  $('link[href*="fonts.googleapis.com"]').each((i, el) => {
-    fontSources.push('Google Fonts');
-  });
-  $('link[href*="fonts.adobe.com"], link[href*="typekit.net"]').each((i, el) => {
-    fontSources.push('Adobe Fonts');
-  });
-  visual.fonts = [...new Set(fontSources)];
+  visual.fonts = extractFonts($);
+  
+  // Извлечение цветовой палитры
+  visual.colors = extractColors($);
+  
+  // Поиск логотипа
+  visual.logo = extractLogo($, baseUrl);
+  
+  // Поиск фавиконки
+  visual.favicon = extractFavicon($, baseUrl);
   
   // Анализ иконок
   const iconSources = [];
@@ -1605,6 +1607,197 @@ function analyzeContact($, html, url) {
 
   contact.phones = Array.from(phoneSet);
   return contact;
+}
+
+// Извлечение шрифтов из HTML и CSS
+function extractFonts($) {
+  const fonts = [];
+  const foundFonts = new Set();
+  
+  // Google Fonts из link тегов
+  $('link[href*="fonts.googleapis.com"]').each((i, link) => {
+    const href = $(link).attr('href');
+    if (href) {
+      const familyMatch = href.match(/family=([^&]+)/);
+      if (familyMatch) {
+        const families = decodeURIComponent(familyMatch[1]).split('|');
+        families.forEach(family => {
+          const [name] = family.split(':');
+          const fontName = name.replace(/\+/g, ' ');
+          if (!foundFonts.has(fontName.toLowerCase())) {
+            foundFonts.add(fontName.toLowerCase());
+            fonts.push({ name: fontName });
+          }
+        });
+      }
+    }
+  });
+  
+  // Adobe Fonts
+  $('link[href*="fonts.adobe.com"], link[href*="typekit.net"]').each((i, link) => {
+    const fontName = 'Adobe Fonts Kit';
+    if (!foundFonts.has(fontName.toLowerCase())) {
+      foundFonts.add(fontName.toLowerCase());
+      fonts.push({ name: fontName });
+    }
+  });
+  
+  // Анализ CSS для font-family
+  const cssContent = [];
+  $('style').each((i, style) => {
+    const styleContent = $(style).html();
+    if (styleContent) {
+      cssContent.push(styleContent);
+    }
+  });
+  
+  // Поиск font-family в CSS
+  const allCss = cssContent.join('\n');
+  const fontFamilyRegex = /font-family\s*:\s*([^;}]+)/gi;
+  
+  let match;
+  while ((match = fontFamilyRegex.exec(allCss)) !== null) {
+    const fontDeclaration = match[1].trim();
+    const fontList = fontDeclaration.split(',').map(font => {
+      return font.trim()
+        .replace(/^["']|["']$/g, '') // Удаляем кавычки
+        .replace(/\s+/g, ' ') // Нормализуем пробелы
+        .trim();
+    });
+    
+    fontList.forEach(font => {
+      // Исключаем системные шрифты
+      if (font && 
+          !font.match(/^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace|ui-rounded|inherit|initial|unset)$/i) &&
+          !foundFonts.has(font.toLowerCase())) {
+        foundFonts.add(font.toLowerCase());
+        fonts.push({ name: font });
+      }
+    });
+  }
+  
+  return fonts;
+}
+
+// Извлечение цветовой палитры
+function extractColors($) {
+  const colors = new Set();
+  
+  // Поиск цветов в CSS
+  const cssContent = [];
+  $('style').each((i, style) => {
+    const styleContent = $(style).html();
+    if (styleContent) {
+      cssContent.push(styleContent);
+    }
+  });
+  
+  const allCss = cssContent.join('\n');
+  
+  // Поиск HEX цветов
+  const hexRegex = /#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})\b/g;
+  let match;
+  while ((match = hexRegex.exec(allCss)) !== null) {
+    const color = match[0].toUpperCase();
+    if (color !== '#000' && color !== '#FFF' && color !== '#000000' && color !== '#FFFFFF') {
+      colors.add(color);
+    }
+  }
+  
+  // Поиск RGB цветов
+  const rgbRegex = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/g;
+  while ((match = rgbRegex.exec(allCss)) !== null) {
+    const r = parseInt(match[1]);
+    const g = parseInt(match[2]);
+    const b = parseInt(match[3]);
+    
+    // Исключаем чистый черный и белый
+    if (!(r === 0 && g === 0 && b === 0) && !(r === 255 && g === 255 && b === 255)) {
+      const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+      colors.add(hex);
+    }
+  }
+  
+  return Array.from(colors).slice(0, 8); // Ограничиваем количество цветов
+}
+
+// Извлечение логотипа
+function extractLogo($, baseUrl) {
+  // Ищем изображения с атрибутами, указывающими на логотип
+  const logoSelectors = [
+    'img[alt*="logo" i]',
+    'img[class*="logo" i]',
+    'img[id*="logo" i]',
+    'img[src*="logo" i]',
+    '.logo img',
+    '#logo img',
+    'header img:first-child',
+    '.header img:first-child'
+  ];
+  
+  for (const selector of logoSelectors) {
+    const logoImg = $(selector).first();
+    if (logoImg.length > 0) {
+      let src = logoImg.attr('src');
+      if (src) {
+        try {
+          // Преобразуем относительные URL в абсолютные
+          if (src.startsWith('//')) {
+            src = 'https:' + src;
+          } else if (src.startsWith('/')) {
+            src = new URL(src, baseUrl).href;
+          } else if (!src.startsWith('http')) {
+            src = new URL(src, baseUrl).href;
+          }
+          return src;
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+// Извлечение фавиконки
+function extractFavicon($, baseUrl) {
+  // Ищем различные типы фавиконок
+  const faviconSelectors = [
+    'link[rel="icon"]',
+    'link[rel="shortcut icon"]',
+    'link[rel="apple-touch-icon"]',
+    'link[rel="apple-touch-icon-precomposed"]'
+  ];
+  
+  for (const selector of faviconSelectors) {
+    const faviconLink = $(selector).first();
+    if (faviconLink.length > 0) {
+      let href = faviconLink.attr('href');
+      if (href) {
+        try {
+          // Преобразуем относительные URL в абсолютные
+          if (href.startsWith('//')) {
+            href = 'https:' + href;
+          } else if (href.startsWith('/')) {
+            href = new URL(href, baseUrl).href;
+          } else if (!href.startsWith('http')) {
+            href = new URL(href, baseUrl).href;
+          }
+          return href;
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+  }
+  
+  // Если не найдено, пробуем стандартный путь
+  try {
+    return new URL('/favicon.ico', baseUrl).href;
+  } catch (e) {
+    return null;
+  }
 }
 
 module.exports = router;
