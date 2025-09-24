@@ -52,14 +52,15 @@ const getKeywordColor = (density: number): string => {
 // Функция для расчета воспринимаемой скорости загрузки
 const getPerceivedLoadTime = (webVitalsData: any, result: any): string => {
   // Приоритет метрик для воспринимаемой скорости:
-  // 1. Время загрузки HTML (самое релевантное)
-  // 2. FCP (First Contentful Paint) если есть
-  // 3. FID как fallback
+  // 1. LCP из текущего устройства (device-specific)
+  // 2. FCP из текущего устройства 
+  // 3. Время загрузки HTML (общее)
+  // 4. FID как fallback
   
-  // 1. Проверяем время загрузки HTML
-  if (result?.data?.resourcesSpeed?.loadTime) {
-    const htmlLoadTime = result.data.resourcesSpeed.loadTime; // в миллисекундах
-    const seconds = (htmlLoadTime / 1000).toFixed(1);
+  // 1. Используем LCP из device-specific данных (самое точное для устройства)
+  if (webVitalsData?.core_web_vitals?.lcp?.value) {
+    const lcpValue = webVitalsData.core_web_vitals.lcp.value; // в миллисекундах
+    const seconds = (lcpValue / 1000).toFixed(1);
     return `${seconds} секунд`;
   }
   
@@ -70,7 +71,14 @@ const getPerceivedLoadTime = (webVitalsData: any, result: any): string => {
     return `${seconds} секунд`;
   }
   
-  // 3. Fallback на FID
+  // 3. Fallback на общее время загрузки HTML
+  if (result?.data?.resourcesSpeed?.loadTime) {
+    const htmlLoadTime = result.data.resourcesSpeed.loadTime; // в миллисекундах
+    const seconds = (htmlLoadTime / 1000).toFixed(1);
+    return `${seconds} секунд`;
+  }
+  
+  // 4. Последний fallback на FID
   if (webVitalsData?.core_web_vitals?.fid?.value) {
     const fidValue = webVitalsData.core_web_vitals.fid.value; // в миллисекундах
     const seconds = (fidValue / 1000).toFixed(1);
@@ -78,6 +86,35 @@ const getPerceivedLoadTime = (webVitalsData: any, result: any): string => {
   }
   
   return 'N/A';
+};
+
+// Функция для определения цвета блока скорости загрузки
+const getLoadTimeColorClass = (webVitalsData: any, result: any): string => {
+  let timeInSeconds = 0;
+  
+  // Получаем время в секундах из тех же источников, что и getPerceivedLoadTime
+  if (webVitalsData?.core_web_vitals?.lcp?.value) {
+    timeInSeconds = webVitalsData.core_web_vitals.lcp.value / 1000;
+  } else if (webVitalsData?.core_web_vitals?.fcp?.value) {
+    timeInSeconds = webVitalsData.core_web_vitals.fcp.value / 1000;
+  } else if (result?.data?.resourcesSpeed?.loadTime) {
+    timeInSeconds = result.data.resourcesSpeed.loadTime / 1000;
+  } else if (webVitalsData?.core_web_vitals?.fid?.value) {
+    timeInSeconds = webVitalsData.core_web_vitals.fid.value / 1000;
+  }
+  
+  // Определяем цветовой класс на основе времени загрузки
+  if (timeInSeconds <= 1.5) {
+    return 'excellent'; // <= 1.5s - отлично (зеленый)
+  } else if (timeInSeconds <= 2.5) {
+    return 'good'; // 1.5-2.5s - хорошо (светло-зеленый)
+  } else if (timeInSeconds <= 4.0) {
+    return 'average'; // 2.5-4.0s - средне (желтый)
+  } else if (timeInSeconds <= 6.0) {
+    return 'poor'; // 4.0-6.0s - плохо (оранжевый)
+  } else {
+    return 'critical'; // > 6.0s - критично (красный)
+  }
 };
 
 // Типы для Google PageSpeed данных
@@ -976,7 +1013,7 @@ const SeoAudit: React.FC = () => {
                                  currentDeviceData.performance_score >= 70 ? 'Неплохая скорость, но есть возможности для улучшения.' : 
                                  currentDeviceData.performance_score >= 50 ? 'Скорость ниже среднего. Рекомендуется оптимизация.' : 'Критически медленная загрузка. Нужны срочные улучшения!'}
                               </p>
-                              <div className="perceived-load-time">
+                              <div className={`perceived-load-time ${getLoadTimeColorClass(currentDeviceData, result)}`}>
                                 <span className="perceived-load-label">⚡ Скорость загрузки:</span>
                                 <span className="perceived-load-value">{getPerceivedLoadTime(currentDeviceData, result)}</span>
                               </div>

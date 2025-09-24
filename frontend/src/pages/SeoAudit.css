@@ -931,23 +931,72 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 6px;
   margin-top: 8px;
   max-width: 270px;
+  transition: all 0.3s ease;
+}
+
+/* Цветовые варианты для скорости загрузки */
+.perceived-load-time.excellent {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.perceived-load-time.good {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.perceived-load-time.average {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.perceived-load-time.poor {
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.perceived-load-time.critical {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .perceived-load-label {
   font-size: 13px;
-  color: #10B981;
   font-weight: 500;
 }
 
 .perceived-load-value {
   font-size: 14px;
-  color: #10B981;
   font-weight: 600;
+}
+
+/* Цвета текста для разных скоростей */
+.perceived-load-time.excellent .perceived-load-label,
+.perceived-load-time.excellent .perceived-load-value {
+  color: #10B981; /* <= 1.5s - отлично (зеленый) */
+}
+
+.perceived-load-time.good .perceived-load-label,
+.perceived-load-time.good .perceived-load-value {
+  color: #22C55E; /* 1.5-2.5s - хорошо (светло-зеленый) */
+}
+
+.perceived-load-time.average .perceived-load-label,
+.perceived-load-time.average .perceived-load-value {
+  color: #F59E0B; /* 2.5-4.0s - средне (желтый) */
+}
+
+.perceived-load-time.poor .perceived-load-label,
+.perceived-load-time.poor .perceived-load-value {
+  color: #F97316; /* 4.0-6.0s - плохо (оранжевый) */
+}
+
+.perceived-load-time.critical .perceived-load-label,
+.perceived-load-time.critical .perceived-load-value {
+  color: #EF4444; /* > 6.0s - критично (красный) */
 }
 
 /* Web Vitals Section */
