@@ -1974,7 +1974,36 @@ const SeoAudit: React.FC = () => {
                     {/* Скорость ресурсов - Level 2 */}
                     {result.data.resourcesSpeed && (
                       <div className="seo-audit-section">
-                        <h3>⚡ Скорость загрузки</h3>
+                        <h3 
+                          className="seo-audit-section-header" 
+                          onClick={() => toggleSection('loading-speed')}
+                          style={{ 
+                            cursor: 'pointer',
+                            marginBottom: collapsedSections.has('loading-speed') ? '0px' : undefined,
+                            transition: 'margin-bottom 0.4s ease-in-out'
+                          }}
+                        >
+                          ⚡ Скорость загрузки
+                          <img 
+                            src="/icons/arrow_circle.svg" 
+                            alt="" 
+                            style={{ 
+                              width: '20px', 
+                              height: '20px',
+                              marginLeft: 'auto',
+                              transform: collapsedSections.has('loading-speed') ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.4s ease-in-out'
+                            }} 
+                          />
+                        </h3>
+                        <div 
+                          className="seo-audit-section-content"
+                          style={{
+                            overflow: 'hidden',
+                            maxHeight: collapsedSections.has('loading-speed') ? '0px' : '1000px',
+                            transition: 'max-height 0.4s ease-in-out',
+                          }}
+                        >
                         
                         <div className="seo-audit-item">
                           <div className="seo-audit-item-header">
@@ -2030,6 +2059,7 @@ const SeoAudit: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                        </div>
                     )}
                   </div>
 
