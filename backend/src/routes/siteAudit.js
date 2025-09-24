@@ -1679,85 +1679,212 @@ function extractFonts($) {
   return fonts;
 }
 
-// Извлечение цветовой палитры
+// Извлечение цветовой палитры  
 function extractColors($) {
-  const colors = new Set();
+  const colorCount = new Map();
   
-  // Поиск цветов в CSS
-  const cssContent = [];
-  $('style').each((i, style) => {
-    const styleContent = $(style).html();
-    if (styleContent) {
-      cssContent.push(styleContent);
+  // Функция для нормализации HEX цвета
+  function normalizeHex(hex) {
+    hex = hex.toUpperCase();
+    if (hex.length === 4) {
+      hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+    }
+    return hex;
+  }
+  
+  // Анализируем HTML на предмет цветовых атрибутов
+  const htmlContent = $.html();
+  
+  // Ищем все HEX цвета в HTML (включая style атрибуты, CSS в скриптах и т.д.)
+  const hexMatches = htmlContent.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+  hexMatches.forEach(hex => {
+    const normalized = normalizeHex(hex);
+    colorCount.set(normalized, (colorCount.get(normalized) || 0) + 1);
+  });
+  
+  // Ищем все RGB цвета в HTML и конвертируем в HEX
+  const rgbMatches = htmlContent.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+  rgbMatches.forEach(rgb => {
+    const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+    if (rgbMatch) {
+      const r = parseInt(rgbMatch[1]);
+      const g = parseInt(rgbMatch[2]);  
+      const b = parseInt(rgbMatch[3]);
+      const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+      colorCount.set(hex, (colorCount.get(hex) || 0) + 1);
     }
   });
   
-  const allCss = cssContent.join('\n');
+  // Анализируем популярные элементы для определения основных цветов
+  const importantElements = [
+    'body', 'header', 'nav', 'main', '.header', '.navbar', '.content', 
+    'h1', 'h2', 'h3', 'a', 'button', '.btn', '.link'
+  ];
   
-  // Поиск HEX цветов
-  const hexRegex = /#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})\b/g;
-  let match;
-  while ((match = hexRegex.exec(allCss)) !== null) {
-    const color = match[0].toUpperCase();
-    if (color !== '#000' && color !== '#FFF' && color !== '#000000' && color !== '#FFFFFF') {
-      colors.add(color);
-    }
-  }
+  importantElements.forEach(selector => {
+    $(selector).each((i, el) => {
+      const style = $(el).attr('style');
+      if (style) {
+        // Повышенный приоритет для важных элементов
+        const elementHex = style.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+        elementHex.forEach(hex => {
+          const normalized = normalizeHex(hex);
+          colorCount.set(normalized, (colorCount.get(normalized) || 0) + 3);
+        });
+      }
+    });
+  });
   
-  // Поиск RGB цветов
-  const rgbRegex = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/g;
-  while ((match = rgbRegex.exec(allCss)) !== null) {
-    const r = parseInt(match[1]);
-    const g = parseInt(match[2]);
-    const b = parseInt(match[3]);
-    
-    // Исключаем чистый черный и белый
-    if (!(r === 0 && g === 0 && b === 0) && !(r === 255 && g === 255 && b === 255)) {
-      const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-      colors.add(hex);
-    }
-  }
+  // Простая фильтрация - берем топ-6 самых частых цветов
+  const sortedColors = Array.from(colorCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([color]) => color);
   
-  return Array.from(colors).slice(0, 8); // Ограничиваем количество цветов
+  return sortedColors;
 }
 
 // Извлечение логотипа
 function extractLogo($, baseUrl) {
-  // Ищем изображения с атрибутами, указывающими на логотип
-  const logoSelectors = [
-    'img[alt*="logo" i]',
-    'img[class*="logo" i]',
-    'img[id*="logo" i]',
-    'img[src*="logo" i]',
-    '.logo img',
-    '#logo img',
-    'header img:first-child',
-    '.header img:first-child'
-  ];
+  const logoCanididates = [];
   
-  for (const selector of logoSelectors) {
-    const logoImg = $(selector).first();
-    if (logoImg.length > 0) {
-      let src = logoImg.attr('src');
-      if (src) {
-        try {
-          // Преобразуем относительные URL в абсолютные
-          if (src.startsWith('//')) {
-            src = 'https:' + src;
-          } else if (src.startsWith('/')) {
-            src = new URL(src, baseUrl).href;
-          } else if (!src.startsWith('http')) {
-            src = new URL(src, baseUrl).href;
+  // Функция для получения абсолютного URL
+  function getAbsoluteUrl(src) {
+    try {
+      if (src.startsWith('//')) {
+        return 'https:' + src;
+      } else if (src.startsWith('/')) {
+        return new URL(src, baseUrl).href;
+      } else if (!src.startsWith('http')) {
+        return new URL(src, baseUrl).href;
+      }
+      return src;
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  // Функция для оценки вероятности того, что изображение - логотип
+  function scoreLogoCandidate(img) {
+    let score = 0;
+    const $img = $(img);
+    const alt = ($img.attr('alt') || '').toLowerCase();
+    const className = ($img.attr('class') || '').toLowerCase();
+    const id = ($img.attr('id') || '').toLowerCase();
+    const src = ($img.attr('src') || '').toLowerCase();
+    const parent = $img.parent();
+    const parentClass = (parent.attr('class') || '').toLowerCase();
+    const parentId = (parent.attr('id') || '').toLowerCase();
+    
+    // Высокий приоритет: прямые указания на логотип
+    if (alt.includes('logo')) score += 50;
+    if (className.includes('logo')) score += 40;
+    if (id.includes('logo')) score += 40;
+    if (src.includes('logo')) score += 30;
+    if (parentClass.includes('logo')) score += 25;
+    if (parentId.includes('logo')) score += 25;
+    
+    // Штрафы за товарные изображения
+    if (alt.includes('product') || alt.includes('товар') || alt.includes('item')) score -= 30;
+    if (className.includes('product') || className.includes('item') || className.includes('card')) score -= 20;
+    if (src.includes('product') || src.includes('item') || src.includes('card')) score -= 15;
+    
+    // Средний приоритет: контекстные признаки
+    if (alt.includes('brand')) score += 20;
+    if (className.includes('brand')) score += 15;
+    if (alt.includes('site') || alt.includes('company')) score += 10;
+    
+    // Позиционные факторы
+    const isInHeader = $img.closest('header, .header, .navbar, .nav, .top').length > 0;
+    if (isInHeader) score += 15;
+    
+    const isFirstInContainer = $img.is(':first-child') || $img.parent().children('img').first().is($img);
+    if (isFirstInContainer && isInHeader) score += 10;
+    
+    // Размерные факторы (если доступны)
+    const width = parseInt($img.attr('width')) || 0;
+    const height = parseInt($img.attr('height')) || 0;
+    
+    if (width > 0 && height > 0) {
+      const ratio = width / height;
+      // Логотипы обычно горизонтальные или квадратные
+      if (ratio >= 0.5 && ratio <= 4) score += 5;
+      // Разумные размеры для логотипа
+      if (width >= 50 && width <= 400 && height >= 20 && height <= 200) score += 5;
+    }
+    
+    // Штрафы
+    if (alt.includes('avatar') || alt.includes('profile')) score -= 20;
+    if (className.includes('avatar') || className.includes('profile')) score -= 15;
+    if (src.includes('avatar') || src.includes('profile')) score -= 10;
+    if (alt.includes('icon') && !alt.includes('logo')) score -= 5;
+    
+    return score;
+  }
+  
+  // Сначала проверяем специальные контейнеры для логотипа
+  const logoContainers = ['#logo', '.logo', '.brand', '.site-logo', '.navbar-brand', '.header-logo', '.site-title', '.logo-container', '.branding'];
+  
+  for (const container of logoContainers) {
+    const $container = $(container);
+    if ($container.length > 0) {
+      // Ищем изображение внутри контейнера
+      const $img = $container.find('img').first();
+      if ($img.length > 0) {
+        const src = $img.attr('src');
+        if (src && !src.includes('data:')) {
+          const absoluteUrl = getAbsoluteUrl(src);
+          if (absoluteUrl) {
+            logoCanididates.push({
+              url: absoluteUrl,
+              score: 100, // Максимальный приоритет для логотипов в специальных контейнерах
+              element: $img
+            });
           }
-          return src;
-        } catch (e) {
-          continue;
+        }
+      }
+      
+      // Проверяем background-image контейнера
+      const style = $container.attr('style') || '';
+      const bgMatch = style.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/);
+      if (bgMatch) {
+        const bgUrl = getAbsoluteUrl(bgMatch[1]);
+        if (bgUrl) {
+          logoCanididates.push({
+            url: bgUrl,
+            score: 95,
+            element: $container
+          });
         }
       }
     }
   }
   
-  return null;
+  // Если не нашли в специальных контейнерах, ищем среди всех изображений
+  if (logoCanididates.length === 0) {
+    $('img').each((i, img) => {
+      const $img = $(img);
+      const src = $img.attr('src');
+      
+      if (src && !src.includes('data:')) {
+        const score = scoreLogoCandidate(img);
+        const absoluteUrl = getAbsoluteUrl(src);
+        
+        if (absoluteUrl && score > 15) { // Повышаем минимальный порог
+          logoCanididates.push({
+            url: absoluteUrl,
+            score: score,
+            element: $img
+          });
+        }
+      }
+    });
+  }
+  
+  // Сортируем по убыванию рейтинга и возвращаем лучший
+  logoCanididates.sort((a, b) => b.score - a.score);
+  
+  return logoCanididates.length > 0 ? logoCanididates[0].url : null;
 }
 
 // Извлечение фавиконки

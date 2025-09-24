@@ -253,6 +253,7 @@ const SiteAudit: React.FC = () => {
       }
 
       const data = await response.json();
+      console.log('Backend response:', data.results?.visual);
 
       setResult({
         url: fullUrl,
@@ -780,7 +781,7 @@ const SiteAudit: React.FC = () => {
                       {result.data.visual.fonts && result.data.visual.fonts.length > 0 && (
                         <div className="visual-resource-card">
                           <div className="resource-header">
-                            <span className="resource-icon">�</span>
+                            <span className="resource-icon">✏️</span>
                             <span className="resource-title">Шрифты</span>
                           </div>
                           <div className="resource-content">
