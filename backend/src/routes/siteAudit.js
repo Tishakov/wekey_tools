@@ -376,19 +376,24 @@ function analyzeTechnologies($, html, response) {
   }
   
   // Vue.js
-  if (htmlLower.includes('vue.js') ||
+  if ($('script[src*="vue"]').length > 0 ||
+      htmlLower.includes('vue.js') ||
       htmlLower.includes('vue.min.js') ||
       htmlLower.includes('__vue__') ||
-      htmlLower.includes('v-') ||
-      $('script[src*="vue"]').length > 0) {
+      htmlLower.includes('v-if') ||
+      htmlLower.includes('v-for') ||
+      htmlLower.includes('v-model') ||
+      htmlLower.includes('v-show')) {
     technologies.framework.push('Vue.js');
   }
   
   // Angular
-  if (htmlLower.includes('angular') ||
-      htmlLower.includes('ng-') ||
-      htmlLower.includes('ng2-') ||
-      $('script[src*="angular"]').length > 0) {
+  if ($('script[src*="angular"]').length > 0 ||
+      $('script[src*="@angular"]').length > 0 ||
+      htmlLower.includes('ng-app') ||
+      htmlLower.includes('ng-controller') ||
+      htmlLower.includes('[ng-') ||
+      (htmlLower.includes('angular') && (htmlLower.includes('angular.js') || htmlLower.includes('angular.min.js')))) {
     technologies.framework.push('Angular');
   }
   
@@ -400,9 +405,13 @@ function analyzeTechnologies($, html, response) {
   }
   
   // Laravel (PHP)
-  if (htmlLower.includes('laravel') ||
-      htmlLower.includes('laravel_session') ||
-      htmlLower.includes('laravel_token')) {
+  if (htmlLower.includes('laravel_session') ||
+      htmlLower.includes('laravel_token') ||
+      htmlLower.includes('csrf-token') ||
+      htmlLower.includes('_token') ||
+      headers['set-cookie']?.includes('laravel_session') ||
+      headers['x-powered-by']?.includes('laravel') ||
+      $('meta[name="csrf-token"]').length > 0) {
     technologies.framework.push('Laravel');
   }
   
@@ -451,9 +460,11 @@ function analyzeTechnologies($, html, response) {
   }
   
   // Ember.js
-  if (htmlLower.includes('ember') ||
+  if ($('script[src*="ember"]').length > 0 ||
       htmlLower.includes('ember.js') ||
-      $('script[src*="ember"]').length > 0) {
+      htmlLower.includes('ember.min.js') ||
+      htmlLower.includes('emberjs') ||
+      htmlLower.includes('ember-app')) {
     technologies.framework.push('Ember.js');
   }
   
@@ -519,9 +530,9 @@ function analyzeTechnologies($, html, response) {
   }
   
   // Stylus
-  if (htmlLower.includes('.styl') ||
-      htmlLower.includes('stylus') ||
-      $('link[href*=".styl"]').length > 0) {
+  if ($('link[href*=".styl"]').length > 0 ||
+      htmlLower.includes('stylus.css') ||
+      htmlLower.includes('built with stylus')) {
     technologies.cssPreprocessor.push('Stylus');
   }
 
@@ -603,7 +614,13 @@ function analyzeTechnologies($, html, response) {
   if (htmlLower.includes('<?php') ||
       htmlLower.includes('phpsessid') ||
       headers['x-powered-by']?.includes('php') ||
-      headers['set-cookie']?.includes('phpsessid')) {
+      headers['set-cookie']?.includes('phpsessid') ||
+      htmlLower.includes('.php') ||
+      htmlLower.includes('laravel') ||
+      htmlLower.includes('csrf-token') ||
+      htmlLower.includes('_token') ||
+      htmlLower.includes('wp-content') ||
+      $('meta[name="csrf-token"]').length > 0) {
     technologies.language.push('PHP');
   }
   
@@ -633,16 +650,20 @@ function analyzeTechnologies($, html, response) {
   
   // Ruby
   if (headers['x-powered-by']?.includes('ruby') ||
-      htmlLower.includes('rails') ||
-      htmlLower.includes('ruby')) {
+      headers['server']?.includes('passenger') ||
+      htmlLower.includes('ruby on rails') ||
+      htmlLower.includes('authenticity_token') ||
+      (htmlLower.includes('rails') && !htmlLower.includes('laravel'))) {
     technologies.language.push('Ruby');
   }
   
   // Java
   if (htmlLower.includes('jsessionid') ||
       headers['set-cookie']?.includes('jsessionid') ||
-      htmlLower.includes('java') ||
-      htmlLower.includes('jsp')) {
+      htmlLower.includes('.jsp') ||
+      htmlLower.includes('javax.servlet') ||
+      headers['server']?.includes('tomcat') ||
+      headers['server']?.includes('jetty')) {
     technologies.language.push('Java');
   }
   
@@ -790,6 +811,14 @@ function analyzeTechnologies($, html, response) {
   if (htmlLower.includes('unpkg.com') ||
       $('script[src*="unpkg"], link[href*="unpkg"]').length > 0) {
     technologies.cdn.push('unpkg');
+  }
+  
+  // cdnjs
+  if (htmlLower.includes('cdnjs.cloudflare.com') ||
+      htmlLower.includes('cdnjs.com') ||
+      htmlLower.includes('cdnjs') ||
+      $('script[src*="cdnjs"], link[href*="cdnjs"]').length > 0) {
+    technologies.cdn.push('cdnjs');
   }
   
   // MaxCDN / KeyCDN
