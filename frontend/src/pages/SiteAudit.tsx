@@ -105,6 +105,30 @@ interface AuditResult {
       phones: string[];
       emails: string[];
     };
+    domain?: {
+      name?: string;
+      tld?: string;
+      subdomain?: string;
+      registrar?: string;
+      registrarUrl?: string;
+      organization?: string;
+      organizationLocal?: string;
+      city?: string;
+      country?: string;
+      countryCode?: string;
+      nameservers?: string[];
+      creationDate?: string;
+      expirationDate?: string;
+      updatedDate?: string;
+      dnssec?: string;
+      status?: string[];
+      redirects?: Array<{
+        from: string;
+        to: string;
+        type: string;
+      }>;
+      wwwRedirect?: string;
+    };
     performance: {
       loadTime?: number;
       pageSize?: number;
@@ -714,6 +738,155 @@ const SiteAudit: React.FC = () => {
                       )}
                       
 
+                    </div>
+                  </div>
+                )}
+
+                {/* Домен */}
+                {result.data.domain && (
+                  <div className="audit-section">
+                    <h3>🌐 Домен</h3>
+                    <div className="hosting-grid">
+                      {result.data.domain.name && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🏷️</span>
+                            Название
+                          </span>
+                          <span className="hosting-value">{result.data.domain.name}</span>
+                        </div>
+                      )}
+                      {result.data.domain.tld && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🌍</span>
+                            Зона
+                          </span>
+                          <span className="hosting-value">.{result.data.domain.tld}</span>
+                        </div>
+                      )}
+                      {result.data.domain.subdomain && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🔗</span>
+                            Поддомен
+                          </span>
+                          <span className="hosting-value">{result.data.domain.subdomain}</span>
+                        </div>
+                      )}
+                      {result.data.domain.registrar && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🏢</span>
+                            Регистратор
+                          </span>
+                          <span className="hosting-value">
+                            {result.data.domain.registrarUrl ? (
+                              <a href={result.data.domain.registrarUrl} target="_blank" rel="noopener noreferrer">
+                                {result.data.domain.registrar}
+                              </a>
+                            ) : (
+                              result.data.domain.registrar
+                            )}
+                          </span>
+                        </div>
+                      )}
+                      {result.data.domain.organization && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🏛️</span>
+                            Организация
+                          </span>
+                          <span className="hosting-value">{result.data.domain.organization}</span>
+                        </div>
+                      )}
+                      {result.data.domain.organizationLocal && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🏪</span>
+                            Организация (местн.)
+                          </span>
+                          <span className="hosting-value">{result.data.domain.organizationLocal}</span>
+                        </div>
+                      )}
+                      {result.data.domain.city && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🏙️</span>
+                            Город
+                          </span>
+                          <span className="hosting-value">{result.data.domain.city}</span>
+                        </div>
+                      )}
+                      {result.data.domain.country && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🚩</span>
+                            Страна
+                          </span>
+                          <span className="hosting-value">{result.data.domain.country}</span>
+                        </div>
+                      )}
+                      {result.data.domain.creationDate && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">📅</span>
+                            Создан
+                          </span>
+                          <span className="hosting-value">{result.data.domain.creationDate}</span>
+                        </div>
+                      )}
+                      {result.data.domain.expirationDate && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">⏰</span>
+                            Истекает
+                          </span>
+                          <span className="hosting-value">{result.data.domain.expirationDate}</span>
+                        </div>
+                      )}
+                      {result.data.domain.updatedDate && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🔄</span>
+                            Обновлен
+                          </span>
+                          <span className="hosting-value">{result.data.domain.updatedDate}</span>
+                        </div>
+                      )}
+                      {result.data.domain.dnssec && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🔐</span>
+                            DNSSEC
+                          </span>
+                          <span className="hosting-value">{result.data.domain.dnssec}</span>
+                        </div>
+                      )}
+                      {result.data.domain.nameservers && result.data.domain.nameservers.length > 0 && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">🌐</span>
+                            Name серверы
+                          </span>
+                          <span className="hosting-value">{result.data.domain.nameservers.join(', ')}</span>
+                        </div>
+                      )}
+                      {result.data.domain.redirects && result.data.domain.redirects.length > 0 && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">
+                            <span className="tech-category-icon">↗️</span>
+                            Редиректы
+                          </span>
+                          <span className="hosting-value">
+                            {result.data.domain.redirects.map((redirect, index) => (
+                              <div key={index} style={{fontSize: '0.9em', marginBottom: '4px'}}>
+                                {redirect.from} → {redirect.to} ({redirect.type})
+                              </div>
+                            ))}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
