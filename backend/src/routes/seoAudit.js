@@ -1048,56 +1048,165 @@ function calculateOverallScore(seoData, performanceData, additionalData = {}) {
     overall: 0
   };
   
-  // Technical SEO (40% веса)
+  // Technical SEO (40% веса) - Современный подход
   let technicalPoints = 0;
-  technicalPoints += seoData.title?.isOptimal ? 20 : 0;
-  technicalPoints += seoData.metaDescription?.isOptimal ? 15 : 0;
-  technicalPoints += seoData.headings?.h1?.count === 1 ? 15 : 0;
-  technicalPoints += seoData.technical?.https ? 10 : 0;
-  technicalPoints += (seoData.structuredData?.count || 0) > 0 ? 10 : 0;
-  technicalPoints += seoData.canonical?.isPresent ? 10 : 0;
-  technicalPoints += (seoData.openGraph?.title ? 10 : 0);
   
-  // Исправляем расчет для изображений с округлением
-  if (seoData.images?.total > 0) {
-    const altTextCoverage = ((seoData.images.total - seoData.images.withoutAlt) / seoData.images.total) * 100;
-    technicalPoints += Math.round(altTextCoverage / 10);
-  } else {
-    technicalPoints += 10;
+  // Базовые SEO элементы (60 баллов)
+  technicalPoints += seoData.title?.isOptimal ? 15 : 0;
+  technicalPoints += seoData.metaDescription?.isOptimal ? 12 : 0;
+  technicalPoints += seoData.headings?.h1?.count === 1 ? 12 : 0;
+  technicalPoints += seoData.technical?.https ? 8 : 0;
+  technicalPoints += seoData.canonical?.isPresent ? 8 : 0;
+  technicalPoints += (seoData.openGraph?.title ? 5 : 0);
+  
+  // Структурированные данные (15 баллов)
+  if (seoData.structuredData?.count > 0) {
+    technicalPoints += Math.min(seoData.structuredData.count * 3, 15);
   }
+  
+  // W3C валидация (10 баллов)
+  if (additionalData.w3cValidator) {
+    const errorCount = additionalData.w3cValidator.errors?.count || 0;
+    if (errorCount === 0) {
+      technicalPoints += 10;
+    } else if (errorCount <= 5) {
+      technicalPoints += 7;
+    } else if (errorCount <= 10) {
+      technicalPoints += 4;
+    }
+    // >10 ошибок = 0 баллов
+  }
+  
+  // Security Headers (10 баллов)
+  if (additionalData.securityHeaders?.score) {
+    technicalPoints += Math.round(additionalData.securityHeaders.score / 10);
+  }
+  
+  // Robots.txt + Sitemap (5 баллов)
+  technicalPoints += additionalData.robots?.found ? 2.5 : 0;
+  technicalPoints += additionalData.sitemap?.found ? 2.5 : 0;
   
   scores.technical = Math.min(Math.round(technicalPoints), 100);
   
-  // Content Quality (30% веса)  
+  // Content Quality (30% веса) - Расширенный анализ
   let contentPoints = 0;
   
-  // Расчет баллов за количество слов с округлением
-  if ((seoData.performance?.wordCount || 0) >= 300) {
-    contentPoints += 40;
+  // Объем и структура контента (50 баллов)
+  const wordCount = seoData.performance?.wordCount || 0;
+  if (wordCount >= 500) {
+    contentPoints += 25;
+  } else if (wordCount >= 300) {
+    contentPoints += 20;
   } else {
-    contentPoints += Math.round((seoData.performance?.wordCount || 0) / 300 * 40);
+    contentPoints += Math.round(wordCount / 300 * 20);
   }
   
-  // Расчет баллов за соотношение текст/HTML с округлением
-  if ((seoData.performance?.textToHtmlRatio || 0) >= 15) {
-    contentPoints += 30;
+  // Соотношение текст/HTML
+  const textToHtmlRatio = seoData.performance?.textToHtmlRatio || 0;
+  if (textToHtmlRatio >= 20) {
+    contentPoints += 15;
   } else {
-    contentPoints += Math.round((seoData.performance?.textToHtmlRatio || 0) / 15 * 30);
+    contentPoints += Math.round(textToHtmlRatio / 20 * 15);
   }
   
-  contentPoints += (seoData.keywordAnalysis?.titleKeywords?.length || 0) > 0 ? 30 : 0;
+  // Структура заголовков
+  const hasH2 = seoData.headings?.h2?.count > 0;
+  const hasH3 = seoData.headings?.h3?.count > 0;
+  contentPoints += hasH2 ? 5 : 0;
+  contentPoints += hasH3 ? 5 : 0;
+  
+  // SEO оптимизация (30 баллов)
+  contentPoints += (seoData.keywordAnalysis?.titleKeywords?.length || 0) > 0 ? 15 : 0;
+  
+  // Alt-тексты изображений
+  if (seoData.images?.total > 0) {
+    const altTextCoverage = ((seoData.images.total - seoData.images.withoutAlt) / seoData.images.total) * 100;
+    contentPoints += Math.round(altTextCoverage / 100 * 15);
+  } else {
+    contentPoints += 15;
+  }
+  
+  // Link Profile анализ (20 баллов)
+  if (additionalData.linkProfile) {
+    const linkProfile = additionalData.linkProfile;
+    
+    // Внутренняя перелинковка
+    if (linkProfile.internal?.total >= 10) {
+      contentPoints += 10;
+    } else {
+      contentPoints += Math.round((linkProfile.internal?.total || 0) / 10 * 10);
+    }
+    
+    // Баланс внутренних/внешних ссылок
+    if (linkProfile.ratios?.internalToExternal >= 3) {
+      contentPoints += 5;
+    } else {
+      contentPoints += Math.round((linkProfile.ratios?.internalToExternal || 0) / 3 * 5);
+    }
+    
+    // Разнообразие anchor текстов
+    if (linkProfile.ratios?.anchorDiversity >= 5) {
+      contentPoints += 5;
+    } else {
+      contentPoints += Math.round((linkProfile.ratios?.anchorDiversity || 0) / 5 * 5);
+    }
+  }
+  
   scores.content = Math.min(Math.round(contentPoints), 100);
   
-  // Performance (30% веса) - убираем усреднение, оставляем мобильный приоритет
-  if (performanceData?.mobile?.performance_score) {
-    // Приоритет мобильной версии (Google Mobile-First Index)
-    scores.performance = performanceData.mobile.performance_score;
-  } else if (performanceData?.desktop?.performance_score) {
-    // Fallback на desktop если mobile недоступен
-    scores.performance = performanceData.desktop.performance_score;
+  // Performance (30% веса) - Детальный анализ Core Web Vitals
+  let performancePoints = 0;
+  const mobileData = performanceData?.mobile;
+  const desktopData = performanceData?.desktop;
+  const primaryData = mobileData || desktopData; // Mobile-First приоритет
+  
+  if (primaryData) {
+    // Core Web Vitals детально (60 баллов)
+    if (primaryData.core_web_vitals) {
+      const cwv = primaryData.core_web_vitals;
+      
+      // LCP - Largest Contentful Paint (25 баллов)
+      if (cwv.lcp?.score >= 90) {
+        performancePoints += 25;
+      } else if (cwv.lcp?.score >= 50) {
+        performancePoints += Math.round(cwv.lcp.score / 90 * 25);
+      }
+      
+      // FCP - First Contentful Paint (20 баллов) 
+      if (cwv.fcp?.score >= 90) {
+        performancePoints += 20;
+      } else if (cwv.fcp?.score >= 50) {
+        performancePoints += Math.round(cwv.fcp.score / 90 * 20);
+      }
+      
+      // CLS - Cumulative Layout Shift (15 баллов)
+      if (cwv.cls?.score >= 90) {
+        performancePoints += 15;
+      } else if (cwv.cls?.score >= 50) {
+        performancePoints += Math.round(cwv.cls.score / 90 * 15);
+      }
+    } else {
+      // Fallback: если нет детальных CWV, используем общий score
+      performancePoints += Math.round(primaryData.performance_score * 0.6);
+    }
+    
+    // Overall Performance Score (30 баллов)
+    performancePoints += Math.round(primaryData.performance_score * 0.3);
+    
+    // Mobile-Friendly (10 баллов)
+    if (additionalData.mobile?.score >= 80) {
+      performancePoints += 10;
+    } else if (additionalData.mobile?.score >= 60) {
+      performancePoints += 7;
+    } else if (additionalData.mobile?.score >= 40) {
+      performancePoints += 4;
+    }
   } else {
-    scores.performance = 50; // Средняя оценка если PageSpeed недоступен
+    // Если PageSpeed недоступен, используем базовые метрики
+    performancePoints = 50;
   }
+  
+  scores.performance = Math.min(Math.round(performancePoints), 100);
   
   // Общая оценка с весами
   scores.overall = Math.round(
