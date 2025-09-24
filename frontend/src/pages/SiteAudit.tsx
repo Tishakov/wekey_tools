@@ -572,69 +572,250 @@ const SiteAudit: React.FC = () => {
                 {result.data.analytics && (
                   <div className="audit-section">
                     <h3>📊 Аналитика и трекинг</h3>
-                    <div className="analytics-grid">
-                      {Object.entries(result.data.analytics).map(([key, value]) => (
-                        value && (
-                          <div key={key} className="analytics-item">
-                            <span className="analytics-icon">✅</span>
-                            <span className="analytics-name">
-                              {key === 'googleAnalytics' && 'Google Analytics'}
-                              {key === 'googleTagManager' && 'Google Tag Manager'}
-                              {key === 'facebookPixel' && 'Facebook Pixel'}
-                              {key === 'metaPixel' && 'Meta Pixel'}
-                              {key === 'yandexMetrica' && 'Яндекс.Метрика'}
-                              {key === 'hotjar' && 'Hotjar'}
-                              {key === 'clarity' && 'Microsoft Clarity'}
-                              {key === 'mailchimp' && 'Mailchimp'}
-                              {key === 'convertkit' && 'ConvertKit'}
-                              {key === 'klaviyo' && 'Klaviyo'}
-                              {key === 'intercom' && 'Intercom'}
-                              {key === 'zendesk' && 'Zendesk'}
-                              {key === 'tawkTo' && 'Tawk.to'}
-                              {key === 'crisp' && 'Crisp'}
-                              {key === 'optimizely' && 'Optimizely'}
-                              {key === 'vwo' && 'VWO'}
-                              {key === 'googleOptimize' && 'Google Optimize'}
-                              {key === 'crazyEgg' && 'Crazy Egg'}
-                              {key === 'fullstory' && 'FullStory'}
-                              {key === 'mouseflow' && 'Mouseflow'}
-                            </span>
+                    <div className="analytics-categories">
+                      
+                      {/* Веб-аналитика */}
+                      {(result.data.analytics.googleAnalytics || result.data.analytics.googleTagManager || result.data.analytics.yandexMetrica) && (
+                        <div className="analytics-category">
+                          <h4 className="analytics-category-title">📈 Веб-аналитика</h4>
+                          <div className="analytics-badges">
+                            {result.data.analytics.googleAnalytics && (
+                              <div className="analytics-badge web-analytics">
+                                <span className="analytics-icon">📊</span>
+                                <span className="analytics-name">Google Analytics</span>
+                              </div>
+                            )}
+                            {result.data.analytics.googleTagManager && (
+                              <div className="analytics-badge web-analytics">
+                                <span className="analytics-icon">🏷️</span>
+                                <span className="analytics-name">Google Tag Manager</span>
+                              </div>
+                            )}
+                            {result.data.analytics.yandexMetrica && (
+                              <div className="analytics-badge web-analytics">
+                                <span className="analytics-icon">📐</span>
+                                <span className="analytics-name">Яндекс.Метрика</span>
+                              </div>
+                            )}
                           </div>
-                        )
-                      ))}
+                        </div>
+                      )}
+
+                      {/* Социальная аналитика */}
+                      {(result.data.analytics.facebookPixel || result.data.analytics.metaPixel) && (
+                        <div className="analytics-category">
+                          <h4 className="analytics-category-title">📱 Социальная аналитика</h4>
+                          <div className="analytics-badges">
+                            {result.data.analytics.facebookPixel && (
+                              <div className="analytics-badge social">
+                                <span className="analytics-icon">👥</span>
+                                <span className="analytics-name">Facebook Pixel</span>
+                              </div>
+                            )}
+                            {result.data.analytics.metaPixel && (
+                              <div className="analytics-badge social">
+                                <span className="analytics-icon">🎯</span>
+                                <span className="analytics-name">Meta Pixel</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Тепловые карты */}
+                      {(result.data.analytics.hotjar || result.data.analytics.crazyEgg || result.data.analytics.fullstory || result.data.analytics.mouseflow || result.data.analytics.clarity) && (
+                        <div className="analytics-category">
+                          <h4 className="analytics-category-title">🔥 Тепловые карты</h4>
+                          <div className="analytics-badges">
+                            {result.data.analytics.hotjar && (
+                              <div className="analytics-badge heatmaps">
+                                <span className="analytics-icon">🔥</span>
+                                <span className="analytics-name">Hotjar</span>
+                              </div>
+                            )}
+                            {result.data.analytics.crazyEgg && (
+                              <div className="analytics-badge heatmaps">
+                                <span className="analytics-icon">👁️</span>
+                                <span className="analytics-name">Crazy Egg</span>
+                              </div>
+                            )}
+                            {result.data.analytics.fullstory && (
+                              <div className="analytics-badge heatmaps">
+                                <span className="analytics-icon">📹</span>
+                                <span className="analytics-name">FullStory</span>
+                              </div>
+                            )}
+                            {result.data.analytics.mouseflow && (
+                              <div className="analytics-badge heatmaps">
+                                <span className="analytics-icon">🖱️</span>
+                                <span className="analytics-name">Mouseflow</span>
+                              </div>
+                            )}
+                            {result.data.analytics.clarity && (
+                              <div className="analytics-badge heatmaps">
+                                <span className="analytics-icon">🔍</span>
+                                <span className="analytics-name">Microsoft Clarity</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Чаты и поддержка */}
+                      {(result.data.analytics.intercom || result.data.analytics.zendesk || result.data.analytics.tawkTo || result.data.analytics.crisp) && (
+                        <div className="analytics-category">
+                          <h4 className="analytics-category-title">💬 Чаты и поддержка</h4>
+                          <div className="analytics-badges">
+                            {result.data.analytics.intercom && (
+                              <div className="analytics-badge support">
+                                <span className="analytics-icon">💬</span>
+                                <span className="analytics-name">Intercom</span>
+                              </div>
+                            )}
+                            {result.data.analytics.zendesk && (
+                              <div className="analytics-badge support">
+                                <span className="analytics-icon">🎧</span>
+                                <span className="analytics-name">Zendesk</span>
+                              </div>
+                            )}
+                            {result.data.analytics.tawkTo && (
+                              <div className="analytics-badge support">
+                                <span className="analytics-icon">💭</span>
+                                <span className="analytics-name">Tawk.to</span>
+                              </div>
+                            )}
+                            {result.data.analytics.crisp && (
+                              <div className="analytics-badge support">
+                                <span className="analytics-icon">💙</span>
+                                <span className="analytics-name">Crisp</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Email маркетинг */}
+                      {(result.data.analytics.mailchimp || result.data.analytics.convertkit || result.data.analytics.klaviyo) && (
+                        <div className="analytics-category">
+                          <h4 className="analytics-category-title">📧 Email маркетинг</h4>
+                          <div className="analytics-badges">
+                            {result.data.analytics.mailchimp && (
+                              <div className="analytics-badge email">
+                                <span className="analytics-icon">📧</span>
+                                <span className="analytics-name">Mailchimp</span>
+                              </div>
+                            )}
+                            {result.data.analytics.convertkit && (
+                              <div className="analytics-badge email">
+                                <span className="analytics-icon">✉️</span>
+                                <span className="analytics-name">ConvertKit</span>
+                              </div>
+                            )}
+                            {result.data.analytics.klaviyo && (
+                              <div className="analytics-badge email">
+                                <span className="analytics-icon">📮</span>
+                                <span className="analytics-name">Klaviyo</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* A/B тестирование */}
+                      {(result.data.analytics.optimizely || result.data.analytics.vwo || result.data.analytics.googleOptimize) && (
+                        <div className="analytics-category">
+                          <h4 className="analytics-category-title">🧪 A/B тестирование</h4>
+                          <div className="analytics-badges">
+                            {result.data.analytics.optimizely && (
+                              <div className="analytics-badge testing">
+                                <span className="analytics-icon">🧪</span>
+                                <span className="analytics-name">Optimizely</span>
+                              </div>
+                            )}
+                            {result.data.analytics.vwo && (
+                              <div className="analytics-badge testing">
+                                <span className="analytics-icon">⚗️</span>
+                                <span className="analytics-name">VWO</span>
+                              </div>
+                            )}
+                            {result.data.analytics.googleOptimize && (
+                              <div className="analytics-badge testing">
+                                <span className="analytics-icon">🔬</span>
+                                <span className="analytics-name">Google Optimize</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                     </div>
                   </div>
                 )}
 
-                {/* Производительность */}
-                {result.data.performance && (
+                {/* SEO-анализ */}
+                <div className="audit-section">
+                  <h3>🔍 SEO-анализ</h3>
+                  <div className="seo-recommendation">
+                    <p className="recommendation-text">
+                      Для подробного SEO-анализа сайта воспользуйтесь нашим специализированным инструментом
+                    </p>
+                    <Link 
+                      to={createLink('/seo-audit')} 
+                      className="recommendation-button"
+                    >
+                      🚀 Запустить SEO Аудит
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Визуальные элементы */}
+                {result.data.visual && (
                   <div className="audit-section">
-                    <h3>⚡ Производительность</h3>
-                    <div className="performance-grid">
-                      <div className="performance-item">
-                        <span className="performance-label">Время загрузки:</span>
-                        <span className="performance-value">{result.data.performance.loadTime}ms</span>
-                      </div>
-                      <div className="performance-item">
-                        <span className="performance-label">Размер страницы:</span>
-                        <span className="performance-value">
-                          {result.data.performance.pageSizeKB 
-                            ? `${result.data.performance.pageSizeKB} KB` 
-                            : result.data.performance.pageSize 
-                              ? `${(result.data.performance.pageSize / 1024).toFixed(2)} KB`
-                              : '0 KB'
-                          }
-                        </span>
-                      </div>
-                      {result.data.performance.requests && (
-                        <div className="performance-item">
-                          <span className="performance-label">Запросов:</span>
-                          <span className="performance-value">{result.data.performance.requests}</span>
+                    <h3>🎨 Визуальные элементы</h3>
+                    <div className="visual-grid">
+                      {result.data.visual.imagesCount && (
+                        <div className="visual-item">
+                          <span className="visual-icon">🖼️</span>
+                          <span className="visual-label">Изображения:</span>
+                          <span className="visual-value">{result.data.visual.imagesCount}</span>
+                          {(result.data.visual.imagesWithoutAlt ?? 0) > 0 && (
+                            <span className="visual-warning">({result.data.visual.imagesWithoutAlt} без alt)</span>
+                          )}
+                        </div>
+                      )}
+                      {result.data.visual.cssFiles && (
+                        <div className="visual-item">
+                          <span className="visual-icon">🎨</span>
+                          <span className="visual-label">CSS файлы:</span>
+                          <span className="visual-value">{result.data.visual.cssFiles}</span>
+                        </div>
+                      )}
+                      {result.data.visual.jsFiles && (
+                        <div className="visual-item">
+                          <span className="visual-icon">⚡</span>
+                          <span className="visual-label">JS файлы:</span>
+                          <span className="visual-value">{result.data.visual.jsFiles}</span>
+                        </div>
+                      )}
+                      {result.data.visual.fonts && (
+                        <div className="visual-item">
+                          <span className="visual-icon">🔤</span>
+                          <span className="visual-label">Шрифты:</span>
+                          <span className="visual-value">{result.data.visual.fonts.join(', ')}</span>
+                        </div>
+                      )}
+                      {result.data.visual.icons && (
+                        <div className="visual-item">
+                          <span className="visual-icon">⭐</span>
+                          <span className="visual-label">Иконки:</span>
+                          <span className="visual-value">{result.data.visual.icons.join(', ')}</span>
                         </div>
                       )}
                     </div>
                   </div>
                 )}
+
+
                   </div>
 
                   {/* Правая колонка */}
@@ -891,68 +1072,6 @@ const SiteAudit: React.FC = () => {
                   </div>
                 )}
 
-                {/* SEO Recommendation */}
-                <div className="audit-section">
-                  <h3>🔍 SEO-анализ</h3>
-                  <div className="seo-recommendation">
-                    <p className="recommendation-text">
-                      Для подробного SEO-анализа сайта воспользуйтесь нашим специализированным инструментом
-                    </p>
-                    <Link 
-                      to={createLink('/seo-audit')} 
-                      className="recommendation-button"
-                    >
-                      🚀 Запустить SEO Аудит
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Визуальные элементы */}
-                {result.data.visual && (
-                  <div className="audit-section">
-                    <h3>🎨 Визуальные элементы</h3>
-                    <div className="visual-grid">
-                      {result.data.visual.imagesCount && (
-                        <div className="visual-item">
-                          <span className="visual-icon">🖼️</span>
-                          <span className="visual-label">Изображения:</span>
-                          <span className="visual-value">{result.data.visual.imagesCount}</span>
-                          {(result.data.visual.imagesWithoutAlt ?? 0) > 0 && (
-                            <span className="visual-warning">({result.data.visual.imagesWithoutAlt} без alt)</span>
-                          )}
-                        </div>
-                      )}
-                      {result.data.visual.cssFiles && (
-                        <div className="visual-item">
-                          <span className="visual-icon">🎨</span>
-                          <span className="visual-label">CSS файлы:</span>
-                          <span className="visual-value">{result.data.visual.cssFiles}</span>
-                        </div>
-                      )}
-                      {result.data.visual.jsFiles && (
-                        <div className="visual-item">
-                          <span className="visual-icon">⚡</span>
-                          <span className="visual-label">JS файлы:</span>
-                          <span className="visual-value">{result.data.visual.jsFiles}</span>
-                        </div>
-                      )}
-                      {result.data.visual.fonts && (
-                        <div className="visual-item">
-                          <span className="visual-icon">🔤</span>
-                          <span className="visual-label">Шрифты:</span>
-                          <span className="visual-value">{result.data.visual.fonts.join(', ')}</span>
-                        </div>
-                      )}
-                      {result.data.visual.icons && (
-                        <div className="visual-item">
-                          <span className="visual-icon">⭐</span>
-                          <span className="visual-label">Иконки:</span>
-                          <span className="visual-value">{result.data.visual.icons.join(', ')}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
                 {/* Социальные сети */}
                 {result.data.social && Object.values(result.data.social).some(Boolean) && (
                   <div className="audit-section">

@@ -351,30 +351,112 @@
   font-size: 12px;
 }
 
-.analytics-grid {
-  display: grid;
-  gap: 8px;
+/* Новая категоризированная система аналитики */
+.analytics-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
 }
 
-.analytics-item {
+/* .analytics-category {
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 16px;
+} */
+
+.analytics-category-title {
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px;
+}
+
+.analytics-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.analytics-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 40px;
   background: #28282A;
-  border-radius: 8px;
-  border-left: 3px solid #28a745;
+  transition: all 0.2s ease;
+}
+
+.analytics-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .analytics-icon {
-  font-size: 14px;
-  color: #28a745;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
 }
 
 .analytics-name {
   color: #BCBBBD;
   font-weight: 500;
   font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Цветовые схемы для категорий */
+.analytics-badge.web-analytics {
+  border-left-color: #4285f4;
+}
+
+.analytics-badge.web-analytics .analytics-icon {
+  color: #4285f4;
+}
+
+.analytics-badge.social {
+  border-left-color: #1877f2;
+}
+
+.analytics-badge.social .analytics-icon {
+  color: #1877f2;
+}
+
+.analytics-badge.heatmaps {
+  border-left-color: #ff6b35;
+}
+
+.analytics-badge.heatmaps .analytics-icon {
+  color: #ff6b35;
+}
+
+.analytics-badge.support {
+  border-left-color: #00d4aa;
+}
+
+.analytics-badge.support .analytics-icon {
+  color: #00d4aa;
+}
+
+.analytics-badge.email {
+  border-left-color: #f39c12;
+}
+
+.analytics-badge.email .analytics-icon {
+  color: #f39c12;
+}
+
+.analytics-badge.testing {
+  border-left-color: #9b59b6;
+}
+
+.analytics-badge.testing .analytics-icon {
+  color: #9b59b6;
 }
 
 .social-grid {
@@ -665,10 +747,7 @@
   margin-top: 0;
 }
 
-/* Дополнительные аналитические теги */
-.analytics-item .analytics-name {
-  font-size: 0.9em;
-}
+/* Старый стиль удален - используем новую категоризированную систему */
 
 /* Улучшенная анимация загрузки */
 .audit-loading {
