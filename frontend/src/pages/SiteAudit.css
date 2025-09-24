@@ -197,7 +197,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  padding: 30px;
+  padding: 20px;
   align-items: start;
 }
 
@@ -277,7 +277,7 @@
 
 .audit-section {
   background: #1c1d1f;
-  border: 1px solid #28282A;
+  border: 1px solid #333335;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 0;

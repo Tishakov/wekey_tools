@@ -25,12 +25,10 @@ interface AuditResult {
       cmsVersion?: string;
       framework?: string[];
       language?: string[];
-      cdn?: string[];
-      webServer?: string;
       database?: string[];
       analytics?: string[];
       security?: string[];
-      hosting?: string;
+      cloudPlatform?: string;
       cssFramework?: string[];
       cssPreprocessor?: string[];
       staticGenerator?: string[];
@@ -77,7 +75,7 @@ interface AuditResult {
       ssl?: boolean;
       webServer?: string;
       cloudflare?: boolean;
-      cdn?: boolean;
+      cdn?: string[];
       securityHeaders?: Record<string, boolean>;
     };
     social: {
@@ -413,41 +411,15 @@ const SiteAudit: React.FC = () => {
                         </div>
                       )}
 
-                      {/* CDN */}
-                      {result.data.technologies.cdn && result.data.technologies.cdn.length > 0 && (
-                        <div className="tech-category">
-                          <span className="tech-category-title">
-                            <span className="tech-category-icon">🌐</span>
-                            CDN:
-                          </span>
-                          <span className="tech-category-value">
-                            {result.data.technologies.cdn.join(', ')}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Web Server */}
-                      {result.data.technologies.webServer && (
-                        <div className="tech-category">
-                          <span className="tech-category-title">
-                            <span className="tech-category-icon">🖥️</span>
-                            Веб-сервер:
-                          </span>
-                          <span className="tech-category-value">
-                            {result.data.technologies.webServer}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Hosting */}
-                      {result.data.technologies.hosting && (
+                      {/* Cloud Platform */}
+                      {result.data.technologies.cloudPlatform && (
                         <div className="tech-category">
                           <span className="tech-category-title">
                             <span className="tech-category-icon">☁️</span>
-                            Хостинг:
+                            Облачная платформа:
                           </span>
                           <span className="tech-category-value">
-                            {result.data.technologies.hosting}
+                            {result.data.technologies.cloudPlatform}
                           </span>
                         </div>
                       )}
@@ -547,7 +519,8 @@ const SiteAudit: React.FC = () => {
                       {!result.data.technologies.cms && 
                        (!result.data.technologies.framework || result.data.technologies.framework.length === 0) &&
                        (!result.data.technologies.language || result.data.technologies.language.length === 0) &&
-                       !result.data.technologies.webServer && (
+                       (!result.data.technologies.cssFramework || result.data.technologies.cssFramework.length === 0) &&
+                       !result.data.technologies.cloudPlatform && (
                         <div className="tech-empty">
                           <p>🔍 Не удалось определить используемые технологии</p>
                           <small>Сайт может использовать нестандартную конфигурацию или статическую генерацию</small>
@@ -629,6 +602,45 @@ const SiteAudit: React.FC = () => {
 
                   {/* Правая колонка */}
                   <div className="audit-column-right">
+                
+                {/* Хостинг и безопасность */}
+                {result.data.hosting && (
+                  <div className="audit-section">
+                    <h3>🔒 Хостинг и безопасность</h3>
+                    <div className="hosting-grid">
+                      {result.data.hosting.webServer && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">Веб-сервер:</span>
+                          <span className="hosting-value">{result.data.hosting.webServer}</span>
+                        </div>
+                      )}
+                      
+                      {result.data.hosting.cdn && result.data.hosting.cdn.length > 0 && (
+                        <div className="hosting-item">
+                          <span className="hosting-label">CDN:</span>
+                          <span className="hosting-value">{result.data.hosting.cdn.join(', ')}</span>
+                        </div>
+                      )}
+                      
+                      <div className="hosting-features">
+                        {result.data.hosting.ssl && <span className="security-tag">SSL/HTTPS</span>}
+                        {result.data.hosting.cloudflare && <span className="security-tag">Cloudflare</span>}
+                        {result.data.hosting.cdn && result.data.hosting.cdn.length > 0 && <span className="security-tag">CDN</span>}
+                      </div>
+                      {result.data.hosting.securityHeaders && (
+                        <div className="security-headers">
+                          <span className="hosting-label">Заголовки безопасности:</span>
+                          <div className="security-tags">
+                            {Object.keys(result.data.hosting.securityHeaders).map(header => (
+                              <span key={header} className="security-tag">{header.toUpperCase()}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* SEO Recommendation */}
                 <div className="audit-section">
                   <h3>🔍 SEO-анализ</h3>
@@ -686,42 +698,6 @@ const SiteAudit: React.FC = () => {
                           <span className="visual-icon">⭐</span>
                           <span className="visual-label">Иконки:</span>
                           <span className="visual-value">{result.data.visual.icons.join(', ')}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Хостинг и безопасность */}
-                {result.data.hosting && (
-                  <div className="audit-section">
-                    <h3>🔒 Хостинг и безопасность</h3>
-                    <div className="hosting-grid">
-                      {result.data.hosting.webServer && (
-                        <div className="hosting-item">
-                          <span className="hosting-label">Сервер:</span>
-                          <span className="hosting-value">{result.data.hosting.webServer}</span>
-                        </div>
-                      )}
-                      {result.data.hosting.webServer && (
-                        <div className="hosting-item">
-                          <span className="hosting-label">Веб-сервер:</span>
-                          <span className="hosting-value">{result.data.hosting.webServer}</span>
-                        </div>
-                      )}
-                      <div className="hosting-features">
-                        {result.data.hosting.ssl && <span className="security-tag">SSL/HTTPS</span>}
-                        {result.data.hosting.cloudflare && <span className="security-tag">Cloudflare</span>}
-                        {result.data.hosting.cdn && <span className="security-tag">CDN</span>}
-                      </div>
-                      {result.data.hosting.securityHeaders && (
-                        <div className="security-headers">
-                          <span className="hosting-label">Заголовки безопасности:</span>
-                          <div className="security-tags">
-                            {Object.keys(result.data.hosting.securityHeaders).map(header => (
-                              <span key={header} className="security-tag">{header.toUpperCase()}</span>
-                            ))}
-                          </div>
                         </div>
                       )}
                     </div>

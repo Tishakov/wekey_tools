@@ -122,12 +122,10 @@ function analyzeTechnologies($, html, response) {
     cmsVersion: null,
     framework: [],
     language: [],
-    cdn: [],
-    webServer: null,
     database: [],
     analytics: [],
     security: [],
-    hosting: null,
+    cloudPlatform: null, // переименовываем hosting в cloudPlatform
     cssFramework: [],
     cssPreprocessor: [],
     staticGenerator: [],
@@ -778,114 +776,19 @@ function analyzeTechnologies($, html, response) {
     technologies.database.push('Redis');
   }
 
-  // === CDN DETECTION ===
-  
-  // Cloudflare
-  if (headers['cf-ray'] || 
-      headers['server']?.includes('cloudflare') ||
-      htmlLower.includes('cloudflare')) {
-    technologies.cdn.push('Cloudflare');
-  }
-  
-  // Amazon CloudFront
-  if (headers['x-amz-cf-id'] ||
-      htmlLower.includes('cloudfront.net') ||
-      htmlLower.includes('amazonaws.com')) {
-    technologies.cdn.push('Amazon CloudFront');
-  }
-  
-  // Google CDN
-  if (htmlLower.includes('googleapis.com') ||
-      htmlLower.includes('gstatic.com') ||
-      htmlLower.includes('google-analytics.com')) {
-    technologies.cdn.push('Google CDN');
-  }
-  
-  // jsDelivr
-  if (htmlLower.includes('jsdelivr.net') ||
-      $('script[src*="jsdelivr"], link[href*="jsdelivr"]').length > 0) {
-    technologies.cdn.push('jsDelivr');
-  }
-  
-  // unpkg
-  if (htmlLower.includes('unpkg.com') ||
-      $('script[src*="unpkg"], link[href*="unpkg"]').length > 0) {
-    technologies.cdn.push('unpkg');
-  }
-  
-  // cdnjs
-  if (htmlLower.includes('cdnjs.cloudflare.com') ||
-      htmlLower.includes('cdnjs.com') ||
-      htmlLower.includes('cdnjs') ||
-      $('script[src*="cdnjs"], link[href*="cdnjs"]').length > 0) {
-    technologies.cdn.push('cdnjs');
-  }
-  
-  // MaxCDN / KeyCDN
-  if (htmlLower.includes('maxcdn.com') ||
-      htmlLower.includes('keycdn.com')) {
-    technologies.cdn.push('MaxCDN');
-  }
-  
-  // Fastly
-  if (htmlLower.includes('fastly.com') ||
-      headers['fastly-debug-digest'] ||
-      headers['x-served-by']?.includes('fastly')) {
-    technologies.cdn.push('Fastly');
-  }
-  
-  // Azure CDN
-  if (htmlLower.includes('azureedge.net') ||
-      htmlLower.includes('azure.com') ||
-      headers['x-azure-ref']) {
-    technologies.cdn.push('Azure CDN');
-  }
-  
-  // BunnyCDN
-  if (htmlLower.includes('bunnycdn.com') ||
-      htmlLower.includes('b-cdn.net') ||
-      headers['bunny-cache-status']) {
-    technologies.cdn.push('BunnyCDN');
-  }
-  
-  // StackPath
-  if (htmlLower.includes('stackpath.com') ||
-      htmlLower.includes('stackpathcdn.com') ||
-      headers['x-sp-edge-server']) {
-    technologies.cdn.push('StackPath');
-  }
-
-  // === WEB SERVER DETECTION ===
-  const serverHeader = headers['server'];
-  if (serverHeader) {
-    if (serverHeader.includes('apache')) {
-      technologies.webServer = 'Apache';
-    } else if (serverHeader.includes('nginx')) {
-      technologies.webServer = 'Nginx';
-    } else if (serverHeader.includes('iis')) {
-      technologies.webServer = 'Microsoft IIS';
-    } else if (serverHeader.includes('openresty')) {
-      technologies.webServer = 'OpenResty';
-    } else if (serverHeader.includes('cloudflare')) {
-      technologies.webServer = 'Cloudflare';
-    } else {
-      technologies.webServer = serverHeader;
-    }
-  }
-
-  // === HOSTING DETECTION ===
+  // === CLOUD PLATFORM DETECTION ===
   
   // По заголовкам и контенту
   if (headers['x-github-request-id']) {
-    technologies.hosting = 'GitHub Pages';
+    technologies.cloudPlatform = 'GitHub Pages';
   } else if (headers['x-vercel-id'] || htmlLower.includes('vercel.app')) {
-    technologies.hosting = 'Vercel';
+    technologies.cloudPlatform = 'Vercel';
   } else if (headers['x-netlify-id'] || htmlLower.includes('netlify')) {
-    technologies.hosting = 'Netlify';
+    technologies.cloudPlatform = 'Netlify';
   } else if (htmlLower.includes('heroku') || headers['via']?.includes('heroku')) {
-    technologies.hosting = 'Heroku';
+    technologies.cloudPlatform = 'Heroku';
   } else if (htmlLower.includes('firebase') || htmlLower.includes('firebaseapp.com')) {
-    technologies.hosting = 'Firebase';
+    technologies.cloudPlatform = 'Firebase';
   }
 
   return technologies;
@@ -1010,7 +913,7 @@ function analyzeHosting($, html, response) {
     ssl: false,
     webServer: null,
     cloudflare: false,
-    cdn: false,
+    cdn: [],
     securityHeaders: {}
   };
   
@@ -1024,18 +927,103 @@ function analyzeHosting($, html, response) {
   // SSL проверка
   hosting.ssl = response.url ? response.url.startsWith('https://') : false;
   
-  // Web сервер
-  if (headers['server']) {
-    hosting.webServer = headers['server'];
+  // Web сервер с детальным определением
+  const serverHeader = headers['server'];
+  if (serverHeader) {
+    if (serverHeader.includes('apache')) {
+      hosting.webServer = 'Apache';
+    } else if (serverHeader.includes('nginx')) {
+      hosting.webServer = 'Nginx';
+    } else if (serverHeader.includes('iis')) {
+      hosting.webServer = 'Microsoft IIS';
+    } else if (serverHeader.includes('openresty')) {
+      hosting.webServer = 'OpenResty';
+    } else if (serverHeader.includes('cloudflare')) {
+      hosting.webServer = 'Cloudflare';
+    } else {
+      hosting.webServer = serverHeader;
+    }
   }
   
-  // Cloudflare
-  hosting.cloudflare = !!(headers['cf-ray'] || headers['server']?.includes('cloudflare'));
+  const htmlLower = html.toLowerCase();
   
-  // CDN
-  hosting.cdn = hosting.cloudflare || 
-                headers['x-amz-cf-id'] || 
-                html.toLowerCase().includes('cdn.');
+  // === CDN DETECTION ===
+  
+  // Cloudflare
+  if (headers['cf-ray'] || 
+      headers['server']?.includes('cloudflare') ||
+      htmlLower.includes('cloudflare')) {
+    hosting.cdn.push('Cloudflare');
+    hosting.cloudflare = true;
+  }
+  
+  // Amazon CloudFront
+  if (headers['x-amz-cf-id'] ||
+      htmlLower.includes('cloudfront.net') ||
+      htmlLower.includes('amazonaws.com')) {
+    hosting.cdn.push('Amazon CloudFront');
+  }
+  
+  // Google CDN
+  if (htmlLower.includes('googleapis.com') ||
+      htmlLower.includes('gstatic.com') ||
+      htmlLower.includes('google-analytics.com')) {
+    hosting.cdn.push('Google CDN');
+  }
+  
+  // jsDelivr
+  if (htmlLower.includes('jsdelivr.net') ||
+      $('script[src*="jsdelivr"], link[href*="jsdelivr"]').length > 0) {
+    hosting.cdn.push('jsDelivr');
+  }
+  
+  // unpkg
+  if (htmlLower.includes('unpkg.com') ||
+      $('script[src*="unpkg"], link[href*="unpkg"]').length > 0) {
+    hosting.cdn.push('unpkg');
+  }
+  
+  // cdnjs
+  if (htmlLower.includes('cdnjs.cloudflare.com') ||
+      htmlLower.includes('cdnjs.com') ||
+      htmlLower.includes('cdnjs') ||
+      $('script[src*="cdnjs"], link[href*="cdnjs"]').length > 0) {
+    hosting.cdn.push('cdnjs');
+  }
+  
+  // MaxCDN / KeyCDN
+  if (htmlLower.includes('maxcdn.com') ||
+      htmlLower.includes('keycdn.com')) {
+    hosting.cdn.push('MaxCDN');
+  }
+  
+  // Fastly
+  if (htmlLower.includes('fastly.com') ||
+      headers['fastly-debug-digest'] ||
+      headers['x-served-by']?.includes('fastly')) {
+    hosting.cdn.push('Fastly');
+  }
+  
+  // Azure CDN
+  if (htmlLower.includes('azureedge.net') ||
+      htmlLower.includes('azure.com') ||
+      headers['x-azure-ref']) {
+    hosting.cdn.push('Azure CDN');
+  }
+  
+  // BunnyCDN
+  if (htmlLower.includes('bunnycdn.com') ||
+      htmlLower.includes('b-cdn.net') ||
+      headers['bunny-cache-status']) {
+    hosting.cdn.push('BunnyCDN');
+  }
+  
+  // StackPath
+  if (htmlLower.includes('stackpath.com') ||
+      htmlLower.includes('stackpathcdn.com') ||
+      headers['x-sp-edge-server']) {
+    hosting.cdn.push('StackPath');
+  }
   
   // Security headers
   hosting.securityHeaders = {
