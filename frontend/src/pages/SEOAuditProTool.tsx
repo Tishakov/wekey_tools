@@ -10,7 +10,8 @@ import SEOAnalysisResults from '../components/SEOAnalysisResults';
 import './SEOAuditProTool.css';
 import '../styles/tool-pages.css';
 
-const TOOL_ID = 'seo-audit-pro';
+const TOOL_ID = 'seoauditpro';
+console.log('SEO Audit Pro: Using tool ID:', TOOL_ID);
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
 
 // Типы для GSC данных
@@ -111,7 +112,24 @@ const SEOAuditProTool: React.FC = () => {
 
   // Загружаем статистику при инициализации
   useEffect(() => {
-    statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+    const loadLaunchCount = async () => {
+      try {
+        console.log(`SEO Audit Pro: Loading launch count for tool ID: ${TOOL_ID}`);
+        console.log(`SEO Audit Pro: API Base URL: ${API_BASE}`);
+        
+        const count = await statsService.getLaunchCount(TOOL_ID);
+        console.log(`SEO Audit Pro: Successfully loaded launch count: ${count}`);
+        setLaunchCount(count);
+      } catch (error) {
+        console.error('SEO Audit Pro: Error loading launch count:', error);
+        console.log('SEO Audit Pro: Falling back to 0 count');
+        // Устанавливаем 0 как fallback
+        setLaunchCount(0);
+      }
+    };
+    
+    // Добавляем небольшую задержку, чтобы дать время компоненту полностью загрузиться
+    setTimeout(loadLaunchCount, 100);
   }, []);
 
   // Загрузка доступных сайтов из GSC (демо-данные)
@@ -176,10 +194,6 @@ const SEOAuditProTool: React.FC = () => {
 
     setIsConnecting(true);
     try {
-      // Инкрементируем счетчик использования
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-      setLaunchCount(newCount);
-
       // Получаем URL авторизации Google OAuth
       const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/auth`);
       const data = await response.json();
@@ -231,6 +245,16 @@ const SEOAuditProTool: React.FC = () => {
   // Запуск анализа выбранного сайта
   const handleAnalyzeSite = async () => {
     if (!selectedSite) return;
+
+    // Инкрементируем счетчик использования только при запуске анализа
+    try {
+      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+      console.log(`SEO Audit Pro: Launch count updated from ${launchCount} to ${newCount}`);
+      setLaunchCount(newCount);
+    } catch (error) {
+      console.error('Error updating launch count:', error);
+      // Продолжаем анализ даже если не удалось обновить счетчик
+    }
 
     setResult({
       loading: true

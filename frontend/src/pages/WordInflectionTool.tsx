@@ -50,13 +50,6 @@ const WordInflectionTool: React.FC = () => {
       return;
     }
 
-    // Увеличиваем счетчик запусков
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
     }
 
     setAiError('');

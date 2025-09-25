@@ -119,15 +119,7 @@ const FindReplaceTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-        }
 
-        // Увеличиваем счетчик запусков
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
         }
 
 

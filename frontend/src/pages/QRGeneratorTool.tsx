@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
+import { statsService } from '../utils/statsService';
 import './QRGeneratorTool.css';
+
+const TOOL_ID = 'qr-generator';
 
 interface QRFormData {
     type: 'url' | 'text' | 'email' | 'phone' | 'wifi' | 'vcard' | 'sms';
@@ -33,6 +36,7 @@ const QRGeneratorTool: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [qrDataUrl, setQrDataUrl] = useState<string>('');
     const [qrSvg, setQrSvg] = useState<string>('');
+    const [launchCount, setLaunchCount] = useState(0);
 
     const [formData, setFormData] = useState<QRFormData>({
         type: 'url',
@@ -44,6 +48,10 @@ const QRGeneratorTool: React.FC = () => {
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+    }, []);
 
     const handleInputChange = (field: keyof QRFormData, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -158,7 +166,9 @@ const QRGeneratorTool: React.FC = () => {
                 setQrDataUrl('');
             }
 
-            // Трекинг использования - добавим позже
+            // Трекинг использования
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
             console.log('QR code generated successfully');
         } catch (error) {
             console.error('Error generating QR code:', error);
@@ -387,7 +397,7 @@ const QRGeneratorTool: React.FC = () => {
                 <div className="tool-header-buttons">
                     <button className="tool-header-btn counter-btn" title="Счетчик запусков">
                         <img src="/icons/rocket.svg" alt="" />
-                        <span className="counter">0</span>
+                        <span className="counter">{launchCount}</span>
                     </button>
                     <button className="tool-header-btn icon-only" title="Подсказки">
                         <img src="/icons/lamp.svg" alt="" />

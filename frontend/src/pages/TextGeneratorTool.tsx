@@ -206,13 +206,6 @@ const TextGeneratorTool: React.FC = () => {
         return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
     }
 
-    // Увеличиваем счетчик запусков
-    try {
-        const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-        setLaunchCount(newCount);
-    } catch (error) {
-        console.error('Failed to update stats:', error);
-        setLaunchCount(prev => prev + 1);
     }
 
     setAiError('');
@@ -245,7 +238,6 @@ const TextGeneratorTool: React.FC = () => {
         } else {
           setAiError(response.error || 'Не удалось сгенерировать текст');
           console.error('❌ AI generation failed:', response.error);
-        }
       }
       
     } catch (error) {

@@ -104,16 +104,7 @@ const WordMixerTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-        }
 
-        // Увеличиваем счетчик запусков
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
 
 
         // Получаем списки слов, фильтруя пустые строки
@@ -133,7 +124,6 @@ const WordMixerTool: React.FC = () => {
         if (nonEmptyLists.length === 0) {
             setResult('');
             return;
-        }
 
         // Увеличиваем счетчик запусков и получаем актуальное значение
         try {
@@ -145,7 +135,6 @@ const WordMixerTool: React.FC = () => {
         } catch (error) {
             console.error('Failed to update stats:', error);
             setLaunchCount(prev => prev + 1);
-        }
 
         // Алгоритм миксации: создаем все возможные комбинации и сохраняем промежуточные результаты
         let currentCombinations = nonEmptyLists[0].map(word => [word]);
@@ -155,7 +144,6 @@ const WordMixerTool: React.FC = () => {
         if (nonEmptyLists.length === 1) {
             setResult(currentCombinations.map(combination => combination.join(' ')).join('\n'));
             return;
-        }
 
         // Последовательно комбинируем с каждым следующим списком
         for (let i = 1; i < nonEmptyLists.length; i++) {
@@ -173,7 +161,6 @@ const WordMixerTool: React.FC = () => {
             // Добавляем результат этого этапа к общему результату
             const stageResults = currentCombinations.map(combination => combination.join(' '));
             allResults.push(...stageResults);
-        }
 
         setResult(allResults.join('\n'));
     };

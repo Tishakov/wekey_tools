@@ -435,7 +435,6 @@ const AnalyticsTool: React.FC = () => {
           finalValue = numericValue.toFixed(1);
         } else {
           return;
-        }
       }
     } else {
       // Для обычных полей преобразуем в число

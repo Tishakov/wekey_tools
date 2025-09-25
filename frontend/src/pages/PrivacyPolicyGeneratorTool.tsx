@@ -213,8 +213,8 @@ Email: ${data.email}
             }
             
             setResult(documents);
-            await statsService.incrementLaunchCount(TOOL_ID);
-            setLaunchCount(prev => prev + 1);
+            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+            setLaunchCount(newCount);
             
         } catch (error) {
             console.error('Error generating documents:', error);
