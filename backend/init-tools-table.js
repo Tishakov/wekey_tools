@@ -225,6 +225,22 @@ const toolsConfig = [
     icon: '/icons/tool_seo_site.svg',
     path: '/seo-audit',
     category: 'analytics'
+  },
+  {
+    id: 'privacy-policy-generator',
+    title: 'Политика и оферта',
+    description: 'Создание политики конфиденциальности и публичной оферты для сайта',
+    icon: '/icons/tool_policy.svg',
+    path: '/privacy-policy-generator',
+    category: 'generators'
+  },
+  {
+    id: 'qr-generator',
+    title: 'Генератор QR-кодов',
+    description: 'Генерация QR-кодов для ссылок, текста, контактов, Wi-Fi и других данных',
+    icon: '/icons/tool_qr.svg',
+    path: '/qr-generator',
+    category: 'generators'
   }
 ];
 

@@ -235,6 +235,24 @@ export const toolsConfig: Tool[] = [
     path: '/seo-audit',
     category: 'analytics',
     status: 'ready'
+  },
+  {
+    id: 'privacy-policy-generator',
+    title: 'Политика и оферта',
+    description: 'Создание политики конфиденциальности и публичной оферты для сайта',
+    icon: '/icons/tool_policy.svg',
+    path: '/privacy-policy-generator',
+    category: 'generators',
+    status: 'ready'
+  },
+  {
+    id: 'qr-generator',
+    title: 'Генератор QR-кодов',
+    description: 'Генерация QR-кодов для ссылок, текста, контактов, Wi-Fi и других данных',
+    icon: '/icons/tool_qr.svg',
+    path: '/qr-generator',
+    category: 'generators',
+    status: 'ready'
   }
 ];
 

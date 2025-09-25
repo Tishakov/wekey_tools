@@ -43,7 +43,9 @@
       "duplicate-finder": "Пошук дублікатів",
       "cross-analytics": "Наскрізна аналітика",
       "site-audit": "Аудит сайту",
-      "seo-audit": "Аудит SEO"
+      "seo-audit": "Аудит SEO",
+      "privacy-policy-generator": "Політика і оферта",
+      "qr-generator": "Генератор QR-кодів"
     },
     "descriptions": {
       "case-changer": "Інструмент для зміни регістру тексту",
@@ -81,7 +83,9 @@
       "duplicate-finder": "Пошук дублюючого контенту",
       "cross-analytics": "Наскрізна аналітика",
       "site-audit": "Комплексний аналіз технологій та аналітики сайту",
-      "seo-audit": "Детальний аналіз SEO-оптимізації сайту"
+      "seo-audit": "Детальний аналіз SEO-оптимізації сайту",
+      "privacy-policy-generator": "Генерування політик конфіденційності та публічних оферт для веб-сайтів",
+      "qr-generator": "Генерація QR-кодів для посилань, тексту, контактів, Wi-Fi та інших даних"
     }
   },
   "common": {
@@ -1629,5 +1633,153 @@
     "benefit3": "Персональна статистика використання",
     "loginButton": "Увійти",
     "cancelButton": "Скасувати"
+  },
+  "privacyPolicyGenerator": {
+    "title": "Політика і оферта",
+    "description": "Створіть професійні юридичні документи для вашого веб-сайту",
+    "seo": {
+      "title": "Генератор політики та оферти - Створіть юридичні документи для сайту | WEKey Tools",
+      "description": "Безкоштовний генератор політики конфіденційності та публічної оферти. Створюйте професійні юридичні документи для вашого веб-сайту відповідно до законодавства України.",
+      "keywords": "генератор політики конфіденційності, публічна оферта, юридичні документи, договір оферти, політика конфіденційності України, GDPR, персональні дані"
+    },
+    "form": {
+      "companyInfo": "Інформація про компанію",
+      "companyName": "Назва компанії",
+      "companyNamePlaceholder": "ТОВ \"Моя компанія\"",
+      "legalAddress": "Юридична адреса",
+      "legalAddressPlaceholder": "вул. Хрещатик, 1, м. Київ, 01001",
+      "contactInfo": "Контактна інформація",
+      "phone": "Телефон",
+      "phonePlaceholder": "+380671234567",
+      "email": "Email",
+      "emailPlaceholder": "info@example.com",
+      "website": "Веб-сайт",
+      "websitePlaceholder": "https://example.com",
+      "edrpou": "Код ЄДРПОУ",
+      "edrpouPlaceholder": "12345678",
+      "director": "Директор",
+      "directorPlaceholder": "Іванов Іван Іванович",
+      "serviceType": "Тип послуг",
+      "serviceTypeOptions": {
+        "website": "Веб-сайт",
+        "ecommerce": "Інтернет-магазин",
+        "service": "Онлайн-сервіс",
+        "consulting": "Консультації",
+        "education": "Освітні послуги",
+        "other": "Інше"
+      },
+      "serviceDescription": "Опис послуг",
+      "serviceDescriptionPlaceholder": "Детальний опис ваших послуг...",
+      "documentType": "Тип документа",
+      "documentTypeOptions": {
+        "privacy": "Політика конфіденційності",
+        "offer": "Публічна оферта",
+        "both": "Обидва документи"
+      },
+      "dataProcessing": "Обробка персональних даних",
+      "collectsPersonalData": "Збираємо персональні дані користувачів",
+      "usesAnalytics": "Використовуємо аналітику (Google Analytics, тощо)",
+      "usesCookies": "Використовуємо cookies",
+      "sendsEmails": "Відправляємо email розсилки",
+      "sharesWithThirdParty": "Передаємо дані третім особам",
+      "generate": "Згенерувати документи",
+      "generating": "Генерація...",
+      "downloadPrivacy": "Завантажити політику конфіденційності",
+      "downloadOffer": "Завантажити публічну оферту",
+      "copyPrivacy": "Копіювати політику конфіденційності",
+      "copyOffer": "Копіювати публічну оферту"
+    },
+    "validation": {
+      "companyNameRequired": "Назва компанії є обов'язковою",
+      "legalAddressRequired": "Юридична адреса є обов'язковою",
+      "phoneRequired": "Телефон є обов'язковим",
+      "emailRequired": "Email є обов'язковим",
+      "emailInvalid": "Неправильний формат email",
+      "websiteRequired": "Веб-сайт є обов'язковим",
+      "websiteInvalid": "Неправильний формат URL",
+      "edrpouRequired": "Код ЄДРПОУ є обов'язковим",
+      "edrpouInvalid": "Код ЄДРПОУ повинен містити 8 цифр",
+      "directorRequired": "ПІБ директора є обов'язковим",
+      "serviceDescriptionRequired": "Опис послуг є обов'язковим"
+    },
+    "success": {
+      "generated": "Документи успішно згенеровано!",
+      "copied": "Скопійовано в буфер обміну!"
+    },
+    "tips": {
+      "title": "Корисні поради",
+      "tip1": "Заповніть всі обов'язкові поля для створення повноцінного документа",
+      "tip2": "Перевірте правильність контактних даних",
+      "tip3": "Опис послуг повинен бути детальним та зрозумілим",
+      "tip4": "Обирайте правильний тип обробки даних відповідно до вашого сайту",
+      "tip5": "Згенеровані документи рекомендується переглянути з юристом"
+    }
+  },
+  "qrGenerator": {
+    "title": "Генератор QR-кодів",
+    "description": "Створюйте QR-коди для посилань, тексту, контактів, Wi-Fi та інших даних з налаштуванням кольорів і розмірів",
+    "generate": "Генерувати QR-код",
+    "generating": "Генеруємо...",
+    "download": "Завантажити",
+    "form": {
+      "content": "Вміст QR-коду",
+      "type": "Тип даних",
+      "typeOptions": {
+        "url": "Посилання (URL)",
+        "text": "Текст",
+        "email": "Email",
+        "phone": "Телефон",
+        "wifi": "Wi-Fi",
+        "vcard": "Контакт (vCard)",
+        "sms": "SMS"
+      },
+      "url": "Посилання",
+      "urlPlaceholder": "https://example.com",
+      "text": "Текст",
+      "textPlaceholder": "Введіть текст для QR-коду",
+      "email": "Email адреса",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Номер телефону",
+      "phonePlaceholder": "+38 (099) 123-45-67",
+      "wifiSSID": "Назва Wi-Fi мережі",
+      "wifiSSIDPlaceholder": "MyWiFiNetwork",
+      "wifiPassword": "Пароль Wi-Fi",
+      "wifiPasswordPlaceholder": "Введіть пароль",
+      "wifiSecurity": "Тип безпеки",
+      "wifiNoPassword": "Без пароля",
+      "vcardName": "Ім'я контакту",
+      "vcardNamePlaceholder": "Іван Іванов",
+      "vcardPhone": "Телефон контакту",
+      "vcardPhonePlaceholder": "+38 (099) 123-45-67",
+      "vcardEmail": "Email контакту",
+      "vcardEmailPlaceholder": "contact@example.com",
+      "vcardOrg": "Організація",
+      "vcardOrgPlaceholder": "ТОВ \"Компанія\"",
+      "smsPhone": "Номер для SMS",
+      "smsPhonePlaceholder": "+38 (099) 123-45-67",
+      "smsMessage": "Текст повідомлення",
+      "smsMessagePlaceholder": "Текст SMS повідомлення",
+      "customization": "Налаштування зовнішнього вигляду",
+      "foregroundColor": "Колір QR-коду",
+      "backgroundColor": "Колір фону",
+      "size": "Розмір",
+      "format": "Формат файлу"
+    },
+    "preview": {
+      "title": "Попередній перегляд QR-коду",
+      "placeholder": "QR-код з'явиться тут після заповнення даних"
+    },
+    "validation": {
+      "urlRequired": "Посилання обов'язкове",
+      "urlInvalid": "Введіть коректне посилання (повинно починатися з http:// або https://)",
+      "textRequired": "Текст обов'язковий",
+      "emailRequired": "Email обов'язковий",
+      "emailInvalid": "Введіть коректний email",
+      "phoneRequired": "Номер телефону обов'язковий",
+      "wifiSSIDRequired": "Назва Wi-Fi мережі обов'язкова",
+      "wifiPasswordRequired": "Пароль Wi-Fi обов'язковий",
+      "vcardNameRequired": "Ім'я контакту обов'язкове",
+      "smsPhoneRequired": "Номер телефону для SMS обов'язковий"
+    }
   }
 }

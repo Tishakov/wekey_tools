@@ -43,7 +43,9 @@
       "duplicate-finder": "Duplicate Finder",
       "cross-analytics": "Cross Analytics",
       "site-audit": "Site Audit",
-      "seo-audit": "SEO Audit"
+      "seo-audit": "SEO Audit",
+      "privacy-policy-generator": "Privacy & Terms",
+      "qr-generator": "QR Code Generator"
     },
     "descriptions": {
       "case-changer": "Tool for changing text case",
@@ -81,7 +83,9 @@
       "duplicate-finder": "Find duplicate content",
       "cross-analytics": "Cross-platform analytics",
       "site-audit": "Comprehensive analysis of website technologies and analytics",
-      "seo-audit": "Detailed SEO optimization analysis"
+      "seo-audit": "Detailed SEO optimization analysis",
+      "privacy-policy-generator": "Create privacy policy and public offer for website",
+      "qr-generator": "Generate QR codes for URLs, text, contacts, Wi-Fi and other data"
     }
   },
   "common": {
@@ -1638,5 +1642,153 @@
     "benefit3": "Personal usage statistics",
     "loginButton": "Sign In",
     "cancelButton": "Cancel"
+  },
+  "privacyPolicyGenerator": {
+    "title": "Privacy & Terms",
+    "description": "Create professional legal documents for your website",
+    "seo": {
+      "title": "Privacy Policy & Offer Generator - Create Legal Documents for Website | WEKey Tools",
+      "description": "Free privacy policy and public offer generator. Create professional legal documents for your website compliant with Ukrainian legislation.",
+      "keywords": "privacy policy generator, public offer, legal documents, offer agreement, privacy policy Ukraine, GDPR, personal data"
+    },
+    "form": {
+      "companyInfo": "Company Information",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "LLC \"My Company\"",
+      "legalAddress": "Legal Address",
+      "legalAddressPlaceholder": "Khreshchatyk St., 1, Kyiv, 01001",
+      "contactInfo": "Contact Information",
+      "phone": "Phone",
+      "phonePlaceholder": "+380671234567",
+      "email": "Email",
+      "emailPlaceholder": "info@example.com",
+      "website": "Website",
+      "websitePlaceholder": "https://example.com",
+      "edrpou": "EDRPOU Code",
+      "edrpouPlaceholder": "12345678",
+      "director": "Director",
+      "directorPlaceholder": "Ivanov Ivan Ivanovich",
+      "serviceType": "Service Type",
+      "serviceTypeOptions": {
+        "website": "Website",
+        "ecommerce": "E-commerce",
+        "service": "Online Service",
+        "consulting": "Consulting",
+        "education": "Educational Services",
+        "other": "Other"
+      },
+      "serviceDescription": "Service Description",
+      "serviceDescriptionPlaceholder": "Detailed description of your services...",
+      "documentType": "Document Type",
+      "documentTypeOptions": {
+        "privacy": "Privacy Policy",
+        "offer": "Public Offer",
+        "both": "Both Documents"
+      },
+      "dataProcessing": "Personal Data Processing",
+      "collectsPersonalData": "We collect users' personal data",
+      "usesAnalytics": "We use analytics (Google Analytics, etc.)",
+      "usesCookies": "We use cookies",
+      "sendsEmails": "We send email newsletters",
+      "sharesWithThirdParty": "We share data with third parties",
+      "generate": "Generate Documents",
+      "generating": "Generating...",
+      "downloadPrivacy": "Download Privacy Policy",
+      "downloadOffer": "Download Public Offer",
+      "copyPrivacy": "Copy Privacy Policy",
+      "copyOffer": "Copy Public Offer"
+    },
+    "validation": {
+      "companyNameRequired": "Company name is required",
+      "legalAddressRequired": "Legal address is required",
+      "phoneRequired": "Phone is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "websiteRequired": "Website is required",
+      "websiteInvalid": "Invalid URL format",
+      "edrpouRequired": "EDRPOU code is required",
+      "edrpouInvalid": "EDRPOU code must contain 8 digits",
+      "directorRequired": "Director name is required",
+      "serviceDescriptionRequired": "Service description is required"
+    },
+    "success": {
+      "generated": "Documents generated successfully!",
+      "copied": "Copied to clipboard!"
+    },
+    "tips": {
+      "title": "Useful Tips",
+      "tip1": "Fill in all required fields to create a complete document",
+      "tip2": "Check the correctness of contact information",
+      "tip3": "Service description should be detailed and clear",
+      "tip4": "Choose appropriate data processing options for your website",
+      "tip5": "Generated documents are recommended to be reviewed by a lawyer"
+    }
+  },
+  "qrGenerator": {
+    "title": "QR Code Generator",
+    "description": "Create QR codes for URLs, text, contacts, Wi-Fi and other data with color and size customization",
+    "generate": "Generate QR Code",
+    "generating": "Generating...",
+    "download": "Download",
+    "form": {
+      "content": "QR Code Content",
+      "type": "Data Type",
+      "typeOptions": {
+        "url": "URL Link",
+        "text": "Text",
+        "email": "Email",
+        "phone": "Phone",
+        "wifi": "Wi-Fi",
+        "vcard": "Contact (vCard)",
+        "sms": "SMS"
+      },
+      "url": "URL Link",
+      "urlPlaceholder": "https://example.com",
+      "text": "Text",
+      "textPlaceholder": "Enter text for QR code",
+      "email": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "wifiSSID": "Wi-Fi Network Name",
+      "wifiSSIDPlaceholder": "MyWiFiNetwork",
+      "wifiPassword": "Wi-Fi Password",
+      "wifiPasswordPlaceholder": "Enter password",
+      "wifiSecurity": "Security Type",
+      "wifiNoPassword": "No Password",
+      "vcardName": "Contact Name",
+      "vcardNamePlaceholder": "John Doe",
+      "vcardPhone": "Contact Phone",
+      "vcardPhonePlaceholder": "+1 (555) 123-4567",
+      "vcardEmail": "Contact Email",
+      "vcardEmailPlaceholder": "contact@example.com",
+      "vcardOrg": "Organization",
+      "vcardOrgPlaceholder": "Company LLC",
+      "smsPhone": "SMS Phone Number",
+      "smsPhonePlaceholder": "+1 (555) 123-4567",
+      "smsMessage": "Message Text",
+      "smsMessagePlaceholder": "SMS message text",
+      "customization": "Appearance Settings",
+      "foregroundColor": "QR Code Color",
+      "backgroundColor": "Background Color",
+      "size": "Size",
+      "format": "File Format"
+    },
+    "preview": {
+      "title": "QR Code Preview",
+      "placeholder": "QR code will appear here after filling in the data"
+    },
+    "validation": {
+      "urlRequired": "URL is required",
+      "urlInvalid": "Enter a valid URL (must start with http:// or https://)",
+      "textRequired": "Text is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Enter a valid email",
+      "phoneRequired": "Phone number is required",
+      "wifiSSIDRequired": "Wi-Fi network name is required",
+      "wifiPasswordRequired": "Wi-Fi password is required",
+      "vcardNameRequired": "Contact name is required",
+      "smsPhoneRequired": "SMS phone number is required"
+    }
   }
 }

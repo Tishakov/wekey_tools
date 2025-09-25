@@ -34,6 +34,16 @@ export const TOOLS_REGISTRY: Record<string, ToolInfo> = {
     name: 'Генератор UTM-меток',
     description: 'Создание UTM-параметров для аналитики'
   },
+  'privacy-policy-generator': {
+    id: 'privacy-policy-generator',
+    name: 'Политика и оферта',
+    description: 'Создание политики конфиденциальности и публичной оферты'
+  },
+  'qr-generator': {
+    id: 'qr-generator',
+    name: 'Генератор QR-кодов',
+    description: 'Создание QR-кодов для различных типов данных'
+  },
 
   // Обработка текста
   'case-changer': {
