@@ -6,7 +6,7 @@ class GoogleSearchConsoleService {
     this.oauth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8880/auth/google/callback'
+      process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8880/api/tools/seo-audit-pro/callback'
     );
     
     this.searchconsole = google.searchconsole({
@@ -23,18 +23,21 @@ class GoogleSearchConsoleService {
         'https://www.googleapis.com/auth/webmasters.readonly',
         'https://www.googleapis.com/auth/webmasters'
       ],
-      prompt: 'consent'
+      prompt: 'consent',
+      state: 'gsc_auth' // Помечаем как GSC авторизацию
     });
   }
 
   // Обмен кода авторизации на токены
   async getTokensFromCode(code) {
     try {
-      const { tokens } = await this.oauth2Client.getAccessToken(code);
+      // Правильный метод для обмена кода на токены
+      const { tokens } = await this.oauth2Client.getToken(code);
       this.oauth2Client.setCredentials(tokens);
       return tokens;
     } catch (error) {
       console.error('Error getting tokens:', error);
+      console.error('Error details:', error);
       throw new Error('Failed to exchange authorization code for tokens');
     }
   }

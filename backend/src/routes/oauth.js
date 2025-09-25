@@ -14,11 +14,30 @@ router.get('/google', (req, res, next) => {
   scope: ['profile', 'email']
 }));
 
-// Callback после OAuth
+// Callback после OAuth (для обычной авторизации пользователей)
 router.get('/google/callback', (req, res, next) => {
   console.log('🔄 OAuth: Callback received from Google');
   console.log('🔍 Callback URL:', req.url);
   console.log('🔍 Callback query:', req.query);
+  
+  // Проверяем, это GSC авторизация или обычная авторизация пользователя
+  if (req.query.state === 'gsc_auth') {
+    // Это авторизация для Google Search Console
+    const { code, error } = req.query;
+    
+    if (error) {
+      return res.redirect(`http://localhost:5173/gsc-callback.html?error=${encodeURIComponent(error)}`);
+    }
+    
+    if (!code) {
+      return res.redirect(`http://localhost:5173/gsc-callback.html?error=no_code`);
+    }
+
+    // Редирект на страницу обработки GSC с кодом
+    return res.redirect(`http://localhost:5173/gsc-callback.html?code=${encodeURIComponent(code)}`);
+  }
+  
+  // Обычная авторизация пользователя
   next();
 }, passport.authenticate('google', { session: false }),
   async (req, res) => {

@@ -22,10 +22,12 @@ router.get('/seo-audit-pro/auth', async (req, res) => {
   }
 });
 
-// Callback для OAuth авторизации
-router.get('/seo-audit-pro/callback', async (req, res) => {
+// OAuth callback для GSC обрабатывается в /auth/google/callback через oauth.js
+
+// API endpoint для получения токенов по коду
+router.post('/seo-audit-pro/exchange-token', async (req, res) => {
   try {
-    const { code } = req.query;
+    const { code } = req.body;
     
     if (!code) {
       return res.status(400).json({
@@ -42,15 +44,39 @@ router.get('/seo-audit-pro/callback', async (req, res) => {
       message: 'Successfully connected to Google Search Console'
     });
   } catch (error) {
-    console.error('GSC OAuth callback error:', error);
+    console.error('GSC token exchange error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to complete authorization'
+      error: 'Failed to exchange code for tokens'
     });
   }
 });
 
-// Получение списка сайтов
+// Получение списка сайтов (GET - для демо)
+router.get('/seo-audit-pro/sites', async (req, res) => {
+  try {
+    // Возвращаем демо-данные сайтов из GSC (включая ваш реальный сайт)
+    res.json({ 
+      success: true, 
+      sites: [
+        { siteUrl: 'https://wekey.tools/', permissionLevel: 'siteOwner' },
+        { siteUrl: 'https://example.com/', permissionLevel: 'siteOwner' },
+        { siteUrl: 'https://mywebsite.com/', permissionLevel: 'siteOwner' },
+        { siteUrl: 'https://testsite.org/', permissionLevel: 'siteFullUser' },
+        { siteUrl: 'https://blog.example.com/', permissionLevel: 'siteOwner' }
+      ],
+      isDemo: true
+    });
+  } catch (error) {
+    console.error('Error fetching sites:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch sites'
+    });
+  }
+});
+
+// Получение списка сайтов (POST - с токенами)
 router.post('/seo-audit-pro/sites', async (req, res) => {
   try {
     const { tokens } = req.body;
@@ -71,6 +97,22 @@ router.post('/seo-audit-pro/sites', async (req, res) => {
     });
   } catch (error) {
     console.error('GSC Sites fetch error:', error);
+    
+    // Если API не активирован, возвращаем demo данные с предупреждением
+    if (error.message && error.message.includes('API has not been used')) {
+      return res.json({
+        success: true,
+        sites: [
+          { siteUrl: 'https://wekey.tools/', permissionLevel: 'siteOwner' },
+          { siteUrl: 'https://example.com/', permissionLevel: 'siteOwner' },
+          { siteUrl: 'https://mywebsite.com/', permissionLevel: 'siteOwner' }
+        ],
+        isDemo: true,
+        message: 'Search Console API не активирован. Используются демо-данные.',
+        apiActivationUrl: 'https://console.developers.google.com/apis/api/searchconsole.googleapis.com/overview?project=751826217400'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Failed to fetch sites from Google Search Console'

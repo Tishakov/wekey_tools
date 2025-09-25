@@ -100,15 +100,74 @@ const SEOAuditProTool: React.FC = () => {
   } = useAuthRequired();
 
   const [launchCount, setLaunchCount] = useState(0);
-  const [website, setWebsite] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [result, setResult] = useState<AuditResult | null>(null);
+  
+  // Новые состояния для выбора сайтов из GSC
+  const [availableSites, setAvailableSites] = useState<Array<{siteUrl: string, permissionLevel: string}>>([]);
+  const [selectedSite, setSelectedSite] = useState('');
+  const [loadingSites, setLoadingSites] = useState(false);
 
   // Загружаем статистику при инициализации
   useEffect(() => {
     statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
   }, []);
+
+  // Загрузка доступных сайтов из GSC (демо-данные)
+  const loadAvailableSites = async () => {
+    setLoadingSites(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/sites`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setAvailableSites(data.sites);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки сайтов:', error);
+    } finally {
+      setLoadingSites(false);
+    }
+  };
+
+  // Загрузка реальных сайтов из GSC с токенами
+  const loadAvailableSitesWithTokens = async (tokens: any) => {
+    setLoadingSites(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/sites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tokens })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setAvailableSites(data.sites);
+        // Сохраняем токены для последующих запросов
+        localStorage.setItem('gsc-tokens', JSON.stringify(tokens));
+        
+        // Показываем сообщение об активации API если нужно
+        if (data.message && data.apiActivationUrl) {
+          console.warn('🔧 API Activation needed:', data.message);
+          console.warn('🔗 Activation URL:', data.apiActivationUrl);
+          
+          // Можно добавить уведомление пользователю
+          if (data.isDemo) {
+            alert(`${data.message}\n\nДля получения реальных данных активируйте API:\n${data.apiActivationUrl}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки сайтов с токенами:', error);
+      // Fallback к демо-данным
+      await loadAvailableSites();
+    } finally {
+      setLoadingSites(false);
+    }
+  };
 
   // Подключение к Google Search Console
   const handleConnectGSC = async () => {
@@ -121,27 +180,66 @@ const SEOAuditProTool: React.FC = () => {
       const newCount = await statsService.incrementAndGetCount(TOOL_ID);
       setLaunchCount(newCount);
 
-      // Здесь будет логика подключения к GSC
-      // Пока имитируем процесс
-      setTimeout(() => {
-        setIsConnected(true);
-        setIsConnecting(false);
-      }, 2000);
+      // Получаем URL авторизации Google OAuth
+      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/auth`);
+      const data = await response.json();
+      
+      if (data.success) {
+        // Открываем окно авторизации Google
+        const authWindow = window.open(
+          data.authUrl, 
+          'gsc-auth', 
+          'width=600,height=700,scrollbars=yes,resizable=yes'
+        );
+
+        // Слушаем сообщения от окна авторизации
+        const handleAuthMessage = (event: MessageEvent) => {
+          if (event.origin !== window.location.origin) return;
+          
+          if (event.data.type === 'GSC_AUTH_SUCCESS') {
+            authWindow?.close();
+            setIsConnected(true);
+            setIsConnecting(false);
+            // Загружаем реальные сайты из GSC
+            loadAvailableSitesWithTokens(event.data.tokens);
+            window.removeEventListener('message', handleAuthMessage);
+          } else if (event.data.type === 'GSC_AUTH_ERROR') {
+            authWindow?.close();
+            setIsConnecting(false);
+            console.error('Ошибка авторизации GSC:', event.data.error);
+            window.removeEventListener('message', handleAuthMessage);
+          }
+        };
+
+        window.addEventListener('message', handleAuthMessage);
+
+        // Проверяем, если окно было закрыто пользователем
+        const checkClosed = setInterval(() => {
+          if (authWindow?.closed) {
+            setIsConnecting(false);
+            clearInterval(checkClosed);
+            window.removeEventListener('message', handleAuthMessage);
+          }
+        }, 1000);
+      }
     } catch (error) {
       setIsConnecting(false);
       console.error('Ошибка подключения к GSC:', error);
     }
   };
 
-  // Запуск анализа сайта
+  // Запуск анализа выбранного сайта
   const handleAnalyzeSite = async () => {
-    if (!website.trim()) return;
+    if (!selectedSite) return;
 
     setResult({
       loading: true
     });
 
     try {
+      // Извлекаем домен из полного URL
+      const websiteDomain = selectedSite.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      
       // API запрос к новому endpoint для анализа GSC данных
       const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze`, {
         method: 'POST',
@@ -149,7 +247,7 @@ const SEOAuditProTool: React.FC = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          website: website.trim(),
+          website: websiteDomain,
           useMockData: true // Используем демо-данные для тестирования
         })
       });
@@ -199,46 +297,46 @@ const SEOAuditProTool: React.FC = () => {
         </div>
       </div>
 
-      <div className="main-workspace">
+      <div className="seopro-main-workspace">
         {/* GSC Connection Section */}
         {!isConnected ? (
-          <div className="gsc-connection-section">
-            <div className="gsc-intro">
-              <div className="gsc-icon">
+          <div className="seopro-gsc-connection-section">
+            <div className="seopro-gsc-intro">
+              <div className="seopro-gsc-icon">
                 <img src="/icons/google-search-console.svg" alt="Google Search Console" />
               </div>
               <h2>Подключите Google Search Console</h2>
-              <p className="gsc-description">
+              <p className="seopro-gsc-description">
                 Получите персональный SEO-анализ на основе реальных данных Google о вашем сайте
               </p>
               
-              <div className="gsc-benefits">
-                <div className="benefit-item">
-                  <span className="benefit-icon">📊</span>
+              <div className="seopro-gsc-benefits">
+                <div className="seopro-benefit-item">
+                  <span className="seopro-benefit-icon">📊</span>
                   <span>Реальные данные поиска</span>
                 </div>
-                <div className="benefit-item">
-                  <span className="benefit-icon">🔍</span>
+                <div className="seopro-benefit-item">
+                  <span className="seopro-benefit-icon">🔍</span>
                   <span>Анализ ключевых запросов</span>
                 </div>
-                <div className="benefit-item">
-                  <span className="benefit-icon">⚡</span>
+                <div className="seopro-benefit-item">
+                  <span className="seopro-benefit-icon">⚡</span>
                   <span>Проблемы производительности</span>
                 </div>
-                <div className="benefit-item">
-                  <span className="benefit-icon">🎯</span>
+                <div className="seopro-benefit-item">
+                  <span className="seopro-benefit-icon">🎯</span>
                   <span>Персональные рекомендации</span>
                 </div>
               </div>
 
               <button 
-                className={`gsc-connect-btn ${isConnecting ? 'connecting' : ''}`}
+                className={`seopro-gsc-connect-btn ${isConnecting ? 'connecting' : ''}`}
                 onClick={handleConnectGSC}
                 disabled={isConnecting}
               >
                 {isConnecting ? (
                   <>
-                    <div className="loading-spinner"></div>
+                    <div className="seopro-loading-spinner"></div>
                     Подключаемся...
                   </>
                 ) : (
@@ -252,56 +350,64 @@ const SEOAuditProTool: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* Website Input Section */}
-            <div className="website-input-section">
-              <h3>Выберите сайт для анализа</h3>
-              <div className="website-input-row">
-                <input
-                  type="text"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  placeholder="example.com"
-                  className="website-input"
-                />
-                <button 
-                  className="analyze-btn"
-                  onClick={handleAnalyzeSite}
-                  disabled={!website.trim() || (result?.loading || false)}
+            {/* Website Selection Section */}
+            <div className="seopro-website-input-section">
+              <div className="seopro-site-selector-container">
+                <select
+                  value={selectedSite}
+                  onChange={(e) => setSelectedSite(e.target.value)}
+                  className="seopro-site-selector"
+                  disabled={loadingSites}
                 >
-                  {result?.loading ? (
-                    <>
-                      <div className="loading-spinner"></div>
-                      Анализируем...
-                    </>
-                  ) : (
-                    'Проанализировать'
-                  )}
-                </button>
+                  <option value="">
+                    {loadingSites ? 'Загружаю сайты...' : 'Выберите сайт для анализа'}
+                  </option>
+                  {availableSites.map((site, index) => (
+                    <option key={index} value={site.siteUrl}>
+                      {site.siteUrl} {site.permissionLevel === 'siteOwner' ? '👑' : '👤'}
+                    </option>
+                  ))}
+                </select>
               </div>
+              
+              <button 
+                className="seopro-analyze-btn"
+                onClick={handleAnalyzeSite}
+                disabled={!selectedSite || (result?.loading || false)}
+              >
+                {result?.loading ? (
+                  <>
+                    <div className="seopro-loading-spinner"></div>
+                    Анализируем...
+                  </>
+                ) : (
+                  'Проанализировать'
+                )}
+              </button>
             </div>
 
             {/* Results Section */}
             {result && (
               <div className="seo-audit-pro-results">
                 {result.loading && (
-                  <div className="loading-state">
-                    <div className="loading-spinner large"></div>
+                  <div className="seopro-loading-state">
+                    <div className="seopro-loading-spinner large"></div>
                     <h3>Анализируем данные Google Search Console</h3>
                     <p>Получаем актуальную информацию о вашем сайте...</p>
-                    <div className="loading-steps">
-                      <div className="step active">📊 Загружаем статистику поиска</div>
-                      <div className="step">🔍 Анализируем индексацию</div>
-                      <div className="step">⚡ Проверяем Core Web Vitals</div>
-                      <div className="step">🎯 Формируем рекомендации</div>
+                    <div className="seopro-loading-steps">
+                      <div className="seopro-step active">📊 Загружаем статистику поиска</div>
+                      <div className="seopro-step">🔍 Анализируем индексацию</div>
+                      <div className="seopro-step">⚡ Проверяем Core Web Vitals</div>
+                      <div className="seopro-step">🎯 Формируем рекомендации</div>
                     </div>
                   </div>
                 )}
 
                 {result.error && (
-                  <div className="error-state">
+                  <div className="seopro-error-state">
                     <h3>❌ Ошибка анализа</h3>
                     <p>{result.error}</p>
-                    <button className="retry-btn" onClick={handleAnalyzeSite}>
+                    <button className="seopro-retry-btn" onClick={handleAnalyzeSite}>
                       Попробовать снова
                     </button>
                   </div>
