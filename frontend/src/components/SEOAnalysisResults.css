@@ -9,46 +9,93 @@
   gap: 32px;
 }
 
-/* Панель метрик */
-.metrics-dashboard {
+/* 📊 КЛАССИЧЕСКАЯ ПАНЕЛЬ МЕТРИК - 4x3 СЕТКА */
+.seopro-metrics-dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 32px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.metric-card {
-  background: var(--card-bg);
+/* Универсальная карточка метрики */
+.seopro-metric-card {
+  background-color: #1c1d1f;
   border: 1px solid var(--card-border);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 24px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.metric-card:hover {
+.seopro-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-color);
+}
+
+/* Элементы карточки */
+.seopro-metric-icon {
+  font-size: 36px;
+  margin-bottom: 16px;
+  display: block;
+  opacity: 0.8;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+  transition: all 0.3s ease;
+}
+
+.seopro-metric-icon:hover {
+  filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.2));
   transform: translateY(-2px);
+  opacity: 1;
 }
 
-.metric-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.metric-value {
+.seopro-metric-value {
   font-size: 32px;
   font-weight: 700;
   color: var(--accent-color);
   margin-bottom: 8px;
+  line-height: 1.2;
 }
 
-.metric-label {
-  font-size: 14px;
+.seopro-metric-label {
+  font-size: 13px;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.seopro-metric-change {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.seopro-metric-change.positive {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.seopro-metric-change.negative {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.seopro-metric-detail {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  opacity: 0.7;
+  font-weight: 500;
 }
 
 /* Health Score секция */
@@ -513,80 +560,165 @@
   }
 }
 
-/* Новые стили для расширенных метрик */
-.metric-change {
-  font-size: 10px;
-  font-weight: 600;
-  margin-top: 4px;
-  padding: 2px 6px;
-  border-radius: 10px;
-  display: inline-block;
+/* 🎨 ТОНКИЕ РАЗЛИЧИЯ ДЛЯ ТИПОВ МЕТРИК (БЕЗ ЯРКИХ ЦВЕТОВ) */
+
+/* Основные метрики - легкий акцент */
+.seopro-metric-card.primary-metric {
+  border-left: 3px solid var(--accent-color);
 }
 
-.metric-change.positive {
-  background: rgba(52, 168, 83, 0.1);
-  color: #34a853;
+.seopro-metric-card.primary-metric .seopro-metric-icon {
+  opacity: 1;
+  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.15));
 }
 
-.metric-change.negative {
-  background: rgba(234, 67, 53, 0.1);
-  color: #ea4335;
+.seopro-metric-card.primary-metric .seopro-metric-icon:hover {
+  filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.25));
 }
 
-.metric-detail {
-  font-size: 10px;
-  color: var(--text-secondary);
-  margin-top: 4px;
-  opacity: 0.8;
+/* Метрики устройств - нейтральный стиль */
+.seopro-metric-card.device-metric {
+  background: #1c1d1f;
+  flex-direction: column;
 }
 
-/* Расширенная сетка для большего количества карточек */
-.metrics-dashboard {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+.seopro-metric-card.device-metric .seopro-metric-value {
+  color: #64748b;
 }
 
-/* Стили для продвинутых метрик */
-.advanced-metric {
-  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(76, 175, 80, 0.05) 100%);
-  border: 1px solid rgba(76, 175, 80, 0.2);
+.seopro-metric-card.device-metric .seopro-metric-icon {
+  filter: drop-shadow(0 2px 4px rgba(148, 163, 184, 0.2));
+}
+
+.seopro-metric-card.device-metric .seopro-metric-icon:hover {
+  filter: drop-shadow(0 3px 6px rgba(148, 163, 184, 0.3));
+}
+
+/* Стандартные метрики - базовый стиль */
+.seopro-metric-card.standard-metric .seopro-metric-value {
+  color: #6b7280;
+}
+
+/* Предупреждающие метрики - осторожный акцент */
+.seopro-metric-card.warning-metric {
+  background-color: #1c1d1f;
+}
+
+.seopro-metric-card.warning-metric .seopro-metric-value {
+  color: #f59e0b;
+}
+
+.seopro-metric-card.warning-metric .seopro-metric-icon {
+  filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.2));
+  animation: warning-subtle 3s ease-in-out infinite alternate;
+}
+
+@keyframes warning-subtle {
+  from { filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.2)); }
+  to { filter: drop-shadow(0 3px 6px rgba(251, 191, 36, 0.3)); }
+}
+
+/* PRO метрики - премиальный, но сдержанный стиль */
+.seopro-metric-card.pro-metric {
+  background: #1c1d1f;
   position: relative;
 }
 
-.advanced-metric::before {
+.seopro-metric-card.pro-metric .seopro-metric-value {
+  color: #8b5cf6;
+}
+
+.seopro-metric-card.pro-metric .seopro-metric-icon {
+  filter: drop-shadow(0 2px 4px rgba(196, 181, 253, 0.2));
+  animation: pro-gentle 4s ease-in-out infinite;
+}
+
+@keyframes pro-gentle {
+  0%, 100% { filter: drop-shadow(0 2px 4px rgba(196, 181, 253, 0.2)); }
+  50% { filter: drop-shadow(0 3px 6px rgba(196, 181, 253, 0.3)); }
+}
+
+.seopro-metric-card.pro-metric::before {
   content: "PRO";
   position: absolute;
   top: 8px;
   right: 8px;
-  background: linear-gradient(45deg, #4caf50, #81c784);
+  background: #8b5cf6;
   color: white;
-  font-size: 8px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  opacity: 0.8;
 }
 
-.advanced-metric .metric-icon {
-  filter: drop-shadow(0 0 8px rgba(76, 175, 80, 0.3));
+/* 📱 АДАПТИВНОСТЬ ДЛЯ КЛАССИЧЕСКОЙ СЕТКИ */
+
+/* Планшеты - 3 колонки */
+@media (max-width: 1024px) {
+  .seopro-metrics-dashboard {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
 }
 
+/* Планшеты маленькие - 2 колонки */
 @media (max-width: 768px) {
-  .metrics-dashboard {
+  .seopro-metrics-dashboard {
     grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .seopro-metric-card {
+    padding: 20px;
+  }
+  
+  .seopro-metric-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  
+  .seopro-metric-value {
+    font-size: 28px;
+  }
+  
+  .seopro-metric-label {
+    font-size: 12px;
+  }
+}
+
+/* Мобильные - 1 колонка */
+@media (max-width: 480px) {
+  .seopro-metrics-dashboard {
+    grid-template-columns: 1fr;
     gap: 12px;
   }
   
-  .metric-card {
-    padding: 16px;
+  .seopro-metric-card {
+    padding: 18px;
   }
   
-  .metric-change {
-    font-size: 9px;
+  .seopro-metric-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
   }
   
-  .metric-detail {
-    font-size: 9px;
+  .seopro-metric-value {
+    font-size: 24px;
+  }
+  
+  .seopro-metric-label {
+    font-size: 11px;
+  }
+  
+  .seopro-metric-change {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  .seopro-metric-detail {
+    font-size: 10px;
   }
 }

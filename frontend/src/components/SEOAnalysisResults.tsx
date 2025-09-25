@@ -259,7 +259,7 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
         <div className="seopro-metric-card standard-metric">
           <div className="seopro-metric-icon">📄</div>
           <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.validPages || 0)}</div>
-          <div className="seopro-metric-label">Проиндексированные</div>
+          <div className="seopro-metric-label">Проиндексир.</div>
           <div className="seopro-metric-detail">страницы</div>
         </div>
 
