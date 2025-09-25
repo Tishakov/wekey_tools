@@ -750,6 +750,35 @@ const SeoAudit: React.FC = () => {
     };
   }, [protocolDropdownOpen]);
 
+  // Извлечение URL из query параметров при загрузке компонента
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlParam = urlParams.get('url');
+    
+    if (urlParam) {
+      try {
+        const decodedUrl = decodeURIComponent(urlParam);
+        // Проверяем, есть ли протокол в URL
+        if (decodedUrl.startsWith('http://')) {
+          setProtocol('http://');
+          setUrl(decodedUrl.replace('http://', ''));
+        } else if (decodedUrl.startsWith('https://')) {
+          setProtocol('https://');
+          setUrl(decodedUrl.replace('https://', ''));
+        } else {
+          // Если протокола нет, используем URL как есть
+          setUrl(decodedUrl);
+        }
+        console.log('🎯 Auto-filled URL from Site Audit:', decodedUrl);
+        
+        // Плавный скролл вверх при переходе из Site Audit
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        console.error('Error decoding URL parameter:', error);
+      }
+    }
+  }, []); // Выполняется только при первой загрузке
+
   // Функция для показа дополнительных W3C ошибок
   const showMoreW3cErrors = () => {
     setW3cErrorsToShow(prev => prev + 5);
