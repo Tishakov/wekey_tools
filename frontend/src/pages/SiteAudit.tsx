@@ -962,7 +962,7 @@ const SiteAudit: React.FC = () => {
                       {result.data.visual.logo && (
                         <div className="visual-resource-card">
                           <div className="resource-header">
-                            <span className="resource-icon">�</span>
+                            <span className="resource-icon">🖼️</span>
                             <span className="resource-title">Логотип сайта</span>
                           </div>
                           <div className="resource-content">
