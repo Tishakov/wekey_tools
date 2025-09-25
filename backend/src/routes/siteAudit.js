@@ -1486,10 +1486,11 @@ function analyzeSocial($) {
     instagram: ['a[href*="instagram.com/"]'],
     twitter: ['a[href*="twitter.com/"]', 'a[href*="x.com/"]'],
     linkedin: ['a[href*="linkedin.com/in/"]', 'a[href*="linkedin.com/company/"]'],
-    youtube: ['a[href*="youtube.com/channel/"]', 'a[href*="youtube.com/user/"]', 'a[href*="youtube.com/c/"]', 'a[href*="youtube.com/@"]'],
+    youtube: ['a[href*="youtube.com/"]'], // Расширенный поиск YouTube
     telegram: ['a[href*="t.me/"]', 'a[href*="telegram.me/"]'],
     whatsapp: ['a[href*="wa.me/"]', 'a[href*="whatsapp.com/"]'],
-    viber: ['a[href*="viber.click/"]']
+    viber: ['a[href*="viber://"]', 'a[href*="viber.click/"]'], // Добавлен viber:// протокол
+    tiktok: ['a[href*="tiktok.com/"]'] // Отдельная платформа для TikTok
   };
   
   Object.keys(socialSelectors).forEach(platform => {
@@ -1544,21 +1545,27 @@ function isValidSocialLink(href, platform) {
   // Специфичные проверки для каждой платформы
   switch (platform) {
     case 'facebook':
-      return /facebook\.com\/[a-zA-Z0-9._-]+$/.test(href) || /fb\.com\/[a-zA-Z0-9._-]+$/.test(href);
+      return /facebook\.com\/[a-zA-Z0-9._-]+/.test(href) || /fb\.com\/[a-zA-Z0-9._-]+/.test(href);
     case 'instagram':
-      return /instagram\.com\/[a-zA-Z0-9._-]+\/?$/.test(href);
+      return /instagram\.com\/[a-zA-Z0-9._-]+/.test(href);
     case 'twitter':
-      return /(twitter\.com|x\.com)\/[a-zA-Z0-9._-]+\/?$/.test(href);
+      // Проверяем только Twitter и X.com
+      return /(twitter\.com|x\.com)\/[a-zA-Z0-9._-]+/.test(href);
     case 'linkedin':
-      return /linkedin\.com\/(in|company)\/[a-zA-Z0-9._-]+\/?$/.test(href);
+      return /linkedin\.com\/(in|company)\/[a-zA-Z0-9._-]+/.test(href);
     case 'youtube':
-      return /youtube\.com\/(channel\/|user\/|c\/|@)[a-zA-Z0-9._-]+\/?$/.test(href);
+      // Более гибкая проверка YouTube - любые ссылки на youtube.com
+      return /youtube\.com\//.test(href) && !/youtube\.com\/(watch\?|embed\/|v\/)/.test(href);
     case 'telegram':
-      return /(t\.me|telegram\.me)\/[a-zA-Z0-9._-]+\/?$/.test(href);
+      return /(t\.me|telegram\.me)\/[a-zA-Z0-9._-]+/.test(href);
     case 'whatsapp':
-      return /(wa\.me|whatsapp\.com)\/[a-zA-Z0-9._+-]+\/?$/.test(href);
+      return /(wa\.me|whatsapp\.com)\/[a-zA-Z0-9._+%-]+/.test(href);
     case 'viber':
-      return /viber\.click\/[a-zA-Z0-9._-]+\/?$/.test(href);
+      // Поддержка как viber:// протокола, так и веб-ссылок
+      return /viber:\/\//.test(href) || /viber\.click\/[a-zA-Z0-9._-]+/.test(href);
+    case 'tiktok':
+      // Проверяем TikTok профили
+      return /tiktok\.com\/@[a-zA-Z0-9._-]+/.test(href);
     default:
       return true;
   }
@@ -1880,7 +1887,13 @@ async function extractFonts($, baseUrl) {
               const isSystemFont = font.match(/^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace|ui-rounded|inherit|initial|unset|Arial|Times|Helvetica|Helvetica Neue|Georgia|Verdana|Tahoma|Impact|Comic Sans MS|Courier|Courier New|Monaco|Menlo|Consolas|Trebuchet MS|Lucida Console|Palatino|Book Antiqua|Times New Roman)$/i);
               
               // Исключаем иконочные шрифты
-              const isIconFont = font.match(/(swiper-icons|fontawesome|fa-|Font Awesome|icomoon|icon-|icons|glyphicons|material-icons|bootstrap-icons|feather|lucide|tabler-icons|heroicons|phosphor|remix-icon)/i);
+              const isIconFont = font.match(/(swiper-icons|fontawesome|fa-|Font Awesome|font-awesome|icomoon|icon-|icons|glyphicons|material-icons|bootstrap-icons|feather|lucide|tabler-icons|heroicons|phosphor|remix-icon)/i);
+              
+              // Исключаем CSS переменные и функции
+              const isCSSVariable = font.match(/var\(--.*\)|calc\(|rgb\(|rgba\(|hsl\(|hsla\(|url\(/i);
+              
+              // Исключаем Bootstrap переменные
+              const isBootstrapVar = font.match(/--bs-/i);
               
               // Исключаем псевдо-шрифты и конкретные проблемные названия
               const isPseudoFont = font.match(/UserRegistration|Registration|Login|Button|Menu|Header|Footer|Navigation|Form|User[A-Z]|Admin|Panel|Widget|Element|Component|Toggle|Switch|Enable|Disable|Active|Inactive|Show|Hide|Display|Screen|Canvas|Control|Input|Output|Process|Handle|Manage|Create|Update|Delete|Execute|Run|Start|Stop|Pause|Resume|Load|Save|Import|Export|Config|Setting|Option|Parameter|Variable|Constant|Function|Method|Property|Attribute|Event|Handler|Listener|Observer|Promise|Callback|Request|Response|Session|Token|Auth|Security|Permission|Access|Role|Status|State|Mode|Phase|Stage|Level|Grade|Rank|Position|Location|Address|Contact|Profile|Account|Dashboard|Analytics|Report|Chart|Graph|Table|Calendar|Date|Time|Clock|Counter|Progress|Loading|Spinner|Toast|Alert|Message|Error|Warning|Success|Debug|Console|Terminal|Editor|Compiler|Builder|Runner|Tester|Monitor|Tracker|Analyzer|Parser|Validator|Formatter|Generator|Factory|Provider|Service|Manager|Controller|Router|Store|Action|Reducer|Middleware|Filter|Guard|Interceptor|Decorator|Wrapper|Container|Box|Card|Item|List|Grid|Row|Column|Section|Article|Block|Inline|Layout|Template|Pattern|Model|View|Page|Site|App|System|Platform|Framework|Library|Module|Plugin|Extension|Theme|Style|Design|Color|Background|Foreground|Border|Margin|Padding|Width|Height|Size|Scale|Transform|Rotate|Translate|Animation|Transition|Effect|Shadow|Glow|Blur|Opacity|Visibility|Overflow|Scroll|Zoom|Focus|Hover|Click|Touch|Drag|Drop|Swipe|Pinch|Resize|Move|Copy|Cut|Paste|Undo|Redo|Reset|Clear|Clean|Refresh|Reload|Restart|Shutdown|Install|Uninstall|Update|Upgrade|Download|Upload|Sync|Backup|Restore|Migrate|Deploy|Build|Compile|Bundle|Package|Archive|Compress|Extract|Encode|Decode|Encrypt|Decrypt|Hash|Sign|Verify|Validate|Check|Test|Mock|Stub|Fake|Demo|Sample|Example|Preview|Prototype|Draft|Sketch|Wireframe|Blueprint|Specification|Requirement|Document|Manual|Guide|Reference/i);
@@ -1919,6 +1932,8 @@ async function extractFonts($, baseUrl) {
                   !isPseudoFont &&
                   !isCSSSelector &&
                   !isBadLength &&
+                  !isCSSVariable &&
+                  !isBootstrapVar &&
                   cleanFont) {
                 // Сохраняем базовое имя без суффиксов
                 const baseName = cleanFont.replace(/-(Regular|Light|Medium|Bold|SemiBold|Thin|Black|Heavy|ExtraBold|ExtraLight)$/i, '');
@@ -1979,8 +1994,28 @@ async function extractFonts($, baseUrl) {
     .slice(0, 10));
   console.log('Final fonts sorted by popularity:', sortedFonts);
   
-  // Финальная фильтрация псевдо-шрифтов
+  // Финальная фильтрация псевдо-шрифтов и технических значений
   const filteredFonts = sortedFonts.filter(font => {
+    const fontName = font.name;
+    
+    // Исключаем CSS переменные
+    if (fontName.match(/var\(--.*\)|Var\(--.*\)/i)) {
+      console.log(`🚫 Filtered CSS variable: ${fontName}`);
+      return false;
+    }
+    
+    // Исключаем Font Awesome и другие иконочные шрифты
+    if (fontName.match(/font-awesome|fontawesome|fa-/i)) {
+      console.log(`🚫 Filtered icon font: ${fontName}`);
+      return false;
+    }
+    
+    // Исключаем Bootstrap переменные
+    if (fontName.match(/--bs-|bootstrap/i)) {
+      console.log(`🚫 Filtered Bootstrap variable: ${fontName}`);
+      return false;
+    }
+    
     const pseudoFonts = [
       'UserRegistration', 'Registration', 'Login', 'Button', 'Menu', 'Header', 'Footer', 
       'Navigation', 'Form', 'Admin', 'Panel', 'Widget', 'Element', 'Component', 'Control', 
@@ -1991,7 +2026,12 @@ async function extractFonts($, baseUrl) {
       'Counter', 'Progress', 'Loading', 'Alert', 'Message', 'Error', 'Debug', 'Console'
     ];
     
-    return !pseudoFonts.includes(font.name);
+    const isPseudoFont = pseudoFonts.includes(fontName);
+    if (isPseudoFont) {
+      console.log(`🚫 Filtered pseudo-font: ${fontName}`);
+    }
+    
+    return !isPseudoFont;
   });
   
   return filteredFonts;

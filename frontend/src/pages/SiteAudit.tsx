@@ -1278,7 +1278,8 @@ const SiteAudit: React.FC = () => {
                             youtube: '/icons/tools_youtube.svg',
                             telegram: '/icons/tools_telegram.svg',
                             whatsapp: '/icons/tools_whats_app.svg',
-                            viber: '/icons/tools_viber.svg'
+                            viber: '/icons/tools_viber.svg',
+                            tiktok: '/icons/tools_tik_tok.svg'
                           };
                           return iconMap[platform] || '/icons/tools_facebook.svg'; // Fallback
                         };
@@ -1306,6 +1307,7 @@ const SiteAudit: React.FC = () => {
                               {platform === 'telegram' && '✈️'}
                               {platform === 'whatsapp' && '💬'}
                               {platform === 'viber' && '💜'}
+                              {platform === 'tiktok' && '🎵'}
                             </span>
                             <span className="social-name">{platform}</span>
                             <a href={url} target="_blank" rel="noopener noreferrer" className="social-link">
