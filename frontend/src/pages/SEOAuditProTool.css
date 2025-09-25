@@ -8,4 +8,360 @@
   min-height: 100vh;
 }
 
-/* Используем стили из tool-pages.css - tool-header-isla и остальные уже определены глобально */
+/* GSC Connection Section */
+.gsc-connection-section {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.gsc-intro {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.gsc-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gsc-icon img {
+  width: 48px;
+  height: 48px;
+  filter: brightness(0) invert(1);
+}
+
+.gsc-intro h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.gsc-description {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.gsc-benefits {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.benefit-icon {
+  font-size: 20px;
+}
+
+.benefit-item span:last-child {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.gsc-connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 280px;
+}
+
+.gsc-connect-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+}
+
+.gsc-connect-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.gsc-connect-btn.connecting {
+  background: var(--accent-color);
+}
+
+.gsc-connect-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Website Input Section */
+.website-input-section {
+  max-width: 800px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.website-input-section h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.website-input-row {
+  display: flex;
+  gap: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.website-input {
+  flex: 1;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+}
+
+.website-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.analyze-btn {
+  padding: 16px 32px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 160px;
+  justify-content: center;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.analyze-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading States */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner.large {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px 40px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  margin: 40px 0;
+}
+
+.loading-state h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 24px 0 12px;
+}
+
+.loading-state p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.loading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.step {
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  border: 1px solid var(--border);
+}
+
+.step.active {
+  background: var(--accent-light);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+/* Error State */
+.error-state {
+  text-align: center;
+  padding: 40px;
+  background: var(--card-bg);
+  border: 1px solid var(--error-color);
+  border-radius: 16px;
+  margin: 40px 0;
+}
+
+.error-state h3 {
+  color: var(--error-color);
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.error-state p {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.retry-btn {
+  padding: 12px 24px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* Analysis Results */
+.analysis-results {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.health-dashboard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.health-dashboard h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+}
+
+.health-score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent-color) 0deg, var(--accent-color) 216deg, var(--border) 216deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  position: relative;
+}
+
+.health-score-circle::before {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  background: var(--card-bg);
+  border-radius: 50%;
+}
+
+.score-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  z-index: 2;
+}
+
+.score-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  z-index: 2;
+}
+
+.health-status {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent-color);
+  text-transform: capitalize;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .gsc-benefits {
+    grid-template-columns: 1fr;
+  }
+  
+  .website-input-row {
+    flex-direction: column;
+  }
+  
+  .gsc-connect-btn {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Используем стили из tool-pages.css - tool-header-island и остальные уже определены глобально */
