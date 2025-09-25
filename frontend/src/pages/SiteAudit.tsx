@@ -873,34 +873,34 @@ const SiteAudit: React.FC = () => {
                                   }}
                                 />
                               </div>
-                              <div className="logo-details">
-                                <div className="logo-filename">
+                              <div className="asset-info">
+                                <div className="asset-name">
                                   {result.data.visual.logo.split('/').pop()?.split('?')[0] || 'logo'}
                                 </div>
-                                <div className="logo-info">
-                                  <span className="format-badge">
+                                <div className="asset-meta">
+                                  <span className="asset-format">
                                     {(result.data.visual.logo.split('.').pop()?.split('?')[0] || 'unknown').toUpperCase()}
                                   </span>
-                                  <span className="logo-type">Основной логотип</span>
+                                  <span className="asset-type">Основной логотип</span>
                                 </div>
-                                <div className="logo-actions">
-                                  <button 
-                                    className="action-btn download-btn"
-                                    onClick={() => handleImageDownload(result.data!.visual.logo!, 'logo.png')}
-                                    title="Скачать логотип"
-                                  >
-                                    <span>⬇️</span>
-                                    Скачать
-                                  </button>
-                                  <button 
-                                    className="action-btn copy-btn"
-                                    onClick={() => navigator.clipboard.writeText(result.data!.visual.logo!)}
-                                    title="Копировать URL"
-                                  >
-                                    <span>🔗</span>
-                                    URL
-                                  </button>
-                                </div>
+                              </div>
+                              <div className="asset-actions">
+                                <button 
+                                  className="asset-btn primary"
+                                  onClick={() => handleImageDownload(result.data!.visual.logo!, 'logo.png')}
+                                  title="Скачать логотип"
+                                >
+                                  <span>⬇️</span>
+                                  Скачать
+                                </button>
+                                <button 
+                                  className="asset-btn secondary"
+                                  onClick={() => navigator.clipboard.writeText(result.data!.visual.logo!)}
+                                  title="Копировать URL"
+                                >
+                                  <span>🔗</span>
+                                  URL
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -926,34 +926,34 @@ const SiteAudit: React.FC = () => {
                                   }}
                                 />
                               </div>
-                              <div className="favicon-details">
-                                <div className="favicon-filename">
+                              <div className="asset-info">
+                                <div className="asset-name">
                                   {result.data.visual.favicon.split('/').pop()?.split('?')[0] || 'favicon.ico'}
                                 </div>
-                                <div className="favicon-info">
-                                  <span className="format-badge">
+                                <div className="asset-meta">
+                                  <span className="asset-format">
                                     {(result.data.visual.favicon.split('.').pop()?.split('?')[0] || 'ico').toUpperCase()}
                                   </span>
-                                  <span className="favicon-size">16×16 - 512×512</span>
+                                  <span className="asset-type">16×16 - 512×512</span>
                                 </div>
-                                <div className="favicon-actions">
-                                  <button 
-                                    className="action-btn download-btn"
-                                    onClick={() => handleImageDownload(result.data!.visual.favicon!, 'favicon.ico')}
-                                    title="Скачать фавикон"
-                                  >
-                                    <span>⬇️</span>
-                                    Скачать
-                                  </button>
-                                  <button 
-                                    className="action-btn copy-btn"
-                                    onClick={() => navigator.clipboard.writeText(result.data!.visual.favicon!)}
-                                    title="Копировать URL"
-                                  >
-                                    <span>🔗</span>
-                                    URL
-                                  </button>
-                                </div>
+                              </div>
+                              <div className="asset-actions">
+                                <button 
+                                  className="asset-btn primary"
+                                  onClick={() => handleImageDownload(result.data!.visual.favicon!, 'favicon.ico')}
+                                  title="Скачать фавикон"
+                                >
+                                  <span>⬇️</span>
+                                  Скачать
+                                </button>
+                                <button 
+                                  className="asset-btn secondary"
+                                  onClick={() => navigator.clipboard.writeText(result.data!.visual.favicon!)}
+                                  title="Копировать URL"
+                                >
+                                  <span>🔗</span>
+                                  URL
+                                </button>
                               </div>
                             </div>
                           </div>

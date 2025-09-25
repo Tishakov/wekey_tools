@@ -1173,213 +1173,357 @@
   opacity: 1;
 }
 
-/* Логотип сайта - отдельный блок */
-.logo-card {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 20px;
+/* Общие стили для asset карточек */
+.asset-card {
+  background: linear-gradient(135deg, rgba(40, 40, 42, 0.8), rgba(32, 32, 34, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.asset-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #09CEA7, #00B8A3, #09CEA7);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.asset-card:hover::before {
+  opacity: 1;
+}
+
+.asset-card:hover {
+  background: linear-gradient(135deg, rgba(40, 40, 42, 0.95), rgba(32, 32, 34, 0.8));
+  border-color: rgba(9, 206, 167, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(9, 206, 167, 0.1);
+}
+
+/* Превью изображения */
+.asset-preview {
+  display: flex;
   align-items: center;
-  padding: 16px;
-  background: linear-gradient(135deg, rgba(40, 40, 42, 0.6), rgba(45, 45, 47, 0.4));
-  border-radius: 8px;
+  justify-content: center;
+  width: 100%;
+  height: 120px;
+  background: 
+    radial-gradient(circle at 30% 70%, rgba(9, 206, 167, 0.05), transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(0, 184, 163, 0.03), transparent 50%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.asset-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(9, 206, 167, 0.02));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.asset-card:hover .asset-preview::after {
+  opacity: 1;
+}
+
+/* Изображения */
+.asset-image {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 6px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.asset-card:hover .asset-image {
+  transform: scale(1.08);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
+}
+
+/* Информация о файле */
+.asset-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.asset-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.asset-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.asset-format {
+  background: linear-gradient(135deg, #09CEA7, #00B8A3);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(9, 206, 167, 0.3);
+}
+
+.asset-type {
+  color: #9CA3AF;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.asset-size {
+  color: #6B7280;
+  font-size: 0.75rem;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* Действия */
+.asset-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.asset-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.asset-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.asset-btn:hover::before {
+  opacity: 1;
+}
+
+.asset-btn.primary {
+  background: linear-gradient(135deg, #09CEA7, #00B8A3);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(9, 206, 167, 0.2);
+}
+
+.asset-btn.primary:hover {
+  background: linear-gradient(135deg, #0BB8A0, #009688);
+  box-shadow: 0 6px 20px rgba(9, 206, 167, 0.4);
+  transform: translateY(-2px);
+}
+
+.asset-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #BCBBBD;
+}
+
+.asset-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(9, 206, 167, 0.4);
+  color: #09CEA7;
+  transform: translateY(-1px);
+}
+
+/* Алиасы для логотипа */
+.logo-card {
+  background: linear-gradient(135deg, rgba(40, 40, 42, 0.8), rgba(32, 32, 34, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #09CEA7, #00B8A3, #09CEA7);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.logo-card:hover::before {
+  opacity: 1;
 }
 
 .logo-card:hover {
-  background: linear-gradient(135deg, rgba(40, 40, 42, 0.8), rgba(45, 45, 47, 0.6));
-  border-color: rgba(9, 206, 167, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, rgba(40, 40, 42, 0.95), rgba(32, 32, 34, 0.8));
+  border-color: rgba(9, 206, 167, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(9, 206, 167, 0.1);
 }
 
 .logo-preview-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 120px;
-  min-height: 80px;
+  width: 100%;
+  height: 100px;
   background: 
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
-    rgba(50, 50, 52, 0.7);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 12px;
+    radial-gradient(circle at 30% 70%, rgba(9, 206, 167, 0.05), transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(0, 184, 163, 0.03), transparent 50%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-preview-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(9, 206, 167, 0.02));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.logo-card:hover .logo-preview-container::after {
+  opacity: 1;
 }
 
 .logo-image {
-  max-width: 100px;
-  max-height: 60px;
+  max-width: 90%;
+  max-height: 65px;
   object-fit: contain;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  border-radius: 6px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
 .logo-card:hover .logo-image {
-  transform: scale(1.05);
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+  transform: scale(1.08);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
 }
 
-.logo-details {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.logo-filename {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #FFFFFF;
-  word-break: break-word;
-  line-height: 1.3;
-}
-
-.logo-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.logo-type {
-  color: #BCBBBD;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.logo-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* Фавикон сайта - отдельный блок */
+/* Алиасы для фавикона */
 .favicon-card {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 20px;
-  align-items: center;
-  padding: 16px;
-  background: linear-gradient(135deg, rgba(40, 40, 42, 0.6), rgba(45, 45, 47, 0.4));
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, rgba(40, 40, 42, 0.8), rgba(32, 32, 34, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.favicon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #09CEA7, #00B8A3, #09CEA7);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.favicon-card:hover::before {
+  opacity: 1;
 }
 
 .favicon-card:hover {
-  background: linear-gradient(135deg, rgba(40, 40, 42, 0.8), rgba(45, 45, 47, 0.6));
-  border-color: rgba(9, 206, 167, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, rgba(40, 40, 42, 0.95), rgba(32, 32, 34, 0.8));
+  border-color: rgba(9, 206, 167, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(9, 206, 167, 0.1);
 }
 
 .favicon-preview-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  height: 100px;
   background: 
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
-    rgba(50, 50, 52, 0.7);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 12px;
+    radial-gradient(circle at 30% 70%, rgba(9, 206, 167, 0.05), transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(0, 184, 163, 0.03), transparent 50%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.favicon-preview-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(9, 206, 167, 0.02));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.favicon-card:hover .favicon-preview-container::after {
+  opacity: 1;
 }
 
 .favicon-image {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
+  max-width: 64px;
+  max-height: 64px;
   object-fit: contain;
   border-radius: 6px;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
 .favicon-card:hover .favicon-image {
-  transform: scale(1.05);
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+  transform: scale(1.08);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
 }
 
-.favicon-details {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.favicon-filename {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #FFFFFF;
-  word-break: break-word;
-  line-height: 1.3;
-}
-
-.favicon-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.favicon-size {
-  color: #09CEA7;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.favicon-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* Общие стили для кнопок действий */
-.action-btn {
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-}
-
-.action-btn.download-btn {
-  background: linear-gradient(135deg, #09CEA7, #00B8A3);
-  color: #FFFFFF;
-}
-
-.action-btn.download-btn:hover {
-  background: linear-gradient(135deg, #0BB8A0, #09A890);
-  box-shadow: 0 4px 12px rgba(9, 206, 167, 0.4);
-  transform: translateY(-1px);
-}
-
-.action-btn.copy-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #BCBBBD;
-}
-
-.action-btn.copy-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(9, 206, 167, 0.3);
-  color: #09CEA7;
-}
-
-.format-badge {
-  background: linear-gradient(135deg, #09CEA7, #00B8A3);
-  color: #FFFFFF;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
