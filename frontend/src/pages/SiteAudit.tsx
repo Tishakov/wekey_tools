@@ -234,9 +234,15 @@ const SiteAudit: React.FC = () => {
         loading: true
       });
 
-      // Увеличиваем счетчик использования
+      // Увеличиваем счетчик использования и получаем новое значение
       if (user) {
-        await statsService.incrementLaunchCount('site-audit');
+        try {
+          const newCount = await statsService.incrementAndGetCount('site-audit');
+          setLaunchCount(newCount);
+        } catch (error) {
+          console.error('Failed to update stats:', error);
+          setLaunchCount(prev => prev + 1);
+        }
       }
 
       // Вызов API для анализа сайта

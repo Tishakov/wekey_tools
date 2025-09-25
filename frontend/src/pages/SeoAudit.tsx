@@ -843,10 +843,15 @@ const SeoAudit: React.FC = () => {
         loading: true
       });
 
-      // Увеличиваем счетчик использования
+      // Увеличиваем счетчик использования и получаем новое значение
       if (user) {
-        await statsService.incrementLaunchCount('seo-audit');
-        setLaunchCount(prev => prev + 1);
+        try {
+          const newCount = await statsService.incrementAndGetCount('seo-audit');
+          setLaunchCount(newCount);
+        } catch (error) {
+          console.error('Failed to update stats:', error);
+          setLaunchCount(prev => prev + 1);
+        }
       }
 
       // Вызов API для SEO анализа
