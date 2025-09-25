@@ -6,6 +6,7 @@ import { statsService } from '../utils/statsService';
 import { useAuthRequired } from '../hooks/useAuthRequired';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
+import SEOAnalysisResults from '../components/SEOAnalysisResults';
 import './SEOAuditProTool.css';
 import '../styles/tool-pages.css';
 
@@ -33,13 +34,21 @@ interface GSCData {
       ctr: number;
       position: number;
     }>;
+    devices?: Array<{
+      device: string;
+      clicks: number;
+      impressions: number;
+      ctr: number;
+      position: number;
+    }>;
   };
   indexCoverage?: {
     validPages: number;
     errorPages: number;
     excludedPages: number;
     warnings: number;
-    issues: Array<{
+    status?: string;
+    issues?: Array<{
       type: string;
       count: number;
       urls: string[];
@@ -133,14 +142,15 @@ const SEOAuditProTool: React.FC = () => {
     });
 
     try {
-      // Здесь будет API запрос к бэкенду для анализа GSC данных
-      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro`, {
+      // API запрос к новому endpoint для анализа GSC данных
+      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          website: website.trim()
+          website: website.trim(),
+          useMockData: true // Используем демо-данные для тестирования
         })
       });
 
@@ -298,17 +308,7 @@ const SEOAuditProTool: React.FC = () => {
                 )}
 
                 {result.data && (
-                  <div className="analysis-results">
-                    {/* Здесь будут результаты анализа с диаграммами и прогресс-барами */}
-                    <div className="health-dashboard">
-                      <h3>Общая оценка SEO</h3>
-                      <div className="health-score-circle">
-                        <div className="score-value">{result.data.overallScore}</div>
-                        <div className="score-label">из 100</div>
-                      </div>
-                      <div className="health-status">{result.data.healthStatus}</div>
-                    </div>
-                  </div>
+                  <SEOAnalysisResults data={result.data} />
                 )}
               </div>
             )}
