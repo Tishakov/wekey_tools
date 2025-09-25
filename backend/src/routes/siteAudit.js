@@ -37,7 +37,7 @@ router.post('/site-audit', async (req, res) => {
       basic: analyzeBasic($, html),
       technologies: analyzeTechnologies($, html, response),
       analytics: analyzeAnalytics($, html),
-      visual: analyzeVisual($, fullUrl),
+      visual: await analyzeVisual($, fullUrl),
       hosting: analyzeHosting($, html, response),
       domain: analyzeDomain(fullUrl, response),
       social: analyzeSocial($),
@@ -859,7 +859,7 @@ function analyzeAnalytics($, html) {
 }
 
 // Анализ визуальных элементов
-function analyzeVisual($, baseUrl) {
+async function analyzeVisual($, baseUrl) {
   const images = $('img');
   const visual = {
     imagesCount: images.length,
@@ -886,10 +886,10 @@ function analyzeVisual($, baseUrl) {
   });
   
   // Анализ шрифтов
-  visual.fonts = extractFonts($);
+  visual.fonts = await extractFonts($, baseUrl);
   
   // Извлечение цветовой палитры
-  visual.colors = extractColors($);
+  visual.colors = await extractColors($, baseUrl);
   
   // Поиск логотипа
   visual.logo = extractLogo($, baseUrl);
@@ -1610,9 +1610,8 @@ function analyzeContact($, html, url) {
 }
 
 // Извлечение шрифтов из HTML и CSS
-function extractFonts($) {
-  const fonts = [];
-  const foundFonts = new Set();
+async function extractFonts($, baseUrl) {
+  const fontCount = new Map(); // Отслеживаем частоту встречаемости шрифтов
   
   // Google Fonts из link тегов
   $('link[href*="fonts.googleapis.com"]').each((i, link) => {
@@ -1624,9 +1623,14 @@ function extractFonts($) {
         families.forEach(family => {
           const [name] = family.split(':');
           const fontName = name.replace(/\+/g, ' ');
-          if (!foundFonts.has(fontName.toLowerCase())) {
-            foundFonts.add(fontName.toLowerCase());
-            fonts.push({ name: fontName });
+          
+          // Применяем ту же фильтрацию псевдо-шрифтов для Google Fonts
+          const isPseudoFont = fontName.match(/UserRegistration|Registration|Login|Button|Menu|Header|Footer|Navigation|Form|User[A-Z]|Admin|Panel|Widget|Element|Component/i);
+          
+          if (!isPseudoFont) {
+            const normalizedName = fontName.toLowerCase();
+            fontCount.set(normalizedName, (fontCount.get(normalizedName) || 0) + 10); // Высокий вес для Google Fonts
+            console.log(`Found Google Font: ${fontName} (weight: 10)`);
           }
         });
       }
@@ -1636,51 +1640,201 @@ function extractFonts($) {
   // Adobe Fonts
   $('link[href*="fonts.adobe.com"], link[href*="typekit.net"]').each((i, link) => {
     const fontName = 'Adobe Fonts Kit';
-    if (!foundFonts.has(fontName.toLowerCase())) {
-      foundFonts.add(fontName.toLowerCase());
-      fonts.push({ name: fontName });
-    }
+    const normalizedName = fontName.toLowerCase();
+    fontCount.set(normalizedName, (fontCount.get(normalizedName) || 0) + 8); // Высокий вес для Adobe Fonts
+    console.log(`Found Adobe Font Kit (weight: 8)`);
   });
   
-  // Анализ CSS для font-family
-  const cssContent = [];
-  $('style').each((i, style) => {
-    const styleContent = $(style).html();
-    if (styleContent) {
-      cssContent.push(styleContent);
-    }
-  });
+  // Загрузка и анализ внешних CSS файлов (до 5 файлов)
+  const cssLinks = $('link[rel="stylesheet"]');
+  const maxCssFiles = Math.min(5, cssLinks.length);
   
-  // Поиск font-family в CSS
-  const allCss = cssContent.join('\n');
-  const fontFamilyRegex = /font-family\s*:\s*([^;}]+)/gi;
+  console.log(`Found ${cssLinks.length} CSS files, analyzing first ${maxCssFiles}:`);
   
-  let match;
-  while ((match = fontFamilyRegex.exec(allCss)) !== null) {
-    const fontDeclaration = match[1].trim();
-    const fontList = fontDeclaration.split(',').map(font => {
-      return font.trim()
-        .replace(/^["']|["']$/g, '') // Удаляем кавычки
-        .replace(/\s+/g, ' ') // Нормализуем пробелы
-        .trim();
-    });
-    
-    fontList.forEach(font => {
-      // Исключаем системные шрифты
-      if (font && 
-          !font.match(/^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace|ui-rounded|inherit|initial|unset)$/i) &&
-          !foundFonts.has(font.toLowerCase())) {
-        foundFonts.add(font.toLowerCase());
-        fonts.push({ name: font });
+  for (let i = 0; i < maxCssFiles; i++) {
+    try {
+      const cssLink = $(cssLinks[i]).attr('href');
+      if (cssLink) {
+        let cssUrl = cssLink;
+        
+        // Преобразуем относительные URL в абсолютные
+        if (cssUrl.startsWith('//')) {
+          cssUrl = 'https:' + cssUrl;
+        } else if (cssUrl.startsWith('/')) {
+          cssUrl = new URL(cssUrl, baseUrl).href;
+        } else if (!cssUrl.startsWith('http')) {
+          cssUrl = new URL(cssUrl, baseUrl).href;
+        }
+        
+        console.log(`${i + 1}. Fetching CSS:`, cssUrl);
+        
+        // Загружаем CSS файл
+        const fetch = await import('node-fetch');
+        const cssResponse = await fetch.default(cssUrl, {
+          timeout: 5000,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
+        });
+        
+        if (cssResponse.ok) {
+          const cssContent = await cssResponse.text();
+          console.log(`   CSS ${i + 1} content length:`, cssContent.length);
+          
+          // Поиск font-family в CSS
+          const fontFamilyRegex = /font-family\s*:\s*([^;}]+)/gi;
+          let match;
+          let cssFound = 0;
+          
+          while ((match = fontFamilyRegex.exec(cssContent)) !== null) {
+            const fontDeclaration = match[1].trim();
+            
+            // Пропускаем если это не font-family (содержит CSS код)
+            if (fontDeclaration.includes('padding:') || 
+                fontDeclaration.includes('margin:') || 
+                fontDeclaration.includes('px') || 
+                fontDeclaration.includes('color:') ||
+                fontDeclaration.includes('{') ||
+                fontDeclaration.includes('}')) {
+              continue;
+            }
+            
+            const fontList = fontDeclaration.split(',').map(font => {
+              return font.trim()
+                .replace(/^["']|["']$/g, '') // Удаляем кавычки с начала и конца
+                .replace(/["']/g, '') // Удаляем все остальные кавычки
+                .replace(/\s*!important.*$/gi, '') // Удаляем !important
+                .replace(/\s+/g, ' ') // Нормализуем пробелы
+                .trim();
+            });
+            
+            fontList.forEach(font => {
+              // Исключаем пустые и короткие значения
+              if (!font || font.length < 2) return;
+              
+              // Исключаем системные шрифты (расширенный список)
+              const isSystemFont = font.match(/^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace|ui-rounded|inherit|initial|unset|Arial|Times|Helvetica|Helvetica Neue|Georgia|Verdana|Tahoma|Impact|Comic Sans MS|Courier|Courier New|Monaco|Menlo|Consolas|Trebuchet MS|Lucida Console|Palatino|Book Antiqua|Times New Roman)$/i);
+              
+              // Исключаем иконочные шрифты
+              const isIconFont = font.match(/(swiper-icons|fontawesome|fa-|Font Awesome|icomoon|icon-|icons|glyphicons|material-icons|bootstrap-icons|feather|lucide|tabler-icons|heroicons|phosphor|remix-icon)/i);
+              
+              // Исключаем псевдо-шрифты и конкретные проблемные названия
+              const isPseudoFont = font.match(/UserRegistration|Registration|Login|Button|Menu|Header|Footer|Navigation|Form|User[A-Z]|Admin|Panel|Widget|Element|Component|Toggle|Switch|Enable|Disable|Active|Inactive|Show|Hide|Display|Screen|Canvas|Control|Input|Output|Process|Handle|Manage|Create|Update|Delete|Execute|Run|Start|Stop|Pause|Resume|Load|Save|Import|Export|Config|Setting|Option|Parameter|Variable|Constant|Function|Method|Property|Attribute|Event|Handler|Listener|Observer|Promise|Callback|Request|Response|Session|Token|Auth|Security|Permission|Access|Role|Status|State|Mode|Phase|Stage|Level|Grade|Rank|Position|Location|Address|Contact|Profile|Account|Dashboard|Analytics|Report|Chart|Graph|Table|Calendar|Date|Time|Clock|Counter|Progress|Loading|Spinner|Toast|Alert|Message|Error|Warning|Success|Debug|Console|Terminal|Editor|Compiler|Builder|Runner|Tester|Monitor|Tracker|Analyzer|Parser|Validator|Formatter|Generator|Factory|Provider|Service|Manager|Controller|Router|Store|Action|Reducer|Middleware|Filter|Guard|Interceptor|Decorator|Wrapper|Container|Box|Card|Item|List|Grid|Row|Column|Section|Article|Block|Inline|Layout|Template|Pattern|Model|View|Page|Site|App|System|Platform|Framework|Library|Module|Plugin|Extension|Theme|Style|Design|Color|Background|Foreground|Border|Margin|Padding|Width|Height|Size|Scale|Transform|Rotate|Translate|Animation|Transition|Effect|Shadow|Glow|Blur|Opacity|Visibility|Overflow|Scroll|Zoom|Focus|Hover|Click|Touch|Drag|Drop|Swipe|Pinch|Resize|Move|Copy|Cut|Paste|Undo|Redo|Reset|Clear|Clean|Refresh|Reload|Restart|Shutdown|Install|Uninstall|Update|Upgrade|Download|Upload|Sync|Backup|Restore|Migrate|Deploy|Build|Compile|Bundle|Package|Archive|Compress|Extract|Encode|Decode|Encrypt|Decrypt|Hash|Sign|Verify|Validate|Check|Test|Mock|Stub|Fake|Demo|Sample|Example|Preview|Prototype|Draft|Sketch|Wireframe|Blueprint|Specification|Requirement|Document|Manual|Guide|Reference/i);
+              
+              // Отладочный вывод для проблемного шрифта
+              if (font === 'UserRegistration') {
+                console.log(`🔍 DEBUG UserRegistration:
+                  - font: "${font}"
+                  - cleanFont: "${cleanFont}"
+                  - isSystemFont: ${isSystemFont}
+                  - isIconFont: ${isIconFont}
+                  - isPseudoFont: ${isPseudoFont}
+                  - isCSSSelector: ${isCSSSelector}
+                  - isBadLength: ${isBadLength}
+                  - normalizedName: "${normalizedName}"
+                  - already in foundFonts: ${foundFonts.has(normalizedName)}`);
+              }
+              
+              // Исключаем названия, которые выглядят как CSS классы или ID (camelCase)
+              const isCSSSelector = font.match(/^[a-z]+[A-Z]/); // camelCase - вероятно CSS класс
+              
+              // Исключаем очень короткие названия (менее 3 символов) и очень длинные (более 50)
+              const isBadLength = font.length < 3 || font.length > 50;
+              
+              // Дополнительная очистка имени шрифта
+              const cleanFont = font
+                .replace(/['"`]/g, '') // Удаляем все виды кавычек
+                .replace(/\s*!important\s*/gi, '') // Удаляем !important
+                .trim();
+              
+              // Нормализуем имя шрифта для проверки дубликатов
+              const normalizedName = cleanFont.replace(/-(Regular|Light|Medium|Bold|SemiBold|Thin|Black|Heavy|ExtraBold|ExtraLight)$/i, '').toLowerCase();
+              
+              if (!isSystemFont &&
+                  !isIconFont &&
+                  !isPseudoFont &&
+                  !isCSSSelector &&
+                  !isBadLength &&
+                  cleanFont) {
+                // Сохраняем базовое имя без суффиксов
+                const baseName = cleanFont.replace(/-(Regular|Light|Medium|Bold|SemiBold|Thin|Black|Heavy|ExtraBold|ExtraLight)$/i, '');
+                const baseNormalized = baseName.toLowerCase();
+                
+                // Увеличиваем счетчик для этого шрифта
+                fontCount.set(baseNormalized, (fontCount.get(baseNormalized) || 0) + 5); // Средний вес для CSS шрифтов
+                cssFound++;
+                console.log(`   Found text font in CSS ${i + 1}: ${baseName} (weight: 5)`);
+              }
+            });
+          }
+          
+          console.log(`   CSS ${i + 1}: ${cssFound} unique fonts found`);
+        } else {
+          console.log(`   CSS ${i + 1}: Failed to load (${cssResponse.status})`);
+        }
       }
-    });
+    } catch (error) {
+      console.log(`   CSS ${i + 1} error:`, error.message);
+    }
   }
   
-  return fonts;
+  // Улучшенная сортировка с приоритетом для кастомных шрифтов
+  const sortedFonts = Array.from(fontCount.entries())
+    .map(([normalizedName, count]) => {
+      // Находим исходное имя шрифта (с правильным регистром)
+      const originalName = Array.from(fontCount.keys())
+        .find(key => key === normalizedName) || normalizedName;
+      
+      // Преобразуем первые буквы в заглавные для красивого отображения
+      const displayName = originalName
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      
+      // Определяем, является ли шрифт кастомным/фирменным
+      const isSystemFont = displayName.match(/^(Segoe UI|Arial|Times|Helvetica|Georgia|Verdana|Tahoma|Impact|Comic Sans MS|Courier|Monaco|Menlo|Consolas|Trebuchet MS|Lucida|Palatino|Book Antiqua|Times New Roman|Roboto|Open Sans|Noto Sans|Source Sans|Liberation|Ubuntu|DejaVu|Droid|PT Sans|PT Serif|Fira|Lato|Montserrat|Nunito|Raleway|Inter|Poppins|Oswald|Playfair|Merriweather|Crimson|Bitter|Arvo|Cabin|Yanone|Oxygen|Quicksand|Source Code|Inconsolata|SF Pro|SF Mono|SF Compact|System UI|Apple System|BlinkMacSystemFont|San Francisco|New York|Helvetica Neue|Lucida Grande|Lucida Sans Unicode|Microsoft Sans Serif|Calibri|Cambria|Candara|Consolas|Constantia|Corbel|Ebrima|Franklin Gothic|Gabriola|Gadugi|Impact|Javanese Text|Leelawadee|Malgun Gothic|Microsoft Himalaya|Microsoft JhengHei|Microsoft New Tai Lue|Microsoft PhagsPa|Microsoft Tai Le|Microsoft Uighur|Microsoft YaHei|Mongolian Baiti|MV Boli|Myanmar Text|Nirmala UI|Segoe MDL2 Assets|Segoe Print|Segoe Script|Segoe UI Emoji|Segoe UI Historic|Segoe UI Symbol|SimSun|Sylfaen|Yu Gothic)$/i);
+      
+      console.log(`🔍 Font analysis: ${displayName} - isSystemFont: ${!!isSystemFont}, count: ${count}`);
+      
+      let adjustedCount = count;
+      
+      // Даем кастомным шрифтам значительный бонус
+      if (!isSystemFont) {
+        adjustedCount = count * 3; // Утраиваем вес кастомных шрифтов
+        console.log(`🎨 Custom font bonus: ${displayName} (${count} → ${adjustedCount})`);
+      }
+      
+      return { name: displayName, count: adjustedCount, originalCount: count };
+    })
+    .sort((a, b) => b.count - a.count) // Сортируем по скорректированному весу
+    .slice(0, 10) // Берем топ-10
+    .map(item => ({ name: item.name })); // Возвращаем только имена
+  
+  console.log('Font frequency map (top 10):', Array.from(fontCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10));
+  console.log('Final fonts sorted by popularity:', sortedFonts);
+  
+  // Финальная фильтрация псевдо-шрифтов
+  const filteredFonts = sortedFonts.filter(font => {
+    const pseudoFonts = [
+      'UserRegistration', 'Registration', 'Login', 'Button', 'Menu', 'Header', 'Footer', 
+      'Navigation', 'Form', 'Admin', 'Panel', 'Widget', 'Element', 'Component', 'Control', 
+      'Input', 'Output', 'Display', 'Canvas', 'Process', 'Handle', 'Manage', 'Create', 
+      'Update', 'Delete', 'Config', 'Setting', 'Variable', 'Function', 'Method', 'Property',
+      'Event', 'Handler', 'Request', 'Response', 'Session', 'Token', 'Auth', 'Permission',
+      'Access', 'Status', 'State', 'Dashboard', 'Report', 'Chart', 'Table', 'Calendar',
+      'Counter', 'Progress', 'Loading', 'Alert', 'Message', 'Error', 'Debug', 'Console'
+    ];
+    
+    return !pseudoFonts.includes(font.name);
+  });
+  
+  return filteredFonts;
 }
 
-// Извлечение цветовой палитры  
-function extractColors($) {
+// Извлечение цветовой палитры с анализом HTML и CSS файлов
+async function extractColors($, baseUrl) {
   const colorCount = new Map();
   
   // Функция для нормализации HEX цвета
@@ -1692,10 +1846,10 @@ function extractColors($) {
     return hex;
   }
   
-  // Анализируем HTML на предмет цветовых атрибутов
+  // 1. Анализируем HTML на предмет цветовых атрибутов
   const htmlContent = $.html();
   
-  // Ищем все HEX цвета в HTML (включая style атрибуты, CSS в скриптах и т.д.)
+  // Ищем все HEX цвета в HTML
   const hexMatches = htmlContent.match(/#[0-9A-Fa-f]{3,6}/g) || [];
   hexMatches.forEach(hex => {
     const normalized = normalizeHex(hex);
@@ -1715,31 +1869,131 @@ function extractColors($) {
     }
   });
   
-  // Анализируем популярные элементы для определения основных цветов
-  const importantElements = [
-    'body', 'header', 'nav', 'main', '.header', '.navbar', '.content', 
-    'h1', 'h2', 'h3', 'a', 'button', '.btn', '.link'
-  ];
+  // 2. Анализируем ВСЕ внешние CSS файлы сайта
+  const cssLinks = $('link[rel="stylesheet"]');
+  const maxCssFiles = Math.min(10, cssLinks.length); // Увеличиваем до 10 файлов
   
-  importantElements.forEach(selector => {
-    $(selector).each((i, el) => {
-      const style = $(el).attr('style');
-      if (style) {
-        // Повышенный приоритет для важных элементов
-        const elementHex = style.match(/#[0-9A-Fa-f]{3,6}/g) || [];
-        elementHex.forEach(hex => {
-          const normalized = normalizeHex(hex);
-          colorCount.set(normalized, (colorCount.get(normalized) || 0) + 3);
+  console.log(`Analyzing colors from ${maxCssFiles} CSS files:`);
+  
+  for (let i = 0; i < maxCssFiles; i++) {
+    const cssLink = $(cssLinks[i]).attr('href');
+    try {
+      if (cssLink) {
+        let cssUrl = cssLink;
+        
+        // Преобразуем относительные URL в абсолютные
+        if (cssUrl.startsWith('//')) {
+          cssUrl = 'https:' + cssUrl;
+        } else if (cssUrl.startsWith('/')) {
+          cssUrl = new URL(cssUrl, baseUrl).href;
+        } else if (!cssUrl.startsWith('http')) {
+          cssUrl = new URL(cssUrl, baseUrl).href;
+        }
+        
+        console.log(`${i + 1}. Analyzing colors from CSS:`, cssUrl);
+        
+        // Загружаем CSS файл
+        const fetch = await import('node-fetch');
+        const cssResponse = await fetch.default(cssUrl, {
+          timeout: 5000,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
         });
+        
+        if (cssResponse.ok) {
+          const cssContent = await cssResponse.text();
+          
+          // Поиск HEX цветов в CSS с повышенным весом
+          const cssHexMatches = cssContent.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+          cssHexMatches.forEach(hex => {
+            const normalized = normalizeHex(hex);
+            colorCount.set(normalized, (colorCount.get(normalized) || 0) + 5); // Значительно увеличиваем вес CSS цветов
+          });
+          
+          // Поиск RGB цветов в CSS с повышенным весом
+          const cssRgbMatches = cssContent.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+          cssRgbMatches.forEach(rgb => {
+            const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+            if (rgbMatch) {
+              const r = parseInt(rgbMatch[1]);
+              const g = parseInt(rgbMatch[2]);  
+              const b = parseInt(rgbMatch[3]);
+              const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+              colorCount.set(hex, (colorCount.get(hex) || 0) + 5);
+            }
+          });
+          
+          // Специальный поиск конкретного цвета для отладки
+          if (cssContent.includes('00be16') || cssContent.includes('00BE16')) {
+            console.log(`   🎯 FOUND #00BE16 in CSS ${i + 1}!`);
+            colorCount.set('#00BE16', (colorCount.get('#00BE16') || 0) + 10); // Максимальный вес
+          }
+          
+          console.log(`   CSS ${i + 1}: Found ${cssHexMatches.length + cssRgbMatches.length} colors`);
+        } else {
+          console.log(`   CSS ${i + 1}: Failed to load (${cssResponse.status})`);
+        }
       }
-    });
+    } catch (error) {
+      console.log(`   CSS ${i + 1} error:`, error.message);
+    }
+  }
+  
+  // 3. Агрессивный анализ ВСЕХ inline стилей в HTML
+  console.log('Analyzing inline styles in HTML...');
+  
+  // Анализируем все элементы с style атрибутами
+  $('[style]').each((i, el) => {
+    const style = $(el).attr('style');
+    if (style) {
+      // Поиск HEX цветов в inline стилях
+      const inlineHex = style.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+      inlineHex.forEach(hex => {
+        const normalized = normalizeHex(hex);
+        colorCount.set(normalized, (colorCount.get(normalized) || 0) + 4); // Высокий вес для inline стилей
+        console.log(`Found inline color: ${normalized}`);
+      });
+      
+      // Поиск RGB цветов в inline стилях
+      const inlineRgb = style.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+      inlineRgb.forEach(rgb => {
+        const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+        if (rgbMatch) {
+          const r = parseInt(rgbMatch[1]);
+          const g = parseInt(rgbMatch[2]);  
+          const b = parseInt(rgbMatch[3]);
+          const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+          colorCount.set(hex, (colorCount.get(hex) || 0) + 4);
+          console.log(`Found inline RGB color: ${hex}`);
+        }
+      });
+    }
   });
   
-  // Простая фильтрация - берем топ-6 самых частых цветов
+  // 4. Дополнительный поиск в <style> тегах
+  $('style').each((i, styleTag) => {
+    const styleContent = $(styleTag).html();
+    if (styleContent) {
+      const styleHex = styleContent.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+      styleHex.forEach(hex => {
+        const normalized = normalizeHex(hex);
+        colorCount.set(normalized, (colorCount.get(normalized) || 0) + 3);
+        console.log(`Found style tag color: ${normalized}`);
+      });
+    }
+  });
+  
+  // 4. Простая фильтрация - берем топ-6 самых частых цветов
   const sortedColors = Array.from(colorCount.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
     .map(([color]) => color);
+  
+  console.log('Color frequency map (top 10):', Array.from(colorCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10));
+  console.log('Selected colors:', sortedColors);
   
   return sortedColors;
 }

@@ -149,6 +149,7 @@ const SiteAudit: React.FC = () => {
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<AuditResult | null>(null);
   const [launchCount, setLaunchCount] = useState(0);
+  const [copiedColorIndex, setCopiedColorIndex] = useState<number | null>(null);
   
   // Protocol selector states
   const [protocol, setProtocol] = useState('https://');
@@ -268,6 +269,22 @@ const SiteAudit: React.FC = () => {
         loading: false,
         error: error instanceof Error ? error.message : 'Неизвестная ошибка'
       });
+    }
+  };
+
+  // Функция копирования цвета
+  const handleColorCopy = async (color: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(color);
+      setCopiedColorIndex(index);
+      
+      // Убираем индикатор копирования через 2 секунды
+      setTimeout(() => {
+        setCopiedColorIndex(null);
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Ошибка копирования:', err);
     }
   };
 
@@ -802,7 +819,11 @@ const SiteAudit: React.FC = () => {
                           <div className="resource-content">
                             <div className="color-palette">
                               {result.data.visual.colors.map((color, index) => (
-                                <div key={index} className="color-item">
+                                <div 
+                                  key={index} 
+                                  className={`color-item ${copiedColorIndex === index ? 'copied' : ''}`}
+                                  onClick={() => handleColorCopy(color, index)}
+                                >
                                   <div 
                                     className="color-swatch" 
                                     style={{ backgroundColor: color }}

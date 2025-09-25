@@ -990,7 +990,7 @@
 }
 
 .visual-resource-card {
-  background-color: #1C1D1F;
+  background-color: #28282A;
   border: 1px solid #333335;
   border-radius: 8px;
   padding: 16px;
@@ -1025,7 +1025,7 @@
 /* Шрифты */
 .font-item {
   display: inline-block;
-  background-color: #28282A;
+  background-color: #1C1D1F;
   color: #BCBBBD;
   padding: 4px 8px;
   margin: 2px 4px 2px 0;
@@ -1036,30 +1036,86 @@
 
 /* Цвета */
 .color-palette {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 12px;
+  justify-items: center;
 }
 
 .color-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.color-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
 }
 
 .color-swatch {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  border: 1px solid #333335;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #333335;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.color-item:hover .color-swatch {
+  transform: scale(1.1);
+  border-color: #09CEA7;
+  box-shadow: 0 4px 12px rgba(9, 206, 167, 0.3);
 }
 
 .color-code {
   font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #BCBBBD;
   font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.color-item:hover .color-code {
+  color: #FFFFFF;
+}
+
+/* Tooltip для копирования */
+.color-item::after {
+  content: 'Нажмите чтобы скопировать';
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1C1D1F;
+  color: #BCBBBD;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  border: 1px solid #333335;
+}
+
+.color-item:hover::after {
+  opacity: 1;
+}
+
+/* Анимация при копировании */
+.color-item.copied::after {
+  content: 'Скопировано!';
+  color: #09CEA7;
+  opacity: 1;
 }
 
 /* Логотип */
