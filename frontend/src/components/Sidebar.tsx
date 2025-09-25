@@ -50,6 +50,7 @@ const Sidebar: React.FC = () => {
     'emoji',                 // Эмодзи
     'site-audit',            // Аудит сайта
     'seo-audit',             // SEO Аудит
+    'seo-audit-pro',         // Аудит SEO PRO
     'privacy-policy-generator', // Генератор политики и оферты
     'qr-generator'           // Генератор QR-кодов
   ];

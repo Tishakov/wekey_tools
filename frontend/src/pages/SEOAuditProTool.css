@@ -1,0 +1,11 @@
+/* Стили для инструмента "Аудит SEO PRO" */
+
+.seo-audit-pro-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Используем стили из tool-pages.css - tool-header-isla и остальные уже определены глобально */

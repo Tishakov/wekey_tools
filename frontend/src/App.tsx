@@ -33,6 +33,7 @@ import TextByColumnsTool from './pages/TextByColumnsTool';
 import MatchTypesTool from './pages/MatchTypesTool';
 import SiteAudit from './pages/SiteAudit';
 import SeoAudit from './pages/SeoAudit';
+import SEOAuditProTool from './pages/SEOAuditProTool';
 import PrivacyPolicyGeneratorTool from './pages/PrivacyPolicyGeneratorTool';
 import QRGeneratorTool from './pages/QRGeneratorTool';
 import AdminPanel from './pages/AdminPanel';
@@ -94,6 +95,7 @@ function App() {
             <Route path="match-types" element={<MatchTypesTool />} />
             <Route path="site-audit" element={<SiteAudit />} />
             <Route path="seo-audit" element={<SeoAudit />} />
+            <Route path="seo-audit-pro" element={<SEOAuditProTool />} />
             <Route path="privacy-policy-generator" element={<PrivacyPolicyGeneratorTool />} />
             <Route path="qr-generator" element={<QRGeneratorTool />} />
           </Route>

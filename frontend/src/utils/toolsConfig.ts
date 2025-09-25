@@ -253,6 +253,15 @@ export const toolsConfig: Tool[] = [
     path: '/qr-generator',
     category: 'generators',
     status: 'ready'
+  },
+  {
+    id: 'seo-audit-pro',
+    title: 'Аудит SEO PRO',
+    description: 'Продвинутый анализ SEO-оптимизации сайта с расширенными возможностями',
+    icon: '/icons/tool_seo_pro.svg',
+    path: '/seo-audit-pro',
+    category: 'analytics',
+    status: 'ready'
   }
 ];
 

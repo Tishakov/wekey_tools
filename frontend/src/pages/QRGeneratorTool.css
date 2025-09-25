@@ -9,9 +9,6 @@
 }
 
 /* Tool Header Island - используем стандартные стили */
-.qr-generator-tool .tool-header-island {
-  margin: 20px auto;
-}
 
 .qr-generator-tool .loading-spinner {
   width: 12px;

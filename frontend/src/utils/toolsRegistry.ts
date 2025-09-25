@@ -165,6 +165,11 @@ export const TOOLS_REGISTRY: Record<string, ToolInfo> = {
     id: 'site-audit',
     name: 'Аудит сайта',
     description: 'Комплексный анализ технологий и аналитики сайта'
+  },
+  'seo-audit-pro': {
+    id: 'seo-audit-pro',
+    name: 'Аудит SEO PRO',
+    description: 'Продвинутый анализ SEO-оптимизации сайта с расширенными возможностями'
   }
 };
 

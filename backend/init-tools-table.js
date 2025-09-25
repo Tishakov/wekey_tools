@@ -227,6 +227,14 @@ const toolsConfig = [
     category: 'analytics'
   },
   {
+    id: 'seo-audit-pro',
+    title: 'Аудит SEO PRO',
+    description: 'Продвинутый анализ SEO-оптимизации сайта с расширенными возможностями',
+    icon: '/icons/tool_seo_pro.svg',
+    path: '/seo-audit-pro',
+    category: 'analytics'
+  },
+  {
     id: 'privacy-policy-generator',
     title: 'Политика и оферта',
     description: 'Создание политики конфиденциальности и публичной оферты для сайта',

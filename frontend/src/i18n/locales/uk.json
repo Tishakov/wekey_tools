@@ -44,6 +44,7 @@
       "cross-analytics": "Наскрізна аналітика",
       "site-audit": "Аудит сайту",
       "seo-audit": "Аудит SEO",
+      "seo-audit-pro": "Аудит SEO PRO",
       "privacy-policy-generator": "Політика і оферта",
       "qr-generator": "Генератор QR-кодів"
     },
@@ -84,6 +85,7 @@
       "cross-analytics": "Наскрізна аналітика",
       "site-audit": "Комплексний аналіз технологій та аналітики сайту",
       "seo-audit": "Детальний аналіз SEO-оптимізації сайту",
+      "seo-audit-pro": "Просунутий аналіз SEO-оптимізації сайту з розширеними можливостями",
       "privacy-policy-generator": "Генерування політик конфіденційності та публічних оферт для веб-сайтів",
       "qr-generator": "Генерація QR-кодів для посилань, тексту, контактів, Wi-Fi та інших даних"
     }
@@ -1780,6 +1782,23 @@
       "wifiPasswordRequired": "Пароль Wi-Fi обов'язковий",
       "vcardNameRequired": "Ім'я контакту обов'язкове",
       "smsPhoneRequired": "Номер телефону для SMS обов'язковий"
+    }
+  },
+  "seoAuditPro": {
+    "title": "Аудит SEO PRO",
+    "allTools": "Всі інструменти",
+    "description": "Просунутий аналіз SEO-оптимізації сайту з розширеними можливостями",
+    "buttons": {
+      "analyze": "Аналізувати",
+      "copy": "Копіювати",
+      "download": "Завантажити звіт"
+    },
+    "placeholders": {
+      "enterUrl": "Введіть URL сайту для аналізу..."
+    },
+    "errors": {
+      "invalidUrl": "Введіть коректний URL",
+      "analysisError": "Помилка при аналізі сайту"
     }
   }
 }

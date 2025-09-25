@@ -44,6 +44,7 @@
       "cross-analytics": "Сквозная аналитика",
       "site-audit": "Аудит сайта",
       "seo-audit": "Аудит SEO",
+      "seo-audit-pro": "Аудит SEO PRO",
       "privacy-policy-generator": "Политика и оферта",
       "qr-generator": "Генератор QR-кодов"
     },
@@ -84,6 +85,7 @@
       "cross-analytics": "Сквозная аналитика",
       "site-audit": "Комплексный анализ технологий и аналитики сайта",
       "seo-audit": "Детальный анализ SEO-оптимизации сайта",
+      "seo-audit-pro": "Продвинутый анализ SEO-оптимизации сайта с расширенными возможностями",
       "privacy-policy-generator": "Создание политики конфиденциальности и публичной оферты для сайта",
       "qr-generator": "Генерация QR-кодов для ссылок, текста, контактов, Wi-Fi и других данных"
     }
@@ -1840,6 +1842,23 @@
       "wifiPasswordRequired": "Пароль Wi-Fi обязателен",
       "vcardNameRequired": "Имя контакта обязательно",
       "smsPhoneRequired": "Номер телефона для SMS обязателен"
+    }
+  },
+  "seoAuditPro": {
+    "title": "Аудит SEO PRO",
+    "allTools": "Все инструменты",
+    "description": "Продвинутый анализ SEO-оптимизации сайта с расширенными возможностями",
+    "buttons": {
+      "analyze": "Анализировать",
+      "copy": "Копировать",
+      "download": "Скачать отчет"
+    },
+    "placeholders": {
+      "enterUrl": "Введите URL сайта для анализа..."
+    },
+    "errors": {
+      "invalidUrl": "Введите корректный URL",
+      "analysisError": "Ошибка при анализе сайта"
     }
   }
 }

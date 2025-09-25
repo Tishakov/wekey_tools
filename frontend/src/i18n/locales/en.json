@@ -44,6 +44,7 @@
       "cross-analytics": "Cross Analytics",
       "site-audit": "Site Audit",
       "seo-audit": "SEO Audit",
+      "seo-audit-pro": "SEO Audit PRO",
       "privacy-policy-generator": "Privacy & Terms",
       "qr-generator": "QR Code Generator"
     },
@@ -84,6 +85,7 @@
       "cross-analytics": "Cross-platform analytics",
       "site-audit": "Comprehensive analysis of website technologies and analytics",
       "seo-audit": "Detailed SEO optimization analysis",
+      "seo-audit-pro": "Advanced SEO optimization analysis with extended capabilities",
       "privacy-policy-generator": "Create privacy policy and public offer for website",
       "qr-generator": "Generate QR codes for URLs, text, contacts, Wi-Fi and other data"
     }
@@ -1789,6 +1791,23 @@
       "wifiPasswordRequired": "Wi-Fi password is required",
       "vcardNameRequired": "Contact name is required",
       "smsPhoneRequired": "SMS phone number is required"
+    }
+  },
+  "seoAuditPro": {
+    "title": "SEO Audit PRO",
+    "allTools": "All Tools",
+    "description": "Advanced SEO optimization analysis with extended capabilities",
+    "buttons": {
+      "analyze": "Analyze",
+      "copy": "Copy",
+      "download": "Download Report"
+    },
+    "placeholders": {
+      "enterUrl": "Enter website URL for analysis..."
+    },
+    "errors": {
+      "invalidUrl": "Enter a valid URL",
+      "analysisError": "Error analyzing website"
     }
   }
 }
