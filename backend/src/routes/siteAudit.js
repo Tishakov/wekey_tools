@@ -2224,9 +2224,10 @@ async function extractColors($, baseUrl) {
           ];
           
           buttonCssPatterns.forEach(pattern => {
-            // Ищем CSS правила с этими классами
+            // Ищем CSS правила с этими классами и все важные CSS свойства
             const buttonRules = cssContent.match(new RegExp(`\\.${pattern}[^{]*\\{[^}]*\\}`, 'gi')) || [];
             buttonRules.forEach(rule => {
+              // Стандартные hex цвета
               const ruleColors = rule.match(/#[0-9A-Fa-f]{3,6}/g) || [];
               ruleColors.forEach(color => {
                 const normalized = normalizeHex(color);
@@ -2234,6 +2235,7 @@ async function extractColors($, baseUrl) {
                 console.log(`   🔘 Found CSS button color .${pattern}: ${normalized}`);
               });
               
+              // RGB/RGBA цвета
               const ruleRgb = rule.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
               ruleRgb.forEach(rgb => {
                 const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
@@ -2244,6 +2246,38 @@ async function extractColors($, baseUrl) {
                   const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
                   buttonColorCount.set(hex, (buttonColorCount.get(hex) || 0) + 10);
                   console.log(`   🔘 Found CSS button RGB .${pattern}: ${hex}`);
+                }
+              });
+              
+              // HSL цвета (часто используются в современных сайтах)
+              const ruleHsl = rule.match(/hsla?\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+              ruleHsl.forEach(hsl => {
+                const hslMatch = hsl.match(/hsla?\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%/);
+                if (hslMatch) {
+                  const h = parseInt(hslMatch[1]);
+                  const s = parseInt(hslMatch[2]) / 100;
+                  const l = parseInt(hslMatch[3]) / 100;
+                  
+                  // Простое преобразование HSL в RGB
+                  const c = (1 - Math.abs(2 * l - 1)) * s;
+                  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+                  const m = l - c / 2;
+                  
+                  let r, g, b;
+                  if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
+                  else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
+                  else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
+                  else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
+                  else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
+                  else { r = c; g = 0; b = x; }
+                  
+                  r = Math.round((r + m) * 255);
+                  g = Math.round((g + m) * 255);
+                  b = Math.round((b + m) * 255);
+                  
+                  const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+                  buttonColorCount.set(hex, (buttonColorCount.get(hex) || 0) + 10);
+                  console.log(`   🔘 Found CSS button HSL .${pattern}: ${hsl} → ${hex}`);
                 }
               });
             });
@@ -2365,7 +2399,7 @@ async function extractColors($, baseUrl) {
     console.log(`   ${color}: ${count} points`);
   });
 
-  // 7. 🎯 НОВЫЙ УМНЫЙ АЛГОРИТМ: Топ-3 основных + Топ-3 акцентных (из кнопок)
+  // 7. 🎯 НОВЫЙ УМНЫЙ АЛГОРИТМ: Топ-5 основных + Топ-4 акцентных (из кнопок)
   const buttonColorCount = new Map();
   
   // Анализируем цвета в кнопках, ссылках и интерактивных элементах
@@ -2407,14 +2441,29 @@ async function extractColors($, baseUrl) {
           });
           
           // 🎯 НОВОЕ: Поиск специфических цветов Yakaboo по классам
-          if (className.includes('primary') || className.includes('btn-primary')) {
-            // Добавляем типичные акцентные цвета якабу
-            const yakabooColors = ['#E91E63', '#FF6B35', '#9C27B0', '#3F51B5', '#FF9800'];
-            yakabooColors.forEach(color => {
-              buttonColorCount.set(color, (buttonColorCount.get(color) || 0) + 12);
-              console.log(`   🎨 Added Yakaboo accent color: ${color}`);
-            });
-          }
+          // Анализируем inline стили элементов с кнопочными классами для поиска реальных цветов
+          const elementStyles = element.attr('style') || '';
+          
+          // Ищем цвета в inline стилях кнопок
+          const buttonInlineColors = elementStyles.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+          buttonInlineColors.forEach(color => {
+            const normalized = normalizeHex(color);
+            buttonColorCount.set(normalized, (buttonColorCount.get(normalized) || 0) + 8);
+            console.log(`   🎨 Found inline button style color: ${normalized}`);
+          });
+          
+          const buttonInlineRgb = elementStyles.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+          buttonInlineRgb.forEach(rgb => {
+            const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+            if (rgbMatch) {
+              const r = parseInt(rgbMatch[1]);
+              const g = parseInt(rgbMatch[2]);
+              const b = parseInt(rgbMatch[3]);
+              const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+              buttonColorCount.set(hex, (buttonColorCount.get(hex) || 0) + 8);
+              console.log(`   🎨 Found inline button RGB color: ${hex}`);
+            }
+          });
           
         } catch (elError) {
           console.log(`   ⚠️ Error processing element in ${selector}:`, elError.message);
@@ -2426,42 +2475,42 @@ async function extractColors($, baseUrl) {
   });
   
   try {
-    // Получаем топ-3 основных цвета (по общей частоте)
+    // Получаем топ-5 основных цветов (по общей частоте)
     const topMainColors = Array.from(colorCount.entries())
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
+      .slice(0, 5)
       .map(([color]) => color);
     
-    // Получаем топ-3 акцентных цвета (из кнопок, исключая уже выбранные основные)
+    // Получаем топ-4 акцентных цвета (из кнопок, исключая уже выбранные основные)
     const topAccentColors = Array.from(buttonColorCount.entries())
       .filter(([color]) => !topMainColors.includes(color)) // Исключаем дубли
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
+      .slice(0, 4)
       .map(([color]) => color);
     
-    // Объединяем: сначала 3 основных, затем до 3 акцентных
+    // Объединяем: сначала 5 основных, затем до 4 акцентных
     const sortedColors = [...topMainColors];
     topAccentColors.forEach(color => {
-      if (sortedColors.length < 6) {
+      if (sortedColors.length < 9) {
         sortedColors.push(color);
       }
     });
     
-    // Если акцентных меньше 3, дополняем общими цветами
-    if (sortedColors.length < 6) {
+    // Если акцентных меньше 4, дополняем общими цветами
+    if (sortedColors.length < 9) {
       const remainingColors = Array.from(colorCount.entries())
         .filter(([color]) => !sortedColors.includes(color))
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 6 - sortedColors.length)
+        .slice(0, 9 - sortedColors.length)
         .map(([color]) => color);
       
       sortedColors.push(...remainingColors);
     }
     
     console.log('🎨 Smart Color Analysis:');
-    console.log('   📊 Top-3 Main colors:', topMainColors);
-    console.log('   🔘 Top-3 Accent colors:', topAccentColors);
-    console.log('   🎯 Final Smart Top-6:', sortedColors);
+    console.log('   📊 Top-5 Main colors:', topMainColors);
+    console.log('   🔘 Top-4 Accent colors:', topAccentColors);
+    console.log('   🎯 Final Smart Top-9:', sortedColors);
     
     // Возвращаем результат
     return sortedColors.length > 0 ? sortedColors : ['#FFFFFF', '#000000', '#CCCCCC'];
@@ -2471,7 +2520,7 @@ async function extractColors($, baseUrl) {
     // Fallback к старому алгоритму
     return Array.from(colorCount.entries())
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
+      .slice(0, 9)
       .map(([color]) => color);
   }
 }
