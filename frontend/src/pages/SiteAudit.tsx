@@ -288,13 +288,19 @@ const SiteAudit: React.FC = () => {
     }
   };
 
-  // Функция скачивания изображения
+  // Функция скачивания изображения с fallback методами
   const handleImageDownload = async (imageUrl: string, filename: string) => {
     console.log('Попытка скачивания:', imageUrl, filename);
+    
+    // Метод 1: Пробуем fetch с CORS
     try {
+      console.log('Метод 1: Fetch с CORS...');
       const response = await fetch(imageUrl, {
         mode: 'cors',
-        credentials: 'omit'
+        credentials: 'omit',
+        headers: {
+          'Accept': 'image/*,*/*;q=0.8'
+        }
       });
       
       if (!response.ok) {
@@ -311,11 +317,74 @@ const SiteAudit: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      console.log('Скачивание успешно:', filename);
-    } catch (err) {
-      console.error('Ошибка скачивания:', err);
-      alert(`Не удалось скачать файл: ${err instanceof Error ? err.message : 'Неизвестная ошибка'}`);
+      console.log('✅ Скачивание успешно (метод 1):', filename);
+      return;
+    } catch (corsError) {
+      console.log('❌ Метод 1 не сработал:', corsError);
     }
+    
+    // Метод 2: Прямая ссылка (открываем в новой вкладке)
+    try {
+      console.log('Метод 2: Прямая ссылка в новой вкладке...');
+      
+      // Создаем временную ссылку для скачивания
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = filename;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ Открыто в новой вкладке (метод 2):', filename);
+      
+      // Показываем пользователю что делать
+      const userMessage = `Изображение открыто в новой вкладке.\nДля сохранения: ПКМ → "Сохранить изображение как..." → "${filename}"`;
+      alert(userMessage);
+      return;
+    } catch (directError) {
+      console.log('❌ Метод 2 не сработал:', directError);
+    }
+    
+    // Метод 3: Создаем прокси через наш бэкенд
+    try {
+      console.log('Метод 3: Прокси через бэкенд...');
+      const proxyUrl = `http://localhost:8880/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+      
+      const response = await fetch(proxyUrl);
+      if (!response.ok) {
+        throw new Error(`Proxy error! status: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      console.log('✅ Скачивание через прокси успешно (метод 3):', filename);
+      return;
+    } catch (proxyError) {
+      console.log('❌ Метод 3 не сработал:', proxyError);
+    }
+    
+    // Если все методы не сработали
+    const fallbackMessage = `Не удалось автоматически скачать изображение.
+    
+Вы можете:
+1. Открыть ссылку в новой вкладке: ${imageUrl}
+2. ПКМ на изображении → "Сохранить изображение как..."
+3. Использовать имя файла: ${filename}`;
+    
+    console.error('❌ Все методы скачивания не сработали');
+    alert(fallbackMessage);
   };
 
   // Функция копирования URL
@@ -906,11 +975,15 @@ const SiteAudit: React.FC = () => {
                               </div>
                               <div className="asset-info">
                                 <div className="asset-name">
-                                  {result.data.visual.logo.split('/').pop()?.split('?')[0] || 'logo'}
+                                  {result.data.visual.logo.startsWith('data:image/svg+xml') 
+                                    ? 'logo.svg' 
+                                    : result.data.visual.logo.split('/').pop()?.split('?')[0] || 'logo'}
                                 </div>
                                 <div className="asset-meta">
                                   <span className="asset-format">
-                                    {(result.data.visual.logo.split('.').pop()?.split('?')[0] || 'unknown').toUpperCase()}
+                                    {result.data.visual.logo.startsWith('data:image/svg+xml') 
+                                      ? 'SVG' 
+                                      : (result.data.visual.logo.split('.').pop()?.split('?')[0] || 'unknown').toUpperCase()}
                                   </span>
                                   <span className="asset-type">Основной логотип</span>
                                 </div>

@@ -53,6 +53,60 @@ router.post('/site-audit', async (req, res) => {
   }
 });
 
+// Прокси для скачивания изображений (обход CORS)
+router.get('/proxy-image', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) {
+      return res.status(400).json({ success: false, error: 'URL parameter is required' });
+    }
+
+    console.log('Proxying image:', url);
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'image/*,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
+      },
+      timeout: 10000
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+    }
+
+    // Определяем тип контента
+    const contentType = response.headers.get('content-type') || 'image/png';
+    
+    // Проверяем, что это действительно изображение
+    if (!contentType.startsWith('image/')) {
+      throw new Error('URL does not point to an image');
+    }
+
+    // Устанавливаем заголовки для скачивания
+    res.set({
+      'Content-Type': contentType,
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Cache-Control': 'public, max-age=3600'
+    });
+
+    // Передаем изображение
+    const buffer = await response.buffer();
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Image proxy error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Базовый анализ сайта
 function analyzeBasic($, html) {
   const basic = {
@@ -2243,9 +2297,17 @@ function extractLogo($, baseUrl) {
     if (parentId.includes('logo')) score += 25;
     
     // Штрафы за товарные изображения
-    if (alt.includes('product') || alt.includes('товар') || alt.includes('item')) score -= 30;
-    if (className.includes('product') || className.includes('item') || className.includes('card')) score -= 20;
-    if (src.includes('product') || src.includes('item') || src.includes('card')) score -= 15;
+    if (alt.includes('product') || alt.includes('товар') || alt.includes('item')) score -= 50;
+    if (className.includes('product') || className.includes('item') || className.includes('card')) score -= 40;
+    if (src.includes('product') || src.includes('item') || src.includes('card')) score -= 30;
+    
+    // Дополнительные штрафы для товарных изображений
+    if (alt.includes('модель') || alt.includes('model') || alt.includes('catalog')) score -= 40;
+    if (className.includes('catalog') || className.includes('gallery') || className.includes('slider')) score -= 30;
+    if (src.includes('catalog') || src.includes('gallery') || src.includes('upload')) score -= 25;
+    
+    // Штрафы для изображений с численными названиями (часто товары)
+    if (src.match(/\d{3,}/)) score -= 20; // Много цифр в URL
     
     // Средний приоритет: контекстные признаки
     if (alt.includes('brand')) score += 20;
@@ -2253,11 +2315,18 @@ function extractLogo($, baseUrl) {
     if (alt.includes('site') || alt.includes('company')) score += 10;
     
     // Позиционные факторы
-    const isInHeader = $img.closest('header, .header, .navbar, .nav, .top').length > 0;
-    if (isInHeader) score += 15;
+    const isInHeader = $img.closest('header, .header, .navbar, .nav, .top, .main-header, .site-header').length > 0;
+    if (isInHeader) score += 25;
+    
+    const isInFooter = $img.closest('footer, .footer, .bottom').length > 0;
+    if (isInFooter) score -= 10; // Логотипы в футере менее приоритетны
     
     const isFirstInContainer = $img.is(':first-child') || $img.parent().children('img').first().is($img);
-    if (isFirstInContainer && isInHeader) score += 10;
+    if (isFirstInContainer && isInHeader) score += 15;
+    
+    // Бонус для изображений в верхнем левом углу (типичное место для логотипа)
+    const isInTopLeft = $img.closest('.logo, .brand, .navbar-brand, .site-title').length > 0;
+    if (isInTopLeft) score += 30;
     
     // Размерные факторы (если доступны)
     const width = parseInt($img.attr('width')) || 0;
@@ -2283,16 +2352,27 @@ function extractLogo($, baseUrl) {
   // Сначала проверяем специальные контейнеры для логотипа
   const logoContainers = ['#logo', '.logo', '.brand', '.site-logo', '.navbar-brand', '.header-logo', '.site-title', '.logo-container', '.branding'];
   
+  console.log(`🔍 Searching for logo containers on ${baseUrl}...`);
+  
   for (const container of logoContainers) {
     const $container = $(container);
+    console.log(`  Checking container: ${container} - found: ${$container.length > 0 ? 'YES' : 'NO'}`);
+    
     if ($container.length > 0) {
+      console.log(`    Container HTML: ${$container.html()?.substring(0, 200)}...`);
+      
       // Ищем изображение внутри контейнера
       const $img = $container.find('img').first();
+      console.log(`    Found img inside: ${$img.length > 0 ? 'YES' : 'NO'}`);
+      
       if ($img.length > 0) {
         const src = $img.attr('src');
+        console.log(`    Image src: ${src}`);
+        
         if (src && !src.includes('data:')) {
           const absoluteUrl = getAbsoluteUrl(src);
           if (absoluteUrl) {
+            console.log(`    ✅ Added logo candidate from ${container}: ${absoluteUrl}`);
             logoCanididates.push({
               url: absoluteUrl,
               score: 100, // Максимальный приоритет для логотипов в специальных контейнерах
@@ -2302,11 +2382,34 @@ function extractLogo($, baseUrl) {
         }
       }
       
+      // Ищем SVG внутри контейнера
+      const $svg = $container.find('svg').first();
+      console.log(`    Found SVG inside: ${$svg.length > 0 ? 'YES' : 'NO'}`);
+      
+      if ($svg.length > 0) {
+        // Создаем data URL из SVG
+        const svgHtml = $svg.prop('outerHTML');
+        if (svgHtml) {
+          // Создаем data URL для SVG
+          const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgHtml).toString('base64')}`;
+          console.log(`    ✅ Added SVG logo candidate from ${container}`);
+          
+          logoCanididates.push({
+            url: svgDataUrl,
+            score: 100, // Максимальный приоритет для SVG логотипов
+            element: $svg
+          });
+        }
+      }
+      
       // Проверяем background-image контейнера
       const style = $container.attr('style') || '';
+      console.log(`    Container style: ${style}`);
+      
       const bgMatch = style.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/);
       if (bgMatch) {
         const bgUrl = getAbsoluteUrl(bgMatch[1]);
+        console.log(`    ✅ Found background-image: ${bgUrl}`);
         if (bgUrl) {
           logoCanididates.push({
             url: bgUrl,
@@ -2315,8 +2418,69 @@ function extractLogo($, baseUrl) {
           });
         }
       }
+      
+      // Проверяем ссылки внутри контейнера
+      const $link = $container.find('a').first();
+      if ($link.length > 0) {
+        const $linkImg = $link.find('img').first();
+        if ($linkImg.length > 0) {
+          const src = $linkImg.attr('src');
+          console.log(`    Found img in link: ${src}`);
+          
+          if (src && !src.includes('data:')) {
+            const absoluteUrl = getAbsoluteUrl(src);
+            if (absoluteUrl) {
+              console.log(`    ✅ Added logo candidate from link in ${container}: ${absoluteUrl}`);
+              logoCanididates.push({
+                url: absoluteUrl,
+                score: 100,
+                element: $linkImg
+              });
+            }
+          }
+        }
+        
+        // Проверяем SVG внутри ссылки
+        const $linkSvg = $link.find('svg').first();
+        if ($linkSvg.length > 0) {
+          const svgHtml = $linkSvg.prop('outerHTML');
+          if (svgHtml) {
+            const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgHtml).toString('base64')}`;
+            console.log(`    ✅ Added SVG logo candidate from link in ${container}`);
+            
+            logoCanididates.push({
+              url: svgDataUrl,
+              score: 100,
+              element: $linkSvg
+            });
+          }
+        }
+      }
     }
   }
+  
+  // Дополнительно проверяем CSS стили для логотипов
+  $('style').each((i, styleEl) => {
+    const cssText = $(styleEl).html() || '';
+    const logoRules = cssText.match(/(#logo|\.logo|\.brand)[^{]*\{[^}]*background-image:\s*url\(['"]?([^'"]+)['"]?\)[^}]*\}/gi);
+    
+    if (logoRules) {
+      logoRules.forEach(rule => {
+        const urlMatch = rule.match(/url\(['"]?([^'"]+)['"]?\)/);
+        if (urlMatch) {
+          const bgUrl = getAbsoluteUrl(urlMatch[1]);
+          if (bgUrl) {
+            console.log(`    ✅ Found logo in CSS: ${bgUrl}`);
+            logoCanididates.push({
+              url: bgUrl,
+              score: 90,
+              element: null
+            });
+          }
+        }
+      });
+    }
+  });
   
   // Если не нашли в специальных контейнерах, ищем среди всех изображений
   if (logoCanididates.length === 0) {
@@ -2328,7 +2492,7 @@ function extractLogo($, baseUrl) {
         const score = scoreLogoCandidate(img);
         const absoluteUrl = getAbsoluteUrl(src);
         
-        if (absoluteUrl && score > 15) { // Повышаем минимальный порог
+        if (absoluteUrl && score > 25) { // Повышаем минимальный порог для более строгой фильтрации
           logoCanididates.push({
             url: absoluteUrl,
             score: score,
@@ -2342,7 +2506,25 @@ function extractLogo($, baseUrl) {
   // Сортируем по убыванию рейтинга и возвращаем лучший
   logoCanididates.sort((a, b) => b.score - a.score);
   
-  return logoCanididates.length > 0 ? logoCanididates[0].url : null;
+  // Отладочная информация
+  console.log(`🎯 Logo extraction for ${baseUrl}:`);
+  console.log(`Found ${logoCanididates.length} logo candidates:`);
+  logoCanididates.slice(0, 5).forEach((candidate, index) => {
+    const element = candidate.element;
+    const alt = element.attr('alt') || '';
+    const className = element.attr('class') || '';
+    const id = element.attr('id') || '';
+    console.log(`  ${index + 1}. Score: ${candidate.score}, URL: ${candidate.url}`);
+    console.log(`     Alt: "${alt}", Class: "${className}", ID: "${id}"`);
+  });
+  
+  if (logoCanididates.length > 0) {
+    console.log(`✅ Selected logo: ${logoCanididates[0].url} (score: ${logoCanididates[0].score})`);
+    return logoCanididates[0].url;
+  }
+  
+  console.log(`❌ No logo found for ${baseUrl}`);
+  return null;
 }
 
 // Извлечение фавиконки
