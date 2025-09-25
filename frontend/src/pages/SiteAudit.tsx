@@ -288,6 +288,24 @@ const SiteAudit: React.FC = () => {
     }
   };
 
+  // Функция скачивания изображения
+  const handleImageDownload = async (imageUrl: string, filename: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Ошибка скачивания:', err);
+    }
+  };
+
   return (
     <div className="site-audit-tool">
       {/* Header Island */}
@@ -836,42 +854,108 @@ const SiteAudit: React.FC = () => {
                         </div>
                       )}
                       
-                      {/* Логотип */}
+                      {/* Логотип сайта */}
                       {result.data.visual.logo && (
                         <div className="visual-resource-card">
                           <div className="resource-header">
-                            <span className="resource-icon">🏷️</span>
-                            <span className="resource-title">Логотип</span>
+                            <span className="resource-icon">�</span>
+                            <span className="resource-title">Логотип сайта</span>
                           </div>
                           <div className="resource-content">
-                            <img 
-                              src={result.data.visual.logo} 
-                              alt="Logo" 
-                              className="logo-preview"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
+                            <div className="logo-card">
+                              <div className="logo-preview-container">
+                                <img 
+                                  src={result.data.visual.logo} 
+                                  alt="Logo" 
+                                  className="logo-image"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                              <div className="logo-details">
+                                <div className="logo-filename">
+                                  {result.data.visual.logo.split('/').pop()?.split('?')[0] || 'logo'}
+                                </div>
+                                <div className="logo-info">
+                                  <span className="format-badge">
+                                    {(result.data.visual.logo.split('.').pop()?.split('?')[0] || 'unknown').toUpperCase()}
+                                  </span>
+                                  <span className="logo-type">Основной логотип</span>
+                                </div>
+                                <div className="logo-actions">
+                                  <button 
+                                    className="action-btn download-btn"
+                                    onClick={() => handleImageDownload(result.data!.visual.logo!, 'logo.png')}
+                                    title="Скачать логотип"
+                                  >
+                                    <span>⬇️</span>
+                                    Скачать
+                                  </button>
+                                  <button 
+                                    className="action-btn copy-btn"
+                                    onClick={() => navigator.clipboard.writeText(result.data!.visual.logo!)}
+                                    title="Копировать URL"
+                                  >
+                                    <span>🔗</span>
+                                    URL
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
-                      
-                      {/* Фавиконка */}
+
+                      {/* Фавикон сайта */}
                       {result.data.visual.favicon && (
                         <div className="visual-resource-card">
                           <div className="resource-header">
                             <span className="resource-icon">🔖</span>
-                            <span className="resource-title">Фавиконка</span>
+                            <span className="resource-title">Фавикон сайта</span>
                           </div>
                           <div className="resource-content">
-                            <img 
-                              src={result.data.visual.favicon} 
-                              alt="Favicon" 
-                              className="favicon-preview"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
+                            <div className="favicon-card">
+                              <div className="favicon-preview-container">
+                                <img 
+                                  src={result.data.visual.favicon} 
+                                  alt="Favicon" 
+                                  className="favicon-image"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                              <div className="favicon-details">
+                                <div className="favicon-filename">
+                                  {result.data.visual.favicon.split('/').pop()?.split('?')[0] || 'favicon.ico'}
+                                </div>
+                                <div className="favicon-info">
+                                  <span className="format-badge">
+                                    {(result.data.visual.favicon.split('.').pop()?.split('?')[0] || 'ico').toUpperCase()}
+                                  </span>
+                                  <span className="favicon-size">16×16 - 512×512</span>
+                                </div>
+                                <div className="favicon-actions">
+                                  <button 
+                                    className="action-btn download-btn"
+                                    onClick={() => handleImageDownload(result.data!.visual.favicon!, 'favicon.ico')}
+                                    title="Скачать фавикон"
+                                  >
+                                    <span>⬇️</span>
+                                    Скачать
+                                  </button>
+                                  <button 
+                                    className="action-btn copy-btn"
+                                    onClick={() => navigator.clipboard.writeText(result.data!.visual.favicon!)}
+                                    title="Копировать URL"
+                                  >
+                                    <span>🔗</span>
+                                    URL
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
