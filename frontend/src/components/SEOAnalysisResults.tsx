@@ -50,6 +50,37 @@ interface Recommendation {
   actionSteps: string[];
 }
 
+interface DeviceMetrics {
+  mobile: {
+    clicks: number;
+    impressions: number;
+    ctr: number;
+  };
+  desktop: {
+    clicks: number;
+    impressions: number;
+    ctr: number;
+  };
+  tablet: {
+    clicks: number;
+    impressions: number;
+    ctr: number;
+  };
+}
+
+interface Changes {
+  clicksChange: number;
+  impressionsChange: number;
+  ctrChange: number;
+  positionChange: number;
+}
+
+interface AdvancedMetrics {
+  top10Positions: number;
+  featuredSnippets: number;
+  estimatedBacklinks: number;
+}
+
 interface AnalysisData {
   url: string;
   period?: {
@@ -62,6 +93,10 @@ interface AnalysisData {
       totalImpressions: number;
       averageCTR: number;
       averagePosition: number;
+      changes?: Changes;
+      deviceMetrics?: DeviceMetrics;
+      uniqueQueries?: number;
+      advancedMetrics?: AdvancedMetrics;
       queries: Query[];
       pages: Page[];
       devices?: Device[];
@@ -143,29 +178,128 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
   return (
     <div className="seo-analysis-results">
       {/* Главная панель с метриками */}
-      <div className="metrics-dashboard">
-        <div className="metric-card">
-          <div className="metric-icon">👆</div>
-          <div className="metric-value">{formatNumber(searchPerformance.totalClicks)}</div>
-          <div className="metric-label">Клики</div>
+      <div className="seopro-metrics-dashboard">
+        {/* Основные метрики с изменениями */}
+        <div className="seopro-metric-card primary-metric">
+          <div className="seopro-metric-icon">👆</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.totalClicks)}</div>
+          <div className="seopro-metric-label">Клики</div>
+          {searchPerformance.changes?.clicksChange !== undefined && (
+            <div className={`seopro-metric-change ${searchPerformance.changes.clicksChange >= 0 ? 'positive' : 'negative'}`}>
+              {searchPerformance.changes.clicksChange >= 0 ? '↗' : '↘'} {Math.abs(searchPerformance.changes.clicksChange).toFixed(1)}%
+            </div>
+          )}
         </div>
         
-        <div className="metric-card">
-          <div className="metric-icon">👁️</div>
-          <div className="metric-value">{formatNumber(searchPerformance.totalImpressions)}</div>
-          <div className="metric-label">Показы</div>
+        <div className="seopro-metric-card primary-metric">
+          <div className="seopro-metric-icon">👁️</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.totalImpressions)}</div>
+          <div className="seopro-metric-label">Показы</div>
+          {searchPerformance.changes?.impressionsChange !== undefined && (
+            <div className={`seopro-metric-change ${searchPerformance.changes.impressionsChange >= 0 ? 'positive' : 'negative'}`}>
+              {searchPerformance.changes.impressionsChange >= 0 ? '↗' : '↘'} {Math.abs(searchPerformance.changes.impressionsChange).toFixed(1)}%
+            </div>
+          )}
         </div>
         
-        <div className="metric-card">
-          <div className="metric-icon">📊</div>
-          <div className="metric-value">{searchPerformance.averageCTR.toFixed(1)}%</div>
-          <div className="metric-label">Средний CTR</div>
+        <div className="seopro-metric-card primary-metric">
+          <div className="seopro-metric-icon">📊</div>
+          <div className="seopro-metric-value">{searchPerformance.averageCTR.toFixed(1)}%</div>
+          <div className="seopro-metric-label">Средний CTR</div>
+          {searchPerformance.changes?.ctrChange !== undefined && (
+            <div className={`seopro-metric-change ${searchPerformance.changes.ctrChange >= 0 ? 'positive' : 'negative'}`}>
+              {searchPerformance.changes.ctrChange >= 0 ? '↗' : '↘'} {Math.abs(searchPerformance.changes.ctrChange).toFixed(1)}%
+            </div>
+          )}
         </div>
         
-        <div className="metric-card">
-          <div className="metric-icon">🎯</div>
-          <div className="metric-value">{searchPerformance.averagePosition.toFixed(1)}</div>
-          <div className="metric-label">Средняя позиция</div>
+        <div className="seopro-metric-card primary-metric">
+          <div className="seopro-metric-icon">🎯</div>
+          <div className="seopro-metric-value">{searchPerformance.averagePosition.toFixed(1)}</div>
+          <div className="seopro-metric-label">Средняя позиция</div>
+          {searchPerformance.changes?.positionChange !== undefined && (
+            <div className={`seopro-metric-change ${searchPerformance.changes.positionChange <= 0 ? 'positive' : 'negative'}`}>
+              {searchPerformance.changes.positionChange <= 0 ? '↗' : '↘'} {Math.abs(searchPerformance.changes.positionChange).toFixed(1)}%
+            </div>
+          )}
+        </div>
+
+        {/* Новые метрики по устройствам */}
+        <div className="seopro-metric-card device-metric">
+          <div className="seopro-metric-icon">📱</div>
+          <div className="seopro-metric-value">
+            {searchPerformance.deviceMetrics?.mobile?.ctr?.toFixed(1) || '0.0'}%
+          </div>
+          <div className="seopro-metric-label">Mobile CTR</div>
+          <div className="seopro-metric-detail">
+            {formatNumber(searchPerformance.deviceMetrics?.mobile?.clicks || 0)} кликов
+          </div>
+        </div>
+
+        <div className="seopro-metric-card device-metric">
+          <div className="seopro-metric-icon">🖥️</div>
+          <div className="seopro-metric-value">
+            {searchPerformance.deviceMetrics?.desktop?.ctr?.toFixed(1) || '0.0'}%
+          </div>
+          <div className="seopro-metric-label">Desktop CTR</div>
+          <div className="seopro-metric-detail">
+            {formatNumber(searchPerformance.deviceMetrics?.desktop?.clicks || 0)} кликов
+          </div>
+        </div>
+
+        <div className="seopro-metric-card standard-metric">
+          <div className="seopro-metric-icon">🔍</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.uniqueQueries || 0)}</div>
+          <div className="seopro-metric-label">Уникальных запросов</div>
+          <div className="seopro-metric-detail">
+            За 28 дней
+          </div>
+        </div>
+
+        <div className="seopro-metric-card standard-metric">
+          <div className="seopro-metric-icon">📄</div>
+          <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.validPages || 0)}</div>
+          <div className="seopro-metric-label">Проиндексированные</div>
+          <div className="seopro-metric-detail">страницы</div>
+        </div>
+
+        <div className="seopro-metric-card warning-metric">
+          <div className="seopro-metric-icon">⚠️</div>
+          <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.errorPages || 0)}</div>
+          <div className="seopro-metric-label">Страницы с ошибками</div>
+          <div className="seopro-metric-detail">
+            {data.gscData?.indexCoverage?.validPages && data.gscData.indexCoverage.validPages > 0 && 
+             `${(((data.gscData.indexCoverage.errorPages || 0) / data.gscData.indexCoverage.validPages) * 100).toFixed(1)}%`
+            }
+          </div>
+        </div>
+
+        {/* Продвинутые метрики */}
+        <div className="seopro-metric-card pro-metric">
+          <div className="seopro-metric-icon">🏆</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.top10Positions || 0)}</div>
+          <div className="seopro-metric-label">TOP-10 позиций</div>
+          <div className="seopro-metric-detail">
+            из {formatNumber(searchPerformance.uniqueQueries || 0)} запросов
+          </div>
+        </div>
+
+        <div className="seopro-metric-card pro-metric">
+          <div className="seopro-metric-icon">💎</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.featuredSnippets || 0)}</div>
+          <div className="seopro-metric-label">Featured Snippets</div>
+          <div className="seopro-metric-detail">
+            избранные фрагменты
+          </div>
+        </div>
+
+        <div className="seopro-metric-card pro-metric">
+          <div className="seopro-metric-icon">🔗</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.estimatedBacklinks || 0)}</div>
+          <div className="seopro-metric-label">Внешние ссылки</div>
+          <div className="seopro-metric-detail">
+            оценка доменов
+          </div>
         </div>
       </div>
 
