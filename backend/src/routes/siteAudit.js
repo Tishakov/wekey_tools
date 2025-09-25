@@ -1480,28 +1480,88 @@ function analyzeDomain(url, response) {
 function analyzeSocial($) {
   const social = {};
   
-  const socialPatterns = {
-    facebook: /facebook\.com\/[^\/\s"'>]+/gi,
-    instagram: /instagram\.com\/[^\/\s"'>]+/gi,
-    twitter: /(twitter\.com|x\.com)\/[^\/\s"'>]+/gi,
-    linkedin: /linkedin\.com\/(?:in|company)\/[^\/\s"'>]+/gi,
-    youtube: /youtube\.com\/(?:channel\/|user\/|c\/|@)[^\/\s"'>]+/gi,
-    telegram: /(t\.me|telegram\.me)\/[^\/\s"'>]+/gi,
-    whatsapp: /wa\.me\/[^\/\s"'>]+/gi,
-    viber: /viber\.click\/[^\/\s"'>]+/gi
+  // Priority 1: Look for actual social media profile links (more reliable)
+  const socialSelectors = {
+    facebook: ['a[href*="facebook.com/"]', 'a[href*="fb.com/"]'],
+    instagram: ['a[href*="instagram.com/"]'],
+    twitter: ['a[href*="twitter.com/"]', 'a[href*="x.com/"]'],
+    linkedin: ['a[href*="linkedin.com/in/"]', 'a[href*="linkedin.com/company/"]'],
+    youtube: ['a[href*="youtube.com/channel/"]', 'a[href*="youtube.com/user/"]', 'a[href*="youtube.com/c/"]', 'a[href*="youtube.com/@"]'],
+    telegram: ['a[href*="t.me/"]', 'a[href*="telegram.me/"]'],
+    whatsapp: ['a[href*="wa.me/"]', 'a[href*="whatsapp.com/"]'],
+    viber: ['a[href*="viber.click/"]']
   };
   
-  const html = $.html();
-  
-  Object.keys(socialPatterns).forEach(platform => {
-    const matches = html.match(socialPatterns[platform]);
-    if (matches && matches.length > 0) {
-      // Берем первую найденную ссылку
-      social[platform] = matches[0].replace(/["'>]/g, '');
+  Object.keys(socialSelectors).forEach(platform => {
+    const selectors = socialSelectors[platform];
+    
+    for (const selector of selectors) {
+      const links = $(selector);
+      
+      if (links.length > 0) {
+        // Найдем первую подходящую ссылку
+        for (let i = 0; i < links.length; i++) {
+          const href = $(links[i]).attr('href');
+          
+          if (href && isValidSocialLink(href, platform)) {
+            // Убедимся, что ссылка имеет протокол
+            const fullUrl = href.startsWith('http') ? href : `https://${href}`;
+            social[platform] = fullUrl;
+            break;
+          }
+        }
+        
+        if (social[platform]) break; // Если нашли подходящую ссылку, переходим к следующей платформе
+      }
     }
   });
   
   return social;
+}
+
+// Проверка валидности ссылки на социальную сеть
+function isValidSocialLink(href, platform) {
+  if (!href) return false;
+  
+  // Исключаем технические ссылки и трекеры
+  const excludePatterns = [
+    /\/tr\?/,           // Facebook Pixel tracker
+    /\/analytics/,      // Analytics trackers
+    /\/pixel/,          // Pixel trackers
+    /\/tracking/,       // Tracking links
+    /sharer\.php/,      // Facebook share buttons
+    /share\?/,          // Share links
+    /intent\/tweet/,    // Twitter share intents
+    /oauth/,            // OAuth links
+    /login/,            // Login pages
+    /signup/,           // Signup pages
+  ];
+  
+  // Проверяем, не является ли ссылка техническим трекером
+  const isTechnical = excludePatterns.some(pattern => pattern.test(href));
+  if (isTechnical) return false;
+  
+  // Специфичные проверки для каждой платформы
+  switch (platform) {
+    case 'facebook':
+      return /facebook\.com\/[a-zA-Z0-9._-]+$/.test(href) || /fb\.com\/[a-zA-Z0-9._-]+$/.test(href);
+    case 'instagram':
+      return /instagram\.com\/[a-zA-Z0-9._-]+\/?$/.test(href);
+    case 'twitter':
+      return /(twitter\.com|x\.com)\/[a-zA-Z0-9._-]+\/?$/.test(href);
+    case 'linkedin':
+      return /linkedin\.com\/(in|company)\/[a-zA-Z0-9._-]+\/?$/.test(href);
+    case 'youtube':
+      return /youtube\.com\/(channel\/|user\/|c\/|@)[a-zA-Z0-9._-]+\/?$/.test(href);
+    case 'telegram':
+      return /(t\.me|telegram\.me)\/[a-zA-Z0-9._-]+\/?$/.test(href);
+    case 'whatsapp':
+      return /(wa\.me|whatsapp\.com)\/[a-zA-Z0-9._+-]+\/?$/.test(href);
+    case 'viber':
+      return /viber\.click\/[a-zA-Z0-9._-]+\/?$/.test(href);
+    default:
+      return true;
+  }
 }
 
 // Анализ производительности
@@ -1606,7 +1666,111 @@ function analyzeContact($, html, url) {
   });
 
   contact.phones = Array.from(phoneSet);
+  
+  // Email extraction
+  contact.emails = extractEmails($, html, url);
+  
   return contact;
+}
+
+// Извлечение email-адресов
+function extractEmails($, html, url) {
+  const emailSet = new Set();
+  
+  // Priority 1: mailto: links (most reliable)
+  const mailtoLinks = $('a[href^="mailto:"]');
+  
+  mailtoLinks.each((i, el) => {
+    const href = $(el).attr('href');
+    if (href && href.startsWith('mailto:')) {
+      let email = href.substring(7); // Remove 'mailto:'
+      
+      // Remove parameters like ?subject=... 
+      const paramIndex = email.indexOf('?');
+      if (paramIndex !== -1) {
+        email = email.substring(0, paramIndex);
+      }
+      
+      // Basic email validation
+      if (isValidEmail(email)) {
+        emailSet.add(email.toLowerCase());
+      }
+    }
+  });
+  
+  // Priority 2: If no mailto links found, search for email patterns in text
+  if (emailSet.size === 0) {
+    // Email pattern: word@domain.tld
+    const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+    
+    const processedHtml = html.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
+    const matches = processedHtml.match(emailPattern);
+    
+    if (matches) {
+      matches.forEach(email => {
+        const lowerEmail = email.toLowerCase();
+        
+        // Skip common false positives
+        if (!isEmailFalsePositive(lowerEmail)) {
+          emailSet.add(lowerEmail);
+        }
+      });
+    }
+  }
+  
+  return Array.from(emailSet).slice(0, 10); // Limit to 10 emails max
+}
+
+// Валидация email
+function isValidEmail(email) {
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  return emailRegex.test(email) && email.length <= 254; // RFC 5321 limit
+}
+
+// Проверка на ложные срабатывания email
+function isEmailFalsePositive(email) {
+  // Исключения для файлов изображений и ресурсов
+  const fileExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.bmp', '.tiff'];
+  const hasFileExtension = fileExtensions.some(ext => email.includes(ext));
+  
+  if (hasFileExtension) {
+    return true;
+  }
+  
+  // Исключения для технических доменов и токенов
+  const technicalPatterns = [
+    /@2x\./,           // Retina images: Icon-1@2x.png
+    /@3x\./,           // High-res images: Icon-1@3x.png
+    /@imli\.com$/,     // Spam/token emails
+    /^[a-f0-9]{32,}@/, // Long hex tokens
+    /^[A-Z0-9]{40,}@/i, // Long random strings
+    /@[a-f0-9-]{20,}\./, // Hex-based domains
+    /@localhost/,      // Local development
+    /@example\./,      // Example domains
+    /@test\./,         // Test domains
+  ];
+  
+  const isTechnical = technicalPatterns.some(pattern => pattern.test(email));
+  
+  if (isTechnical) {
+    return true;
+  }
+  
+  // Исключения для очень длинных локальных частей (скорее всего токены)
+  const localPart = email.split('@')[0];
+  if (localPart.length > 30) {
+    return true;
+  }
+  
+  // Исключения для подозрительных паттернов
+  const suspiciousPatterns = [
+    /thumbnail_/i,     // thumbnail_Icon-1@2x.png
+    /icon[-_]\d+@/i,   // icon-1@domain, icon_2@domain
+    /img[-_]\d+@/i,    // img-1@domain
+    /asset[-_]/i,      // asset_name@domain
+  ];
+  
+  return suspiciousPatterns.some(pattern => pattern.test(email));
 }
 
 // Извлечение шрифтов из HTML и CSS

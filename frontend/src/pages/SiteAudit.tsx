@@ -290,19 +290,50 @@ const SiteAudit: React.FC = () => {
 
   // Функция скачивания изображения
   const handleImageDownload = async (imageUrl: string, filename: string) => {
+    console.log('Попытка скачивания:', imageUrl, filename);
     try {
-      const response = await fetch(imageUrl);
+      const response = await fetch(imageUrl, {
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      console.log('Скачивание успешно:', filename);
     } catch (err) {
       console.error('Ошибка скачивания:', err);
+      alert(`Не удалось скачать файл: ${err instanceof Error ? err.message : 'Неизвестная ошибка'}`);
+    }
+  };
+
+  // Функция копирования URL
+  const handleCopyUrl = async (url: string) => {
+    console.log('Копирование URL:', url);
+    try {
+      await navigator.clipboard.writeText(url);
+      console.log('URL скопирован в буфер обмена');
+      // Можно добавить toast уведомление
+    } catch (err) {
+      console.error('Ошибка копирования:', err);
+      // Fallback для старых браузеров
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
     }
   };
 
@@ -887,7 +918,10 @@ const SiteAudit: React.FC = () => {
                               <div className="asset-actions">
                                 <button 
                                   className="asset-btn primary"
-                                  onClick={() => handleImageDownload(result.data!.visual.logo!, 'logo.png')}
+                                  onClick={() => {
+                                    console.log('Клик по кнопке Скачать логотип');
+                                    handleImageDownload(result.data!.visual.logo!, 'logo.png');
+                                  }}
                                   title="Скачать логотип"
                                 >
                                   <span>⬇️</span>
@@ -895,7 +929,10 @@ const SiteAudit: React.FC = () => {
                                 </button>
                                 <button 
                                   className="asset-btn secondary"
-                                  onClick={() => navigator.clipboard.writeText(result.data!.visual.logo!)}
+                                  onClick={() => {
+                                    console.log('Клик по кнопке URL логотипа');
+                                    handleCopyUrl(result.data!.visual.logo!);
+                                  }}
                                   title="Копировать URL"
                                 >
                                   <span>🔗</span>
@@ -940,7 +977,10 @@ const SiteAudit: React.FC = () => {
                               <div className="asset-actions">
                                 <button 
                                   className="asset-btn primary"
-                                  onClick={() => handleImageDownload(result.data!.visual.favicon!, 'favicon.ico')}
+                                  onClick={() => {
+                                    console.log('Клик по кнопке Скачать фавикон');
+                                    handleImageDownload(result.data!.visual.favicon!, 'favicon.ico');
+                                  }}
                                   title="Скачать фавикон"
                                 >
                                   <span>⬇️</span>
@@ -948,7 +988,10 @@ const SiteAudit: React.FC = () => {
                                 </button>
                                 <button 
                                   className="asset-btn secondary"
-                                  onClick={() => navigator.clipboard.writeText(result.data!.visual.favicon!)}
+                                  onClick={() => {
+                                    console.log('Клик по кнопке URL фавикона');
+                                    handleCopyUrl(result.data!.visual.favicon!);
+                                  }}
                                   title="Копировать URL"
                                 >
                                   <span>🔗</span>
@@ -1225,10 +1268,36 @@ const SiteAudit: React.FC = () => {
                   <div className="audit-section">
                     <h3>📱 Социальные сети</h3>
                     <div className="social-grid">
-                      {Object.entries(result.data.social).map(([platform, url]) => (
-                        url && (
+                      {Object.entries(result.data.social).map(([platform, url]) => {
+                        const getSocialIcon = (platform: string) => {
+                          const iconMap: { [key: string]: string } = {
+                            facebook: '/icons/tools_facebook.svg',
+                            instagram: '/icons/tools_instagram.svg',
+                            twitter: '/icons/tools_tik_tok.svg', // Используем TikTok иконку для Twitter/X
+                            linkedin: '/icons/tools_linkedin.svg',
+                            youtube: '/icons/tools_youtube.svg',
+                            telegram: '/icons/tools_telegram.svg',
+                            whatsapp: '/icons/tools_whats_app.svg',
+                            viber: '/icons/tools_viber.svg'
+                          };
+                          return iconMap[platform] || '/icons/tools_facebook.svg'; // Fallback
+                        };
+
+                        return url && (
                           <div key={platform} className="social-item">
-                            <span className="social-icon">
+                            <img 
+                              src={getSocialIcon(platform)} 
+                              alt={`${platform} icon`}
+                              className="social-icon-svg"
+                              onError={(e) => {
+                                // Fallback к эмодзи если SVG не загрузился
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const fallback = target.nextElementSibling as HTMLSpanElement;
+                                if (fallback) fallback.style.display = 'inline';
+                              }}
+                            />
+                            <span className="social-icon-fallback" style={{ display: 'none' }}>
                               {platform === 'facebook' && '👥'}
                               {platform === 'instagram' && '📷'}
                               {platform === 'twitter' && '🐦'}
@@ -1243,8 +1312,8 @@ const SiteAudit: React.FC = () => {
                               Перейти
                             </a>
                           </div>
-                        )
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -1258,9 +1327,36 @@ const SiteAudit: React.FC = () => {
                         <div className="contact-group">
                           <h4>📱 Телефоны:</h4>
                           {result.data.contact.phones.map((phone, index) => (
-                            <a key={index} href={`tel:${phone}`} className="contact-item">
-                              {phone}
-                            </a>
+                            <div key={index} className="contact-item">
+                              <a href={`tel:${phone}`} className="contact-link">
+                                {phone}
+                              </a>
+                              <button 
+                                className="copy-contact-btn"
+                                onClick={(e) => {
+                                  console.log('Копирование телефона:', phone);
+                                  navigator.clipboard.writeText(phone);
+                                  
+                                  // Визуальная обратная связь
+                                  const btn = e.target as HTMLButtonElement;
+                                  const originalText = btn.textContent;
+                                  btn.textContent = '✅';
+                                  btn.style.background = 'rgba(46, 204, 113, 0.2)';
+                                  btn.style.borderColor = 'rgba(46, 204, 113, 0.5)';
+                                  btn.style.transform = 'scale(1.1)';
+                                  
+                                  setTimeout(() => {
+                                    btn.textContent = originalText;
+                                    btn.style.background = '';
+                                    btn.style.borderColor = '';
+                                    btn.style.transform = '';
+                                  }, 1000);
+                                }}
+                                title="Скопировать телефон"
+                              >
+                                📋
+                              </button>
+                            </div>
                           ))}
                         </div>
                       )}
@@ -1268,9 +1364,36 @@ const SiteAudit: React.FC = () => {
                         <div className="contact-group">
                           <h4>📧 Email:</h4>
                           {result.data.contact.emails.map((email, index) => (
-                            <a key={index} href={`mailto:${email}`} className="contact-item">
-                              {email}
-                            </a>
+                            <div key={index} className="contact-item">
+                              <a href={`mailto:${email}`} className="contact-link">
+                                {email}
+                              </a>
+                              <button 
+                                className="copy-contact-btn"
+                                onClick={(e) => {
+                                  console.log('Копирование email:', email);
+                                  navigator.clipboard.writeText(email);
+                                  
+                                  // Визуальная обратная связь
+                                  const btn = e.target as HTMLButtonElement;
+                                  const originalText = btn.textContent;
+                                  btn.textContent = '✅';
+                                  btn.style.background = 'rgba(46, 204, 113, 0.2)';
+                                  btn.style.borderColor = 'rgba(46, 204, 113, 0.5)';
+                                  btn.style.transform = 'scale(1.1)';
+                                  
+                                  setTimeout(() => {
+                                    btn.textContent = originalText;
+                                    btn.style.background = '';
+                                    btn.style.borderColor = '';
+                                    btn.style.transform = '';
+                                  }, 1000);
+                                }}
+                                title="Скопировать email"
+                              >
+                                📋
+                              </button>
+                            </div>
                           ))}
                         </div>
                       )}
