@@ -49,8 +49,6 @@ const SynonymGeneratorTool: React.FC = () => {
       return;
     }
 
-    }
-
     setAiError('');
     setIsGenerating(true);
     

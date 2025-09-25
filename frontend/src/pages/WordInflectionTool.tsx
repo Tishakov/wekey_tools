@@ -50,8 +50,6 @@ const WordInflectionTool: React.FC = () => {
       return;
     }
 
-    }
-
     setAiError('');
     setIsGenerating(true);
     

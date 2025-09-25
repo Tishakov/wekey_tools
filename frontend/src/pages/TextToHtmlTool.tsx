@@ -132,8 +132,7 @@ const TextToHtmlTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
-
+        }
 
         const processedText = processText(inputText);
         setResult(processedText);

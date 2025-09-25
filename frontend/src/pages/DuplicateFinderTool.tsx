@@ -74,6 +74,7 @@ const DuplicateFinderTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
 
         if (!inputText1.trim() && !inputText2.trim()) {
             setOnlyInFirst('');

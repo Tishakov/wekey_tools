@@ -51,6 +51,7 @@ const MinusWordsTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
 
         }
 
@@ -81,4 +82,4 @@ const MinusWordsTool: React.FC = () => {
         });
         
         setWords(processedLines);
-        
+    };

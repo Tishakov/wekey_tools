@@ -87,6 +87,7 @@ const AddSymbolTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
 
     if (!symbolToAdd.trim()) {
       setOutputText('');

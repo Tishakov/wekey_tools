@@ -206,8 +206,6 @@ const TextGeneratorTool: React.FC = () => {
         return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
     }
 
-    }
-
     setAiError('');
     setIsGenerating(true);
     
@@ -238,6 +236,7 @@ const TextGeneratorTool: React.FC = () => {
         } else {
           setAiError(response.error || 'Не удалось сгенерировать текст');
           console.error('❌ AI generation failed:', response.error);
+        }
       }
       
     } catch (error) {
