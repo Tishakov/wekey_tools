@@ -135,6 +135,7 @@ router.post('/seo-audit-pro/analyze', async (req, res) => {
     // Если есть токены и не используем демо-данные, делаем реальный анализ
     if (tokens && !useMockData) {
       try {
+        console.log('🔍 Analyzing real GSC data for:', website);
         const analysis = await gscService.analyzeSite(website, tokens);
         
         return res.json({
@@ -144,7 +145,11 @@ router.post('/seo-audit-pro/analyze', async (req, res) => {
         });
       } catch (gscError) {
         console.error('Real GSC analysis failed:', gscError);
-        // Fallback к демо-данным при ошибке
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to analyze GSC data: ' + gscError.message,
+          source: 'gsc_api_error'
+        });
       }
     }
 

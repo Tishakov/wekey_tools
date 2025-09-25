@@ -172,38 +172,42 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
       {/* Health Score с круговой диаграммой */}
       <div className="health-score-section">
         <h3>Общая оценка SEO</h3>
-        <div className="health-score-container">
-          <div className="health-score-circle">
-            <svg width="160" height="160" className="health-score-svg">
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                fill="none"
-                stroke="#e5e7eb"
-                strokeWidth="10"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                fill="none"
-                stroke={getHealthScoreColor(overallScore)}
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeDasharray={`${(overallScore / 100) * 439.8} 439.8`}
-                transform="rotate(-90 80 80)"
-                className="health-score-progress"
-              />
-            </svg>
-            <div className="health-score-content">
-              <div className="score-value">{overallScore}</div>
-              <div className="score-max">из 100</div>
-              <div className={`health-status ${healthStatus}`}>
-                {healthStatus === 'excellent' && '🟢 Отлично'}
-                {healthStatus === 'good' && '🟡 Хорошо'}
-                {healthStatus === 'average' && '🟠 Средне'}
-                {healthStatus === 'poor' && '🔴 Плохо'}
+        <div className="health-score-wrapper">
+          <div className="health-score-chart">
+            <div className="score-circle-container">
+              <svg viewBox="0 0 200 200" className="score-circle-svg">
+                {/* Фоновый круг */}
+                <circle
+                  cx="100"
+                  cy="100" 
+                  r="80"
+                  fill="none"
+                  stroke="#374151"
+                  strokeWidth="12"
+                />
+                {/* Прогресс круг */}
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="80"
+                  fill="none"
+                  stroke={getHealthScoreColor(overallScore)}
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(overallScore / 100) * 502.65} 502.65`}
+                  transform="rotate(-90 100 100)"
+                  className="score-progress-circle"
+                />
+              </svg>
+              <div className="score-content-center">
+                <div className="score-number">{overallScore}</div>
+                <div className="score-total">из 100</div>
+                <div className={`score-status score-${healthStatus}`}>
+                  {healthStatus === 'excellent' && 'Отлично'}
+                  {healthStatus === 'good' && 'Хорошо'}
+                  {healthStatus === 'average' && 'Средне'}
+                  {healthStatus === 'poor' && 'Плохо'}
+                </div>
               </div>
             </div>
           </div>

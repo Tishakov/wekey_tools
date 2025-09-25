@@ -237,18 +237,20 @@ const SEOAuditProTool: React.FC = () => {
     });
 
     try {
-      // Извлекаем домен из полного URL
-      const websiteDomain = selectedSite.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      // Получаем сохраненные токены GSC
+      const savedTokens = localStorage.getItem('gsc-tokens');
+      const tokens = savedTokens ? JSON.parse(savedTokens) : null;
       
-      // API запрос к новому endpoint для анализа GSC данных
+      // API запрос к endpoint для анализа реальных GSC данных
       const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          website: websiteDomain,
-          useMockData: true // Используем демо-данные для тестирования
+          website: selectedSite, // Передаем полный URL
+          tokens: tokens, // Передаем токены для GSC API
+          useMockData: false // Используем реальные данные GSC
         })
       });
 
