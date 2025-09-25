@@ -512,10 +512,11 @@
   text-decoration: none;
   font-weight: 500;
   padding: 4px 8px;
-  background: #333335;
+  background: rgba(9, 206, 167, 0.1);
+  border: 1px solid rgba(9, 206, 167, 0.3);
   border-radius: 4px;
   transition: all 0.2s ease;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .social-link:hover {

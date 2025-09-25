@@ -340,10 +340,6 @@ const SiteAudit: React.FC = () => {
       document.body.removeChild(link);
       
       console.log('✅ Открыто в новой вкладке (метод 2):', filename);
-      
-      // Показываем пользователю что делать
-      const userMessage = `Изображение открыто в новой вкладке.\nДля сохранения: ПКМ → "Сохранить изображение как..." → "${filename}"`;
-      alert(userMessage);
       return;
     } catch (directError) {
       console.log('❌ Метод 2 не сработал:', directError);

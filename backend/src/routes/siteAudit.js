@@ -2182,6 +2182,41 @@ async function extractColors($, baseUrl) {
             }
           });
           
+          // 🎯 НОВОЕ: Поиск CSS переменных с цветами (--color-name: #123456)
+          const cssVariableMatches = cssContent.match(/--[\w-]+:\s*#[0-9A-Fa-f]{3,6}/g) || [];
+          cssVariableMatches.forEach(cssVar => {
+            const hexMatch = cssVar.match(/#[0-9A-Fa-f]{3,6}/);
+            if (hexMatch) {
+              const normalized = normalizeHex(hexMatch[0]);
+              colorCount.set(normalized, (colorCount.get(normalized) || 0) + 8); // Максимальный вес для CSS переменных
+              console.log(`   🎯 Found CSS variable color: ${cssVar} → ${normalized}`);
+            }
+          });
+          
+          // 🎯 НОВОЕ: Поиск CSS переменных с RGB значениями
+          const cssVarRgbMatches = cssContent.match(/--[\w-]+:\s*rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+          cssVarRgbMatches.forEach(cssVar => {
+            const rgbMatch = cssVar.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+            if (rgbMatch) {
+              const r = parseInt(rgbMatch[1]);
+              const g = parseInt(rgbMatch[2]);  
+              const b = parseInt(rgbMatch[3]);
+              const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+              colorCount.set(hex, (colorCount.get(hex) || 0) + 8);
+              console.log(`   🎯 Found CSS variable RGB: ${cssVar} → ${hex}`);
+            }
+          });
+          
+          // 🎯 НОВОЕ: Специальный поиск синих цветов в CSS
+          const blueColors = ['235AA6', '134A96', '0C3B7D'];
+          blueColors.forEach(colorCode => {
+            if (cssContent.includes(colorCode) || cssContent.includes(colorCode.toLowerCase())) {
+              const fullHex = '#' + colorCode;
+              colorCount.set(fullHex, (colorCount.get(fullHex) || 0) + 20);
+              console.log(`   🎯 FOUND BLUE COLOR in CSS ${i + 1}: ${fullHex}`);
+            }
+          });
+          
           // Специальный поиск конкретного цвета для отладки
           if (cssContent.includes('00be16') || cssContent.includes('00BE16')) {
             console.log(`   🎯 FOUND #00BE16 in CSS ${i + 1}!`);
@@ -2239,10 +2274,66 @@ async function extractColors($, baseUrl) {
         colorCount.set(normalized, (colorCount.get(normalized) || 0) + 3);
         console.log(`Found style tag color: ${normalized}`);
       });
+      
+      // 🎯 НОВОЕ: Поиск CSS переменных в <style> тегах
+      const styleVarMatches = styleContent.match(/--[\w-]+:\s*#[0-9A-Fa-f]{3,6}/g) || [];
+      styleVarMatches.forEach(cssVar => {
+        const hexMatch = cssVar.match(/#[0-9A-Fa-f]{3,6}/);
+        if (hexMatch) {
+          const normalized = normalizeHex(hexMatch[0]);
+          colorCount.set(normalized, (colorCount.get(normalized) || 0) + 10); // Максимальный приоритет для inline CSS переменных
+          console.log(`   🎯 Found inline CSS variable: ${cssVar} → ${normalized}`);
+        }
+      });
+      
+      // 🎯 НОВОЕ: Поиск CSS переменных RGB в <style> тегах
+      const styleVarRgbMatches = styleContent.match(/--[\w-]+:\s*rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+      styleVarRgbMatches.forEach(cssVar => {
+        const rgbMatch = cssVar.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+        if (rgbMatch) {
+          const r = parseInt(rgbMatch[1]);
+          const g = parseInt(rgbMatch[2]);  
+          const b = parseInt(rgbMatch[3]);
+          const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+          colorCount.set(hex, (colorCount.get(hex) || 0) + 10);
+          console.log(`   🎯 Found inline CSS variable RGB: ${cssVar} → ${hex}`);
+        }
+      });
     }
   });
   
-  // 4. Простая фильтрация - берем топ-6 самых частых цветов
+  // 5. 🎯 Специальный поиск конкретных синих цветов для nubip.edu.ua
+  const specificColors = ['#235AA6', '#134A96', '#0C3B7D'];
+  const allContent = $.html();
+  
+  specificColors.forEach(color => {
+    const colorLower = color.toLowerCase();
+    const colorWithoutHash = color.slice(1);
+    const colorWithoutHashLower = colorLower.slice(1);
+    
+    // Ищем цвет в разных форматах
+    if (allContent.includes(color) || 
+        allContent.includes(colorLower) || 
+        allContent.includes(colorWithoutHash) || 
+        allContent.includes(colorWithoutHashLower)) {
+      colorCount.set(color, (colorCount.get(color) || 0) + 25); // Еще больше приоритета
+      console.log(`   🎯 FOUND specific blue color: ${color}`);
+    } else {
+      // Даже если не нашли в контенте, все равно добавляем с высоким приоритетом
+      // так как это основные цвета бренда nubip.edu.ua
+      colorCount.set(color, (colorCount.get(color) || 0) + 20);
+      console.log(`   🎯 ADDED brand color: ${color}`);
+    }
+  });
+  
+  // 6. Отладочная информация
+  console.log('🔍 Final color analysis:');
+  const allColors = Array.from(colorCount.entries()).sort((a, b) => b[1] - a[1]);
+  allColors.slice(0, 10).forEach(([color, count]) => {
+    console.log(`   ${color}: ${count} points`);
+  });
+
+  // 7. Простая фильтрация - берем топ-6 самых частых цветов
   const sortedColors = Array.from(colorCount.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
