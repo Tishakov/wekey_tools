@@ -2441,7 +2441,13 @@ function extractLogo($, baseUrl) {
   }
   
   // Сначала проверяем специальные контейнеры для логотипа
-  const logoContainers = ['#logo', '.logo', '.brand', '.site-logo', '.navbar-brand', '.header-logo', '.site-title', '.logo-container', '.branding'];
+  const logoContainers = [
+    '#logo', '.logo', '.brand', '.site-logo', '.navbar-brand', 
+    '.header-logo', '.header__logo', '.site-title', '.logo-container', 
+    '.branding', '.header__brand', '.nav__logo', '.top__logo',
+    '.main-logo', '.company-logo', '.brand-logo', '.site-brand',
+    '.header-brand', '.navigation__logo', '.nav-logo'
+  ];
   
   console.log(`🔍 Searching for logo containers on ${baseUrl}...`);
   
