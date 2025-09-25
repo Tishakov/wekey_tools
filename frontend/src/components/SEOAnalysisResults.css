@@ -3,10 +3,13 @@
 .seo-analysis-results {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+.seo-audit-pro-results {
+  padding: 20px;
 }
 
 /* 📊 КЛАССИЧЕСКАЯ ПАНЕЛЬ МЕТРИК - 4x3 СЕТКА */
@@ -497,7 +500,6 @@
 /* Адаптивность */
 @media (max-width: 768px) {
   .seo-analysis-results {
-    padding: 16px;
     gap: 24px;
   }
 
