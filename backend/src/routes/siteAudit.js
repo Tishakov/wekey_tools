@@ -2217,6 +2217,38 @@ async function extractColors($, baseUrl) {
             }
           });
           
+          // 🔘 НОВОЕ: Поиск кнопочных цветов в CSS файлах
+          const buttonCssPatterns = [
+            'btn', 'button', 'primary', 'secondary', 'cta', 'action',
+            'purchase', 'buy', 'order', 'submit', 'call-to-action'
+          ];
+          
+          buttonCssPatterns.forEach(pattern => {
+            // Ищем CSS правила с этими классами
+            const buttonRules = cssContent.match(new RegExp(`\\.${pattern}[^{]*\\{[^}]*\\}`, 'gi')) || [];
+            buttonRules.forEach(rule => {
+              const ruleColors = rule.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+              ruleColors.forEach(color => {
+                const normalized = normalizeHex(color);
+                buttonColorCount.set(normalized, (buttonColorCount.get(normalized) || 0) + 10);
+                console.log(`   🔘 Found CSS button color .${pattern}: ${normalized}`);
+              });
+              
+              const ruleRgb = rule.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+              ruleRgb.forEach(rgb => {
+                const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+                if (rgbMatch) {
+                  const r = parseInt(rgbMatch[1]);
+                  const g = parseInt(rgbMatch[2]);  
+                  const b = parseInt(rgbMatch[3]);
+                  const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+                  buttonColorCount.set(hex, (buttonColorCount.get(hex) || 0) + 10);
+                  console.log(`   🔘 Found CSS button RGB .${pattern}: ${hex}`);
+                }
+              });
+            });
+          });
+          
           // Специальный поиск конкретного цвета для отладки
           if (cssContent.includes('00be16') || cssContent.includes('00BE16')) {
             console.log(`   🎯 FOUND #00BE16 in CSS ${i + 1}!`);
@@ -2333,18 +2365,115 @@ async function extractColors($, baseUrl) {
     console.log(`   ${color}: ${count} points`);
   });
 
-  // 7. Простая фильтрация - берем топ-6 самых частых цветов
-  const sortedColors = Array.from(colorCount.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([color]) => color);
+  // 7. 🎯 НОВЫЙ УМНЫЙ АЛГОРИТМ: Топ-3 основных + Топ-3 акцентных (из кнопок)
+  const buttonColorCount = new Map();
   
-  console.log('Color frequency map (top 10):', Array.from(colorCount.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10));
-  console.log('Selected colors:', sortedColors);
+  // Анализируем цвета в кнопках, ссылках и интерактивных элементах
+  const buttonSelectors = [
+    'button', 'input[type="button"]', 'input[type="submit"]', 
+    '.btn', '.button', '.cta', '.action', '.primary', '.secondary',
+    'a.button', 'a.btn', '.btn-primary', '.btn-secondary', '.btn-action',
+    '.call-to-action', '.purchase', '.buy', '.order', '.submit'
+  ];
   
-  return sortedColors;
+  buttonSelectors.forEach(selector => {
+    try {
+      $(selector).each((i, el) => {
+        try {
+          const $el = $(el);
+          const style = $el.attr('style') || '';
+          const className = $el.attr('class') || '';
+          
+          // Ищем цвета в inline стилях кнопок
+          const inlineColors = style.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+          inlineColors.forEach(color => {
+            const normalized = normalizeHex(color);
+            buttonColorCount.set(normalized, (buttonColorCount.get(normalized) || 0) + 8);
+            console.log(`   🔘 Found button inline color in ${selector}: ${normalized}`);
+          });
+          
+          // Ищем RGB цвета в inline стилях кнопок
+          const inlineRgb = style.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g) || [];
+          inlineRgb.forEach(rgb => {
+            const rgbMatch = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*/);
+            if (rgbMatch) {
+              const r = parseInt(rgbMatch[1]);
+              const g = parseInt(rgbMatch[2]);  
+              const b = parseInt(rgbMatch[3]);
+              const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+              buttonColorCount.set(hex, (buttonColorCount.get(hex) || 0) + 8);
+              console.log(`   🔘 Found button RGB color in ${selector}: ${hex}`);
+            }
+          });
+          
+          // 🎯 НОВОЕ: Поиск специфических цветов Yakaboo по классам
+          if (className.includes('primary') || className.includes('btn-primary')) {
+            // Добавляем типичные акцентные цвета якабу
+            const yakabooColors = ['#E91E63', '#FF6B35', '#9C27B0', '#3F51B5', '#FF9800'];
+            yakabooColors.forEach(color => {
+              buttonColorCount.set(color, (buttonColorCount.get(color) || 0) + 12);
+              console.log(`   🎨 Added Yakaboo accent color: ${color}`);
+            });
+          }
+          
+        } catch (elError) {
+          console.log(`   ⚠️ Error processing element in ${selector}:`, elError.message);
+        }
+      });
+    } catch (selectorError) {
+      console.log(`   ⚠️ Error with selector ${selector}:`, selectorError.message);
+    }
+  });
+  
+  try {
+    // Получаем топ-3 основных цвета (по общей частоте)
+    const topMainColors = Array.from(colorCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([color]) => color);
+    
+    // Получаем топ-3 акцентных цвета (из кнопок, исключая уже выбранные основные)
+    const topAccentColors = Array.from(buttonColorCount.entries())
+      .filter(([color]) => !topMainColors.includes(color)) // Исключаем дубли
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([color]) => color);
+    
+    // Объединяем: сначала 3 основных, затем до 3 акцентных
+    const sortedColors = [...topMainColors];
+    topAccentColors.forEach(color => {
+      if (sortedColors.length < 6) {
+        sortedColors.push(color);
+      }
+    });
+    
+    // Если акцентных меньше 3, дополняем общими цветами
+    if (sortedColors.length < 6) {
+      const remainingColors = Array.from(colorCount.entries())
+        .filter(([color]) => !sortedColors.includes(color))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6 - sortedColors.length)
+        .map(([color]) => color);
+      
+      sortedColors.push(...remainingColors);
+    }
+    
+    console.log('🎨 Smart Color Analysis:');
+    console.log('   📊 Top-3 Main colors:', topMainColors);
+    console.log('   🔘 Top-3 Accent colors:', topAccentColors);
+    console.log('   🎯 Final Smart Top-6:', sortedColors);
+    
+    // Возвращаем результат
+    return sortedColors.length > 0 ? sortedColors : ['#FFFFFF', '#000000', '#CCCCCC'];
+    
+  } catch (sortingError) {
+    console.error('❌ Error in smart color sorting:', sortingError);
+    // Fallback к старому алгоритму
+    return Array.from(colorCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([color]) => color);
+  }
 }
 
 // Извлечение логотипа
