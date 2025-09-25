@@ -168,6 +168,99 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
     return COLORS.danger;
   };
 
+  // Функции для расчета компонентных скоров
+  const getTrafficScore = (performance: any) => {
+    const clicks = performance.totalClicks || 0;
+    const impressions = performance.totalImpressions || 0;
+    const ctr = performance.averageCTR || 0;
+    
+    // Скор на основе трафика (0-100)
+    let score = 0;
+    if (clicks > 10000) score += 40;
+    else if (clicks > 5000) score += 30;
+    else if (clicks > 1000) score += 20;
+    else if (clicks > 100) score += 10;
+    
+    if (impressions > 100000) score += 30;
+    else if (impressions > 50000) score += 20;
+    else if (impressions > 10000) score += 15;
+    else if (impressions > 1000) score += 10;
+    
+    if (ctr > 5) score += 30;
+    else if (ctr > 3) score += 20;
+    else if (ctr > 1) score += 10;
+    
+    return Math.min(100, score);
+  };
+
+  const getPositionScore = (performance: any) => {
+    const avgPosition = performance.averagePosition || 100;
+    const top10 = performance.advancedMetrics?.top10Positions || 0;
+    const totalQueries = performance.uniqueQueries || 1;
+    
+    // Скор на основе позиций (0-100)
+    let score = 0;
+    if (avgPosition <= 3) score += 40;
+    else if (avgPosition <= 5) score += 30;
+    else if (avgPosition <= 10) score += 20;
+    else if (avgPosition <= 20) score += 10;
+    
+    const top10Ratio = top10 / totalQueries;
+    if (top10Ratio > 0.5) score += 60;
+    else if (top10Ratio > 0.3) score += 40;
+    else if (top10Ratio > 0.1) score += 20;
+    else if (top10Ratio > 0.05) score += 10;
+    
+    return Math.min(100, score);
+  };
+
+  const getTechnicalScore = (coverage: any) => {
+    if (!coverage) return 0;
+    
+    const validPages = coverage.validPages || 0;
+    const errorPages = coverage.errorPages || 0;
+    const totalPages = validPages + errorPages;
+    
+    if (totalPages === 0) return 0;
+    
+    // Скор на основе технического состояния (0-100)
+    const healthRatio = validPages / totalPages;
+    let score = healthRatio * 80;
+    
+    if (validPages > 1000) score += 20;
+    else if (validPages > 500) score += 15;
+    else if (validPages > 100) score += 10;
+    else if (validPages > 10) score += 5;
+    
+    return Math.min(100, Math.round(score));
+  };
+
+  const getProScore = (performance: any) => {
+    const featuredSnippets = performance.advancedMetrics?.featuredSnippets || 0;
+    const backlinks = performance.advancedMetrics?.estimatedBacklinks || 0;
+    
+    // Скор на основе PRO метрик (0-100)
+    let score = 0;
+    
+    if (featuredSnippets > 20) score += 50;
+    else if (featuredSnippets > 10) score += 35;
+    else if (featuredSnippets > 5) score += 25;
+    else if (featuredSnippets > 0) score += 15;
+    
+    if (backlinks > 1000) score += 50;
+    else if (backlinks > 500) score += 35;
+    else if (backlinks > 100) score += 25;
+    else if (backlinks > 10) score += 15;
+    
+    return Math.min(100, score);
+  };
+
+  const getComponentScoreColor = (score: number) => {
+    if (score >= 75) return '#10B981'; // Зеленый
+    if (score >= 50) return '#F59E0B'; // Желтый
+    return '#EF4444'; // Красный
+  };
+
   // Функция для форматирования больших чисел
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -303,47 +396,188 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* Health Score с круговой диаграммой */}
+      {/* Health Score Dashboard */}
       <div className="health-score-section">
-        <h3>Общая оценка SEO</h3>
-        <div className="health-score-wrapper">
-          <div className="health-score-chart">
-            <div className="score-circle-container">
-              <svg viewBox="0 0 200 200" className="score-circle-svg">
-                {/* Фоновый круг */}
-                <circle
-                  cx="100"
-                  cy="100" 
-                  r="80"
-                  fill="none"
-                  stroke="#374151"
-                  strokeWidth="12"
-                />
-                {/* Прогресс круг */}
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="80"
-                  fill="none"
-                  stroke={getHealthScoreColor(overallScore)}
-                  strokeWidth="12"
-                  strokeLinecap="round"
-                  strokeDasharray={`${(overallScore / 100) * 502.65} 502.65`}
-                  transform="rotate(-90 100 100)"
-                  className="score-progress-circle"
-                />
-              </svg>
-              <div className="score-content-center">
-                <div className="score-number">{overallScore}</div>
-                <div className="score-total">из 100</div>
-                <div className={`score-status score-${healthStatus}`}>
-                  {healthStatus === 'excellent' && 'Отлично'}
-                  {healthStatus === 'good' && 'Хорошо'}
-                  {healthStatus === 'average' && 'Средне'}
-                  {healthStatus === 'poor' && 'Плохо'}
+        <h3>📊 Общая оценка SEO</h3>
+        
+        {/* Главная оценка - большая диаграмма */}
+        <div className="health-score-main">
+          <div className="health-score-circle-main">
+            <svg width="140" height="140">
+              <circle cx="70" cy="70" r="55" fill="none" stroke="#374151" strokeWidth="10"></circle>
+              <circle 
+                cx="70" cy="70" r="55" 
+                fill="none"
+                stroke={getHealthScoreColor(overallScore)}
+                strokeWidth="10"
+                strokeLinecap="round"
+                style={{
+                  strokeDasharray: `${2 * Math.PI * 55}`,
+                  strokeDashoffset: `${2 * Math.PI * 55 * (1 - overallScore / 100)}`,
+                  transform: 'rotate(-90deg)',
+                  transformOrigin: 'center'
+                }}
+              ></circle>
+            </svg>
+            <div className="health-score-text">
+              <span className="health-score-number">{overallScore}</span>
+              <span className="health-score-label">SEO Score</span>
+            </div>
+          </div>
+          <div className="health-score-status">
+            <h4>
+              {healthStatus === 'excellent' && '🟢 Отличное SEO'}
+              {healthStatus === 'good' && '🟡 Хорошее SEO'}
+              {healthStatus === 'average' && '🟠 Среднее SEO'}
+              {healthStatus === 'poor' && '🔴 Слабое SEO'}
+            </h4>
+            <p>
+              {healthStatus === 'excellent' && 'Ваш сайт отлично оптимизирован для поисковых систем!'}
+              {healthStatus === 'good' && 'Хорошая SEO оптимизация, есть небольшие возможности для улучшения.'}
+              {healthStatus === 'average' && 'SEO требует внимания. Рекомендуется оптимизация.'}
+              {healthStatus === 'poor' && 'SEO нуждается в серьезных улучшениях!'}
+            </p>
+            <div className={`health-summary ${healthStatus}`}>
+              <span className="health-summary-label">⚡ Общее состояние:</span>
+              <span className="health-summary-value">
+                {healthStatus === 'excellent' && 'Превосходно'}
+                {healthStatus === 'good' && 'Хорошо'}
+                {healthStatus === 'average' && 'Удовлетворительно'}
+                {healthStatus === 'poor' && 'Требует работы'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Компонентные оценки - маленькие диаграммы */}
+        <div className="health-components-section">
+          <h4>🔍 Детализация по компонентам</h4>
+          <div className="health-components-grid">
+            
+            {/* Трафик */}
+            <div className="health-component-item">
+              <div className="health-component-icon">📈</div>
+              <div className="health-component-info">
+                <div className="health-component-name">Трафик</div>
+                <div className="health-component-description">Клики и показы</div>
+              </div>
+              <div className="health-component-value">
+                <span className="health-component-number">{formatNumber(searchPerformance.totalClicks)}</span>
+                <div className="health-component-score-circle">
+                  <svg width="50" height="50">
+                    <circle cx="25" cy="25" r="22" fill="none" stroke="#374151" strokeWidth="3"></circle>
+                    <circle 
+                      cx="25" cy="25" r="22" 
+                      fill="none"
+                      stroke={getComponentScoreColor(getTrafficScore(searchPerformance))}
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      style={{
+                        strokeDasharray: `${2 * Math.PI * 22}`,
+                        strokeDashoffset: `${2 * Math.PI * 22 * (1 - getTrafficScore(searchPerformance) / 100)}`,
+                        transform: 'rotate(-90deg)',
+                        transformOrigin: 'center'
+                      }}
+                    ></circle>
+                  </svg>
+                  <span className="health-component-score-text">{getTrafficScore(searchPerformance)}</span>
                 </div>
               </div>
             </div>
+
+            {/* Позиции */}
+            <div className="health-component-item">
+              <div className="health-component-icon">🎯</div>
+              <div className="health-component-info">
+                <div className="health-component-name">Позиции</div>
+                <div className="health-component-description">Ранжирование</div>
+              </div>
+              <div className="health-component-value">
+                <span className="health-component-number">{searchPerformance.averagePosition.toFixed(1)}</span>
+                <div className="health-component-score-circle">
+                  <svg width="50" height="50">
+                    <circle cx="25" cy="25" r="22" fill="none" stroke="#374151" strokeWidth="3"></circle>
+                    <circle 
+                      cx="25" cy="25" r="22" 
+                      fill="none"
+                      stroke={getComponentScoreColor(getPositionScore(searchPerformance))}
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      style={{
+                        strokeDasharray: `${2 * Math.PI * 22}`,
+                        strokeDashoffset: `${2 * Math.PI * 22 * (1 - getPositionScore(searchPerformance) / 100)}`,
+                        transform: 'rotate(-90deg)',
+                        transformOrigin: 'center'
+                      }}
+                    ></circle>
+                  </svg>
+                  <span className="health-component-score-text">{getPositionScore(searchPerformance)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Техническое */}
+            <div className="health-component-item">
+              <div className="health-component-icon">⚙️</div>
+              <div className="health-component-info">
+                <div className="health-component-name">Техническое</div>
+                <div className="health-component-description">Индексация</div>
+              </div>
+              <div className="health-component-value">
+                <span className="health-component-number">{formatNumber(indexCoverage?.validPages || 0)}</span>
+                <div className="health-component-score-circle">
+                  <svg width="50" height="50">
+                    <circle cx="25" cy="25" r="22" fill="none" stroke="#374151" strokeWidth="3"></circle>
+                    <circle 
+                      cx="25" cy="25" r="22" 
+                      fill="none"
+                      stroke={getComponentScoreColor(getTechnicalScore(indexCoverage))}
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      style={{
+                        strokeDasharray: `${2 * Math.PI * 22}`,
+                        strokeDashoffset: `${2 * Math.PI * 22 * (1 - getTechnicalScore(indexCoverage) / 100)}`,
+                        transform: 'rotate(-90deg)',
+                        transformOrigin: 'center'
+                      }}
+                    ></circle>
+                  </svg>
+                  <span className="health-component-score-text">{getTechnicalScore(indexCoverage)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* PRO метрики */}
+            <div className="health-component-item">
+              <div className="health-component-icon">💎</div>
+              <div className="health-component-info">
+                <div className="health-component-name">PRO метрики</div>
+                <div className="health-component-description">Продвинутые</div>
+              </div>
+              <div className="health-component-value">
+                <span className="health-component-number">{formatNumber(searchPerformance.advancedMetrics?.top10Positions || 0)}</span>
+                <div className="health-component-score-circle">
+                  <svg width="50" height="50">
+                    <circle cx="25" cy="25" r="22" fill="none" stroke="#374151" strokeWidth="3"></circle>
+                    <circle 
+                      cx="25" cy="25" r="22" 
+                      fill="none"
+                      stroke={getComponentScoreColor(getProScore(searchPerformance))}
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      style={{
+                        strokeDasharray: `${2 * Math.PI * 22}`,
+                        strokeDashoffset: `${2 * Math.PI * 22 * (1 - getProScore(searchPerformance) / 100)}`,
+                        transform: 'rotate(-90deg)',
+                        transformOrigin: 'center'
+                      }}
+                    ></circle>
+                  </svg>
+                  <span className="health-component-score-text">{getProScore(searchPerformance)}</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

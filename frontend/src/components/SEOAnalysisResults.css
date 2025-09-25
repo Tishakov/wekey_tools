@@ -103,103 +103,212 @@
 
 /* Health Score секция */
 /* Health Score Section - Перекомпонованная структура */
+/* Health Score Dashboard - похожий на Core Web Vitals */
 .health-score-section {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 32px;
-  text-align: center;
+  background: #1C1D1F;
+  border: 1px solid #333335;
+  border-radius: 12px;
+  padding: 24px;
   margin-bottom: 24px;
 }
 
 .health-score-section h3 {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #FAFAFA;
+}
+
+/* Главная скорость загрузки - стиль как в SEO Audit */
+.health-score-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
   margin-bottom: 32px;
+  padding: 20px;
+  background: #28282A;
+  border-radius: 12px;
+  border: 1px solid #333335;
 }
 
-.health-score-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.health-score-chart {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.score-circle-container {
+.health-score-circle-main {
   position: relative;
-  width: 200px;
-  height: 200px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.score-circle-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.score-progress-circle {
-  transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.score-content-center {
+.health-score-text {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.score-number {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--text-primary);
+.health-score-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FAFAFA;
   line-height: 1;
-  margin-bottom: 4px;
 }
 
-.score-total {
+.health-score-label {
+  font-size: 12px;
+  color: #808184;
+  margin-top: 2px;
+}
+
+.health-score-status h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #FAFAFA;
+}
+
+.health-score-status p {
+  margin: 0 0 12px 0;
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #D1D5DB;
+  line-height: 1.4;
+}
+
+.health-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  max-width: 270px;
+  transition: all 0.3s ease;
+}
+
+/* Цветовые варианты для summary */
+.health-summary.excellent {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.health-summary.good {
+  background: rgba(34, 197, 94, 0.1);  
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.health-summary.average {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.health-summary.poor {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.health-summary-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.health-summary-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Цвета текста для разных состояний здоровья */
+.health-summary.excellent .health-summary-label,
+.health-summary.excellent .health-summary-value {
+  color: #10B981;
+}
+
+.health-summary.good .health-summary-label,
+.health-summary.good .health-summary-value {
+  color: #22C55E;
+}
+
+.health-summary.average .health-summary-label,
+.health-summary.average .health-summary-value {
+  color: #F59E0B;
+}
+
+.health-summary.poor .health-summary-label,
+.health-summary.poor .health-summary-value {
+  color: #EF4444;
+}
+
+/* Компонентные health scores */
+.health-components-section {
+  margin-top: 24px;
+}
+
+.health-components-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #FAFAFA;
+}
+
+.health-components-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.health-component-item {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.health-component-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.health-component-info {
   margin-bottom: 12px;
 }
 
-.score-status {
+.health-component-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FAFAFA;
+  margin-bottom: 2px;
+}
+
+.health-component-description {
+  font-size: 12px;
+  color: #808184;
+}
+
+.health-component-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.health-component-number {
   font-size: 14px;
   font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 20px;
-  display: inline-block;
+  color: #D1D5DB;
 }
 
-.score-excellent {
-  background: rgba(52, 168, 83, 0.1);
-  color: #34a853;
+.health-component-score-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.score-good {
-  background: rgba(66, 133, 244, 0.1);
-  color: #4285f4;
-}
-
-.score-average {
-  background: rgba(251, 188, 5, 0.1);
-  color: #fbbc05;
-}
-
-.score-poor {
-  background: rgba(234, 67, 53, 0.1);
-  color: #ea4335;
+.health-component-score-text {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 600;
+  color: #FAFAFA;
 }
 
 /* Секции анализа */
@@ -664,6 +773,11 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
   }
+  
+  .health-components-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
 }
 
 /* Планшеты маленькие - 2 колонки */
@@ -688,6 +802,17 @@
   
   .seopro-metric-label {
     font-size: 12px;
+  }
+  
+  .health-score-main {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .health-components-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
@@ -722,5 +847,26 @@
   
   .seopro-metric-detail {
     font-size: 10px;
+  }
+  
+  .health-components-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .health-component-item {
+    padding: 14px;
+  }
+  
+  .health-component-icon {
+    font-size: 20px;
+  }
+  
+  .health-component-name {
+    font-size: 14px;
+  }
+  
+  .health-component-number {
+    font-size: 12px;
   }
 }
