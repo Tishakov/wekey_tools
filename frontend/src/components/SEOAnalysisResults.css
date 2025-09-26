@@ -119,6 +119,8 @@
   opacity: 0.8;
   filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .seopro-metric-icon:hover {
@@ -133,6 +135,8 @@
   color: var(--accent-color);
   margin-bottom: 8px;
   line-height: 1.2;
+  position: relative;
+  z-index: 2;
 }
 
 .seopro-metric-label {
@@ -142,6 +146,8 @@
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
 }
 
 .seopro-metric-change {
@@ -169,6 +175,8 @@
   margin-top: 6px;
   opacity: 0.7;
   font-weight: 500;
+  position: relative;
+  z-index: 2;
 }
 
 /* Health Score секция */
@@ -760,10 +768,25 @@
 /* Метрики устройств - нейтральный стиль */
 .seopro-metric-card.device-metric {
   gap: 0px;
+  position: relative;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.seopro-metric-card.device-metric::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.05));
+  pointer-events: none;
+  z-index: 1;
 }
 
 .seopro-metric-card.device-metric .seopro-metric-value {
-  color: #64748b;
+  color: #bcbbbd;
 }
 
 .seopro-metric-card.device-metric .seopro-metric-icon {
@@ -775,8 +798,31 @@
 }
 
 /* Стандартные метрики - базовый стиль */
+.seopro-metric-card.standard-metric {
+  position: relative;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.seopro-metric-card.standard-metric::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.03), rgba(75, 85, 99, 0.03));
+  pointer-events: none;
+  z-index: 1;
+}
+
 .seopro-metric-card.standard-metric .seopro-metric-value {
-  color: #6b7280;
+  color: #bcbbbd;
+}
+
+/* Проиндексированные страницы - зеленый цвет для индикации успеха */
+.seopro-metric-card.standard-metric.current-state .seopro-metric-value {
+  color: #22c55e;
 }
 
 /* Информационные метрики - спокойный синий */
@@ -785,7 +831,7 @@
 }
 
 .seopro-metric-card.info-metric .seopro-metric-value {
-  color: #3b82f6;
+  color: #ef4444;
 }
 
 .seopro-metric-card.info-metric .seopro-metric-icon {
@@ -851,6 +897,20 @@
 .seopro-metric-card.pro-metric {
   background: #1c1d1f;
   position: relative;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.seopro-metric-card.pro-metric::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(124, 58, 237, 0.05));
+  pointer-events: none;
+  z-index: 1;
 }
 
 .seopro-metric-card.pro-metric .seopro-metric-value {
