@@ -4,6 +4,188 @@ import { useTranslation } from 'react-i18next';
 import AvatarUpload from '../components/profile/AvatarUpload';
 import './UserProfile.css';
 
+// Список популярных стран
+const COUNTRIES = [
+  'Россия',
+  'США',
+  'Украина',
+  'Беларусь',
+  'Казахстан',
+  'Узбекистан',
+  'Кыргызстан',
+  'Таджикистан',
+  'Туркменистан',
+  'Армения',
+  'Азербайджан',
+  'Грузия',
+  'Молдова',
+  'Германия',
+  'Великобритания',
+  'Франция',
+  'Италия',
+  'Испания',
+  'Канада',
+  'Австралия',
+  'Новая Зеландия',
+  'Бразилия',
+  'Аргентина',
+  'Чили',
+  'Перу',
+  'Колумбия',
+  'Венесуэла',
+  'Эквадор',
+  'Уругвай',
+  'Парагвай',
+  'Боливия',
+  'Мексика',
+  'Коста-Рика',
+  'Панама',
+  'Гватемала',
+  'Никарагуа',
+  'Сальвадор',
+  'Гондурас',
+  'Белиз',
+  'Доминиканская Республика',
+  'Куба',
+  'Ямайка',
+  'Тринидад и Тобаго',
+  'Барбадос',
+  'Япония',
+  'Китай',
+  'Южная Корея',
+  'КНДР',
+  'Монголия',
+  'Тайвань',
+  'Гонконг',
+  'Сингапур',
+  'Малайзия',
+  'Таиланд',
+  'Вьетнам',
+  'Лаос',
+  'Камбоджа',
+  'Мьянма',
+  'Филиппины',
+  'Индонезия',
+  'Бруней',
+  'Восточный Тимор',
+  'Папуа-Новая Гвинея',
+  'Фиджи',
+  'Индия',
+  'Пакистан',
+  'Бангладеш',
+  'Шри-Ланка',
+  'Мальдивы',
+  'Непал',
+  'Бутан',
+  'Афганистан',
+  'Иран',
+  'Ирак',
+  'Турция',
+  'Сирия',
+  'Ливан',
+  'Иордания',
+  'Израиль',
+  'Палестина',
+  'Кувейт',
+  'Бахрейн',
+  'Катар',
+  'ОАЭ',
+  'Оман',
+  'Йемен',
+  'Саудовская Аравия',
+  'Египет',
+  'Ливия',
+  'Тунис',
+  'Алжир',
+  'Марокко',
+  'Судан',
+  'Южный Судан',
+  'Эфиопия',
+  'Эритрея',
+  'Джибути',
+  'Сомали',
+  'Кения',
+  'Уганда',
+  'Танзания',
+  'Руанда',
+  'Бурунди',
+  'ДР Конго',
+  'Республика Конго',
+  'ЦАР',
+  'Чад',
+  'Камерун',
+  'Экваториальная Гвинея',
+  'Габон',
+  'Сан-Томе и Принсипи',
+  'Нигерия',
+  'Нигер',
+  'Мали',
+  'Буркина-Фасо',
+  'Кот-д\'Ивуар',
+  'Либерия',
+  'Сьерра-Леоне',
+  'Гвинея',
+  'Гвинея-Бисау',
+  'Сенегал',
+  'Гамбия',
+  'Кабо-Верде',
+  'Мавритания',
+  'Того',
+  'Бенин',
+  'Гана',
+  'ЮАР',
+  'Намибия',
+  'Ботсвана',
+  'Зимбабве',
+  'Замбия',
+  'Малави',
+  'Мозамбик',
+  'Мадагаскар',
+  'Маврикий',
+  'Коморы',
+  'Сейшелы',
+  'Лесото',
+  'Эсватини',
+  'Ангола',
+  'Польша',
+  'Чехия',
+  'Словакия',
+  'Венгрия',
+  'Румыния',
+  'Болгария',
+  'Хорватия',
+  'Словения',
+  'Сербия',
+  'Босния и Герцеговина',
+  'Черногория',
+  'Северная Македония',
+  'Албания',
+  'Косово',
+  'Эстония',
+  'Латвия',
+  'Литва',
+  'Финляндия',
+  'Швеция',
+  'Норвегия',
+  'Дания',
+  'Исландия',
+  'Ирландия',
+  'Португалия',
+  'Греция',
+  'Кипр',
+  'Мальта',
+  'Люксембург',
+  'Бельгия',
+  'Нидерланды',
+  'Австрия',
+  'Швейцария',
+  'Лихтенштейн',
+  'Монако',
+  'Андорра',
+  'Сан-Марино',
+  'Ватикан'
+].sort();
+
 interface UserSettings {
   defaultLanguage: string;
   emailNotifications: boolean;
@@ -74,6 +256,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     facebook?: string;
     telegram?: string;
   }>({});
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countrySearchQuery, setCountrySearchQuery] = useState('');
   
   // Initialize profile data when user changes
   useEffect(() => {
@@ -313,6 +497,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       ...prev, 
       [platform]: error 
     }));
+  };
+
+  // Функции для работы с выпадающим списком стран
+  const filteredCountries = COUNTRIES.filter(country =>
+    country.toLowerCase().includes(countrySearchQuery.toLowerCase())
+  );
+
+  const handleCountrySelect = (country: string) => {
+    setProfileData(prev => ({ ...prev, country }));
+    setCountryDropdownOpen(false);
+    setCountrySearchQuery('');
+  };
+
+  const handleCountryInputChange = (value: string) => {
+    setProfileData(prev => ({ ...prev, country: value }));
+    setCountrySearchQuery(value);
+    setCountryDropdownOpen(true);
   };
 
   const handleDisabledElementClick = () => {
@@ -565,7 +766,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
                     disabled={!isEditing}
                     className="profile-input"
-                    placeholder="+7 (999) 123-45-67"
+                    placeholder="+38 066 33 74 923"
                     onPointerDown={!isEditing ? (e) => {
                       e.preventDefault();
                       handleDisabledElementClick();
@@ -575,18 +776,41 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
 
                 <div className="form-group">
                   <label>Страна</label>
-                  <input
-                    type="text"
-                    value={profileData.country}
-                    onChange={(e) => setProfileData({...profileData, country: e.target.value})}
-                    disabled={!isEditing}
-                    className="profile-input"
-                    placeholder="Россия"
-                    onPointerDown={!isEditing ? (e) => {
-                      e.preventDefault();
-                      handleDisabledElementClick();
-                    } : undefined}
-                  />
+                  <div className="country-selector">
+                    <input
+                      type="text"
+                      value={profileData.country}
+                      onChange={(e) => handleCountryInputChange(e.target.value)}
+                      onFocus={() => setCountryDropdownOpen(true)}
+                      onBlur={() => setTimeout(() => setCountryDropdownOpen(false), 200)}
+                      disabled={!isEditing}
+                      className="profile-input"
+                      placeholder="Начните вводить название страны"
+                      autoComplete="off"
+                      onPointerDown={!isEditing ? (e) => {
+                        e.preventDefault();
+                        handleDisabledElementClick();
+                      } : undefined}
+                    />
+                    {countryDropdownOpen && isEditing && filteredCountries.length > 0 && (
+                      <div className="country-dropdown">
+                        {filteredCountries.slice(0, 8).map((country) => (
+                          <div
+                            key={country}
+                            className={`country-option ${profileData.country === country ? 'selected' : ''}`}
+                            onMouseDown={() => handleCountrySelect(country)}
+                          >
+                            {country}
+                          </div>
+                        ))}
+                        {filteredCountries.length > 8 && (
+                          <div className="country-option-info">
+                            И еще {filteredCountries.length - 8} стран...
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {isEditing && (
