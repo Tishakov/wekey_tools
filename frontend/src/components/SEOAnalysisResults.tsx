@@ -17,6 +17,60 @@ import {
 } from 'recharts';
 import './SEOAnalysisResults.css';
 
+// Словарь для преобразования кодов стран в названия
+const getCountryName = (countryCode: string): string => {
+  const countryNames: { [key: string]: string } = {
+    'ukr': 'Украина',
+    'rus': 'Россия',
+    'usa': 'США',
+    'deu': 'Германия',
+    'fra': 'Франция',
+    'gbr': 'Великобритания',
+    'pol': 'Польша',
+    'ita': 'Италия',
+    'esp': 'Испания',
+    'can': 'Канада',
+    'aus': 'Австралия',
+    'jpn': 'Япония',
+    'chn': 'Китай',
+    'ind': 'Индия',
+    'bra': 'Бразилия',
+    'mex': 'Мексика',
+    'tur': 'Турция',
+    'nld': 'Нидерланды',
+    'swe': 'Швеция',
+    'nor': 'Норвегия',
+    'dnk': 'Дания',
+    'fin': 'Финляндия',
+    'che': 'Швейцария',
+    'aut': 'Австрия',
+    'bel': 'Бельгия',
+    'cze': 'Чехия',
+    'hun': 'Венгрия',
+    'rou': 'Румыния',
+    'bgr': 'Болгария',
+    'hrv': 'Хорватия',
+    'srb': 'Сербия',
+    'svk': 'Словакия',
+    'svn': 'Словения',
+    'ltu': 'Литва',
+    'lva': 'Латвия',
+    'est': 'Эстония',
+    'blr': 'Беларусь',
+    'mda': 'Молдова',
+    'geo': 'Грузия',
+    'arm': 'Армения',
+    'aze': 'Азербайджан',
+    'kaz': 'Казахстан',
+    'uzb': 'Узбекистан',
+    'kgz': 'Киргизия',
+    'tjk': 'Таджикистан',
+    'tkm': 'Туркменистан'
+  };
+  
+  return countryNames[countryCode.toLowerCase()] || countryCode.toUpperCase();
+};
+
 interface Query {
   query: string;
   clicks: number;
@@ -492,11 +546,11 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
 
         {/* Продвинутые метрики */}
         <div className="seopro-metric-card pro-metric">
-          <div className="seopro-metric-icon">🏆</div>
-          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.top10Positions || 0)}</div>
-          <div className="seopro-metric-label">TOP-10 позиций</div>
+          <div className="seopro-metric-icon">🔗</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.estimatedBacklinks || 0)}</div>
+          <div className="seopro-metric-label">Внешние ссылки</div>
           <div className="seopro-metric-detail">
-            из {formatNumber(searchPerformance.uniqueQueries || 0)} запросов
+            оценка доменов
           </div>
         </div>
 
@@ -506,6 +560,15 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
           <div className="seopro-metric-label">TOP-3 позиций</div>
           <div className="seopro-metric-detail">
             премиум места
+          </div>
+        </div>
+
+        <div className="seopro-metric-card pro-metric">
+          <div className="seopro-metric-icon">🏆</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.top10Positions || 0)}</div>
+          <div className="seopro-metric-label">TOP-10 позиций</div>
+          <div className="seopro-metric-detail">
+            из {formatNumber(searchPerformance.uniqueQueries || 0)} запросов
           </div>
         </div>
 
@@ -520,19 +583,15 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
 
         <div className="seopro-metric-card pro-metric">
           <div className="seopro-metric-icon">🌍</div>
-          <div className="seopro-metric-value">{searchPerformance.advancedMetrics?.topCountry?.country || 'N/A'}</div>
+          <div className="seopro-metric-value">
+            {searchPerformance.advancedMetrics?.topCountry?.country 
+              ? getCountryName(searchPerformance.advancedMetrics.topCountry.country)
+              : 'N/A'
+            }
+          </div>
           <div className="seopro-metric-label">Топ страна</div>
           <div className="seopro-metric-detail">
             {formatNumber(searchPerformance.advancedMetrics?.topCountry?.clicks || 0)} кликов
-          </div>
-        </div>
-
-        <div className="seopro-metric-card pro-metric">
-          <div className="seopro-metric-icon">🔗</div>
-          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.estimatedBacklinks || 0)}</div>
-          <div className="seopro-metric-label">Внешние ссылки</div>
-          <div className="seopro-metric-detail">
-            оценка доменов
           </div>
         </div>
       </div>
