@@ -156,11 +156,11 @@
   margin-bottom: 20px;
 }
 
-.achievements-header h3 {
+.achievements-header h2 {
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  color: #FFFFFF;
+  color: #BCBBBD;
 }
 
 .achievements-content {
@@ -221,6 +221,21 @@
 
 .section-header h2 {
   font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #BCBBBD;
+}
+
+/* Уникальные стили для профиля */
+.profile-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.profile-section-header h2 {
+  font-size: 18px;
   font-weight: 600;
   margin: 0;
   color: #BCBBBD;
@@ -488,11 +503,11 @@
   margin-bottom: 20px;
 }
 
-.about-header h3 {
+.about-header h2 {
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  color: #FFFFFF;
+  color: #BCBBBD;
 }
 
 .edit-buttons {
@@ -593,6 +608,48 @@
   display: flex;
   gap: 8px;
   margin-top: 12px;
+}
+
+/* Анимация привлечения внимания */
+@keyframes attentionShake {
+  0%, 100% { 
+    transform: translateX(0);
+    background: rgba(94, 53, 242, 0.1);
+    border-color: rgba(94, 53, 242, 0.2);
+  }
+  10% { 
+    transform: translateX(-2px);
+    background: rgba(94, 53, 242, 0.18);
+  }
+  20% { 
+    transform: translateX(2px);
+    background: rgba(94, 53, 242, 0.22);
+  }
+  30% { 
+    transform: translateX(-2px);
+    background: rgba(94, 53, 242, 0.25);
+    border-color: rgba(94, 53, 242, 0.4);
+  }
+  40% { 
+    transform: translateX(2px);
+    background: rgba(94, 53, 242, 0.22);
+  }
+  50% { 
+    transform: translateX(-1px);
+    background: rgba(94, 53, 242, 0.18);
+  }
+  60% { 
+    transform: translateX(1px);
+    background: rgba(94, 53, 242, 0.15);
+  }
+  70% { 
+    transform: translateX(0);
+    background: rgba(94, 53, 242, 0.12);
+  }
+}
+
+.profile-edit-button.attention {
+  animation: attentionShake 0.6s ease-out;
 }
 
 .profile-display-text {

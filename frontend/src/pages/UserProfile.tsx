@@ -65,6 +65,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isEditingAbout, setIsEditingAbout] = useState(false);
+  const [showAttentionAnimation, setShowAttentionAnimation] = useState(false);
   
   // Initialize profile data when user changes
   useEffect(() => {
@@ -208,6 +209,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       setLoading(false);
     }
   };
+
+  const handleDisabledElementClick = () => {
+    if (!isEditing) {
+      setShowAttentionAnimation(true);
+      // Убираем анимацию через время её выполнения
+      setTimeout(() => setShowAttentionAnimation(false), 600);
+    }
+  };
   
   if (!user) {
     return (
@@ -314,13 +323,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             </div>
           )}
           
+
+          
           {activeSection === 'personalInfo' && (
             <div className="profile-section">
-              <div className="section-header">
-                <h2>{t('profile.personalInfo.title')}</h2>
+              <div className="profile-section-header">
+                <h2>Профиль</h2>
                 {!isEditing ? (
                   <button 
-                    className="profile-edit-button"
+                    className={`profile-edit-button ${showAttentionAnimation ? 'attention' : ''}`}
                     onClick={() => setIsEditing(true)}
                   >
                     {t('profile.edit')}
@@ -357,6 +368,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       disabled={!isEditing}
                       className="profile-input"
                       placeholder={t('profile.firstNamePlaceholder')}
+                      onPointerDown={!isEditing ? (e) => {
+                        e.preventDefault();
+                        handleDisabledElementClick();
+                      } : undefined}
                     />
                   </div>
                   <div className="form-group">
@@ -368,6 +383,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       disabled={!isEditing}
                       className="profile-input"
                       placeholder={t('profile.lastNamePlaceholder')}
+                      onPointerDown={!isEditing ? (e) => {
+                        e.preventDefault();
+                        handleDisabledElementClick();
+                      } : undefined}
                     />
                   </div>
                 </div>
@@ -381,6 +400,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     disabled={!isEditing}
                     className="profile-input"
                     placeholder={t('profile.emailPlaceholder')}
+                    onPointerDown={!isEditing ? (e) => {
+                      e.preventDefault();
+                      handleDisabledElementClick();
+                    } : undefined}
                   />
                 </div>
 
@@ -391,6 +414,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     onChange={(e) => setProfileData({...profileData, gender: e.target.value})}
                     disabled={!isEditing}
                     className="profile-input"
+                    onPointerDown={!isEditing ? (e) => {
+                      e.preventDefault();
+                      handleDisabledElementClick();
+                    } : undefined}
                   >
                     <option value="">Не указан</option>
                     <option value="male">Мужской</option>
@@ -407,6 +434,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     onChange={(e) => setProfileData({...profileData, birthDate: e.target.value})}
                     disabled={!isEditing}
                     className="profile-input"
+                    onPointerDown={!isEditing ? (e) => {
+                      e.preventDefault();
+                      handleDisabledElementClick();
+                    } : undefined}
                   />
                 </div>
 
@@ -419,6 +450,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     disabled={!isEditing}
                     className="profile-input"
                     placeholder="+7 (999) 123-45-67"
+                    onPointerDown={!isEditing ? (e) => {
+                      e.preventDefault();
+                      handleDisabledElementClick();
+                    } : undefined}
                   />
                 </div>
 
@@ -431,6 +466,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     disabled={!isEditing}
                     className="profile-input"
                     placeholder="Россия"
+                    onPointerDown={!isEditing ? (e) => {
+                      e.preventDefault();
+                      handleDisabledElementClick();
+                    } : undefined}
                   />
                 </div>
                 
@@ -563,7 +602,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       <div className="profile-right-column">
         <div className="profile-achievements">
           <div className="achievements-header">
-            <h3>🏆 Награды</h3>
+            <h2>🏆 Награды</h2>
           </div>
           <div className="achievements-content">
             <div className="achievement-item">
@@ -586,7 +625,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         
         <div className="profile-about">
           <div className="about-header">
-            <h3>📝 О себе</h3>
+            <h2>📝 О себе</h2>
             {!isEditingAbout ? (
               <button 
                 className="profile-edit-button"
