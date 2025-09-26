@@ -1,5 +1,15 @@
 /* UserProfile.css - Стили для страницы профиля пользователя */
 
+.profile-page-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .profile-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -643,8 +653,9 @@
   }
 }
 
-/* Новые стили для блока "О себе" */
+/* Стили для блока статистики на всю ширину страницы */
 .user-stats-section {
+  width: 100%;
   background: #28282A;
   border: 1px solid #333335;
   border-radius: 16px;
@@ -661,7 +672,7 @@
 /* Уникальный стиль для статистики в профиле */
 .profile-stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 12px;
 }
 

@@ -198,7 +198,42 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   }
   
   return (
-    <div className="profile-container">
+    <div className="profile-page-content">
+      {/* Статистика пользователя */}
+      <div className="user-stats-section">
+        <div className="profile-stats-grid">
+          <div className="profile-stat-card">
+            <div className="profile-stat-icon">🚀</div>
+            <div className="profile-stat-info">
+              <div className="stat-number">0</div>
+              <div className="stat-label">Запусков инструментов</div>
+            </div>
+          </div>
+          <div className="profile-stat-card">
+            <div className="profile-stat-icon">🛠️</div>
+            <div className="profile-stat-info">
+              <div className="stat-number">0/25</div>
+              <div className="stat-label">Использовано инструментов</div>
+            </div>
+          </div>
+          <div className="profile-stat-card">
+            <div className="profile-stat-icon">🪙</div>
+            <div className="profile-stat-info">
+              <div className="stat-number">0</div>
+              <div className="stat-label">Использовано токенов</div>
+            </div>
+          </div>
+          <div className="profile-stat-card">
+            <div className="profile-stat-icon">📅</div>
+            <div className="profile-stat-info">
+              <div className="stat-number">0</div>
+              <div className="stat-label">Дней на платформе</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="profile-container">
       <div className="profile-left-column">
         <div className="profile-header">
           <div className="profile-header-main">
@@ -527,40 +562,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           </div>
         </div>
         
-        {/* Статистика пользователя */}
-        <div className="user-stats-section">
-          <div className="profile-stats-grid">
-            <div className="profile-stat-card">
-              <div className="profile-stat-icon">🚀</div>
-              <div className="profile-stat-info">
-                <div className="stat-number">0</div>
-                <div className="stat-label">Запусков инструментов</div>
-              </div>
-            </div>
-            <div className="profile-stat-card">
-              <div className="profile-stat-icon">🛠️</div>
-              <div className="profile-stat-info">
-                <div className="stat-number">0/25</div>
-                <div className="stat-label">Использовано инструментов</div>
-              </div>
-            </div>
-            <div className="profile-stat-card">
-              <div className="profile-stat-icon">🪙</div>
-              <div className="profile-stat-info">
-                <div className="stat-number">0</div>
-                <div className="stat-label">Использовано токенов</div>
-              </div>
-            </div>
-            <div className="profile-stat-card">
-              <div className="profile-stat-icon">📅</div>
-              <div className="profile-stat-info">
-                <div className="stat-number">0</div>
-                <div className="stat-label">Дней на платформе</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="profile-about">
           <div className="about-header">
             <h3>📝 О себе</h3>
@@ -664,6 +665,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
