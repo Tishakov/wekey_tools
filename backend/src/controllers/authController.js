@@ -341,6 +341,7 @@ exports.updateProfile = async (req, res) => {
         role: updatedUser.role,
         language: updatedUser.language,
         theme: updatedUser.theme,
+        avatar: updatedUser.avatar, // Добавляем поле avatar
         createdAt: updatedUser.createdAt,
         lastLoginAt: updatedUser.lastLoginAt,
         loginCount: updatedUser.loginCount

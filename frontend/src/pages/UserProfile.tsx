@@ -64,8 +64,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   // Loading and error states
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [aboutMessage, setAboutMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [showAttentionAnimation, setShowAttentionAnimation] = useState(false);
+  const [messagesFading, setMessagesFading] = useState({ message: false, aboutMessage: false });
+  const [savedStatus, setSavedStatus] = useState({ profile: false, about: false });
   
   // Initialize profile data when user changes
   useEffect(() => {
@@ -89,9 +92,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     setMessage(null);
     
     try {
-      await updateProfile(profileData);
-      setMessage({ type: 'success', text: t('profile.updateSuccess') });
+      // Включаем текущий avatar в данные для предотвращения его потери
+      const dataWithAvatar = {
+        ...profileData,
+        avatar: user?.avatar // Сохраняем текущий avatar
+      };
+      
+      await updateProfile(dataWithAvatar);
       setIsEditing(false);
+      
+      // Показываем статус "Сохранено" на 1 секунду
+      setSavedStatus(prev => ({ ...prev, profile: true }));
+      setTimeout(() => {
+        setSavedStatus(prev => ({ ...prev, profile: false }));
+      }, 1000);
     } catch (error) {
       setMessage({ 
         type: 'error', 
@@ -193,21 +207,43 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const handleAboutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage(null);
+    setAboutMessage(null);
     
     try {
       // Здесь можно добавить API вызов для сохранения данных "О себе"
       // await updateAboutData(aboutData);
-      setMessage({ type: 'success', text: 'Информация "О себе" успешно обновлена' });
       setIsEditingAbout(false);
+      
+      // Показываем статус "Сохранено" на 1 секунду
+      setSavedStatus(prev => ({ ...prev, about: true }));
+      setTimeout(() => {
+        setSavedStatus(prev => ({ ...prev, about: false }));
+      }, 1000);
     } catch (error) {
-      setMessage({ 
+      setAboutMessage({ 
         type: 'error', 
         text: error instanceof Error ? error.message : 'Ошибка при обновлении информации' 
       });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Функции для плавного скрытия сообщений
+  const fadeOutMessage = () => {
+    setMessagesFading(prev => ({ ...prev, message: true }));
+    setTimeout(() => {
+      setMessage(null);
+      setMessagesFading(prev => ({ ...prev, message: false }));
+    }, 300); // Время анимации fade-out
+  };
+
+  const fadeOutAboutMessage = () => {
+    setMessagesFading(prev => ({ ...prev, aboutMessage: true }));
+    setTimeout(() => {
+      setAboutMessage(null);
+      setMessagesFading(prev => ({ ...prev, aboutMessage: false }));
+    }, 300); // Время анимации fade-out
   };
 
   const handleDisabledElementClick = () => {
@@ -317,8 +353,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         
         <div className="profile-content">
         <div className="profile-main-content">
-          {message && (
-            <div className={`profile-message ${message.type}`}>
+          {message && message.type === 'error' && (
+            <div className={`profile-message ${message.type} ${messagesFading.message ? 'fade-out' : ''}`}>
               {message.text}
             </div>
           )}
@@ -328,32 +364,43 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           {activeSection === 'personalInfo' && (
             <div className="profile-section">
               <div className="profile-section-header">
-                <h2>Профиль</h2>
+                <h2>📋 Профиль</h2>
                 {!isEditing ? (
                   <button 
-                    className={`profile-edit-button ${showAttentionAnimation ? 'attention' : ''}`}
+                    className={`profile-edit-button ${showAttentionAnimation ? 'attention' : ''} ${savedStatus.profile ? 'saved' : ''}`}
                     onClick={() => setIsEditing(true)}
+                    disabled={savedStatus.profile}
                   >
-                    {t('profile.edit')}
+                    {savedStatus.profile ? 'Сохранено' : t('profile.edit')}
                   </button>
                 ) : (
-                  <button 
-                    className="profile-cancel-button"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setProfileData({
-                        firstName: user.firstName || '',
-                        lastName: user.lastName || '',
-                        email: user.email || '',
-                        gender: (user as any)?.gender || '',
-                        birthDate: (user as any)?.birthDate || '',
-                        phone: (user as any)?.phone || '',
-                        country: (user as any)?.country || ''
-                      });
-                    }}
-                  >
-                    {t('profile.cancel')}
-                  </button>
+                  <div className="profile-edit-buttons">
+                    <button 
+                      className="profile-save-button"
+                      onClick={handleProfileSubmit}
+                      disabled={loading}
+                    >
+                      {loading ? 'Сохранение...' : 'Сохранить'}
+                    </button>
+                    <button 
+                      className="profile-cancel-button"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setProfileData({
+                          firstName: user.firstName || '',
+                          lastName: user.lastName || '',
+                          email: user.email || '',
+                          gender: (user as any)?.gender || '',
+                          birthDate: (user as any)?.birthDate || '',
+                          phone: (user as any)?.phone || '',
+                          country: (user as any)?.country || ''
+                        });
+                      }}
+                      disabled={loading}
+                    >
+                      {t('profile.cancel')}
+                    </button>
+                  </div>
                 )}
               </div>
               
@@ -624,14 +671,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
         
         <div className="profile-about">
+          {aboutMessage && aboutMessage.type === 'error' && (
+            <div className={`profile-message ${aboutMessage.type} ${messagesFading.aboutMessage ? 'fade-out' : ''}`}>
+              {aboutMessage.text}
+            </div>
+          )}
+
           <div className="about-header">
             <h2>📝 О себе</h2>
             {!isEditingAbout ? (
               <button 
-                className="profile-edit-button"
+                className={`profile-edit-button ${savedStatus.about ? 'saved' : ''}`}
                 onClick={() => setIsEditingAbout(true)}
+                disabled={savedStatus.about}
               >
-                Редактировать
+                {savedStatus.about ? 'Сохранено' : 'Редактировать'}
               </button>
             ) : (
               <div className="profile-edit-buttons">
@@ -753,6 +807,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                 </div>
               </div>
             </div>
+
+            {/* Дублированная кнопка сохранения в нижней части формы */}
+            {isEditingAbout && (
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="profile-save-button"
+                  onClick={handleAboutSubmit}
+                  disabled={loading}
+                >
+                  {loading ? 'Сохранение...' : 'Сохранить'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
