@@ -7,7 +7,18 @@
   color: #FFFFFF;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  gap: 20px;
+}
+
+.profile-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-right-column {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
@@ -329,7 +340,7 @@
 
 .profile-input, .profile-select {
   height: 40px;
-  padding: 14px 16px;
+  padding: 8px 16px;
   background: #1A1A1C;
   border: 1px solid #333335;
   border-radius: 8px;
@@ -541,6 +552,11 @@
   
   .profile-container {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .profile-left-column,
+  .profile-right-column {
     gap: 15px;
   }
   

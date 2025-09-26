@@ -66,8 +66,11 @@ passport.use(new GoogleStrategy({
       // Устанавливаем время истечения токена (обычно 1 час)
       user.googleTokenExpiry = new Date(Date.now() + 3600 * 1000);
       
-      if (profile.photos && profile.photos[0] && user.avatar !== profile.photos[0].value) {
+      // Обновляем аватар от Google только если у пользователя нет локального аватара
+      if (profile.photos && profile.photos[0] && 
+          (!user.avatar || user.avatar.startsWith('https://lh3.googleusercontent.com'))) {
         user.avatar = profile.photos[0].value;
+        console.log('📸 Updated Google avatar for user:', user.email);
       }
       await user.save();
       return done(null, user);
@@ -103,8 +106,11 @@ passport.use(new GoogleStrategy({
         console.log('📝 Updated empty user name to:', user.name);
       }
       
-      if (profile.photos && profile.photos[0]) {
+      // Устанавливаем аватар от Google только если у пользователя нет локального аватара
+      if (profile.photos && profile.photos[0] && 
+          (!user.avatar || user.avatar.startsWith('https://lh3.googleusercontent.com'))) {
         user.avatar = profile.photos[0].value;
+        console.log('📸 Set Google avatar for linked user:', user.email);
       }
       
       // Сохраняем токены для Search Console API

@@ -189,7 +189,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   
   return (
     <div className="profile-container">
-      <div className="profile-header">
+      <div className="profile-left-column">
+        <div className="profile-header">
           <div className="profile-header-main">
             <div 
               className="profile-avatar clickable"
@@ -238,30 +239,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           )}
         </div>
         
-        <div className="profile-achievements">
-          <div className="achievements-header">
-            <h3>🏆 Награды</h3>
-          </div>
-          <div className="achievements-content">
-            <div className="achievement-item">
-              <div className="achievement-icon">🥇</div>
-              <div className="achievement-info">
-                <div className="achievement-title">Первые шаги</div>
-                <div className="achievement-desc">Зарегистрировались на платформе</div>
-              </div>
-            </div>
-            <div className="achievement-item">
-              <div className="achievement-icon">⚡</div>
-              <div className="achievement-info">
-                <div className="achievement-title">Активный пользователь</div>
-                <div className="achievement-desc">Использовали 5+ инструментов</div>
-              </div>
-            </div>
-            {/* Пока что заглушки, потом добавим логику */}
-          </div>
-        </div>
-      
-      <div className="profile-content">
+        <div className="profile-content">
         <div className="profile-main-content">
           {message && (
             <div className={`profile-message ${message.type}`}>
@@ -513,6 +491,31 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           )}
         </div>
         </div>
+      </div>
+      
+      <div className="profile-right-column">
+        <div className="profile-achievements">
+          <div className="achievements-header">
+            <h3>🏆 Награды</h3>
+          </div>
+          <div className="achievements-content">
+            <div className="achievement-item">
+              <div className="achievement-icon">🥇</div>
+              <div className="achievement-info">
+                <div className="achievement-title">Первые шаги</div>
+                <div className="achievement-desc">Зарегистрировались на платформе</div>
+              </div>
+            </div>
+            <div className="achievement-item">
+              <div className="achievement-icon">⚡</div>
+              <div className="achievement-info">
+                <div className="achievement-title">Активный пользователь</div>
+                <div className="achievement-desc">Использовали 5+ инструментов</div>
+              </div>
+            </div>
+            {/* Пока что заглушки, потом добавим логику */}
+          </div>
+        </div>
         
         <div className="profile-about">
           <div className="about-header">
@@ -550,6 +553,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 };
