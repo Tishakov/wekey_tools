@@ -109,6 +109,9 @@ const SEOAuditProTool: React.FC = () => {
   const [availableSites, setAvailableSites] = useState<Array<{siteUrl: string, permissionLevel: string}>>([]);
   const [selectedSite, setSelectedSite] = useState('');
   const [loadingSites, setLoadingSites] = useState(false);
+  
+  // Состояние для выбранного периода анализа
+  const [selectedPeriod, setSelectedPeriod] = useState<7 | 14 | 28 | 90>(28);
 
   // Загружаем статистику при инициализации
   useEffect(() => {
@@ -242,6 +245,17 @@ const SEOAuditProTool: React.FC = () => {
     }
   };
 
+  // Обработчик изменения периода
+  const handlePeriodChange = async (newPeriod: 7 | 14 | 28 | 90) => {
+    setSelectedPeriod(newPeriod);
+    
+    // Если есть активные результаты и выбран сайт, перезапускаем анализ с новым периодом
+    if (result?.data && selectedSite) {
+      console.log(`Период изменен на ${newPeriod} дней, перезапускаем анализ...`);
+      await handleAnalyzeSite();
+    }
+  };
+
   // Запуск анализа выбранного сайта
   const handleAnalyzeSite = async () => {
     if (!selectedSite) return;
@@ -274,7 +288,8 @@ const SEOAuditProTool: React.FC = () => {
         body: JSON.stringify({
           website: selectedSite, // Передаем полный URL
           tokens: tokens, // Передаем токены для GSC API
-          useMockData: false // Используем реальные данные GSC
+          useMockData: false, // Используем реальные данные GSC
+          period: selectedPeriod // Передаем выбранный период
         })
       });
 
@@ -440,7 +455,11 @@ const SEOAuditProTool: React.FC = () => {
                 )}
 
                 {result.data && (
-                  <SEOAnalysisResults data={result.data} />
+                  <SEOAnalysisResults 
+                    data={result.data} 
+                    selectedPeriod={selectedPeriod}
+                    onPeriodChange={handlePeriodChange}
+                  />
                 )}
               </div>
             )}

@@ -116,19 +116,19 @@ class GoogleSearchConsoleService {
   }
 
   // Агрегированный анализ сайта
-  async analyzeSite(siteUrl, tokens) {
+  async analyzeSite(siteUrl, tokens, periodDays = 28) {
     try {
       this.setCredentials(tokens);
 
-      // Устанавливаем период анализа (последние 28 дней)
+      // Устанавливаем период анализа (динамический)
       const endDate = new Date();
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 28);
+      startDate.setDate(startDate.getDate() - periodDays);
 
-      // Предыдущий период для сравнения (28 дней до того)
+      // Предыдущий период для сравнения (такой же период до того)
       const prevEndDate = new Date(startDate); // Конец предыдущего = начало текущего
       const prevStartDate = new Date(startDate);
-      prevStartDate.setDate(prevStartDate.getDate() - 28); // 28 дней назад от начала текущего
+      prevStartDate.setDate(prevStartDate.getDate() - periodDays); // N дней назад от начала текущего
 
       const formatDate = (date) => date.toISOString().split('T')[0];
       const startDateStr = formatDate(startDate);
@@ -136,7 +136,7 @@ class GoogleSearchConsoleService {
       const prevStartDateStr = formatDate(prevStartDate);
       const prevEndDateStr = formatDate(prevEndDate);
 
-      console.log('📅 Date ranges:', {
+      console.log(`📅 Date ranges (${periodDays} days):`, {
         current: `${startDateStr} to ${endDateStr}`,
         previous: `${prevStartDateStr} to ${prevEndDateStr}`
       });

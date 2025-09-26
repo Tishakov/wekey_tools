@@ -81,7 +81,7 @@ router.post('/seo-audit-pro/sites', async (req, res) => {
 // SEO Audit PRO анализ - только реальные данные GSC
 router.post('/seo-audit-pro/analyze', async (req, res) => {
   try {
-    const { website, tokens } = req.body;
+    const { website, tokens, period = 28 } = req.body;
 
     if (!website) {
       return res.status(400).json({
@@ -98,8 +98,8 @@ router.post('/seo-audit-pro/analyze', async (req, res) => {
     }
 
     try {
-      console.log('🔍 Analyzing GSC data for:', website);
-      const analysis = await gscService.analyzeSite(website, tokens);
+      console.log(`🔍 Analyzing GSC data for: ${website} (period: ${period} days)`);
+      const analysis = await gscService.analyzeSite(website, tokens, period);
       
       return res.json({
         success: true,

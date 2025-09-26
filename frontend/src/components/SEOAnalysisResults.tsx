@@ -116,9 +116,15 @@ interface AnalysisData {
 
 interface SEOAnalysisResultsProps {
   data: AnalysisData;
+  selectedPeriod?: 7 | 14 | 28 | 90;
+  onPeriodChange?: (period: 7 | 14 | 28 | 90) => void;
 }
 
-const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
+const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ 
+  data, 
+  selectedPeriod = 28, 
+  onPeriodChange 
+}) => {
   const { gscData, overallScore, healthStatus, recommendations } = data;
   const { searchPerformance, indexCoverage } = gscData;
 
@@ -268,10 +274,45 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({ data }) => {
     return num.toString();
   };
 
+  // Функция для изменения периода
+  const handlePeriodChange = (period: 7 | 14 | 28 | 90) => {
+    if (onPeriodChange) {
+      onPeriodChange(period);
+    }
+    console.log(`Период изменен на ${period} дней`);
+  };
+
+  // Получить текст периода для отображения
+  const getPeriodText = (days: number) => {
+    switch (days) {
+      case 7: return 'Неделя';
+      case 14: return '2 недели';
+      case 28: return 'Месяц';
+      case 90: return '3 месяца';
+      default: return 'Месяц';
+    }
+  };
+
   return (
     <div className="seo-analysis-results">
       {/* Главная панель с метриками */}
       <div className="seopro-metrics-dashboard">
+        {/* Селектор периода */}
+        <div className="seopro-period-selector">
+          <div className="seopro-period-label">📅 Период анализа:</div>
+          <div className="seopro-period-buttons">
+            {[7, 14, 28, 90].map((days) => (
+              <button
+                key={days}
+                className={`seopro-period-btn ${selectedPeriod === days ? 'active' : ''}`}
+                onClick={() => handlePeriodChange(days as 7 | 14 | 28 | 90)}
+              >
+                {getPeriodText(days)}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Основные метрики с изменениями */}
         <div className="seopro-metric-card primary-metric">
           <div className="seopro-metric-icon">👆</div>

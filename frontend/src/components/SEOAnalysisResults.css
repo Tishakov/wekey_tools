@@ -23,6 +23,70 @@
   margin-right: auto;
 }
 
+/* 📅 СЕЛЕКТОР ПЕРИОДА */
+.seopro-period-selector {
+  grid-column: 1 / -1; /* Занимает всю ширину grid */
+  background: linear-gradient(135deg, #2a2d35 0%, #1c1f26 100%);
+  border: 1px solid #3a3f47;
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.seopro-period-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e1e5e9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seopro-period-buttons {
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.seopro-period-btn {
+  padding: 10px 18px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-width: 80px;
+}
+
+.seopro-period-btn:hover {
+  color: #e1e5e9;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.seopro-period-btn.active {
+  background: linear-gradient(135deg, #4285f4 0%, #1976d2 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+}
+
+.seopro-period-btn.active:hover {
+  background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+}
+
 /* Универсальная карточка метрики */
 .seopro-metric-card {
   background-color: #1c1d1f;
@@ -787,6 +851,20 @@
     gap: 16px;
   }
   
+  .seopro-period-selector {
+    padding: 18px 20px;
+  }
+  
+  .seopro-period-label {
+    font-size: 15px;
+  }
+  
+  .seopro-period-btn {
+    padding: 9px 16px;
+    font-size: 13px;
+    min-width: 70px;
+  }
+  
   .seopro-metric-card {
     padding: 20px;
   }
@@ -821,6 +899,24 @@
   .seopro-metrics-dashboard {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+  
+  .seopro-period-selector {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .seopro-period-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .seopro-period-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 8px 12px;
+    font-size: 13px;
   }
   
   .seopro-metric-card {
