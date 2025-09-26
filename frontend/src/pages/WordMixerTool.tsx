@@ -123,6 +123,7 @@ const WordMixerTool: React.FC = () => {
         if (nonEmptyLists.length === 0) {
             setResult('');
             return;
+        }
 
         // Увеличиваем счетчик запусков и получаем актуальное значение
         try {
@@ -158,10 +159,11 @@ const WordMixerTool: React.FC = () => {
             }
             
             currentCombinations = newCombinations;
+        }
             
-            // Добавляем результат этого этапа к общему результату
-            const stageResults = currentCombinations.map(combination => combination.join(' '));
-            allResults.push(...stageResults);
+        // Добавляем результат этого этапа к общему результату
+        const stageResults = currentCombinations.map(combination => combination.join(' '));
+        allResults.push(...stageResults);
 
         setResult(allResults.join('\n'));
     };
