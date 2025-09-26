@@ -19,8 +19,6 @@
   gap: 20px;
   margin-bottom: 32px;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* 📅 СЕЛЕКТОР ПЕРИОДА */
@@ -753,6 +751,7 @@
 
 /* Основные метрики - легкий акцент */
 .seopro-metric-card.primary-metric {
+  border: 1px solid #333335;
   border-left: 3px solid var(--accent-color);
 }
 
@@ -765,11 +764,11 @@
   filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.25));
 }
 
-/* Метрики устройств - нейтральный стиль */
+/* Метрики устройств - синий/голубой стиль */
 .seopro-metric-card.device-metric {
   gap: 0px;
   position: relative;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 .seopro-metric-card.device-metric::after {
@@ -780,7 +779,7 @@
   right: 0;
   bottom: 0;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.05));
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.08));
   pointer-events: none;
   z-index: 1;
 }
@@ -800,7 +799,7 @@
 /* Стандартные метрики - базовый стиль */
 .seopro-metric-card.standard-metric {
   position: relative;
-  border: 1px solid rgba(107, 114, 128, 0.2);
+  border: 1px solid #333335;
 }
 
 .seopro-metric-card.standard-metric::after {
