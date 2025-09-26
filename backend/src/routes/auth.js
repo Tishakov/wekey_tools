@@ -127,4 +127,7 @@ router.post('/update-settings',
   authController.updateSettings
 );
 
+// POST /auth/refresh - Обновление токена
+router.post('/refresh', authController.refreshToken);
+
 module.exports = router;

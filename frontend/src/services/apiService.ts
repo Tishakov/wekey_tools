@@ -1,4 +1,6 @@
 // Сервис для работы с backend API
+import { httpClient } from './httpClient';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8880';
 
 interface RequestOptions extends RequestInit {
@@ -132,16 +134,20 @@ class ApiService {
   }
 
   async login(email: string, password: string): Promise<ApiResponse> {
-    const response = await this.post('/auth/login', { email, password });
-    if (response.token) {
-      this.setToken(response.token);
+    try {
+      const response = await httpClient.post('/api/auth/login', { email, password });
+      if (response.data.token) {
+        this.setToken(response.data.token);
+      }
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Ошибка входа');
     }
-    return response;
   }
 
   async logout(): Promise<void> {
     try {
-      await this.post('/auth/logout');
+      await httpClient.post('/api/auth/logout');
     } finally {
       this.setToken(null);
     }

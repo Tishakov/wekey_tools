@@ -571,3 +571,130 @@ exports.updateSettings = async (req, res) => {
     });
   }
 };
+
+// Обновление токена
+exports.refreshToken = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Токен не предоставлен'
+      });
+    }
+
+    const token = authHeader.substring(7);
+    
+    try {
+      // Проверяем текущий токен (даже если он истек)
+      const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
+      
+      // Проверяем, не истек ли токен более чем на 24 часа
+      const now = Date.now() / 1000;
+      if (decoded.exp && (now - decoded.exp) > 86400) { // 24 часа
+        return res.status(401).json({
+          success: false,
+          message: 'Токен истек более 24 часов назад'
+        });
+      }
+
+      // Создаем новый токен с теми же данными
+      const newToken = jwt.sign(
+        {
+          userId: decoded.userId,
+          email: decoded.email,
+          isAdmin: decoded.isAdmin
+        },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      console.log('��� Token refreshed for user:', decoded.email);
+
+      res.json({
+        success: true,
+        message: 'Токен успешно обновлен',
+        token: newToken
+      });
+
+    } catch (jwtError) {
+      console.error('❌ JWT verification error:', jwtError.message);
+      return res.status(401).json({
+        success: false,
+        message: 'Недействительный токен'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Refresh token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера'
+    });
+  }
+};
+// Обновление токена
+exports.refreshToken = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Токен не предоставлен'
+      });
+    }
+
+    const token = authHeader.substring(7);
+    
+    try {
+      // Проверяем текущий токен (даже если он истек)
+      const JWT_SECRET = process.env.JWT_SECRET || 'wekey-tools-secret-key-2025';
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
+      
+      // Проверяем, не истек ли токен более чем на 24 часа
+      const now = Date.now() / 1000;
+      if (decoded.exp && (now - decoded.exp) > 86400) { // 24 часа
+        return res.status(401).json({
+          success: false,
+          message: 'Токен истек более 24 часов назад'
+        });
+      }
+
+      // Создаем новый токен с теми же данными
+      const newToken = jwt.sign(
+        {
+          userId: decoded.userId,
+          email: decoded.email,
+          isAdmin: decoded.isAdmin
+        },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      console.log('🔄 Token refreshed for user:', decoded.email);
+
+      res.json({
+        success: true,
+        message: 'Токен успешно обновлен',
+        token: newToken
+      });
+
+    } catch (jwtError) {
+      console.error('❌ JWT verification error:', jwtError.message);
+      return res.status(401).json({
+        success: false,
+        message: 'Недействительный токен'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Refresh token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера'
+    });
+  }
+};

@@ -43,7 +43,12 @@ function App() {
   return (
     <HelmetProvider>
       <AuthProvider>
-        <Router>
+        <Router 
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
         <Routes>
           {/* OAuth callback - ДОЛЖЕН БЫТЬ ПЕРВЫМ для правильного матчинга */}
           <Route path="/auth/*" element={<OAuthCallback />} />
