@@ -513,9 +513,9 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
         <div className="seopro-metric-card standard-metric">
           <div className="seopro-metric-icon">🔍</div>
           <div className="seopro-metric-value">{formatNumber(searchPerformance.uniqueQueries || 0)}</div>
-          <div className="seopro-metric-label">Уникальных запросов</div>
+          <div className="seopro-metric-label">Уникальных</div>
           <div className="seopro-metric-detail">
-            {formatNumber(searchPerformance.totalImpressions || 0)} показов всего
+            {formatNumber(searchPerformance.totalImpressions || 0)} запросов всего
           </div>
         </div>
 
@@ -536,7 +536,7 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
         <div className="seopro-metric-card warning-metric current-state">
           <div className="seopro-metric-icon">⚠️</div>
           <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.errorPages || 0)}</div>
-          <div className="seopro-metric-label">Страницы с ошибками</div>
+          <div className="seopro-metric-label">Имеют ошибки</div>
           <div className="seopro-metric-detail">
             {data.gscData?.indexCoverage?.validPages && data.gscData.indexCoverage.validPages > 0 && 
              `${(((data.gscData.indexCoverage.errorPages || 0) / data.gscData.indexCoverage.validPages) * 100).toFixed(1)}%`
