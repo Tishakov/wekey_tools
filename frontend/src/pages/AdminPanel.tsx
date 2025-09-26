@@ -33,6 +33,8 @@ const AdminPanel: React.FC = () => {
     usageCount: number;
     lastUsed: string;
   }> | null>(null);
+  const [sortField, setSortField] = useState<'toolName' | 'usageCount' | 'lastUsed' | 'comparison'>('usageCount');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
   const [dateRange, setDateRange] = useState(() => {
     const endDate = new Date();
@@ -138,6 +140,48 @@ const AdminPanel: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [notification.show, notification.type]);
+
+  // Сортировка инструментов
+  const handleSort = (field: 'toolName' | 'usageCount' | 'lastUsed' | 'comparison') => {
+    const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortField(field);
+    setSortDirection(newDirection);
+  };
+
+  const sortTools = (tools: Array<{
+    toolName: string;
+    usageCount: number;
+    lastUsed: string;
+  }>) => {
+    return [...tools].sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sortField) {
+        case 'toolName':
+          aValue = getToolName(a.toolName);
+          bValue = getToolName(b.toolName);
+          break;
+        case 'usageCount':
+        case 'comparison': // Сравнение зеркально количеству использований
+          aValue = a.usageCount;
+          bValue = b.usageCount;
+          break;
+        case 'lastUsed':
+          aValue = new Date(a.lastUsed).getTime();
+          bValue = new Date(b.lastUsed).getTime();
+          break;
+        default:
+          return 0;
+      }
+
+      if (sortDirection === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+  };
 
   // Загрузка статистики за выбранный период
   const fetchPeriodStats = async (startDate: Date, endDate: Date) => {
@@ -681,18 +725,39 @@ const AdminPanel: React.FC = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Инструмент</th>
-                      <th>Использований</th>
-                      <th>Последний</th>
-                      <th>Сравнение</th>
+                      <th 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleSort('toolName')}
+                      >
+                        Инструмент {sortField === 'toolName' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleSort('usageCount')}
+                      >
+                        Использований {sortField === 'usageCount' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleSort('lastUsed')}
+                      >
+                        Последний {sortField === 'lastUsed' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleSort('comparison')}
+                      >
+                        Сравнение {sortField === 'comparison' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {periodToolsData && periodToolsData.length > 0 ? (() => {
                       const toolsWithUsage = periodToolsData.filter(tool => tool.usageCount > 0);
-                      const maxUsage = Math.max(...toolsWithUsage.map(tool => tool.usageCount));
+                      const sortedTools = sortTools(toolsWithUsage);
+                      const maxUsage = Math.max(...sortedTools.map(tool => tool.usageCount));
                       
-                      return toolsWithUsage.map((tool, index) => (
+                      return sortedTools.map((tool, index) => (
                         <tr key={index}>
                           <td>{getToolName(tool.toolName)}</td>
                           <td>{tool.usageCount}</td>

@@ -1,0 +1,380 @@
+"filename", "language", "Markdown", "JavaScript", "HTML", "JSON", "TypeScript", "JSON with Comments", "TypeScript JSX", "PostCSS", "XML", "comment", "blank", "total"
+"c:\projects\wekey_tools\ADMIN_ANALYTICS_CHANGELOG.md", "Markdown", 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 94
+"c:\projects\wekey_tools\ADMIN_DASHBOARD_IMPLEMENTATION.md", "Markdown", 125, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 154
+"c:\projects\wekey_tools\ADMIN_TOOLS_PROGRESS.md", "Markdown", 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 276
+"c:\projects\wekey_tools\ANALYTICS_TOOL_RESTORATION_REPORT.md", "Markdown", 235, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 291
+"c:\projects\wekey_tools\AUTHENTICATION_GUIDE.md", "Markdown", 1173, 0, 0, 0, 0, 0, 0, 0, 0, 0, 225, 1398
+"c:\projects\wekey_tools\DEPLOYMENT_GUIDE.md", "Markdown", 619, 0, 0, 0, 0, 0, 0, 0, 0, 0, 191, 810
+"c:\projects\wekey_tools\DEVELOPMENT_NOTES.md", "Markdown", 323, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 394
+"c:\projects\wekey_tools\FREEMIUM_IMPLEMENTATION_REPORT.md", "Markdown", 303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 379
+"c:\projects\wekey_tools\OAUTH_SETUP_GUIDE.md", "Markdown", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 48
+"c:\projects\wekey_tools\PORT_SETUP.md", "Markdown", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 47
+"c:\projects\wekey_tools\PROFILE_TRANSLATION_FIX_REPORT.md", "Markdown", 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 145
+"c:\projects\wekey_tools\PROJECT_CONTEXT.md", "Markdown", 204, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 253
+"c:\projects\wekey_tools\SEO_AUDIT_ENHANCEMENT_REPORT.md", "Markdown", 333, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 435
+"c:\projects\wekey_tools\SEO_MULTILINGUAL_GUIDE.md", "Markdown", 333, 0, 0, 0, 0, 0, 0, 0, 0, 0, 79, 412
+"c:\projects\wekey_tools\SEO_TOOLS_TRANSLATION_COMPLETE.md", "Markdown", 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 198
+"c:\projects\wekey_tools\SITE_AUDIT_IMPLEMENTATION_REPORT.md", "Markdown", 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 118
+"c:\projects\wekey_tools\TOOL_ID_FIX_REPORT.md", "Markdown", 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 83
+"c:\projects\wekey_tools\TOOL_ID_REFACTORING_REPORT.md", "Markdown", 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 82
+"c:\projects\wekey_tools\TOOL_NAMES_SYNC_REPORT.md", "Markdown", 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 79
+"c:\projects\wekey_tools\USER_INTERFACE_GUIDE.md", "Markdown", 272, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 324
+"c:\projects\wekey_tools\USER_TRACKING_GUIDE.md", "Markdown", 106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 140
+"c:\projects\wekey_tools\add-auth-to-functions.js", "JavaScript", 0, 130, 0, 0, 0, 0, 0, 0, 0, 17, 31, 178
+"c:\projects\wekey_tools\add-modal-windows-v2.js", "JavaScript", 0, 88, 0, 0, 0, 0, 0, 0, 0, 11, 15, 114
+"c:\projects\wekey_tools\add-modal-windows.js", "JavaScript", 0, 70, 0, 0, 0, 0, 0, 0, 0, 7, 13, 90
+"c:\projects\wekey_tools\audit_tool_names.js", "JavaScript", 0, 114, 0, 0, 0, 0, 0, 0, 0, 17, 35, 166
+"c:\projects\wekey_tools\backend\README.md", "Markdown", 205, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 260
+"c:\projects\wekey_tools\backend\check-all-users.js", "JavaScript", 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 7, 32
+"c:\projects\wekey_tools\backend\check-analytics-events.js", "JavaScript", 0, 26, 0, 0, 0, 0, 0, 0, 0, 1, 10, 37
+"c:\projects\wekey_tools\backend\check-password.js", "JavaScript", 0, 44, 0, 0, 0, 0, 0, 0, 0, 4, 15, 63
+"c:\projects\wekey_tools\backend\check-remove-duplicates.js", "JavaScript", 0, 61, 0, 0, 0, 0, 0, 0, 0, 6, 15, 82
+"c:\projects\wekey_tools\backend\check-stats.js", "JavaScript", 0, 33, 0, 0, 0, 0, 0, 0, 0, 2, 9, 44
+"c:\projects\wekey_tools\backend\check-test-users.js", "JavaScript", 0, 42, 0, 0, 0, 0, 0, 0, 0, 3, 10, 55
+"c:\projects\wekey_tools\backend\complete-cleanup.js", "JavaScript", 0, 18, 0, 0, 0, 0, 0, 0, 0, 2, 7, 27
+"c:\projects\wekey_tools\backend\create-admin.js", "JavaScript", 0, 45, 0, 0, 0, 0, 0, 0, 0, 4, 9, 58
+"c:\projects\wekey_tools\backend\create-analytics-tables.js", "JavaScript", 0, 28, 0, 0, 0, 0, 0, 0, 0, 5, 8, 41
+"c:\projects\wekey_tools\backend\create-test-user.js", "JavaScript", 0, 61, 0, 0, 0, 0, 0, 0, 0, 6, 9, 76
+"c:\projects\wekey_tools\backend\debug_test.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\backend\delete-user.js", "JavaScript", 0, 34, 0, 0, 0, 0, 0, 0, 0, 2, 8, 44
+"c:\projects\wekey_tools\backend\final-check.js", "JavaScript", 0, 44, 0, 0, 0, 0, 0, 0, 0, 2, 11, 57
+"c:\projects\wekey_tools\backend\fix-password-constraint.js", "JavaScript", 0, 53, 0, 0, 0, 0, 0, 0, 0, 3, 7, 63
+"c:\projects\wekey_tools\backend\fix-password.js", "JavaScript", 0, 34, 0, 0, 0, 0, 0, 0, 0, 4, 11, 49
+"c:\projects\wekey_tools\backend\init-db.js", "JavaScript", 0, 87, 0, 0, 0, 0, 0, 0, 0, 7, 19, 113
+"c:\projects\wekey_tools\backend\init-tools-table.js", "JavaScript", 0, 289, 0, 0, 0, 0, 0, 0, 0, 6, 11, 306
+"c:\projects\wekey_tools\backend\minimal-server.js", "JavaScript", 0, 19, 0, 0, 0, 0, 0, 0, 0, 1, 6, 26
+"c:\projects\wekey_tools\backend\package-lock.json", "JSON", 0, 0, 0, 9781, 0, 0, 0, 0, 0, 0, 1, 9782
+"c:\projects\wekey_tools\backend\package.json", "JSON", 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 1, 61
+"c:\projects\wekey_tools\backend\recreate-admin.js", "JavaScript", 0, 44, 0, 0, 0, 0, 0, 0, 0, 3, 9, 56
+"c:\projects\wekey_tools\backend\reorder-tools.js", "JavaScript", 0, 20, 0, 0, 0, 0, 0, 0, 0, 2, 5, 27
+"c:\projects\wekey_tools\backend\reset-admin.js", "JavaScript", 0, 51, 0, 0, 0, 0, 0, 0, 0, 4, 11, 66
+"c:\projects\wekey_tools\backend\reset-corrupted-user.js", "JavaScript", 0, 34, 0, 0, 0, 0, 0, 0, 0, 3, 8, 45
+"c:\projects\wekey_tools\backend\simple-test.js", "JavaScript", 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15
+"c:\projects\wekey_tools\backend\src\app-fixed.js", "JavaScript", 0, 113, 0, 0, 0, 0, 0, 0, 0, 20, 21, 154
+"c:\projects\wekey_tools\backend\src\app-minimal.js", "JavaScript", 0, 395, 0, 0, 0, 0, 0, 0, 0, 43, 91, 529
+"c:\projects\wekey_tools\backend\src\app-original.js", "JavaScript", 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 24, 141
+"c:\projects\wekey_tools\backend\src\app-simple.js", "JavaScript", 0, 41, 0, 0, 0, 0, 0, 0, 0, 7, 9, 57
+"c:\projects\wekey_tools\backend\src\app-test.js", "JavaScript", 0, 78, 0, 0, 0, 0, 0, 0, 0, 8, 12, 98
+"c:\projects\wekey_tools\backend\src\app.js", "JavaScript", 0, 291, 0, 0, 0, 0, 0, 0, 0, 43, 48, 382
+"c:\projects\wekey_tools\backend\src\config\config.js", "JavaScript", 0, 66, 0, 0, 0, 0, 0, 0, 0, 10, 10, 86
+"c:\projects\wekey_tools\backend\src\config\database.js", "JavaScript", 0, 51, 0, 0, 0, 0, 0, 0, 0, 4, 10, 65
+"c:\projects\wekey_tools\backend\src\config\passport.js", "JavaScript", 0, 140, 0, 0, 0, 0, 0, 0, 0, 15, 23, 178
+"c:\projects\wekey_tools\backend\src\config\sequelize.js", "JavaScript", 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 1, 37
+"c:\projects\wekey_tools\backend\src\controllers\authController.js", "JavaScript", 0, 542, 0, 0, 0, 0, 0, 0, 0, 49, 109, 700
+"c:\projects\wekey_tools\backend\src\middleware\auth.js", "JavaScript", 0, 146, 0, 0, 0, 0, 0, 0, 0, 15, 26, 187
+"c:\projects\wekey_tools\backend\src\middleware\errorHandler.js", "JavaScript", 0, 67, 0, 0, 0, 0, 0, 0, 0, 2, 15, 84
+"c:\projects\wekey_tools\backend\src\middleware\upload.js", "JavaScript", 0, 68, 0, 0, 0, 0, 0, 0, 0, 7, 9, 84
+"c:\projects\wekey_tools\backend\src\migrations\20250922-add-avatar-to-users.js", "JavaScript", 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 2, 17
+"c:\projects\wekey_tools\backend\src\migrations\20250922-add-google-oauth-fields.js", "JavaScript", 0, 55, 0, 0, 0, 0, 0, 0, 0, 8, 10, 73
+"c:\projects\wekey_tools\backend\src\migrations\20250923163500-add-google-tokens.js", "JavaScript", 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 4, 26
+"c:\projects\wekey_tools\backend\src\models\AnalyticsEvent.js", "JavaScript", 0, 71, 0, 0, 0, 0, 0, 0, 0, 3, 3, 77
+"c:\projects\wekey_tools\backend\src\models\Payment.js", "JavaScript", 0, 231, 0, 0, 0, 0, 0, 0, 0, 12, 12, 255
+"c:\projects\wekey_tools\backend\src\models\Subscription.js", "JavaScript", 0, 196, 0, 0, 0, 0, 0, 0, 0, 8, 11, 215
+"c:\projects\wekey_tools\backend\src\models\Tool.js", "JavaScript", 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 2, 62
+"c:\projects\wekey_tools\backend\src\models\ToolUsage.js", "JavaScript", 0, 156, 0, 0, 0, 0, 0, 0, 0, 4, 7, 167
+"c:\projects\wekey_tools\backend\src\models\User.js", "JavaScript", 0, 176, 0, 0, 0, 0, 0, 0, 0, 6, 11, 193
+"c:\projects\wekey_tools\backend\src\models\Visitor.js", "JavaScript", 0, 98, 0, 0, 0, 0, 0, 0, 0, 5, 7, 110
+"c:\projects\wekey_tools\backend\src\models\index.js", "JavaScript", 0, 34, 0, 0, 0, 0, 0, 0, 0, 4, 8, 46
+"c:\projects\wekey_tools\backend\src\routes\admin.js", "JavaScript", 0, 648, 0, 0, 0, 0, 0, 0, 0, 58, 101, 807
+"c:\projects\wekey_tools\backend\src\routes\analytics.js", "JavaScript", 0, 196, 0, 0, 0, 0, 0, 0, 0, 24, 36, 256
+"c:\projects\wekey_tools\backend\src\routes\auth.js", "JavaScript", 0, 113, 0, 0, 0, 0, 0, 0, 0, 9, 11, 133
+"c:\projects\wekey_tools\backend\src\routes\oauth.js", "JavaScript", 0, 109, 0, 0, 0, 0, 0, 0, 0, 15, 22, 146
+"c:\projects\wekey_tools\backend\src\routes\seoAudit.js", "JavaScript", 0, 3447, 0, 0, 0, 0, 0, 0, 0, 303, 513, 4263
+"c:\projects\wekey_tools\backend\src\routes\seoAuditPro.js", "JavaScript", 0, 105, 0, 0, 0, 0, 0, 0, 0, 5, 17, 127
+"c:\projects\wekey_tools\backend\src\routes\siteAudit-old.js", "JavaScript", 0, 250, 0, 0, 0, 0, 0, 0, 0, 35, 48, 333
+"c:\projects\wekey_tools\backend\src\routes\siteAudit.js", "JavaScript", 0, 2113, 0, 0, 0, 0, 0, 0, 0, 330, 402, 2845
+"c:\projects\wekey_tools\backend\src\routes\stats.js", "JavaScript", 0, 322, 0, 0, 0, 0, 0, 0, 0, 29, 38, 389
+"c:\projects\wekey_tools\backend\src\routes\tools.js", "JavaScript", 0, 164, 0, 0, 0, 0, 0, 0, 0, 9, 20, 193
+"c:\projects\wekey_tools\backend\src\routes\users.js", "JavaScript", 0, 152, 0, 0, 0, 0, 0, 0, 0, 13, 22, 187
+"c:\projects\wekey_tools\backend\src\scripts\checkTables.js", "JavaScript", 0, 37, 0, 0, 0, 0, 0, 0, 0, 4, 10, 51
+"c:\projects\wekey_tools\backend\src\scripts\checkUserData.js", "JavaScript", 0, 35, 0, 0, 0, 0, 0, 0, 0, 3, 8, 46
+"c:\projects\wekey_tools\backend\src\scripts\cleanAnalytics.js", "JavaScript", 0, 56, 0, 0, 0, 0, 0, 0, 0, 7, 13, 76
+"c:\projects\wekey_tools\backend\src\scripts\createAdmin.js", "JavaScript", 0, 23, 0, 0, 0, 0, 0, 0, 0, 2, 5, 30
+"c:\projects\wekey_tools\backend\src\scripts\testUserCreation.js", "JavaScript", 0, 36, 0, 0, 0, 0, 0, 0, 0, 4, 10, 50
+"c:\projects\wekey_tools\backend\src\scripts\updateAdminPassword.js", "JavaScript", 0, 27, 0, 0, 0, 0, 0, 0, 0, 4, 8, 39
+"c:\projects\wekey_tools\backend\src\services\GoogleSearchConsoleService.js", "JavaScript", 0, 370, 0, 0, 0, 0, 0, 0, 0, 47, 56, 473
+"c:\projects\wekey_tools\backend\src\simple-test.js", "JavaScript", 0, 69, 0, 0, 0, 0, 0, 0, 0, 1, 13, 83
+"c:\projects\wekey_tools\backend\src\utils\logger.js", "JavaScript", 0, 38, 0, 0, 0, 0, 0, 0, 0, 4, 6, 48
+"c:\projects\wekey_tools\backend\test-stats-final.cjs", "JavaScript", 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 10, 64
+"c:\projects\wekey_tools\backend\test-stats-fixed.cjs", "JavaScript", 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 10, 51
+"c:\projects\wekey_tools\backend\test-tz.cjs", "JavaScript", 0, 52, 0, 0, 0, 0, 0, 0, 0, 1, 10, 63
+"c:\projects\wekey_tools\backend\test_server.js", "JavaScript", 0, 118, 0, 0, 0, 0, 0, 0, 0, 7, 9, 134
+"c:\projects\wekey_tools\clean_duplicates.js", "JavaScript", 0, 70, 0, 0, 0, 0, 0, 0, 0, 6, 15, 91
+"c:\projects\wekey_tools\clear_user_data.html", "HTML", 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 13, 67
+"c:\projects\wekey_tools\final_tool_id_check.js", "JavaScript", 0, 65, 0, 0, 0, 0, 0, 0, 0, 6, 18, 89
+"c:\projects\wekey_tools\fix_navigation_mass.js", "JavaScript", 0, 62, 0, 0, 0, 0, 0, 0, 0, 8, 10, 80
+"c:\projects\wekey_tools\fix_tool_ids.js", "JavaScript", 0, 103, 0, 0, 0, 0, 0, 0, 0, 7, 26, 136
+"c:\projects\wekey_tools\fix_tool_names.js", "JavaScript", 0, 174, 0, 0, 0, 0, 0, 0, 0, 10, 29, 213
+"c:\projects\wekey_tools\frontend\clear_user_data.html", "HTML", 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 7, 45
+"c:\projects\wekey_tools\frontend\index.html", "HTML", 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 1, 16
+"c:\projects\wekey_tools\frontend\package-lock.json", "JSON", 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 1, 6491
+"c:\projects\wekey_tools\frontend\package.json", "JSON", 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 48
+"c:\projects\wekey_tools\frontend\public\emergency-cleanup.html", "HTML", 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 16, 136
+"c:\projects\wekey_tools\frontend\public\gsc-callback.html", "HTML", 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 16, 143
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_admin.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_dashboard.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_integration.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_log_out.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_logo.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_logs.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 1, 8
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_money.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_tools.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\admin\admin_users.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\ai.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 1, 23
+"c:\projects\wekey_tools\frontend\public\icons\ai_star.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\arrow_circle.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\arrow_left.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3
+"c:\projects\wekey_tools\frontend\public\icons\button_copy.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\button_paste.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\calendar_mini.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 1, 14
+"c:\projects\wekey_tools\frontend\public\icons\camera.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\change.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\coin.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 1, 21
+"c:\projects\wekey_tools\frontend\public\icons\column-active.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 6
+"c:\projects\wekey_tools\frontend\public\icons\column.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\download.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\fav.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\footer_telegram.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\google-search-console.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 6
+"c:\projects\wekey_tools\frontend\public\icons\google.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 6
+"c:\projects\wekey_tools\frontend\public\icons\help.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\lamp.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\lock.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\logo_wekey_tools.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\password.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\reset.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\rocket.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 1, 19
+"c:\projects\wekey_tools\frontend\public\icons\scale.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 1, 9
+"c:\projects\wekey_tools\frontend\public\icons\settings.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 1, 9
+"c:\projects\wekey_tools\frontend\public\icons\string-active.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 6
+"c:\projects\wekey_tools\frontend\public\icons\string.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\table.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\theme.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_audit_site.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_dobavlenie_simvola.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tool_emoji.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_generator_chisel.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_generator_paroley.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 1, 8
+"c:\projects\wekey_tools\frontend\public\icons\tool_generator_sinonimov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_generator_teksta.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_generator_utm_metok.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\tool_izmeneniya_registra.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tool_kolichestvo_simvolov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_miksaciya_slov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_nayti_i_zamenit.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_obrabotka_minus_slov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tool_optimizator_teksta.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_poisk_dublikatov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_policy.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\tool_probeli_na_abzacy.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\tool_qr.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 1, 16
+"c:\projects\wekey_tools\frontend\public\icons\tool_seo_pro.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_seo_site.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 1, 12
+"c:\projects\wekey_tools\frontend\public\icons\tool_sklejka_slov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_sklonenie_slov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1, 6
+"c:\projects\wekey_tools\frontend\public\icons\tool_skvoznaya_analitika.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_sortirovka_slov_i_strok.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_tekst_po_stolbcam.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tool_tekst_v_html.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_tipy_sootvetstviya.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tool_transliteraciya.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\public\icons\tool_udalenie_dublikatov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 1, 8
+"c:\projects\wekey_tools\frontend\public\icons\tool_udalenie_perenosov.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tool_udalenie_pustyh_strok.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"c:\projects\wekey_tools\frontend\public\icons\tools_facebook.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tools_instagram.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 1, 29
+"c:\projects\wekey_tools\frontend\public\icons\tools_linkedin.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 1, 14
+"c:\projects\wekey_tools\frontend\public\icons\tools_telegram.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\icons\tools_tik_tok.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 1, 9
+"c:\projects\wekey_tools\frontend\public\icons\tools_viber.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 1, 10
+"c:\projects\wekey_tools\frontend\public\icons\tools_whats_app.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 1, 14
+"c:\projects\wekey_tools\frontend\public\icons\tools_youtube.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1, 5
+"c:\projects\wekey_tools\frontend\public\vite.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\projects\wekey_tools\frontend\src\App.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 1, 6
+"c:\projects\wekey_tools\frontend\src\App.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 103, 0, 0, 5, 7, 115
+"c:\projects\wekey_tools\frontend\src\assets\icons\column.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\src\assets\icons\string.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 1, 7
+"c:\projects\wekey_tools\frontend\src\assets\react.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\projects\wekey_tools\frontend\src\components\AdminSidebar.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 153, 0, 2, 26, 181
+"c:\projects\wekey_tools\frontend\src\components\AdminSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 9, 108
+"c:\projects\wekey_tools\frontend\src\components\AnalyticsChart.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 138, 0, 0, 10, 14, 162
+"c:\projects\wekey_tools\frontend\src\components\AuthModal.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 289, 0, 5, 46, 340
+"c:\projects\wekey_tools\frontend\src\components\AuthModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 256, 0, 0, 20, 33, 309
+"c:\projects\wekey_tools\frontend\src\components\AuthRequiredModal.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 172, 0, 8, 28, 208
+"c:\projects\wekey_tools\frontend\src\components\AuthRequiredModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 83, 0, 0, 6, 13, 102
+"c:\projects\wekey_tools\frontend\src\components\Card.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 6, 53
+"c:\projects\wekey_tools\frontend\src\components\Card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 5, 34
+"c:\projects\wekey_tools\frontend\src\components\DateRangePicker.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 309, 0, 1, 48, 358
+"c:\projects\wekey_tools\frontend\src\components\DateRangePicker.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 367, 0, 0, 13, 39, 419
+"c:\projects\wekey_tools\frontend\src\components\GoogleSignInButton.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 88, 0, 3, 14, 105
+"c:\projects\wekey_tools\frontend\src\components\GoogleSignInButton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 3, 47
+"c:\projects\wekey_tools\frontend\src\components\Header.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 36, 0, 1, 6, 43
+"c:\projects\wekey_tools\frontend\src\components\Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 4, 23
+"c:\projects\wekey_tools\frontend\src\components\LanguageSwitcher.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 91, 0, 1, 14, 106
+"c:\projects\wekey_tools\frontend\src\components\LanguageSwitcher.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 10, 68
+"c:\projects\wekey_tools\frontend\src\components\Layout.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 61, 0, 2, 12, 75
+"c:\projects\wekey_tools\frontend\src\components\Layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 85, 0, 0, 3, 17, 105
+"c:\projects\wekey_tools\frontend\src\components\Logo.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 2, 25
+"c:\projects\wekey_tools\frontend\src\components\Logo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 3, 18
+"c:\projects\wekey_tools\frontend\src\components\MiniBarChart.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 48, 0, 3, 7, 58
+"c:\projects\wekey_tools\frontend\src\components\MiniBarChart.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 4, 34
+"c:\projects\wekey_tools\frontend\src\components\OAuthCallback.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 90, 0, 0, 4, 14, 108
+"c:\projects\wekey_tools\frontend\src\components\ProfileLayout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 76, 0, 0, 3, 15, 94
+"c:\projects\wekey_tools\frontend\src\components\ProfileSidebar.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 111, 0, 3, 22, 136
+"c:\projects\wekey_tools\frontend\src\components\ProfileSidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 70, 0, 0, 0, 5, 75
+"c:\projects\wekey_tools\frontend\src\components\SEOAnalysisResults.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 699, 0, 27, 146, 872
+"c:\projects\wekey_tools\frontend\src\components\SEOAnalysisResults.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 674, 0, 0, 27, 67, 768
+"c:\projects\wekey_tools\frontend\src\components\SEOHead.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 107, 0, 0, 13, 18, 138
+"c:\projects\wekey_tools\frontend\src\components\Sidebar.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 82, 0, 3, 16, 101
+"c:\projects\wekey_tools\frontend\src\components\Sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 106, 0, 0, 6, 10, 122
+"c:\projects\wekey_tools\frontend\src\components\UserButton.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 247, 0, 5, 43, 295
+"c:\projects\wekey_tools\frontend\src\components\UserButton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 214, 0, 0, 6, 23, 243
+"c:\projects\wekey_tools\frontend\src\components\WithAuth.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 32, 0, 0, 9, 6, 47
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminAdmins.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 3, 27
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminDashboard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 18, 0, 0, 1, 3, 22
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminFinance.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 3, 27
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminIntegrations.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 3, 27
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminLogs.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 3, 27
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminTools.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 207, 0, 5, 41, 253
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminTools.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 297, 0, 0, 11, 48, 356
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminUsers.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 660, 0, 8, 119, 787
+"c:\projects\wekey_tools\frontend\src\components\admin\AdminUsers.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 587, 0, 0, 20, 60, 667
+"c:\projects\wekey_tools\frontend\src\components\profile\AvatarUpload.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 187, 0, 8, 29, 224
+"c:\projects\wekey_tools\frontend\src\components\profile\AvatarUpload.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 228, 0, 0, 18, 40, 286
+"c:\projects\wekey_tools\frontend\src\contexts\AuthContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 215, 0, 0, 19, 35, 269
+"c:\projects\wekey_tools\frontend\src\data\emoji\activityEmoji.ts", "TypeScript", 0, 0, 0, 0, 26, 0, 0, 0, 0, 1, 1, 28
+"c:\projects\wekey_tools\frontend\src\data\emoji\baseEmoji.ts", "TypeScript", 0, 0, 0, 0, 107, 0, 0, 0, 0, 7, 6, 120
+"c:\projects\wekey_tools\frontend\src\data\emoji\clothesEmoji.ts", "TypeScript", 0, 0, 0, 0, 30, 0, 0, 0, 0, 1, 1, 32
+"c:\projects\wekey_tools\frontend\src\data\emoji\educationEmoji.ts", "TypeScript", 0, 0, 0, 0, 48, 0, 0, 0, 0, 1, 1, 50
+"c:\projects\wekey_tools\frontend\src\data\emoji\flagsEmoji.ts", "TypeScript", 0, 0, 0, 0, 16, 0, 0, 0, 0, 1, 1, 18
+"c:\projects\wekey_tools\frontend\src\data\emoji\gesturesEmoji.ts", "TypeScript", 0, 0, 0, 0, 40, 0, 0, 0, 0, 1, 1, 42
+"c:\projects\wekey_tools\frontend\src\data\emoji\index.ts", "TypeScript", 0, 0, 0, 0, 31, 0, 0, 0, 0, 1, 2, 34
+"c:\projects\wekey_tools\frontend\src\data\emoji\jobsEmoji.ts", "TypeScript", 0, 0, 0, 0, 22, 0, 0, 0, 0, 1, 1, 24
+"c:\projects\wekey_tools\frontend\src\data\emoji\medicineEmoji.ts", "TypeScript", 0, 0, 0, 0, 23, 0, 0, 0, 0, 1, 1, 25
+"c:\projects\wekey_tools\frontend\src\data\emoji\musicEmoji.ts", "TypeScript", 0, 0, 0, 0, 13, 0, 0, 0, 0, 1, 1, 15
+"c:\projects\wekey_tools\frontend\src\data\emoji\symbolsEmoji.ts", "TypeScript", 0, 0, 0, 0, 20, 0, 0, 0, 0, 1, 1, 22
+"c:\projects\wekey_tools\frontend\src\data\emoji\techEmoji.ts", "TypeScript", 0, 0, 0, 0, 13, 0, 0, 0, 0, 1, 1, 15
+"c:\projects\wekey_tools\frontend\src\data\emoji\transportEmoji.ts", "TypeScript", 0, 0, 0, 0, 43, 0, 0, 0, 0, 1, 1, 45
+"c:\projects\wekey_tools\frontend\src\data\emoji\travelEmoji.ts", "TypeScript", 0, 0, 0, 0, 23, 0, 0, 0, 0, 1, 1, 25
+"c:\projects\wekey_tools\frontend\src\data\emoji\weatherEmoji.ts", "TypeScript", 0, 0, 0, 0, 32, 0, 0, 0, 0, 1, 1, 34
+"c:\projects\wekey_tools\frontend\src\hooks\useAuthRequired.ts", "TypeScript", 0, 0, 0, 0, 39, 0, 0, 0, 0, 21, 8, 68
+"c:\projects\wekey_tools\frontend\src\hooks\useLanguageFromUrl.ts", "TypeScript", 0, 0, 0, 0, 84, 0, 0, 0, 0, 20, 25, 129
+"c:\projects\wekey_tools\frontend\src\i18n\README.md", "Markdown", 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 180
+"c:\projects\wekey_tools\frontend\src\i18n\config.ts", "TypeScript", 0, 0, 0, 0, 45, 0, 0, 0, 0, 6, 11, 62
+"c:\projects\wekey_tools\frontend\src\i18n\locales\en.json", "JSON", 0, 0, 0, 1813, 0, 0, 0, 0, 0, 0, 0, 1813
+"c:\projects\wekey_tools\frontend\src\i18n\locales\ru.json", "JSON", 0, 0, 0, 1864, 0, 0, 0, 0, 0, 0, 1, 1865
+"c:\projects\wekey_tools\frontend\src\i18n\locales\uk.json", "JSON", 0, 0, 0, 1804, 0, 0, 0, 0, 0, 0, 0, 1804
+"c:\projects\wekey_tools\frontend\src\i18n\useToolTranslation.ts", "TypeScript", 0, 0, 0, 0, 137, 0, 0, 0, 0, 7, 13, 157
+"c:\projects\wekey_tools\frontend\src\index.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 65, 0, 1, 13, 79
+"c:\projects\wekey_tools\frontend\src\main.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 2, 13
+"c:\projects\wekey_tools\frontend\src\pages\AddSymbolTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 110, 0, 7, 17, 134
+"c:\projects\wekey_tools\frontend\src\pages\AddSymbolTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 311, 0, 0, 27, 40, 378
+"c:\projects\wekey_tools\frontend\src\pages\AdminPanel.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 746, 0, 14, 121, 881
+"c:\projects\wekey_tools\frontend\src\pages\AdminPanel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 814, 0, 0, 42, 94, 950
+"c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 1038, 0, 37, 148, 1223
+"c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 1132, 0, 0, 145, 154, 1431
+"c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool_backup_.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 489, 0, 0, 11, 21, 521
+"c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool_backup_current.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 489, 0, 0, 11, 21, 521
+"c:\projects\wekey_tools\frontend\src\pages\CaseChangerTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 120, 0, 7, 19, 146
+"c:\projects\wekey_tools\frontend\src\pages\CaseChangerTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 307, 0, 0, 21, 37, 365
+"c:\projects\wekey_tools\frontend\src\pages\CharCounterTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 174, 0, 18, 29, 221
+"c:\projects\wekey_tools\frontend\src\pages\CharCounterTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 357, 0, 0, 31, 46, 434
+"c:\projects\wekey_tools\frontend\src\pages\DuplicateFinderTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 182, 0, 18, 28, 228
+"c:\projects\wekey_tools\frontend\src\pages\DuplicateFinderTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 325, 0, 0, 27, 42, 394
+"c:\projects\wekey_tools\frontend\src\pages\DuplicateRemovalTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\src\pages\DuplicateRemovalTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 279, 0, 0, 25, 48, 352
+"c:\projects\wekey_tools\frontend\src\pages\EmojiTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 266, 0, 13, 44, 323
+"c:\projects\wekey_tools\frontend\src\pages\EmojiTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 221, 0, 0, 22, 27, 270
+"c:\projects\wekey_tools\frontend\src\pages\EmptyLinesRemovalTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 79, 0, 4, 13, 96
+"c:\projects\wekey_tools\frontend\src\pages\EmptyLinesRemovalTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 314, 0, 0, 33, 43, 390
+"c:\projects\wekey_tools\frontend\src\pages\FindReplaceTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 48, 0, 6, 10, 64
+"c:\projects\wekey_tools\frontend\src\pages\FindReplaceTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 333, 0, 0, 24, 44, 401
+"c:\projects\wekey_tools\frontend\src\pages\Home.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 2, 10
+"c:\projects\wekey_tools\frontend\src\pages\Home.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 70, 0, 0, 3, 10, 83
+"c:\projects\wekey_tools\frontend\src\pages\HomeSimple.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 2, 15
+"c:\projects\wekey_tools\frontend\src\pages\MatchTypesTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\src\pages\MatchTypesTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 312, 0, 0, 30, 51, 393
+"c:\projects\wekey_tools\frontend\src\pages\MinusWordsTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 222, 0, 19, 32, 273
+"c:\projects\wekey_tools\frontend\src\pages\MinusWordsTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 241, 0, 0, 26, 34, 301
+"c:\projects\wekey_tools\frontend\src\pages\NumberGeneratorTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 182, 0, 10, 25, 217
+"c:\projects\wekey_tools\frontend\src\pages\NumberGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 376, 0, 0, 35, 39, 450
+"c:\projects\wekey_tools\frontend\src\pages\PasswordGeneratorTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 259, 0, 12, 39, 310
+"c:\projects\wekey_tools\frontend\src\pages\PasswordGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 387, 0, 0, 32, 44, 463
+"c:\projects\wekey_tools\frontend\src\pages\PrivacyPolicyGeneratorTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 416, 0, 13, 70, 499
+"c:\projects\wekey_tools\frontend\src\pages\PrivacyPolicyGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 468, 0, 0, 8, 49, 525
+"c:\projects\wekey_tools\frontend\src\pages\ProfilePage.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 19, 0, 2, 3, 24
+"c:\projects\wekey_tools\frontend\src\pages\ProfilePage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 3, 27
+"c:\projects\wekey_tools\frontend\src\pages\QRGeneratorTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 253, 0, 11, 47, 311
+"c:\projects\wekey_tools\frontend\src\pages\QRGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 504, 0, 0, 13, 31, 548
+"c:\projects\wekey_tools\frontend\src\pages\RemoveLineBreaksTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 62, 0, 7, 10, 79
+"c:\projects\wekey_tools\frontend\src\pages\RemoveLineBreaksTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 347, 0, 0, 26, 42, 415
+"c:\projects\wekey_tools\frontend\src\pages\SEOAuditProTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 590, 0, 20, 96, 706
+"c:\projects\wekey_tools\frontend\src\pages\SEOAuditProTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 396, 0, 0, 28, 42, 466
+"c:\projects\wekey_tools\frontend\src\pages\SeoAudit.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 2575, 0, 79, 486, 3140
+"c:\projects\wekey_tools\frontend\src\pages\SeoAudit.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 3475, 0, 0, 157, 201, 3833
+"c:\projects\wekey_tools\frontend\src\pages\SiteAudit.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 1307, 0, 58, 220, 1585
+"c:\projects\wekey_tools\frontend\src\pages\SiteAudit.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 1349, 0, 0, 61, 95, 1505
+"c:\projects\wekey_tools\frontend\src\pages\SpacesToParagraphsTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\src\pages\SpacesToParagraphsTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 264, 0, 0, 28, 44, 336
+"c:\projects\wekey_tools\frontend\src\pages\SynonymGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 248, 0, 0, 17, 32, 297
+"c:\projects\wekey_tools\frontend\src\pages\TextByColumnsTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 335, 0, 21, 50, 406
+"c:\projects\wekey_tools\frontend\src\pages\TextByColumnsTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 353, 0, 0, 33, 48, 434
+"c:\projects\wekey_tools\frontend\src\pages\TextGeneratorTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 398, 0, 17, 59, 474
+"c:\projects\wekey_tools\frontend\src\pages\TextGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 476, 0, 0, 45, 47, 568
+"c:\projects\wekey_tools\frontend\src\pages\TextOptimizerTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\src\pages\TextOptimizerTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 317, 0, 0, 33, 51, 401
+"c:\projects\wekey_tools\frontend\src\pages\TextSortingTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\src\pages\TextSortingTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 310, 0, 0, 28, 45, 383
+"c:\projects\wekey_tools\frontend\src\pages\TextToHtmlTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\src\pages\TextToHtmlTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 259, 0, 0, 26, 39, 324
+"c:\projects\wekey_tools\frontend\src\pages\TransliterationTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 35, 0, 3, 5, 43
+"c:\projects\wekey_tools\frontend\src\pages\TransliterationTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 264, 0, 0, 23, 40, 327
+"c:\projects\wekey_tools\frontend\src\pages\UserProfile.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 337, 0, 4, 62, 403
+"c:\projects\wekey_tools\frontend\src\pages\UserProfile.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 371, 0, 0, 11, 39, 421
+"c:\projects\wekey_tools\frontend\src\pages\UtmGeneratorTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 577, 0, 22, 88, 687
+"c:\projects\wekey_tools\frontend\src\pages\UtmGeneratorTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 535, 0, 0, 41, 50, 626
+"c:\projects\wekey_tools\frontend\src\pages\WordGluingTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 134, 0, 12, 21, 167
+"c:\projects\wekey_tools\frontend\src\pages\WordGluingTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 399, 0, 0, 29, 50, 478
+"c:\projects\wekey_tools\frontend\src\pages\WordInflectionTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 259, 0, 0, 21, 36, 316
+"c:\projects\wekey_tools\frontend\src\pages\WordMixerTool.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 93, 0, 13, 18, 124
+"c:\projects\wekey_tools\frontend\src\pages\WordMixerTool.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 321, 0, 0, 30, 47, 398
+"c:\projects\wekey_tools\frontend\src\services\analyticsService.ts", "TypeScript", 0, 0, 0, 0, 182, 0, 0, 0, 0, 43, 38, 263
+"c:\projects\wekey_tools\frontend\src\services\apiService.ts", "TypeScript", 0, 0, 0, 0, 254, 0, 0, 0, 0, 39, 67, 360
+"c:\projects\wekey_tools\frontend\src\services\googleAuthService.ts", "TypeScript", 0, 0, 0, 0, 121, 0, 0, 0, 0, 27, 24, 172
+"c:\projects\wekey_tools\frontend\src\services\historicalAnalyticsService.ts", "TypeScript", 0, 0, 0, 0, 84, 0, 0, 0, 0, 14, 18, 116
+"c:\projects\wekey_tools\frontend\src\services\httpClient.ts", "TypeScript", 0, 0, 0, 0, 133, 0, 0, 0, 0, 7, 26, 166
+"c:\projects\wekey_tools\frontend\src\services\openaiService.ts", "TypeScript", 0, 0, 0, 0, 703, 0, 0, 0, 0, 70, 123, 896
+"c:\projects\wekey_tools\frontend\src\services\toolsService.ts", "TypeScript", 0, 0, 0, 0, 69, 0, 0, 0, 0, 10, 16, 95
+"c:\projects\wekey_tools\frontend\src\styles\fonts.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 140, 0, 0, 19, 159
+"c:\projects\wekey_tools\frontend\src\styles\footer.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 99, 0, 7, 15, 121
+"c:\projects\wekey_tools\frontend\src\styles\tool-pages.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 699, 0, 41, 116, 856
+"c:\projects\wekey_tools\frontend\src\utils\adminSections.ts", "TypeScript", 0, 0, 0, 0, 32, 0, 0, 0, 0, 5, 4, 41
+"c:\projects\wekey_tools\frontend\src\utils\emojiUtils.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 52, 0, 0, 5, 6, 63
+"c:\projects\wekey_tools\frontend\src\utils\statsService.ts", "TypeScript", 0, 0, 0, 0, 204, 0, 0, 0, 0, 65, 44, 313
+"c:\projects\wekey_tools\frontend\src\utils\toolsConfig.ts", "TypeScript", 0, 0, 0, 0, 272, 0, 0, 0, 0, 0, 4, 276
+"c:\projects\wekey_tools\frontend\src\utils\toolsRegistry.ts", "TypeScript", 0, 0, 0, 0, 180, 0, 0, 0, 0, 22, 12, 214
+"c:\projects\wekey_tools\frontend\src\vite-env.d.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 3
+"c:\projects\wekey_tools\frontend\tsconfig.app.json", "JSON", 0, 0, 0, 23, 0, 0, 0, 0, 0, 2, 3, 28
+"c:\projects\wekey_tools\frontend\tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 8
+"c:\projects\wekey_tools\frontend\tsconfig.node.json", "JSON", 0, 0, 0, 21, 0, 0, 0, 0, 0, 2, 3, 26
+"c:\projects\wekey_tools\frontend\vite.config.ts", "TypeScript", 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 2, 9
+"c:\projects\wekey_tools\mass-add-auth-blocking.js", "JavaScript", 0, 113, 0, 0, 0, 0, 0, 0, 0, 14, 20, 147
+"c:\projects\wekey_tools\pagespeed_test.json", "JSON", 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 1, 12
+"c:\projects\wekey_tools\test_colors_10files.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_debug.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_enhanced.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_final.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_inline.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_priority.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_simple.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_colors_weighted.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_organic.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_organic_final.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_organic_v2.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_result.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_result_v2.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_result_v3.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_result_v4.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\test_result_v5.json", "JSON", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\projects\wekey_tools\tool_names_audit.json", "JSON", 0, 0, 0, 196, 0, 0, 0, 0, 0, 0, 0, 196
+"Total", "-", 5309, 13916, 354, 22127, 3032, 7, 21908, 15083, 500, 3756, 9102, 95094

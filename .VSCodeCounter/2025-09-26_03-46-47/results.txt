@@ -1,0 +1,451 @@
+Date : 2025-09-26 03:46:47
+Directory : c:\projects\wekey_tools
+Total : 378 files,  82236 codes, 3756 comments, 9102 blanks, all 95094 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |         28 |     22,127 |          4 |         12 |     22,143 |
+| TypeScript JSX     |         70 |     21,908 |      1,402 |      2,353 |     25,663 |
+| PostCSS            |         56 |     15,083 |        593 |      2,557 |     18,233 |
+| JavaScript         |         81 |     13,916 |      1,377 |      2,303 |     17,596 |
+| Markdown           |         23 |      5,309 |          0 |      1,291 |      6,600 |
+| TypeScript         |         32 |      3,032 |        380 |        457 |      3,869 |
+| XML                |         82 |        500 |          0 |         75 |        575 |
+| HTML               |          5 |        354 |          0 |         53 |        407 |
+| JSON with Comments |          1 |          7 |          0 |          1 |          8 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                               | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                  |        378 |     82,236 |      3,756 |      9,102 |     95,094 |
+| . (Files)                                                                          |         50 |      6,220 |        103 |      1,432 |      7,755 |
+| backend                                                                            |         75 |     22,974 |      1,274 |      2,148 |     26,396 |
+| backend (Files)                                                                    |         30 |     11,416 |         78 |        304 |     11,798 |
+| backend\src                                                                        |         45 |     11,558 |      1,196 |      1,844 |     14,598 |
+| backend\src (Files)                                                                |          7 |      1,087 |        139 |        218 |      1,444 |
+| backend\src\config                                                                 |          4 |        293 |         29 |         44 |        366 |
+| backend\src\controllers                                                            |          1 |        542 |         49 |        109 |        700 |
+| backend\src\middleware                                                             |          3 |        281 |         24 |         50 |        355 |
+| backend\src\migrations                                                             |          3 |         92 |          8 |         16 |        116 |
+| backend\src\models                                                                 |          8 |      1,022 |         42 |         61 |      1,125 |
+| backend\src\routes                                                                 |         11 |      7,619 |        830 |      1,230 |      9,679 |
+| backend\src\scripts                                                                |          6 |        214 |         24 |         54 |        292 |
+| backend\src\services                                                               |          1 |        370 |         47 |         56 |        473 |
+| backend\src\utils                                                                  |          1 |         38 |          4 |          6 |         48 |
+| frontend                                                                           |        253 |     53,042 |      2,379 |      5,522 |     60,943 |
+| frontend (Files)                                                                   |          8 |      6,647 |          5 |         19 |      6,671 |
+| frontend\public                                                                    |         81 |        734 |          0 |        105 |        839 |
+| frontend\public (Files)                                                            |          3 |        248 |          0 |         32 |        280 |
+| frontend\public\icons                                                              |         78 |        486 |          0 |         73 |        559 |
+| frontend\public\icons (Files)                                                      |         69 |        441 |          0 |         64 |        505 |
+| frontend\public\icons\admin                                                        |          9 |         45 |          0 |          9 |         54 |
+| frontend\src                                                                       |        164 |     45,661 |      2,374 |      5,398 |     53,433 |
+| frontend\src (Files)                                                               |          5 |        184 |          8 |         24 |        216 |
+| frontend\src\assets                                                                |          3 |         13 |          0 |          2 |         15 |
+| frontend\src\assets (Files)                                                        |          1 |          1 |          0 |          0 |          1 |
+| frontend\src\assets\icons                                                          |          2 |         12 |          0 |          2 |         14 |
+| frontend\src\components                                                            |         46 |      7,328 |        255 |      1,100 |      8,683 |
+| frontend\src\components (Files)                                                    |         35 |      5,048 |        184 |        748 |      5,980 |
+| frontend\src\components\admin                                                      |          9 |      1,865 |         45 |        283 |      2,193 |
+| frontend\src\components\profile                                                    |          2 |        415 |         26 |         69 |        510 |
+| frontend\src\contexts                                                              |          1 |        215 |         19 |         35 |        269 |
+| frontend\src\data                                                                  |         15 |        487 |         21 |         21 |        529 |
+| frontend\src\data\emoji                                                            |         15 |        487 |         21 |         21 |        529 |
+| frontend\src\hooks                                                                 |          2 |        123 |         41 |         33 |        197 |
+| frontend\src\i18n                                                                  |          6 |      5,813 |         13 |         55 |      5,881 |
+| frontend\src\i18n (Files)                                                          |          3 |        332 |         13 |         54 |        399 |
+| frontend\src\i18n\locales                                                          |          3 |      5,481 |          0 |          1 |      5,482 |
+| frontend\src\pages                                                                 |         71 |     28,274 |      1,662 |      3,596 |     33,532 |
+| frontend\src\services                                                              |          7 |      1,546 |        210 |        312 |      2,068 |
+| frontend\src\styles                                                                |          3 |        938 |         48 |        150 |      1,136 |
+| frontend\src\utils                                                                 |          5 |        740 |         97 |         70 |        907 |
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                           | language           | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\projects\wekey_tools\ADMIN_ANALYTICS_CHANGELOG.md                               | Markdown           |         72 |          0 |         22 |         94 |
+| c:\projects\wekey_tools\ADMIN_DASHBOARD_IMPLEMENTATION.md                          | Markdown           |        125 |          0 |         29 |        154 |
+| c:\projects\wekey_tools\ADMIN_TOOLS_PROGRESS.md                                    | Markdown           |        234 |          0 |         42 |        276 |
+| c:\projects\wekey_tools\ANALYTICS_TOOL_RESTORATION_REPORT.md                       | Markdown           |        235 |          0 |         56 |        291 |
+| c:\projects\wekey_tools\AUTHENTICATION_GUIDE.md                                    | Markdown           |      1,173 |          0 |        225 |      1,398 |
+| c:\projects\wekey_tools\DEPLOYMENT_GUIDE.md                                        | Markdown           |        619 |          0 |        191 |        810 |
+| c:\projects\wekey_tools\DEVELOPMENT_NOTES.md                                       | Markdown           |        323 |          0 |         71 |        394 |
+| c:\projects\wekey_tools\FREEMIUM_IMPLEMENTATION_REPORT.md                          | Markdown           |        303 |          0 |         76 |        379 |
+| c:\projects\wekey_tools\OAUTH_SETUP_GUIDE.md                                       | Markdown           |         36 |          0 |         12 |         48 |
+| c:\projects\wekey_tools\PORT_SETUP.md                                              | Markdown           |         36 |          0 |         11 |         47 |
+| c:\projects\wekey_tools\PROFILE_TRANSLATION_FIX_REPORT.md                          | Markdown           |        112 |          0 |         33 |        145 |
+| c:\projects\wekey_tools\PROJECT_CONTEXT.md                                         | Markdown           |        204 |          0 |         49 |        253 |
+| c:\projects\wekey_tools\SEO_AUDIT_ENHANCEMENT_REPORT.md                            | Markdown           |        333 |          0 |        102 |        435 |
+| c:\projects\wekey_tools\SEO_MULTILINGUAL_GUIDE.md                                  | Markdown           |        333 |          0 |         79 |        412 |
+| c:\projects\wekey_tools\SEO_TOOLS_TRANSLATION_COMPLETE.md                          | Markdown           |        153 |          0 |         45 |        198 |
+| c:\projects\wekey_tools\SITE_AUDIT_IMPLEMENTATION_REPORT.md                        | Markdown           |        101 |          0 |         17 |        118 |
+| c:\projects\wekey_tools\TOOL_ID_FIX_REPORT.md                                      | Markdown           |         60 |          0 |         23 |         83 |
+| c:\projects\wekey_tools\TOOL_ID_REFACTORING_REPORT.md                              | Markdown           |         62 |          0 |         20 |         82 |
+| c:\projects\wekey_tools\TOOL_NAMES_SYNC_REPORT.md                                  | Markdown           |         62 |          0 |         17 |         79 |
+| c:\projects\wekey_tools\USER_INTERFACE_GUIDE.md                                    | Markdown           |        272 |          0 |         52 |        324 |
+| c:\projects\wekey_tools\USER_TRACKING_GUIDE.md                                     | Markdown           |        106 |          0 |         34 |        140 |
+| c:\projects\wekey_tools\add-auth-to-functions.js                                   | JavaScript         |        130 |         17 |         31 |        178 |
+| c:\projects\wekey_tools\add-modal-windows-v2.js                                    | JavaScript         |         88 |         11 |         15 |        114 |
+| c:\projects\wekey_tools\add-modal-windows.js                                       | JavaScript         |         70 |          7 |         13 |         90 |
+| c:\projects\wekey_tools\audit_tool_names.js                                        | JavaScript         |        114 |         17 |         35 |        166 |
+| c:\projects\wekey_tools\backend\README.md                                          | Markdown           |        205 |          0 |         55 |        260 |
+| c:\projects\wekey_tools\backend\check-all-users.js                                 | JavaScript         |         25 |          0 |          7 |         32 |
+| c:\projects\wekey_tools\backend\check-analytics-events.js                          | JavaScript         |         26 |          1 |         10 |         37 |
+| c:\projects\wekey_tools\backend\check-password.js                                  | JavaScript         |         44 |          4 |         15 |         63 |
+| c:\projects\wekey_tools\backend\check-remove-duplicates.js                         | JavaScript         |         61 |          6 |         15 |         82 |
+| c:\projects\wekey_tools\backend\check-stats.js                                     | JavaScript         |         33 |          2 |          9 |         44 |
+| c:\projects\wekey_tools\backend\check-test-users.js                                | JavaScript         |         42 |          3 |         10 |         55 |
+| c:\projects\wekey_tools\backend\complete-cleanup.js                                | JavaScript         |         18 |          2 |          7 |         27 |
+| c:\projects\wekey_tools\backend\create-admin.js                                    | JavaScript         |         45 |          4 |          9 |         58 |
+| c:\projects\wekey_tools\backend\create-analytics-tables.js                         | JavaScript         |         28 |          5 |          8 |         41 |
+| c:\projects\wekey_tools\backend\create-test-user.js                                | JavaScript         |         61 |          6 |          9 |         76 |
+| c:\projects\wekey_tools\backend\debug_test.json                                    | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\backend\delete-user.js                                     | JavaScript         |         34 |          2 |          8 |         44 |
+| c:\projects\wekey_tools\backend\final-check.js                                     | JavaScript         |         44 |          2 |         11 |         57 |
+| c:\projects\wekey_tools\backend\fix-password-constraint.js                         | JavaScript         |         53 |          3 |          7 |         63 |
+| c:\projects\wekey_tools\backend\fix-password.js                                    | JavaScript         |         34 |          4 |         11 |         49 |
+| c:\projects\wekey_tools\backend\init-db.js                                         | JavaScript         |         87 |          7 |         19 |        113 |
+| c:\projects\wekey_tools\backend\init-tools-table.js                                | JavaScript         |        289 |          6 |         11 |        306 |
+| c:\projects\wekey_tools\backend\minimal-server.js                                  | JavaScript         |         19 |          1 |          6 |         26 |
+| c:\projects\wekey_tools\backend\package-lock.json                                  | JSON               |      9,781 |          0 |          1 |      9,782 |
+| c:\projects\wekey_tools\backend\package.json                                       | JSON               |         60 |          0 |          1 |         61 |
+| c:\projects\wekey_tools\backend\recreate-admin.js                                  | JavaScript         |         44 |          3 |          9 |         56 |
+| c:\projects\wekey_tools\backend\reorder-tools.js                                   | JavaScript         |         20 |          2 |          5 |         27 |
+| c:\projects\wekey_tools\backend\reset-admin.js                                     | JavaScript         |         51 |          4 |         11 |         66 |
+| c:\projects\wekey_tools\backend\reset-corrupted-user.js                            | JavaScript         |         34 |          3 |          8 |         45 |
+| c:\projects\wekey_tools\backend\simple-test.js                                     | JavaScript         |         12 |          0 |          3 |         15 |
+| c:\projects\wekey_tools\backend\src\app-fixed.js                                   | JavaScript         |        113 |         20 |         21 |        154 |
+| c:\projects\wekey_tools\backend\src\app-minimal.js                                 | JavaScript         |        395 |         43 |         91 |        529 |
+| c:\projects\wekey_tools\backend\src\app-original.js                                | JavaScript         |        100 |         17 |         24 |        141 |
+| c:\projects\wekey_tools\backend\src\app-simple.js                                  | JavaScript         |         41 |          7 |          9 |         57 |
+| c:\projects\wekey_tools\backend\src\app-test.js                                    | JavaScript         |         78 |          8 |         12 |         98 |
+| c:\projects\wekey_tools\backend\src\app.js                                         | JavaScript         |        291 |         43 |         48 |        382 |
+| c:\projects\wekey_tools\backend\src\config\config.js                               | JavaScript         |         66 |         10 |         10 |         86 |
+| c:\projects\wekey_tools\backend\src\config\database.js                             | JavaScript         |         51 |          4 |         10 |         65 |
+| c:\projects\wekey_tools\backend\src\config\passport.js                             | JavaScript         |        140 |         15 |         23 |        178 |
+| c:\projects\wekey_tools\backend\src\config\sequelize.js                            | JavaScript         |         36 |          0 |          1 |         37 |
+| c:\projects\wekey_tools\backend\src\controllers\authController.js                  | JavaScript         |        542 |         49 |        109 |        700 |
+| c:\projects\wekey_tools\backend\src\middleware\auth.js                             | JavaScript         |        146 |         15 |         26 |        187 |
+| c:\projects\wekey_tools\backend\src\middleware\errorHandler.js                     | JavaScript         |         67 |          2 |         15 |         84 |
+| c:\projects\wekey_tools\backend\src\middleware\upload.js                           | JavaScript         |         68 |          7 |          9 |         84 |
+| c:\projects\wekey_tools\backend\src\migrations\20250922-add-avatar-to-users.js     | JavaScript         |         15 |          0 |          2 |         17 |
+| c:\projects\wekey_tools\backend\src\migrations\20250922-add-google-oauth-fields.js | JavaScript         |         55 |          8 |         10 |         73 |
+| c:\projects\wekey_tools\backend\src\migrations\20250923163500-add-google-tokens.js | JavaScript         |         22 |          0 |          4 |         26 |
+| c:\projects\wekey_tools\backend\src\models\AnalyticsEvent.js                       | JavaScript         |         71 |          3 |          3 |         77 |
+| c:\projects\wekey_tools\backend\src\models\Payment.js                              | JavaScript         |        231 |         12 |         12 |        255 |
+| c:\projects\wekey_tools\backend\src\models\Subscription.js                         | JavaScript         |        196 |          8 |         11 |        215 |
+| c:\projects\wekey_tools\backend\src\models\Tool.js                                 | JavaScript         |         60 |          0 |          2 |         62 |
+| c:\projects\wekey_tools\backend\src\models\ToolUsage.js                            | JavaScript         |        156 |          4 |          7 |        167 |
+| c:\projects\wekey_tools\backend\src\models\User.js                                 | JavaScript         |        176 |          6 |         11 |        193 |
+| c:\projects\wekey_tools\backend\src\models\Visitor.js                              | JavaScript         |         98 |          5 |          7 |        110 |
+| c:\projects\wekey_tools\backend\src\models\index.js                                | JavaScript         |         34 |          4 |          8 |         46 |
+| c:\projects\wekey_tools\backend\src\routes\admin.js                                | JavaScript         |        648 |         58 |        101 |        807 |
+| c:\projects\wekey_tools\backend\src\routes\analytics.js                            | JavaScript         |        196 |         24 |         36 |        256 |
+| c:\projects\wekey_tools\backend\src\routes\auth.js                                 | JavaScript         |        113 |          9 |         11 |        133 |
+| c:\projects\wekey_tools\backend\src\routes\oauth.js                                | JavaScript         |        109 |         15 |         22 |        146 |
+| c:\projects\wekey_tools\backend\src\routes\seoAudit.js                             | JavaScript         |      3,447 |        303 |        513 |      4,263 |
+| c:\projects\wekey_tools\backend\src\routes\seoAuditPro.js                          | JavaScript         |        105 |          5 |         17 |        127 |
+| c:\projects\wekey_tools\backend\src\routes\siteAudit-old.js                        | JavaScript         |        250 |         35 |         48 |        333 |
+| c:\projects\wekey_tools\backend\src\routes\siteAudit.js                            | JavaScript         |      2,113 |        330 |        402 |      2,845 |
+| c:\projects\wekey_tools\backend\src\routes\stats.js                                | JavaScript         |        322 |         29 |         38 |        389 |
+| c:\projects\wekey_tools\backend\src\routes\tools.js                                | JavaScript         |        164 |          9 |         20 |        193 |
+| c:\projects\wekey_tools\backend\src\routes\users.js                                | JavaScript         |        152 |         13 |         22 |        187 |
+| c:\projects\wekey_tools\backend\src\scripts\checkTables.js                         | JavaScript         |         37 |          4 |         10 |         51 |
+| c:\projects\wekey_tools\backend\src\scripts\checkUserData.js                       | JavaScript         |         35 |          3 |          8 |         46 |
+| c:\projects\wekey_tools\backend\src\scripts\cleanAnalytics.js                      | JavaScript         |         56 |          7 |         13 |         76 |
+| c:\projects\wekey_tools\backend\src\scripts\createAdmin.js                         | JavaScript         |         23 |          2 |          5 |         30 |
+| c:\projects\wekey_tools\backend\src\scripts\testUserCreation.js                    | JavaScript         |         36 |          4 |         10 |         50 |
+| c:\projects\wekey_tools\backend\src\scripts\updateAdminPassword.js                 | JavaScript         |         27 |          4 |          8 |         39 |
+| c:\projects\wekey_tools\backend\src\services\GoogleSearchConsoleService.js         | JavaScript         |        370 |         47 |         56 |        473 |
+| c:\projects\wekey_tools\backend\src\simple-test.js                                 | JavaScript         |         69 |          1 |         13 |         83 |
+| c:\projects\wekey_tools\backend\src\utils\logger.js                                | JavaScript         |         38 |          4 |          6 |         48 |
+| c:\projects\wekey_tools\backend\test-stats-final.cjs                               | JavaScript         |         54 |          0 |         10 |         64 |
+| c:\projects\wekey_tools\backend\test-stats-fixed.cjs                               | JavaScript         |         41 |          0 |         10 |         51 |
+| c:\projects\wekey_tools\backend\test-tz.cjs                                        | JavaScript         |         52 |          1 |         10 |         63 |
+| c:\projects\wekey_tools\backend\test_server.js                                     | JavaScript         |        118 |          7 |          9 |        134 |
+| c:\projects\wekey_tools\clean_duplicates.js                                        | JavaScript         |         70 |          6 |         15 |         91 |
+| c:\projects\wekey_tools\clear_user_data.html                                       | HTML               |         54 |          0 |         13 |         67 |
+| c:\projects\wekey_tools\final_tool_id_check.js                                     | JavaScript         |         65 |          6 |         18 |         89 |
+| c:\projects\wekey_tools\fix_navigation_mass.js                                     | JavaScript         |         62 |          8 |         10 |         80 |
+| c:\projects\wekey_tools\fix_tool_ids.js                                            | JavaScript         |        103 |          7 |         26 |        136 |
+| c:\projects\wekey_tools\fix_tool_names.js                                          | JavaScript         |        174 |         10 |         29 |        213 |
+| c:\projects\wekey_tools\frontend\clear_user_data.html                              | HTML               |         38 |          0 |          7 |         45 |
+| c:\projects\wekey_tools\frontend\index.html                                        | HTML               |         15 |          0 |          1 |         16 |
+| c:\projects\wekey_tools\frontend\package-lock.json                                 | JSON               |      6,490 |          0 |          1 |      6,491 |
+| c:\projects\wekey_tools\frontend\package.json                                      | JSON               |         47 |          0 |          1 |         48 |
+| c:\projects\wekey_tools\frontend\public\emergency-cleanup.html                     | HTML               |        120 |          0 |         16 |        136 |
+| c:\projects\wekey_tools\frontend\public\gsc-callback.html                          | HTML               |        127 |          0 |         16 |        143 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_admin.svg                | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_dashboard.svg            | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_integration.svg          | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_log_out.svg              | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_logo.svg                 | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_logs.svg                 | XML                |          7 |          0 |          1 |          8 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_money.svg                | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_tools.svg                | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\admin\admin_users.svg                | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\ai.svg                               | XML                |         22 |          0 |          1 |         23 |
+| c:\projects\wekey_tools\frontend\public\icons\ai_star.svg                          | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\arrow_circle.svg                     | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\arrow_left.svg                       | XML                |          3 |          0 |          0 |          3 |
+| c:\projects\wekey_tools\frontend\public\icons\button_copy.svg                      | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\button_paste.svg                     | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\calendar_mini.svg                    | XML                |         13 |          0 |          1 |         14 |
+| c:\projects\wekey_tools\frontend\public\icons\camera.svg                           | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\change.svg                           | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\coin.svg                             | XML                |         20 |          0 |          1 |         21 |
+| c:\projects\wekey_tools\frontend\public\icons\column-active.svg                    | XML                |          6 |          0 |          0 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\column.svg                           | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\download.svg                         | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\fav.svg                              | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\footer_telegram.svg                  | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\google-search-console.svg            | XML                |          6 |          0 |          0 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\google.svg                           | XML                |          6 |          0 |          0 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\help.svg                             | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\lamp.svg                             | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\lock.svg                             | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\logo_wekey_tools.svg                 | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\password.svg                         | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\reset.svg                            | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\rocket.svg                           | XML                |         18 |          0 |          1 |         19 |
+| c:\projects\wekey_tools\frontend\public\icons\scale.svg                            | XML                |          8 |          0 |          1 |          9 |
+| c:\projects\wekey_tools\frontend\public\icons\settings.svg                         | XML                |          8 |          0 |          1 |          9 |
+| c:\projects\wekey_tools\frontend\public\icons\string-active.svg                    | XML                |          6 |          0 |          0 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\string.svg                           | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\table.svg                            | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\theme.svg                            | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_audit_site.svg                  | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_dobavlenie_simvola.svg          | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_emoji.svg                       | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_generator_chisel.svg            | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_generator_paroley.svg           | XML                |          7 |          0 |          1 |          8 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_generator_sinonimov.svg         | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_generator_teksta.svg            | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_generator_utm_metok.svg         | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_izmeneniya_registra.svg         | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_kolichestvo_simvolov.svg        | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_miksaciya_slov.svg              | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_nayti_i_zamenit.svg             | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_obrabotka_minus_slov.svg        | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_optimizator_teksta.svg          | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_poisk_dublikatov.svg            | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_policy.svg                      | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_probeli_na_abzacy.svg           | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_qr.svg                          | XML                |         15 |          0 |          1 |         16 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_seo_pro.svg                     | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_seo_site.svg                    | XML                |         11 |          0 |          1 |         12 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_sklejka_slov.svg                | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_sklonenie_slov.svg              | XML                |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_skvoznaya_analitika.svg         | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_sortirovka_slov_i_strok.svg     | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_tekst_po_stolbcam.svg           | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_tekst_v_html.svg                | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_tipy_sootvetstviya.svg          | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_transliteraciya.svg             | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_udalenie_dublikatov.svg         | XML                |          7 |          0 |          1 |          8 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_udalenie_perenosov.svg          | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tool_udalenie_pustyh_strok.svg       | XML                |          3 |          0 |          1 |          4 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_facebook.svg                   | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_instagram.svg                  | XML                |         28 |          0 |          1 |         29 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_linkedin.svg                   | XML                |         13 |          0 |          1 |         14 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_telegram.svg                   | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_tik_tok.svg                    | XML                |          8 |          0 |          1 |          9 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_viber.svg                      | XML                |          9 |          0 |          1 |         10 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_whats_app.svg                  | XML                |         13 |          0 |          1 |         14 |
+| c:\projects\wekey_tools\frontend\public\icons\tools_youtube.svg                    | XML                |          4 |          0 |          1 |          5 |
+| c:\projects\wekey_tools\frontend\public\vite.svg                                   | XML                |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\frontend\src\App.css                                       | PostCSS            |          5 |          0 |          1 |          6 |
+| c:\projects\wekey_tools\frontend\src\App.tsx                                       | TypeScript JSX     |        103 |          5 |          7 |        115 |
+| c:\projects\wekey_tools\frontend\src\assets\icons\column.svg                       | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\src\assets\icons\string.svg                       | XML                |          6 |          0 |          1 |          7 |
+| c:\projects\wekey_tools\frontend\src\assets\react.svg                              | XML                |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\frontend\src\components\AdminSidebar.css                   | PostCSS            |        153 |          2 |         26 |        181 |
+| c:\projects\wekey_tools\frontend\src\components\AdminSidebar.tsx                   | TypeScript JSX     |         99 |          0 |          9 |        108 |
+| c:\projects\wekey_tools\frontend\src\components\AnalyticsChart.tsx                 | TypeScript JSX     |        138 |         10 |         14 |        162 |
+| c:\projects\wekey_tools\frontend\src\components\AuthModal.css                      | PostCSS            |        289 |          5 |         46 |        340 |
+| c:\projects\wekey_tools\frontend\src\components\AuthModal.tsx                      | TypeScript JSX     |        256 |         20 |         33 |        309 |
+| c:\projects\wekey_tools\frontend\src\components\AuthRequiredModal.css              | PostCSS            |        172 |          8 |         28 |        208 |
+| c:\projects\wekey_tools\frontend\src\components\AuthRequiredModal.tsx              | TypeScript JSX     |         83 |          6 |         13 |        102 |
+| c:\projects\wekey_tools\frontend\src\components\Card.css                           | PostCSS            |         47 |          0 |          6 |         53 |
+| c:\projects\wekey_tools\frontend\src\components\Card.tsx                           | TypeScript JSX     |         29 |          0 |          5 |         34 |
+| c:\projects\wekey_tools\frontend\src\components\DateRangePicker.css                | PostCSS            |        309 |          1 |         48 |        358 |
+| c:\projects\wekey_tools\frontend\src\components\DateRangePicker.tsx                | TypeScript JSX     |        367 |         13 |         39 |        419 |
+| c:\projects\wekey_tools\frontend\src\components\GoogleSignInButton.css             | PostCSS            |         88 |          3 |         14 |        105 |
+| c:\projects\wekey_tools\frontend\src\components\GoogleSignInButton.tsx             | TypeScript JSX     |         44 |          0 |          3 |         47 |
+| c:\projects\wekey_tools\frontend\src\components\Header.css                         | PostCSS            |         36 |          1 |          6 |         43 |
+| c:\projects\wekey_tools\frontend\src\components\Header.tsx                         | TypeScript JSX     |         19 |          0 |          4 |         23 |
+| c:\projects\wekey_tools\frontend\src\components\LanguageSwitcher.css               | PostCSS            |         91 |          1 |         14 |        106 |
+| c:\projects\wekey_tools\frontend\src\components\LanguageSwitcher.tsx               | TypeScript JSX     |         58 |          0 |         10 |         68 |
+| c:\projects\wekey_tools\frontend\src\components\Layout.css                         | PostCSS            |         61 |          2 |         12 |         75 |
+| c:\projects\wekey_tools\frontend\src\components\Layout.tsx                         | TypeScript JSX     |         85 |          3 |         17 |        105 |
+| c:\projects\wekey_tools\frontend\src\components\Logo.css                           | PostCSS            |         23 |          0 |          2 |         25 |
+| c:\projects\wekey_tools\frontend\src\components\Logo.tsx                           | TypeScript JSX     |         15 |          0 |          3 |         18 |
+| c:\projects\wekey_tools\frontend\src\components\MiniBarChart.css                   | PostCSS            |         48 |          3 |          7 |         58 |
+| c:\projects\wekey_tools\frontend\src\components\MiniBarChart.tsx                   | TypeScript JSX     |         30 |          0 |          4 |         34 |
+| c:\projects\wekey_tools\frontend\src\components\OAuthCallback.tsx                  | TypeScript JSX     |         90 |          4 |         14 |        108 |
+| c:\projects\wekey_tools\frontend\src\components\ProfileLayout.tsx                  | TypeScript JSX     |         76 |          3 |         15 |         94 |
+| c:\projects\wekey_tools\frontend\src\components\ProfileSidebar.css                 | PostCSS            |        111 |          3 |         22 |        136 |
+| c:\projects\wekey_tools\frontend\src\components\ProfileSidebar.tsx                 | TypeScript JSX     |         70 |          0 |          5 |         75 |
+| c:\projects\wekey_tools\frontend\src\components\SEOAnalysisResults.css             | PostCSS            |        699 |         27 |        146 |        872 |
+| c:\projects\wekey_tools\frontend\src\components\SEOAnalysisResults.tsx             | TypeScript JSX     |        674 |         27 |         67 |        768 |
+| c:\projects\wekey_tools\frontend\src\components\SEOHead.tsx                        | TypeScript JSX     |        107 |         13 |         18 |        138 |
+| c:\projects\wekey_tools\frontend\src\components\Sidebar.css                        | PostCSS            |         82 |          3 |         16 |        101 |
+| c:\projects\wekey_tools\frontend\src\components\Sidebar.tsx                        | TypeScript JSX     |        106 |          6 |         10 |        122 |
+| c:\projects\wekey_tools\frontend\src\components\UserButton.css                     | PostCSS            |        247 |          5 |         43 |        295 |
+| c:\projects\wekey_tools\frontend\src\components\UserButton.tsx                     | TypeScript JSX     |        214 |          6 |         23 |        243 |
+| c:\projects\wekey_tools\frontend\src\components\WithAuth.tsx                       | TypeScript JSX     |         32 |          9 |          6 |         47 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminAdmins.tsx              | TypeScript JSX     |         24 |          0 |          3 |         27 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminDashboard.tsx           | TypeScript JSX     |         18 |          1 |          3 |         22 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminFinance.tsx             | TypeScript JSX     |         24 |          0 |          3 |         27 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminIntegrations.tsx        | TypeScript JSX     |         24 |          0 |          3 |         27 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminLogs.tsx                | TypeScript JSX     |         24 |          0 |          3 |         27 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminTools.css               | PostCSS            |        207 |          5 |         41 |        253 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminTools.tsx               | TypeScript JSX     |        297 |         11 |         48 |        356 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminUsers.css               | PostCSS            |        660 |          8 |        119 |        787 |
+| c:\projects\wekey_tools\frontend\src\components\admin\AdminUsers.tsx               | TypeScript JSX     |        587 |         20 |         60 |        667 |
+| c:\projects\wekey_tools\frontend\src\components\profile\AvatarUpload.css           | PostCSS            |        187 |          8 |         29 |        224 |
+| c:\projects\wekey_tools\frontend\src\components\profile\AvatarUpload.tsx           | TypeScript JSX     |        228 |         18 |         40 |        286 |
+| c:\projects\wekey_tools\frontend\src\contexts\AuthContext.tsx                      | TypeScript JSX     |        215 |         19 |         35 |        269 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\activityEmoji.ts                   | TypeScript         |         26 |          1 |          1 |         28 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\baseEmoji.ts                       | TypeScript         |        107 |          7 |          6 |        120 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\clothesEmoji.ts                    | TypeScript         |         30 |          1 |          1 |         32 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\educationEmoji.ts                  | TypeScript         |         48 |          1 |          1 |         50 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\flagsEmoji.ts                      | TypeScript         |         16 |          1 |          1 |         18 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\gesturesEmoji.ts                   | TypeScript         |         40 |          1 |          1 |         42 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\index.ts                           | TypeScript         |         31 |          1 |          2 |         34 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\jobsEmoji.ts                       | TypeScript         |         22 |          1 |          1 |         24 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\medicineEmoji.ts                   | TypeScript         |         23 |          1 |          1 |         25 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\musicEmoji.ts                      | TypeScript         |         13 |          1 |          1 |         15 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\symbolsEmoji.ts                    | TypeScript         |         20 |          1 |          1 |         22 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\techEmoji.ts                       | TypeScript         |         13 |          1 |          1 |         15 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\transportEmoji.ts                  | TypeScript         |         43 |          1 |          1 |         45 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\travelEmoji.ts                     | TypeScript         |         23 |          1 |          1 |         25 |
+| c:\projects\wekey_tools\frontend\src\data\emoji\weatherEmoji.ts                    | TypeScript         |         32 |          1 |          1 |         34 |
+| c:\projects\wekey_tools\frontend\src\hooks\useAuthRequired.ts                      | TypeScript         |         39 |         21 |          8 |         68 |
+| c:\projects\wekey_tools\frontend\src\hooks\useLanguageFromUrl.ts                   | TypeScript         |         84 |         20 |         25 |        129 |
+| c:\projects\wekey_tools\frontend\src\i18n\README.md                                | Markdown           |        150 |          0 |         30 |        180 |
+| c:\projects\wekey_tools\frontend\src\i18n\config.ts                                | TypeScript         |         45 |          6 |         11 |         62 |
+| c:\projects\wekey_tools\frontend\src\i18n\locales\en.json                          | JSON               |      1,813 |          0 |          0 |      1,813 |
+| c:\projects\wekey_tools\frontend\src\i18n\locales\ru.json                          | JSON               |      1,864 |          0 |          1 |      1,865 |
+| c:\projects\wekey_tools\frontend\src\i18n\locales\uk.json                          | JSON               |      1,804 |          0 |          0 |      1,804 |
+| c:\projects\wekey_tools\frontend\src\i18n\useToolTranslation.ts                    | TypeScript         |        137 |          7 |         13 |        157 |
+| c:\projects\wekey_tools\frontend\src\index.css                                     | PostCSS            |         65 |          1 |         13 |         79 |
+| c:\projects\wekey_tools\frontend\src\main.tsx                                      | TypeScript JSX     |         11 |          0 |          2 |         13 |
+| c:\projects\wekey_tools\frontend\src\pages\AddSymbolTool.css                       | PostCSS            |        110 |          7 |         17 |        134 |
+| c:\projects\wekey_tools\frontend\src\pages\AddSymbolTool.tsx                       | TypeScript JSX     |        311 |         27 |         40 |        378 |
+| c:\projects\wekey_tools\frontend\src\pages\AdminPanel.css                          | PostCSS            |        746 |         14 |        121 |        881 |
+| c:\projects\wekey_tools\frontend\src\pages\AdminPanel.tsx                          | TypeScript JSX     |        814 |         42 |         94 |        950 |
+| c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool.css                       | PostCSS            |      1,038 |         37 |        148 |      1,223 |
+| c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool.tsx                       | TypeScript JSX     |      1,132 |        145 |        154 |      1,431 |
+| c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool_backup_.tsx               | TypeScript JSX     |        489 |         11 |         21 |        521 |
+| c:\projects\wekey_tools\frontend\src\pages\AnalyticsTool_backup_current.tsx        | TypeScript JSX     |        489 |         11 |         21 |        521 |
+| c:\projects\wekey_tools\frontend\src\pages\CaseChangerTool.css                     | PostCSS            |        120 |          7 |         19 |        146 |
+| c:\projects\wekey_tools\frontend\src\pages\CaseChangerTool.tsx                     | TypeScript JSX     |        307 |         21 |         37 |        365 |
+| c:\projects\wekey_tools\frontend\src\pages\CharCounterTool.css                     | PostCSS            |        174 |         18 |         29 |        221 |
+| c:\projects\wekey_tools\frontend\src\pages\CharCounterTool.tsx                     | TypeScript JSX     |        357 |         31 |         46 |        434 |
+| c:\projects\wekey_tools\frontend\src\pages\DuplicateFinderTool.css                 | PostCSS            |        182 |         18 |         28 |        228 |
+| c:\projects\wekey_tools\frontend\src\pages\DuplicateFinderTool.tsx                 | TypeScript JSX     |        325 |         27 |         42 |        394 |
+| c:\projects\wekey_tools\frontend\src\pages\DuplicateRemovalTool.css                | PostCSS            |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\src\pages\DuplicateRemovalTool.tsx                | TypeScript JSX     |        279 |         25 |         48 |        352 |
+| c:\projects\wekey_tools\frontend\src\pages\EmojiTool.css                           | PostCSS            |        266 |         13 |         44 |        323 |
+| c:\projects\wekey_tools\frontend\src\pages\EmojiTool.tsx                           | TypeScript JSX     |        221 |         22 |         27 |        270 |
+| c:\projects\wekey_tools\frontend\src\pages\EmptyLinesRemovalTool.css               | PostCSS            |         79 |          4 |         13 |         96 |
+| c:\projects\wekey_tools\frontend\src\pages\EmptyLinesRemovalTool.tsx               | TypeScript JSX     |        314 |         33 |         43 |        390 |
+| c:\projects\wekey_tools\frontend\src\pages\FindReplaceTool.css                     | PostCSS            |         48 |          6 |         10 |         64 |
+| c:\projects\wekey_tools\frontend\src\pages\FindReplaceTool.tsx                     | TypeScript JSX     |        333 |         24 |         44 |        401 |
+| c:\projects\wekey_tools\frontend\src\pages\Home.css                                | PostCSS            |          8 |          0 |          2 |         10 |
+| c:\projects\wekey_tools\frontend\src\pages\Home.tsx                                | TypeScript JSX     |         70 |          3 |         10 |         83 |
+| c:\projects\wekey_tools\frontend\src\pages\HomeSimple.tsx                          | TypeScript JSX     |         13 |          0 |          2 |         15 |
+| c:\projects\wekey_tools\frontend\src\pages\MatchTypesTool.css                      | PostCSS            |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\src\pages\MatchTypesTool.tsx                      | TypeScript JSX     |        312 |         30 |         51 |        393 |
+| c:\projects\wekey_tools\frontend\src\pages\MinusWordsTool.css                      | PostCSS            |        222 |         19 |         32 |        273 |
+| c:\projects\wekey_tools\frontend\src\pages\MinusWordsTool.tsx                      | TypeScript JSX     |        241 |         26 |         34 |        301 |
+| c:\projects\wekey_tools\frontend\src\pages\NumberGeneratorTool.css                 | PostCSS            |        182 |         10 |         25 |        217 |
+| c:\projects\wekey_tools\frontend\src\pages\NumberGeneratorTool.tsx                 | TypeScript JSX     |        376 |         35 |         39 |        450 |
+| c:\projects\wekey_tools\frontend\src\pages\PasswordGeneratorTool.css               | PostCSS            |        259 |         12 |         39 |        310 |
+| c:\projects\wekey_tools\frontend\src\pages\PasswordGeneratorTool.tsx               | TypeScript JSX     |        387 |         32 |         44 |        463 |
+| c:\projects\wekey_tools\frontend\src\pages\PrivacyPolicyGeneratorTool.css          | PostCSS            |        416 |         13 |         70 |        499 |
+| c:\projects\wekey_tools\frontend\src\pages\PrivacyPolicyGeneratorTool.tsx          | TypeScript JSX     |        468 |          8 |         49 |        525 |
+| c:\projects\wekey_tools\frontend\src\pages\ProfilePage.css                         | PostCSS            |         19 |          2 |          3 |         24 |
+| c:\projects\wekey_tools\frontend\src\pages\ProfilePage.tsx                         | TypeScript JSX     |         24 |          0 |          3 |         27 |
+| c:\projects\wekey_tools\frontend\src\pages\QRGeneratorTool.css                     | PostCSS            |        253 |         11 |         47 |        311 |
+| c:\projects\wekey_tools\frontend\src\pages\QRGeneratorTool.tsx                     | TypeScript JSX     |        504 |         13 |         31 |        548 |
+| c:\projects\wekey_tools\frontend\src\pages\RemoveLineBreaksTool.css                | PostCSS            |         62 |          7 |         10 |         79 |
+| c:\projects\wekey_tools\frontend\src\pages\RemoveLineBreaksTool.tsx                | TypeScript JSX     |        347 |         26 |         42 |        415 |
+| c:\projects\wekey_tools\frontend\src\pages\SEOAuditProTool.css                     | PostCSS            |        590 |         20 |         96 |        706 |
+| c:\projects\wekey_tools\frontend\src\pages\SEOAuditProTool.tsx                     | TypeScript JSX     |        396 |         28 |         42 |        466 |
+| c:\projects\wekey_tools\frontend\src\pages\SeoAudit.css                            | PostCSS            |      2,575 |         79 |        486 |      3,140 |
+| c:\projects\wekey_tools\frontend\src\pages\SeoAudit.tsx                            | TypeScript JSX     |      3,475 |        157 |        201 |      3,833 |
+| c:\projects\wekey_tools\frontend\src\pages\SiteAudit.css                           | PostCSS            |      1,307 |         58 |        220 |      1,585 |
+| c:\projects\wekey_tools\frontend\src\pages\SiteAudit.tsx                           | TypeScript JSX     |      1,349 |         61 |         95 |      1,505 |
+| c:\projects\wekey_tools\frontend\src\pages\SpacesToParagraphsTool.css              | PostCSS            |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\src\pages\SpacesToParagraphsTool.tsx              | TypeScript JSX     |        264 |         28 |         44 |        336 |
+| c:\projects\wekey_tools\frontend\src\pages\SynonymGeneratorTool.tsx                | TypeScript JSX     |        248 |         17 |         32 |        297 |
+| c:\projects\wekey_tools\frontend\src\pages\TextByColumnsTool.css                   | PostCSS            |        335 |         21 |         50 |        406 |
+| c:\projects\wekey_tools\frontend\src\pages\TextByColumnsTool.tsx                   | TypeScript JSX     |        353 |         33 |         48 |        434 |
+| c:\projects\wekey_tools\frontend\src\pages\TextGeneratorTool.css                   | PostCSS            |        398 |         17 |         59 |        474 |
+| c:\projects\wekey_tools\frontend\src\pages\TextGeneratorTool.tsx                   | TypeScript JSX     |        476 |         45 |         47 |        568 |
+| c:\projects\wekey_tools\frontend\src\pages\TextOptimizerTool.css                   | PostCSS            |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\src\pages\TextOptimizerTool.tsx                   | TypeScript JSX     |        317 |         33 |         51 |        401 |
+| c:\projects\wekey_tools\frontend\src\pages\TextSortingTool.css                     | PostCSS            |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\src\pages\TextSortingTool.tsx                     | TypeScript JSX     |        310 |         28 |         45 |        383 |
+| c:\projects\wekey_tools\frontend\src\pages\TextToHtmlTool.css                      | PostCSS            |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\src\pages\TextToHtmlTool.tsx                      | TypeScript JSX     |        259 |         26 |         39 |        324 |
+| c:\projects\wekey_tools\frontend\src\pages\TransliterationTool.css                 | PostCSS            |         35 |          3 |          5 |         43 |
+| c:\projects\wekey_tools\frontend\src\pages\TransliterationTool.tsx                 | TypeScript JSX     |        264 |         23 |         40 |        327 |
+| c:\projects\wekey_tools\frontend\src\pages\UserProfile.css                         | PostCSS            |        337 |          4 |         62 |        403 |
+| c:\projects\wekey_tools\frontend\src\pages\UserProfile.tsx                         | TypeScript JSX     |        371 |         11 |         39 |        421 |
+| c:\projects\wekey_tools\frontend\src\pages\UtmGeneratorTool.css                    | PostCSS            |        577 |         22 |         88 |        687 |
+| c:\projects\wekey_tools\frontend\src\pages\UtmGeneratorTool.tsx                    | TypeScript JSX     |        535 |         41 |         50 |        626 |
+| c:\projects\wekey_tools\frontend\src\pages\WordGluingTool.css                      | PostCSS            |        134 |         12 |         21 |        167 |
+| c:\projects\wekey_tools\frontend\src\pages\WordGluingTool.tsx                      | TypeScript JSX     |        399 |         29 |         50 |        478 |
+| c:\projects\wekey_tools\frontend\src\pages\WordInflectionTool.tsx                  | TypeScript JSX     |        259 |         21 |         36 |        316 |
+| c:\projects\wekey_tools\frontend\src\pages\WordMixerTool.css                       | PostCSS            |         93 |         13 |         18 |        124 |
+| c:\projects\wekey_tools\frontend\src\pages\WordMixerTool.tsx                       | TypeScript JSX     |        321 |         30 |         47 |        398 |
+| c:\projects\wekey_tools\frontend\src\services\analyticsService.ts                  | TypeScript         |        182 |         43 |         38 |        263 |
+| c:\projects\wekey_tools\frontend\src\services\apiService.ts                        | TypeScript         |        254 |         39 |         67 |        360 |
+| c:\projects\wekey_tools\frontend\src\services\googleAuthService.ts                 | TypeScript         |        121 |         27 |         24 |        172 |
+| c:\projects\wekey_tools\frontend\src\services\historicalAnalyticsService.ts        | TypeScript         |         84 |         14 |         18 |        116 |
+| c:\projects\wekey_tools\frontend\src\services\httpClient.ts                        | TypeScript         |        133 |          7 |         26 |        166 |
+| c:\projects\wekey_tools\frontend\src\services\openaiService.ts                     | TypeScript         |        703 |         70 |        123 |        896 |
+| c:\projects\wekey_tools\frontend\src\services\toolsService.ts                      | TypeScript         |         69 |         10 |         16 |         95 |
+| c:\projects\wekey_tools\frontend\src\styles\fonts.css                              | PostCSS            |        140 |          0 |         19 |        159 |
+| c:\projects\wekey_tools\frontend\src\styles\footer.css                             | PostCSS            |         99 |          7 |         15 |        121 |
+| c:\projects\wekey_tools\frontend\src\styles\tool-pages.css                         | PostCSS            |        699 |         41 |        116 |        856 |
+| c:\projects\wekey_tools\frontend\src\utils\adminSections.ts                        | TypeScript         |         32 |          5 |          4 |         41 |
+| c:\projects\wekey_tools\frontend\src\utils\emojiUtils.tsx                          | TypeScript JSX     |         52 |          5 |          6 |         63 |
+| c:\projects\wekey_tools\frontend\src\utils\statsService.ts                         | TypeScript         |        204 |         65 |         44 |        313 |
+| c:\projects\wekey_tools\frontend\src\utils\toolsConfig.ts                          | TypeScript         |        272 |          0 |          4 |        276 |
+| c:\projects\wekey_tools\frontend\src\utils\toolsRegistry.ts                        | TypeScript         |        180 |         22 |         12 |        214 |
+| c:\projects\wekey_tools\frontend\src\vite-env.d.ts                                 | TypeScript         |          0 |          2 |          1 |          3 |
+| c:\projects\wekey_tools\frontend\tsconfig.app.json                                 | JSON               |         23 |          2 |          3 |         28 |
+| c:\projects\wekey_tools\frontend\tsconfig.json                                     | JSON with Comments |          7 |          0 |          1 |          8 |
+| c:\projects\wekey_tools\frontend\tsconfig.node.json                                | JSON               |         21 |          2 |          3 |         26 |
+| c:\projects\wekey_tools\frontend\vite.config.ts                                    | TypeScript         |          6 |          1 |          2 |          9 |
+| c:\projects\wekey_tools\mass-add-auth-blocking.js                                  | JavaScript         |        113 |         14 |         20 |        147 |
+| c:\projects\wekey_tools\pagespeed_test.json                                        | JSON               |         11 |          0 |          1 |         12 |
+| c:\projects\wekey_tools\test_colors_10files.json                                   | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_debug.json                                     | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_enhanced.json                                  | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_final.json                                     | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_inline.json                                    | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_priority.json                                  | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_simple.json                                    | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_colors_weighted.json                                  | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_organic.json                                          | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_organic_final.json                                    | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_organic_v2.json                                       | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_result.json                                           | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_result_v2.json                                        | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_result_v3.json                                        | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_result_v4.json                                        | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\test_result_v5.json                                        | JSON               |          1 |          0 |          0 |          1 |
+| c:\projects\wekey_tools\tool_names_audit.json                                      | JSON               |        196 |          0 |          0 |        196 |
+| Total                                                                              |                    |     82,236 |      3,756 |      9,102 |     95,094 |
++------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

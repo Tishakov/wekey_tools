@@ -641,7 +641,6 @@ router.get('/period-tools', async (req, res, next) => {
         },
         group: ['toolName'],
         order: [[require('sequelize').literal('usageCount'), 'DESC']],
-        limit: 20,
         raw: true
       });
       
