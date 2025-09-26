@@ -1,24 +1,28 @@
-# Руководство по развертыванию Wekey Tools с фримиум-системой
+# Руководство по развертыванию Wekey Tools Enterprise - all_check_ok_1.0
 
 ## 📋 Обзор
 
-Данное руководство описывает процесс развертывания платформы Wekey Tools с интегрированной фримиум-моделью, включая настройку базы данных, серверов и системы аутентификации.
+Данное руководство описывает процесс развертывания платформы Wekey Tools с enterprise-grade функциональностью, включая автоматическое обновление токенов, Google OAuth интеграцию, расширенную админ-панель и систему безопасности нового поколения.
 
 ## 🏗️ Архитектура системы
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Frontend      │    │     Backend      │    │    Database     │
-│   React + Vite  │◄──►│  Node.js + JWT   │◄──►│  SQLite/MySQL   │
-│   Port: 5173    │    │   Port: 8880     │    │  Auth + Stats   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                        │                        │
-         ▼                        ▼                        ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│ Фримиум блокировка │    │  API Endpoints   │    │ Tool Usage Stats│
-│ 26/26 инструментов │    │ /auth, /stats    │    │ User Sessions   │
-│ AuthRequired Modal │    │ JWT Validation   │    │ Analytics Data  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────────┐    ┌────────────────────────┐    ┌─────────────────┐
+│   Frontend          │    │       Backend          │    │    Database     │
+│   React + Vite      │◄──►│  Node.js + Express     │◄──►│  SQLite/MySQL   │
+│   Port: 5173        │    │   Port: 8880           │    │  Auth + Stats   │
+│   • Axios Client    │    │   • JWT + Refresh      │    │  • Optimized    │
+│   • Auto Token      │    │   • Google OAuth       │    │  • Indexed      │
+│   • Error Handling  │    │   • Rate Limiting      │    │  • Encrypted    │
+└─────────────────────┘    └────────────────────────┘    └─────────────────┘
+         │                            │                            │
+         ▼                            ▼                            ▼
+┌─────────────────────┐    ┌────────────────────────┐    ┌─────────────────┐
+│ Security Features   │    │  Enterprise APIs       │    │ Advanced Analytics│
+│ • Token Interceptors│    │  • /auth/refresh       │    │ • Usage Tracking │ 
+│ • Request Queue     │    │  • /admin/sortable     │    │ • Admin Dashboard│
+│ • Seamless UX       │    │  • /oauth/google       │    │ • Real-time Stats│
+└─────────────────────┘    └────────────────────────┘    └─────────────────┘
 ```
 
 ## 🛠️ Системные требования
@@ -38,7 +42,23 @@
 - **Процессор**: 2+ ядра
 - **База данных**: MySQL 8.0+ (для продакшена)
 
-## 📦 Установка и настройка
+## � Критические компоненты системы безопасности
+
+### Система автоматического обновления токенов:
+- **Axios Interceptors**: Перехватывание 401 ошибок без UX disruption
+- **Token Refresh Queue**: Intelligent queueing система для concurrent requests
+- **Seamless Experience**: Пользователи не замечают процесс обновления токенов
+- **Google OAuth Integration**: Single Sign-On с полной JWT совместимостью
+- **Enterprise Security**: Rate limiting, CORS protection, helmet security
+
+### Расширенная админ-панель:
+- **Sortable Tables**: Полнофункциональные таблицы с сортировкой по всем колонкам
+- **Real-time Analytics**: Live данные без refresh страницы
+- **Advanced User Management**: Поиск, фильтрация, bulk operations
+- **Tools Management**: Детальная статистика использования с трендами
+- **Professional UI**: Современный дизайн с анимациями и visual feedback
+
+## �📦 Установка и настройка
 
 ### 1. Клонирование репозитория
 
@@ -47,8 +67,8 @@
 git clone https://github.com/yourusername/wekey_tools.git
 cd wekey_tools
 
-# Проверка версии (должна быть freemium_complete_1.1 или выше)
-git tag --list | grep freemium
+# Проверка версии (должна быть all_check_ok_1.0 или выше)
+git tag --list | grep -E "(all_check|auto_token)"
 ```
 
 ### 2. Настройка Backend
@@ -73,8 +93,16 @@ cp .env.example .env
 NODE_ENV=production
 PORT=8880
 
-# JWT секретный ключ (ОБЯЗАТЕЛЬНО изменить!)
+# JWT секретные ключи (ОБЯЗАТЕЛЬНО изменить!)
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-different-from-access
+JWT_EXPIRES_IN=1h
+JWT_REFRESH_EXPIRES_IN=7d
+
+# Google OAuth (если используется)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:8880/auth/google/callback
 
 # База данных
 DATABASE_URL=sqlite:./database.sqlite
@@ -183,18 +211,28 @@ node src/scripts/create-admin-user.js
 ### Схема базы данных
 
 ```sql
--- Таблица пользователей
+-- Таблица пользователей (Enhanced for Google OAuth)
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255), -- Nullable для Google OAuth users
     name VARCHAR(255),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
     avatar VARCHAR(500),
+    google_id VARCHAR(100) UNIQUE, -- Google OAuth ID
+    is_google_user BOOLEAN DEFAULT false,
+    is_email_verified BOOLEAN DEFAULT false,
     balance DECIMAL(10,2) DEFAULT 0.00,
     subscription_type ENUM('free', 'premium', 'enterprise') DEFAULT 'free',
+    role ENUM('user', 'admin', 'moderator') DEFAULT 'user',
     is_active BOOLEAN DEFAULT true,
+    last_login TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_google_id (google_id),
+    INDEX idx_email (email),
+    INDEX idx_role (role)
 );
 
 -- Таблица статистики использования инструментов
@@ -318,12 +356,21 @@ server {
         proxy_read_timeout 60s;
     }
     
-    # Безопасность заголовков
+    # Enhanced безопасность заголовков
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' accounts.google.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' accounts.google.com;" always;
+    
+    # Rate limiting для API
+    location /api/auth {
+        limit_req zone=auth burst=10 nodelay;
+        proxy_pass http://localhost:8880;
+        # ... остальные proxy настройки
+    }
 }
 ```
 
@@ -804,7 +851,33 @@ curl https://yourdomain.com/api/stats/tools
 
 Данное руководство обеспечивает полное развертывание платформы Wekey Tools с интегрированной фримиум-системой. Следование всем шагам гарантирует стабильную и безопасную работу приложения в продакшн среде.
 
-**Для получения поддержки**: создайте issue в репозитории или обратитесь к документации API.
+## 🎯 Enterprise Features Checklist
 
-**Версия руководства**: freemium_complete_1.1  
-**Дата обновления**: 22.09.2025
+### ✅ Системы безопасности:
+- [ ] Automatic token refresh system активна
+- [ ] Google OAuth интеграция настроена
+- [ ] Rate limiting применен для всех API endpoints
+- [ ] HTTPS с proper security headers
+- [ ] Database encryption и backup strategy
+
+### ✅ Производительность:
+- [ ] CDN configured для статических ресурсов
+- [ ] Database indexing оптимизирован
+- [ ] PM2 cluster mode для backend
+- [ ] Nginx gzip compression enabled
+- [ ] Monitoring и alerting системы активны
+
+### ✅ Пользовательский опыт:
+- [ ] Sortable admin tables работают
+- [ ] Seamless token refresh без UX interruption
+- [ ] Error boundaries catch и handle все ошибки
+- [ ] Mobile responsiveness verified
+- [ ] Load time < 3 seconds
+
+---
+
+**Для получения поддержки**: создайте issue в репозитории или обратитесь к enterprise documentation.
+
+**Версия руководства**: all_check_ok_1.0  
+**Дата обновления**: 26.09.2025  
+**Статус**: 🚀 Enterprise Production Ready

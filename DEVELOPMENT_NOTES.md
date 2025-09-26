@@ -1,6 +1,85 @@
-# ВАЖНЫЕ МОМЕНТЫ РАЗРАБОТКИ - freemium_complete_1.1
+# ВАЖНЫЕ МОМЕНТЫ РАЗРАБОТКИ - all_check_ok_1.0
 
 ## ⚠️ КРИТИЧЕСКИЕ ОСОБЕННОСТИ РАБОТЫ
+
+### 🔐 СИСТЕМА АВТОМАТИЧЕСКОГО ОБНОВЛЕНИЯ ТОКЕНОВ (MAJOR FEATURE):
+```typescript
+// ✅ Axios client с автоматическими interceptors
+// frontend/src/services/httpClient.ts
+export const httpClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+});
+
+// Response interceptor для автоматического refresh токенов
+httpClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 && !error.config.sent) {
+      // Умная система обновления токенов без interruption UX
+      return refreshTokenAndRetry(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ❌ НИКОГДА не использовать fetch() вместо httpClient
+const badExample = async () => {
+  const response = await fetch('/api/admin/stats'); // НЕТ автообновления токенов!
+};
+
+// ✅ ВСЕГДА использовать httpClient для API вызовов
+const goodExample = async () => {
+  const response = await httpClient.get('/api/admin/stats'); // Автоматический refresh!
+};
+```
+
+### 🔄 Queue система для pending requests:
+```typescript
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: Function; reject: Function; config: any }> = [];
+
+// Все failed запросы во время refresh ждут в очереди
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject, config }) => {
+    if (error) {
+      reject(error);
+    } else {
+      config.headers.Authorization = `Bearer ${token}`;
+      resolve(httpClient(config));
+    }
+  });
+  
+  failedQueue = [];
+};
+```
+
+### 📊 ENHANCED ADMIN DASHBOARD SORTING:
+```typescript
+// ✅ Полнофункциональная сортировка таблиц
+const [sortField, setSortField] = useState<'toolName' | 'usageCount' | 'lastUsed' | 'comparison'>('usageCount');
+const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc'); // По умолчанию от большего к меньшему
+
+const handleSort = (field: string) => {
+  const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+  setSortField(field);
+  setSortDirection(newDirection);
+};
+
+// ✅ Сортировка по всем колонкам включая "Сравнение"
+switch (sortField) {
+  case 'toolName':
+    aValue = getToolName(a.toolName); // Алфавитная сортировка
+    break;
+  case 'usageCount':
+  case 'comparison': // Зеркальная сортировка
+    aValue = a.usageCount; // Численная сортировка
+    break;
+  case 'lastUsed':
+    aValue = new Date(a.lastUsed).getTime(); // Хронологическая сортировка
+    break;
+}
+```
 
 ### 🔒 ФРИМИУМ-МОДЕЛЬ (NEW!):
 ```typescript
@@ -322,8 +401,8 @@ admin_X.X: Краткое описание
 ---
 
 **Важно**: Всегда читать этот файл перед началом работы!  
-**Обновлено**: 22.09.2025 (freemium_complete_1.1)  
-**Последние изменения**: Добавлена полная документация фримиум-системы, специальная логика инструментов, обновлена файловая структура, новые API endpoints, расширены приоритеты разработки с учётом завершенной монетизации
+**Обновлено**: 26.09.2025 (all_check_ok_1.0)  
+**Последние изменения**: Добавлена система автоматического обновления токенов, enhanced admin dashboard с сортировкой таблиц, Google OAuth интеграция, системы безопасности с axios interceptors, comprehensive error handling, обновлены все критические компоненты
 
 ### 🏷️ Версии и теги:
 - `admin_users_1.2` - Базовая система с редизайном UI
