@@ -210,10 +210,10 @@
 }
 
 .section-header h2 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   margin: 0;
-  color: #FFFFFF;
+  color: #BCBBBD;
 }
 
 /* Секция аватара - компактная */
@@ -640,5 +640,234 @@
   
   .stat-number {
     font-size: 18px;
+  }
+}
+
+/* Новые стили для блока "О себе" */
+.user-stats-section {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+/* Уникальный стиль для статистики в профиле */
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  background: #28282A;
+  padding: 20px 28px;
+  border-radius: 16px;
+  border: 1px solid #333335;
+  text-align: left;
+  position: relative;
+  min-height: 140px;
+  transition: all 0.2s ease;
+}
+
+/* Уникальные карточки для профиля */
+.profile-stat-card {
+  background: rgba(9, 206, 167, 0.1);
+  border: 1px solid rgba(9, 206, 167, 0.2);
+  border-radius: 12px;
+  padding: 12px 18px 12px 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  background: #2C2C2E;
+  border-color: #444;
+}
+
+.profile-stat-card:hover {
+  background: rgba(9, 206, 167, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Специфичные стили для иконок в профиле */
+.profile-stat-icon {
+  font-size: 20px;
+  width: 46px !important;
+  height: 46px !important;
+  background: rgba(9, 206, 167, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-stat-info {
+  flex: 1;
+}
+
+.profile-stat-card .stat-number {
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0 0 4px 0;
+}
+
+.profile-stat-card .stat-label {
+  font-size: 12px !important;
+  color: #999;
+  margin: 0;
+}
+
+/* Уникальные стили для профильных карточек */
+.profile-stat-card .stat-number {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0 0 2px 0;
+}
+
+.profile-stat-card .stat-label {
+  font-size: 11px;
+  color: #999;
+  margin: 0;
+}
+
+.profile-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 8px 16px;
+  background: #1A1A1C;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.profile-textarea:focus {
+  outline: none;
+  border-color: #5E35F2;
+}
+
+.profile-textarea::placeholder {
+  color: #666;
+}
+
+.interests-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.interest-tag {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: #BCBBBD;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.interest-tag:hover {
+  background: rgba(94, 53, 242, 0.2);
+  border-color: rgba(94, 53, 242, 0.4);
+}
+
+.interest-tag.active {
+  background: rgba(94, 53, 242, 0.3);
+  border-color: #5E35F2;
+  color: #FFFFFF;
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.social-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.social-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.social-input .profile-input {
+  flex: 1;
+}
+
+/* .about-section {
+  margin-bottom: 20px;
+} */
+
+.about-section:last-child {
+  margin-bottom: 0;
+}
+
+.about-section label {
+  display: block;
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.about-section h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin: 0 0 12px 0;
+}
+
+/* Адаптивность для статистики */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .profile-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .profile-stat-card {
+    padding: 10px;
+  }
+  
+  .profile-stat-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+  
+  .interests-selector {
+    gap: 6px;
+  }
+  
+  .interest-tag {
+    font-size: 11px;
+    padding: 5px 10px;
   }
 }

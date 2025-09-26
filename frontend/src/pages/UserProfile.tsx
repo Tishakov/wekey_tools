@@ -37,6 +37,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     country: user?.country || ''
   });
   
+  // State for about section
+  const [aboutData, setAboutData] = useState({
+    bio: '',
+    profession: '',
+    interests: [] as string[],
+    instagram: '',
+    facebook: '',
+    telegram: ''
+  });
+
   // State for password change
   const [passwordData, setPasswordData] = useState<PasswordChangeData>({
     currentPassword: '',
@@ -517,37 +527,137 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           </div>
         </div>
         
+        {/* Статистика пользователя */}
+        <div className="user-stats-section">
+          <div className="profile-stats-grid">
+            <div className="profile-stat-card">
+              <div className="profile-stat-icon">🚀</div>
+              <div className="profile-stat-info">
+                <div className="stat-number">0</div>
+                <div className="stat-label">Запусков инструментов</div>
+              </div>
+            </div>
+            <div className="profile-stat-card">
+              <div className="profile-stat-icon">🛠️</div>
+              <div className="profile-stat-info">
+                <div className="stat-number">0/25</div>
+                <div className="stat-label">Использовано инструментов</div>
+              </div>
+            </div>
+            <div className="profile-stat-card">
+              <div className="profile-stat-icon">🪙</div>
+              <div className="profile-stat-info">
+                <div className="stat-number">0</div>
+                <div className="stat-label">Использовано токенов</div>
+              </div>
+            </div>
+            <div className="profile-stat-card">
+              <div className="profile-stat-icon">📅</div>
+              <div className="profile-stat-info">
+                <div className="stat-number">0</div>
+                <div className="stat-label">Дней на платформе</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="profile-about">
           <div className="about-header">
             <h3>📝 О себе</h3>
           </div>
+
           <div className="about-content">
+            {/* Коротко о себе */}
             <div className="about-section">
-              <h4>Биография</h4>
-              <p className="about-text">
-                Здесь будет информация о пользователе. Пока что это заглушка, 
-                но в будущем пользователь сможет добавить информацию о себе, 
-                своих интересах и профессиональной деятельности.
-              </p>
+              <label>Коротко о себе</label>
+              <textarea
+                value={aboutData.bio}
+                onChange={(e) => setAboutData({...aboutData, bio: e.target.value})}
+                className="profile-textarea"
+                placeholder="Расскажите немного о себе..."
+                rows={3}
+              />
             </div>
+
+            {/* Профессия */}
             <div className="about-section">
-              <h4>Интересы</h4>
-              <div className="interests-tags">
-                <span className="interest-tag">🚀 SEO</span>
-                <span className="interest-tag">📊 Аналитика</span>
-                <span className="interest-tag">💻 Веб-разработка</span>
+              <label>Кем работаете</label>
+              <select
+                value={aboutData.profession}
+                onChange={(e) => setAboutData({...aboutData, profession: e.target.value})}
+                className="profile-select"
+              >
+                <option value="">Выберите профессию</option>
+                <option value="marketer">Маркетолог</option>
+                <option value="seo">SEO-специалист</option>
+                <option value="ppc">PPC-специалист</option>
+                <option value="target">Таргетолог</option>
+                <option value="smm">SMM-специалист</option>
+                <option value="analytics">Аналитик</option>
+                <option value="content">Контент-маркетолог</option>
+                <option value="copywriter">Копирайтер</option>
+                <option value="designer">Дизайнер</option>
+                <option value="developer">Разработчик</option>
+                <option value="manager">Менеджер проектов</option>
+                <option value="other">Другое</option>
+              </select>
+            </div>
+
+            {/* Интересы */}
+            <div className="about-section">
+              <label>Интересы</label>
+              <div className="interests-selector">
+                {['SEO', 'PPC', 'Аналитика', 'Контент', 'Дизайн', 'Email-маркетинг', 'Соцсети', 'E-commerce', 'Мобильный маркетинг', 'Веб-разработка', 'UX/UI', 'Автоматизация'].map((interest) => (
+                  <button
+                    key={interest}
+                    type="button"
+                    className={`interest-tag ${aboutData.interests.includes(interest) ? 'active' : ''}`}
+                    onClick={() => {
+                      const newInterests = aboutData.interests.includes(interest)
+                        ? aboutData.interests.filter(i => i !== interest)
+                        : [...aboutData.interests, interest];
+                      setAboutData({...aboutData, interests: newInterests});
+                    }}
+                  >
+                    {interest}
+                  </button>
+                ))}
               </div>
             </div>
+
+            {/* Социальные сети */}
             <div className="about-section">
-              <h4>Статистика</h4>
-              <div className="user-stats">
-                <div className="stat-item">
-                  <div className="stat-number">0</div>
-                  <div className="stat-label">Инструментов использовано</div>
+              <h4>Социальные сети</h4>
+              <div className="social-links">
+                <div className="social-input">
+                  <img src="/icons/tools_instagram.svg" alt="Instagram" className="social-icon" />
+                  <input
+                    type="url"
+                    value={aboutData.instagram}
+                    onChange={(e) => setAboutData({...aboutData, instagram: e.target.value})}
+                    className="profile-input"
+                    placeholder="Instagram"
+                  />
                 </div>
-                <div className="stat-item">
-                  <div className="stat-number">0</div>
-                  <div className="stat-label">Дней на платформе</div>
+                <div className="social-input">
+                  <img src="/icons/tools_facebook.svg" alt="Facebook" className="social-icon" />
+                  <input
+                    type="url"
+                    value={aboutData.facebook}
+                    onChange={(e) => setAboutData({...aboutData, facebook: e.target.value})}
+                    className="profile-input"
+                    placeholder="Facebook"
+                  />
+                </div>
+                <div className="social-input">
+                  <img src="/icons/tools_telegram.svg" alt="Telegram" className="social-icon" />
+                  <input
+                    type="url"
+                    value={aboutData.telegram}
+                    onChange={(e) => setAboutData({...aboutData, telegram: e.target.value})}
+                    className="profile-input"
+                    placeholder="Telegram"
+                  />
                 </div>
               </div>
             </div>
