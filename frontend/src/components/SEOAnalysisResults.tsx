@@ -445,14 +445,21 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
           </div>
         </div>
 
-        <div className="seopro-metric-card standard-metric">
-          <div className="seopro-metric-icon">📄</div>
+        <div className="seopro-metric-card standard-metric current-state">
+          <div className="seopro-metric-icon">✅</div>
           <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.validPages || 0)}</div>
           <div className="seopro-metric-label">Проиндексир.</div>
           <div className="seopro-metric-detail">страницы</div>
         </div>
 
-        <div className="seopro-metric-card warning-metric">
+        <div className="seopro-metric-card info-metric current-state">
+          <div className="seopro-metric-icon">🚫</div>
+          <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.excludedPages || 0)}</div>
+          <div className="seopro-metric-label">Исключенные</div>
+          <div className="seopro-metric-detail">из индекса</div>
+        </div>
+
+        <div className="seopro-metric-card warning-metric current-state">
           <div className="seopro-metric-icon">⚠️</div>
           <div className="seopro-metric-value">{formatNumber(data.gscData?.indexCoverage?.errorPages || 0)}</div>
           <div className="seopro-metric-label">Страницы с ошибками</div>
@@ -476,9 +483,9 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
         <div className="seopro-metric-card pro-metric">
           <div className="seopro-metric-icon">💎</div>
           <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.featuredSnippets || 0)}</div>
-          <div className="seopro-metric-label">Featured Snippets</div>
+          <div className="seopro-metric-label">Позиция "0"</div>
           <div className="seopro-metric-detail">
-            избранные фрагменты
+            в топе Google
           </div>
         </div>
 

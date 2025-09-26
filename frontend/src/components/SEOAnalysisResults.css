@@ -774,6 +774,19 @@
   color: #6b7280;
 }
 
+/* Информационные метрики - спокойный синий */
+.seopro-metric-card.info-metric {
+  background-color: #1c1d1f;
+}
+
+.seopro-metric-card.info-metric .seopro-metric-value {
+  color: #3b82f6;
+}
+
+.seopro-metric-card.info-metric .seopro-metric-icon {
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2));
+}
+
 /* Предупреждающие метрики - осторожный акцент */
 .seopro-metric-card.warning-metric {
   background-color: #1c1d1f;
@@ -791,6 +804,42 @@
 @keyframes warning-subtle {
   from { filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.2)); }
   to { filter: drop-shadow(0 3px 6px rgba(251, 191, 36, 0.3)); }
+}
+
+/* Индикатор текущего состояния для карточек индексации */
+.seopro-metric-card.current-state::before {
+  content: "СЕЙЧАС";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  z-index: 2;
+  opacity: 0.9;
+}
+
+.seopro-metric-card.current-state {
+  position: relative;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.seopro-metric-card.current-state::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* PRO метрики - премиальный, но сдержанный стиль */
