@@ -69,6 +69,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const [showAttentionAnimation, setShowAttentionAnimation] = useState(false);
   const [messagesFading, setMessagesFading] = useState({ message: false, aboutMessage: false });
   const [savedStatus, setSavedStatus] = useState({ profile: false, about: false });
+  const [socialValidationErrors, setSocialValidationErrors] = useState<{
+    instagram?: string;
+    facebook?: string;
+    telegram?: string;
+  }>({});
   
   // Initialize profile data when user changes
   useEffect(() => {
@@ -206,6 +211,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   // Handle about section save
   const handleAboutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Проверяем валидацию социальных сетей
+    const hasValidationErrors = Object.values(socialValidationErrors).some(error => error !== null && error !== undefined);
+    if (hasValidationErrors) {
+      setAboutMessage({ 
+        type: 'error', 
+        text: 'Исправьте ошибки в ссылках на социальные сети' 
+      });
+      return;
+    }
+    
     setLoading(true);
     setAboutMessage(null);
     
@@ -244,6 +260,59 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       setAboutMessage(null);
       setMessagesFading(prev => ({ ...prev, aboutMessage: false }));
     }, 300); // Время анимации fade-out
+  };
+
+  // Валидация социальных сетей
+  const validateSocialUrl = (url: string, platform: 'instagram' | 'facebook' | 'telegram'): string | null => {
+    if (!url.trim()) return null; // Пустые поля разрешены
+    
+    const patterns = {
+      instagram: [
+        // Instagram domains
+        /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/[\w\.-]+\/?$/i,
+        // Short format
+        /^https?:\/\/(www\.)?ig\.me\/[\w\.-]+\/?$/i
+      ],
+      facebook: [
+        // Facebook domains
+        /^https?:\/\/(www\.)?(facebook\.com|fb\.com|m\.facebook\.com)\/[\w\.-]+\/?$/i,
+        // Facebook pages
+        /^https?:\/\/(www\.)?facebook\.com\/(pages\/)?[\w\.-]+\/[\d]+\/?$/i,
+        // Short format
+        /^https?:\/\/(www\.)?fb\.me\/[\w\.-]+\/?$/i
+      ],
+      telegram: [
+        // Telegram domains
+        /^https?:\/\/(www\.)?(telegram\.org|telegram\.me|t\.me)\/[\w\.-]+\/?$/i,
+        // Username format
+        /^@[\w\.-]+$/i
+      ]
+    };
+
+    const isValid = patterns[platform].some(pattern => pattern.test(url));
+    
+    if (!isValid) {
+      const platformMessages = {
+        instagram: 'Ссылка должна содержать instagram.com, instagr.am, ig.me',
+        facebook: 'Ссылка должна содержать facebook.com, fb.com, fb.me',
+        telegram: 'Ссылка должна содержать t.me, telegram.me или @username'
+      };
+      return platformMessages[platform];
+    }
+    
+    return null;
+  };
+
+  const handleSocialChange = (platform: 'instagram' | 'facebook' | 'telegram', value: string) => {
+    // Обновляем значение
+    setAboutData(prev => ({ ...prev, [platform]: value }));
+    
+    // Валидируем
+    const error = validateSocialUrl(value, platform);
+    setSocialValidationErrors(prev => ({ 
+      ...prev, 
+      [platform]: error 
+    }));
   };
 
   const handleDisabledElementClick = () => {
@@ -774,36 +843,51 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
               <div className="profile-social-links">
                 <div className="profile-social-input">
                   <img src="/icons/tools_instagram.svg" alt="Instagram" className="social-icon" />
-                  <input
-                    type="url"
-                    value={aboutData.instagram}
-                    onChange={isEditingAbout ? (e) => setAboutData({...aboutData, instagram: e.target.value}) : undefined}
-                    className="profile-input"
-                    placeholder="Instagram"
-                    disabled={!isEditingAbout}
-                  />
+                  <div className="social-input-wrapper">
+                    <input
+                      type="url"
+                      value={aboutData.instagram}
+                      onChange={isEditingAbout ? (e) => handleSocialChange('instagram', e.target.value) : undefined}
+                      className={`profile-input ${socialValidationErrors.instagram ? 'error' : ''}`}
+                      placeholder="https://instagram.com/username"
+                      disabled={!isEditingAbout}
+                    />
+                    {socialValidationErrors.instagram && (
+                      <div className="social-validation-error">{socialValidationErrors.instagram}</div>
+                    )}
+                  </div>
                 </div>
                 <div className="profile-social-input">
                   <img src="/icons/tools_facebook.svg" alt="Facebook" className="social-icon" />
-                  <input
-                    type="url"
-                    value={aboutData.facebook}
-                    onChange={isEditingAbout ? (e) => setAboutData({...aboutData, facebook: e.target.value}) : undefined}
-                    className="profile-input"
-                    placeholder="Facebook"
-                    disabled={!isEditingAbout}
-                  />
+                  <div className="social-input-wrapper">
+                    <input
+                      type="url"
+                      value={aboutData.facebook}
+                      onChange={isEditingAbout ? (e) => handleSocialChange('facebook', e.target.value) : undefined}
+                      className={`profile-input ${socialValidationErrors.facebook ? 'error' : ''}`}
+                      placeholder="https://facebook.com/username"
+                      disabled={!isEditingAbout}
+                    />
+                    {socialValidationErrors.facebook && (
+                      <div className="social-validation-error">{socialValidationErrors.facebook}</div>
+                    )}
+                  </div>
                 </div>
                 <div className="profile-social-input">
                   <img src="/icons/tools_telegram.svg" alt="Telegram" className="social-icon" />
-                  <input
-                    type="url"
-                    value={aboutData.telegram}
-                    onChange={isEditingAbout ? (e) => setAboutData({...aboutData, telegram: e.target.value}) : undefined}
-                    className="profile-input"
-                    placeholder="Telegram"
-                    disabled={!isEditingAbout}
-                  />
+                  <div className="social-input-wrapper">
+                    <input
+                      type="url"
+                      value={aboutData.telegram}
+                      onChange={isEditingAbout ? (e) => handleSocialChange('telegram', e.target.value) : undefined}
+                      className={`profile-input ${socialValidationErrors.telegram ? 'error' : ''}`}
+                      placeholder="https://t.me/username или @username"
+                      disabled={!isEditingAbout}
+                    />
+                    {socialValidationErrors.telegram && (
+                      <div className="social-validation-error">{socialValidationErrors.telegram}</div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
