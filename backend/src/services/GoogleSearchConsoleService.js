@@ -94,6 +94,11 @@ class GoogleSearchConsoleService {
     return await this.getSearchPerformance(siteUrl, startDate, endDate, ['device']);
   }
 
+  // Получение данных по странам
+  async getCountryPerformance(siteUrl, startDate, endDate) {
+    return await this.getSearchPerformance(siteUrl, startDate, endDate, ['country']);
+  }
+
   // Получение данных индексации
   async getIndexCoverage(siteUrl) {
     try {
@@ -147,6 +152,7 @@ class GoogleSearchConsoleService {
         queryData,
         pageData,
         deviceData,
+        countryData,
         indexData,
         prevQueryData,
         prevDeviceData
@@ -154,6 +160,7 @@ class GoogleSearchConsoleService {
         this.getQueryPerformance(siteUrl, startDateStr, endDateStr),
         this.getPagePerformance(siteUrl, startDateStr, endDateStr),
         this.getDevicePerformance(siteUrl, startDateStr, endDateStr),
+        this.getCountryPerformance(siteUrl, startDateStr, endDateStr),
         this.getIndexCoverage(siteUrl),
         this.getQueryPerformance(siteUrl, prevStartDateStr, prevEndDateStr),
         this.getDevicePerformance(siteUrl, prevStartDateStr, prevEndDateStr)
@@ -163,11 +170,13 @@ class GoogleSearchConsoleService {
       const safeQueryData = Array.isArray(queryData) ? queryData : [];
       const safePrevQueryData = Array.isArray(prevQueryData) ? prevQueryData : [];
       const safeDeviceData = Array.isArray(deviceData) ? deviceData : [];
+      const safeCountryData = Array.isArray(countryData) ? countryData : [];
 
       console.log('📊 Data received:', {
         queryData: safeQueryData.length,
         prevQueryData: safePrevQueryData.length,
         deviceData: safeDeviceData.length,
+        countryData: safeCountryData.length,
         pageData: Array.isArray(pageData) ? pageData.length : 0
       });
 
@@ -209,10 +218,20 @@ class GoogleSearchConsoleService {
       // Подсчитываем уникальные запросы
       const uniqueQueries = safeQueryData.length;
 
+      // Подсчитываем общее количество запросов (по количеству показов)
+      const totalQueries = safeQueryData.reduce((sum, query) => {
+        return sum + (query.impressions || 0);
+      }, 0);
+
       // Расчеты для продвинутых метрик
       // 🏆 TOP-10 позиции - считаем запросы в первой десятке
       const top10Positions = safeQueryData.filter(query => 
         query.position && query.position <= 10
+      ).length;
+
+      // 🥇 TOP-3 позиции - новая метрика
+      const top3Positions = safeQueryData.filter(query => 
+        query.position && query.position <= 3
       ).length;
 
       // 💎 Featured Snippets - ищем позиции около 1 с высоким CTR (эвристика)
@@ -221,6 +240,26 @@ class GoogleSearchConsoleService {
         query.ctr && query.ctr > 0.15 && // CTR > 15% может указывать на featured snippet
         query.impressions && query.impressions > 100 // достаточно показов
       ).length;
+
+      // 📊 Соотношение трафика Mobile vs Desktop
+      const totalMobileClicks = mobileData.clicks || 0;
+      const totalDesktopClicks = desktopData.clicks || 0;
+      const totalDeviceClicks = totalMobileClicks + totalDesktopClicks;
+      const mobileTrafficRatio = totalDeviceClicks > 0 ? (totalMobileClicks / totalDeviceClicks) * 100 : 0;
+
+      // 🌍 Топ страна по кликам
+      const topCountry = safeCountryData.reduce((top, country) => {
+        const clicks = country.clicks || 0;
+        if (clicks > (top.clicks || 0)) {
+          return {
+            country: country.keys && country.keys[0] ? country.keys[0] : 'Unknown',
+            clicks: clicks,
+            impressions: country.impressions || 0,
+            ctr: Math.round((country.ctr || 0) * 10000) / 100
+          };
+        }
+        return top;
+      }, { country: 'N/A', clicks: 0, impressions: 0, ctr: 0 });
 
       // 🔗 Внешние ссылки - оценка на основе авторитетности (симуляция)
       // В реальности нужен отдельный API (Ahrefs, SEMrush, или Search Console Links API)
@@ -278,12 +317,18 @@ class GoogleSearchConsoleService {
 
             // Количество уникальных запросов
             uniqueQueries,
+            
+            // Общее количество запросов (по показам)
+            totalQueries,
 
             // Продвинутые метрики
             advancedMetrics: {
               top10Positions,
+              top3Positions,
               featuredSnippets,
-              estimatedBacklinks
+              estimatedBacklinks,
+              mobileTrafficRatio: Math.round(mobileTrafficRatio * 10) / 10,
+              topCountry
             },
 
             queries: safeQueryData.slice(0, 20).map(row => ({

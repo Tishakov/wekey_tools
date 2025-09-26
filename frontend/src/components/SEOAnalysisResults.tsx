@@ -77,8 +77,16 @@ interface Changes {
 
 interface AdvancedMetrics {
   top10Positions: number;
+  top3Positions: number;
   featuredSnippets: number;
   estimatedBacklinks: number;
+  mobileTrafficRatio: number;
+  topCountry: {
+    country: string;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+  };
 }
 
 interface AnalysisData {
@@ -97,6 +105,7 @@ interface AnalysisData {
       changes?: Changes;
       deviceMetrics?: DeviceMetrics;
       uniqueQueries?: number;
+      totalQueries?: number;
       advancedMetrics?: AdvancedMetrics;
       queries: Query[];
       pages: Page[];
@@ -436,12 +445,23 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
           </div>
         </div>
 
+        <div className="seopro-metric-card device-metric">
+          <div className="seopro-metric-icon">📊</div>
+          <div className="seopro-metric-value">
+            {searchPerformance.advancedMetrics?.mobileTrafficRatio?.toFixed(1) || '0.0'}%
+          </div>
+          <div className="seopro-metric-label">Mobile трафик</div>
+          <div className="seopro-metric-detail">
+            от общего объема
+          </div>
+        </div>
+
         <div className="seopro-metric-card standard-metric">
           <div className="seopro-metric-icon">🔍</div>
           <div className="seopro-metric-value">{formatNumber(searchPerformance.uniqueQueries || 0)}</div>
           <div className="seopro-metric-label">Уникальных запросов</div>
           <div className="seopro-metric-detail">
-            За 28 дней
+            {formatNumber(searchPerformance.totalImpressions || 0)} показов всего
           </div>
         </div>
 
@@ -481,11 +501,29 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
         </div>
 
         <div className="seopro-metric-card pro-metric">
+          <div className="seopro-metric-icon">🥇</div>
+          <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.top3Positions || 0)}</div>
+          <div className="seopro-metric-label">TOP-3 позиций</div>
+          <div className="seopro-metric-detail">
+            премиум места
+          </div>
+        </div>
+
+        <div className="seopro-metric-card pro-metric">
           <div className="seopro-metric-icon">💎</div>
           <div className="seopro-metric-value">{formatNumber(searchPerformance.advancedMetrics?.featuredSnippets || 0)}</div>
           <div className="seopro-metric-label">Позиция "0"</div>
           <div className="seopro-metric-detail">
             в топе Google
+          </div>
+        </div>
+
+        <div className="seopro-metric-card pro-metric">
+          <div className="seopro-metric-icon">🌍</div>
+          <div className="seopro-metric-value">{searchPerformance.advancedMetrics?.topCountry?.country || 'N/A'}</div>
+          <div className="seopro-metric-label">Топ страна</div>
+          <div className="seopro-metric-detail">
+            {formatNumber(searchPerformance.advancedMetrics?.topCountry?.clicks || 0)} кликов
           </div>
         </div>
 
