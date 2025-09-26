@@ -247,29 +247,45 @@ const SEOAuditProTool: React.FC = () => {
 
   // Обработчик изменения периода
   const handlePeriodChange = async (newPeriod: 7 | 14 | 28 | 90) => {
+    console.log(`🔄 SEOAuditProTool: Изменение периода с ${selectedPeriod} на ${newPeriod} дней`);
+    console.log(`🗂️ Текущий результат:`, result?.data ? 'есть данные' : 'нет данных');
+    
     setSelectedPeriod(newPeriod);
     
     // Если есть активные результаты и выбран сайт, перезапускаем анализ с новым периодом
     if (result?.data && selectedSite) {
-      console.log(`Период изменен на ${newPeriod} дней, перезапускаем анализ...`);
-      await handleAnalyzeSite();
+      console.log(`📊 Перезапуск анализа для периода ${newPeriod} дней (было ${selectedPeriod})...`);
+      
+      // Очищаем предыдущие результаты и показываем loading
+      setResult({
+        loading: true
+      });
+      
+      // Небольшая задержка для визуального feedback
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Запускаем анализ без инкремента счетчика (это не новый запуск, а смена периода)
+      await handleAnalyzeSiteInternal(false, newPeriod);
     }
   };
 
-  // Запуск анализа выбранного сайта
-  const handleAnalyzeSite = async () => {
+  // Внутренняя функция анализа с опциональным инкрементом счетчика
+  const handleAnalyzeSiteInternal = async (shouldIncrementCounter = true, customPeriod?: number) => {
     if (!selectedSite) return;
 
-    // Инкрементируем счетчик использования только при запуске анализа
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-      console.log(`SEO Audit Pro: Launch count updated from ${launchCount} to ${newCount}`);
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Error updating launch count:', error);
-      // Продолжаем анализ даже если не удалось обновить счетчик
+    // Инкрементируем счетчик использования только при первом запуске анализа
+    if (shouldIncrementCounter) {
+      try {
+        const newCount = await statsService.incrementAndGetCount(TOOL_ID);
+        console.log(`SEO Audit Pro: Launch count updated from ${launchCount} to ${newCount}`);
+        setLaunchCount(newCount);
+      } catch (error) {
+        console.error('Error updating launch count:', error);
+        // Продолжаем анализ даже если не удалось обновить счетчик
+      }
     }
 
+    // Очищаем предыдущие результаты
     setResult({
       loading: true
     });
@@ -279,18 +295,34 @@ const SEOAuditProTool: React.FC = () => {
       const savedTokens = localStorage.getItem('gsc-tokens');
       const tokens = savedTokens ? JSON.parse(savedTokens) : null;
       
+      // Добавляем случайный параметр для предотвращения кэширования
+      const cacheBuster = Date.now();
+      const actualPeriod = customPeriod || selectedPeriod;
+      
+      console.log(`🔍 Запрос анализа для ${selectedSite}, период: ${actualPeriod} дней, cacheBuster: ${cacheBuster}`);
+      
+      const requestBody = {
+        website: selectedSite,
+        tokens: tokens,
+        useMockData: false,
+        period: actualPeriod,
+        cacheBuster
+      };
+      
+      console.log(`📤 Отправляем запрос с телом:`, {
+        website: selectedSite,
+        period: actualPeriod,
+        tokensPresent: !!tokens,
+        cacheBuster
+      });
+      
       // API запрос к endpoint для анализа реальных GSC данных
-      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze`, {
+      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze?_t=${cacheBuster}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          website: selectedSite, // Передаем полный URL
-          tokens: tokens, // Передаем токены для GSC API
-          useMockData: false, // Используем реальные данные GSC
-          period: selectedPeriod // Передаем выбранный период
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -298,21 +330,34 @@ const SEOAuditProTool: React.FC = () => {
       }
 
       const data = await response.json();
-      
-      if (data.success) {
+      console.log('📊 Получены данные анализа:', data);
+
+      if (data.success && data.analysis) {
+        console.log(`✅ SEOAuditProTool: Данные получены для периода ${selectedPeriod}:`, {
+          totalClicks: data.analysis.gscData?.searchPerformance?.totalClicks,
+          totalImpressions: data.analysis.gscData?.searchPerformance?.totalImpressions,
+          averageCTR: data.analysis.gscData?.searchPerformance?.averageCTR
+        });
+        
         setResult({
           loading: false,
           data: data.analysis
         });
       } else {
-        throw new Error(data.error || 'Ошибка анализа');
+        throw new Error(data.error || 'Неизвестная ошибка анализа');
       }
     } catch (error) {
+      console.error('❌ Ошибка анализа сайта:', error);
       setResult({
         loading: false,
-        error: error instanceof Error ? error.message : 'Неизвестная ошибка'
+        error: error instanceof Error ? error.message : 'Неизвестная ошибка анализа'
       });
     }
+  };
+
+  // Публичная функция запуска анализа (с инкрементом счетчика)
+  const handleAnalyzeSite = async () => {
+    await handleAnalyzeSiteInternal(true);
   };
 
   return (

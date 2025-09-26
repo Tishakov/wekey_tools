@@ -136,9 +136,10 @@ class GoogleSearchConsoleService {
       const prevStartDateStr = formatDate(prevStartDate);
       const prevEndDateStr = formatDate(prevEndDate);
 
-      console.log(`📅 Date ranges (${periodDays} days):`, {
+      console.log(`📅 [${new Date().toISOString()}] Date ranges for ${siteUrl} (${periodDays} days):`, {
         current: `${startDateStr} to ${endDateStr}`,
-        previous: `${prevStartDateStr} to ${prevEndDateStr}`
+        previous: `${prevStartDateStr} to ${prevEndDateStr}`,
+        periodDays: periodDays
       });
 
       // Параллельно получаем все данные (текущий и предыдущий периоды)
@@ -236,6 +237,7 @@ class GoogleSearchConsoleService {
       // Формируем результат анализа
       const analysis = {
         url: siteUrl,
+        periodDays: periodDays, // Добавляем период в днях для фронтенда
         period: {
           startDate: startDateStr,
           endDate: endDateStr
@@ -332,6 +334,15 @@ class GoogleSearchConsoleService {
       };
 
       analysis.healthStatus = this.getHealthStatus(analysis.overallScore);
+
+      // Логирование результатов для отладки
+      console.log(`📊 [${new Date().toISOString()}] Analysis results for ${siteUrl}:`, {
+        period: periodDays,
+        totalClicks: analysis.gscData.searchPerformance.totalClicks,
+        totalImpressions: analysis.gscData.searchPerformance.totalImpressions,
+        averageCTR: analysis.gscData.searchPerformance.averageCTR,
+        changes: analysis.gscData.searchPerformance.changes
+      });
 
       return analysis;
 

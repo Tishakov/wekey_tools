@@ -98,8 +98,17 @@ router.post('/seo-audit-pro/analyze', async (req, res) => {
     }
 
     try {
-      console.log(`🔍 Analyzing GSC data for: ${website} (period: ${period} days)`);
+      const requestTime = new Date().toISOString();
+      console.log(`🔍 [${requestTime}] Analyzing GSC data for: ${website} (period: ${period} days)`);
+      console.log(`📊 Request body:`, { website, period, tokensPresent: !!tokens });
+      
       const analysis = await gscService.analyzeSite(website, tokens, period);
+      
+      console.log(`✅ [${requestTime}] Analysis completed for ${website}:`, {
+        period: period,
+        totalClicks: analysis?.gscData?.searchPerformance?.totalClicks || 'N/A',
+        totalImpressions: analysis?.gscData?.searchPerformance?.totalImpressions || 'N/A'
+      });
       
       return res.json({
         success: true,

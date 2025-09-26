@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -87,6 +87,7 @@ interface AnalysisData {
     startDate: string;
     endDate: string;
   };
+  periodDays?: number; // Добавляем поле для периода в днях
   gscData: {
     searchPerformance?: {
       totalClicks: number;
@@ -128,6 +129,40 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
   const { gscData, overallScore, healthStatus, recommendations } = data;
   const { searchPerformance, indexCoverage } = gscData;
 
+  // Функция для форматирования больших чисел (объявляем рано для использования в useEffect)
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  };
+
+  // Проверка соответствия данных и выбранного периода
+  const isDataMatching = !data.periodDays || data.periodDays === selectedPeriod;
+  
+  // Логирование изменений данных для отладки
+  useEffect(() => {
+    console.log('🔄 SEOAnalysisResults: Пропсы изменились', {
+      selectedPeriod,
+      dataPeriod: data.periodDays,
+      isMatching: isDataMatching,
+      totalClicks: searchPerformance?.totalClicks,
+      totalImpressions: searchPerformance?.totalImpressions,
+      averageCTR: searchPerformance?.averageCTR,
+      dataTimestamp: data.url
+    });
+    
+    if (!isDataMatching) {
+      console.warn(`⚠️ НЕСООТВЕТСТВИЕ: Показываем данные для ${data.periodDays} дней, а период выбран ${selectedPeriod} дней!`);
+    }
+    
+    console.log(`🎨 Рендер метрик для периода ${selectedPeriod}:`, {
+      totalClicks: searchPerformance?.totalClicks,
+      totalImpressions: searchPerformance?.totalImpressions,
+      averageCTR: searchPerformance?.averageCTR,
+      formatNumberClicks: searchPerformance?.totalClicks ? formatNumber(searchPerformance.totalClicks) : 'N/A'
+    });
+  }, [data, selectedPeriod, searchPerformance?.totalClicks, searchPerformance?.totalImpressions, isDataMatching]);
+
   // Проверяем наличие данных производительности
   if (!searchPerformance) {
     return (
@@ -135,6 +170,19 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
         <div className="error-state">
           <h3>❌ Данные недоступны</h3>
           <p>Не удалось получить данные производительности поиска</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Показываем индикатор загрузки, если данные не соответствуют выбранному периоду
+  if (!isDataMatching) {
+    return (
+      <div className="seo-analysis-results">
+        <div className="seopro-loading-state">
+          <div className="seopro-loading-spinner large"></div>
+          <h3>🔄 Загружаем данные для периода {selectedPeriod} дней</h3>
+          <p>Обновляем аналитику для выбранного периода...</p>
         </div>
       </div>
     );
@@ -267,19 +315,18 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
     return '#EF4444'; // Красный
   };
 
-  // Функция для форматирования больших чисел
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
-  };
-
   // Функция для изменения периода
   const handlePeriodChange = (period: 7 | 14 | 28 | 90) => {
+    console.log(`📅 SEOAnalysisResults: Изменение периода с ${selectedPeriod} на ${period}`);
+    console.log(`📊 Текущие данные до изменения:`, {
+      totalClicks: searchPerformance?.totalClicks,
+      totalImpressions: searchPerformance?.totalImpressions,
+      averageCTR: searchPerformance?.averageCTR
+    });
+    
     if (onPeriodChange) {
       onPeriodChange(period);
     }
-    console.log(`Период изменен на ${period} дней`);
   };
 
   // Получить текст периода для отображения
@@ -292,6 +339,14 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
       default: return 'Месяц';
     }
   };
+
+  // Логирование данных для отладки
+  console.log(`🔍 SEOAnalysisResults render:`, {
+    selectedPeriod,
+    totalClicks: searchPerformance.totalClicks,
+    totalImpressions: searchPerformance.totalImpressions,
+    dataTimestamp: new Date().toISOString()
+  });
 
   return (
     <div className="seo-analysis-results">
