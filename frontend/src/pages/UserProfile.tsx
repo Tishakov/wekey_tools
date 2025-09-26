@@ -64,6 +64,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   // Loading and error states
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isEditingAbout, setIsEditingAbout] = useState(false);
   
   // Initialize profile data when user changes
   useEffect(() => {
@@ -186,6 +187,27 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       setLoading(false);
     }
   };
+
+  // Handle about section save
+  const handleAboutSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+    
+    try {
+      // Здесь можно добавить API вызов для сохранения данных "О себе"
+      // await updateAboutData(aboutData);
+      setMessage({ type: 'success', text: 'Информация "О себе" успешно обновлена' });
+      setIsEditingAbout(false);
+    } catch (error) {
+      setMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Ошибка при обновлении информации' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   
   if (!user) {
     return (
@@ -227,7 +249,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             <div className="profile-stat-icon">📅</div>
             <div className="profile-stat-info">
               <div className="stat-number">0</div>
-              <div className="stat-label">Дней на платформе</div>
+              <div className="stat-label">Количество дней на платформе</div>
             </div>
           </div>
         </div>
@@ -298,14 +320,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                 <h2>{t('profile.personalInfo.title')}</h2>
                 {!isEditing ? (
                   <button 
-                    className="edit-button"
+                    className="profile-edit-button"
                     onClick={() => setIsEditing(true)}
                   >
                     {t('profile.edit')}
                   </button>
                 ) : (
                   <button 
-                    className="cancel-button"
+                    className="profile-cancel-button"
                     onClick={() => {
                       setIsEditing(false);
                       setProfileData({
@@ -416,7 +438,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                   <div className="form-actions">
                     <button 
                       type="submit" 
-                      className="save-button"
+                      className="profile-save-button"
                       disabled={loading}
                     >
                       {loading ? t('common.loading') : t('profile.save')}
@@ -471,7 +493,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                 <div className="form-actions">
                   <button 
                     type="submit" 
-                    className="save-button"
+                    className="profile-save-button"
                     disabled={loading}
                   >
                     {loading ? t('common.loading') : t('profile.changePassword')}
@@ -525,7 +547,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                 <div className="form-actions">
                   <button 
                     type="submit" 
-                    className="save-button"
+                    className="profile-save-button"
                     disabled={loading}
                   >
                     {loading ? t('common.loading') : t('profile.saveSettings')}
@@ -565,6 +587,31 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         <div className="profile-about">
           <div className="about-header">
             <h3>📝 О себе</h3>
+            {!isEditingAbout ? (
+              <button 
+                className="profile-edit-button"
+                onClick={() => setIsEditingAbout(true)}
+              >
+                Редактировать
+              </button>
+            ) : (
+              <div className="profile-edit-buttons">
+                <button 
+                  className="profile-save-button"
+                  onClick={handleAboutSubmit}
+                  disabled={loading}
+                >
+                  {loading ? 'Сохранение...' : 'Сохранить'}
+                </button>
+                <button 
+                  className="profile-cancel-button"
+                  onClick={() => setIsEditingAbout(false)}
+                  disabled={loading}
+                >
+                  Отмена
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="about-content">
@@ -572,11 +619,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             <div className="about-section">
               <label>Коротко о себе</label>
               <textarea
-                value={aboutData.bio}
-                onChange={(e) => setAboutData({...aboutData, bio: e.target.value})}
+                value={aboutData.bio || ''}
+                onChange={isEditingAbout ? (e) => setAboutData({...aboutData, bio: e.target.value}) : undefined}
                 className="profile-textarea"
-                placeholder="Расскажите немного о себе..."
+                placeholder={isEditingAbout ? "Расскажите немного о себе..." : "Информация не указана"}
                 rows={3}
+                readOnly={!isEditingAbout}
               />
             </div>
 
@@ -584,9 +632,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             <div className="about-section">
               <label>Кем работаете</label>
               <select
-                value={aboutData.profession}
-                onChange={(e) => setAboutData({...aboutData, profession: e.target.value})}
+                value={aboutData.profession || ''}
+                onChange={isEditingAbout ? (e) => setAboutData({...aboutData, profession: e.target.value}) : undefined}
                 className="profile-select"
+                disabled={!isEditingAbout}
               >
                 <option value="">Выберите профессию</option>
                 <option value="marketer">Маркетолог</option>
@@ -612,13 +661,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                   <button
                     key={interest}
                     type="button"
-                    className={`interest-tag ${aboutData.interests.includes(interest) ? 'active' : ''}`}
-                    onClick={() => {
+                    className={`interest-tag ${aboutData.interests.includes(interest) ? 'active' : ''} ${!isEditingAbout ? 'readonly' : ''}`}
+                    onClick={isEditingAbout ? () => {
                       const newInterests = aboutData.interests.includes(interest)
                         ? aboutData.interests.filter(i => i !== interest)
                         : [...aboutData.interests, interest];
                       setAboutData({...aboutData, interests: newInterests});
-                    }}
+                    } : undefined}
                   >
                     {interest}
                   </button>
@@ -629,35 +678,38 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             {/* Социальные сети */}
             <div className="about-section">
               <h4>Социальные сети</h4>
-              <div className="social-links">
-                <div className="social-input">
+              <div className="profile-social-links">
+                <div className="profile-social-input">
                   <img src="/icons/tools_instagram.svg" alt="Instagram" className="social-icon" />
                   <input
                     type="url"
                     value={aboutData.instagram}
-                    onChange={(e) => setAboutData({...aboutData, instagram: e.target.value})}
+                    onChange={isEditingAbout ? (e) => setAboutData({...aboutData, instagram: e.target.value}) : undefined}
                     className="profile-input"
                     placeholder="Instagram"
+                    disabled={!isEditingAbout}
                   />
                 </div>
-                <div className="social-input">
+                <div className="profile-social-input">
                   <img src="/icons/tools_facebook.svg" alt="Facebook" className="social-icon" />
                   <input
                     type="url"
                     value={aboutData.facebook}
-                    onChange={(e) => setAboutData({...aboutData, facebook: e.target.value})}
+                    onChange={isEditingAbout ? (e) => setAboutData({...aboutData, facebook: e.target.value}) : undefined}
                     className="profile-input"
                     placeholder="Facebook"
+                    disabled={!isEditingAbout}
                   />
                 </div>
-                <div className="social-input">
+                <div className="profile-social-input">
                   <img src="/icons/tools_telegram.svg" alt="Telegram" className="social-icon" />
                   <input
                     type="url"
                     value={aboutData.telegram}
-                    onChange={(e) => setAboutData({...aboutData, telegram: e.target.value})}
+                    onChange={isEditingAbout ? (e) => setAboutData({...aboutData, telegram: e.target.value}) : undefined}
                     className="profile-input"
                     placeholder="Telegram"
+                    disabled={!isEditingAbout}
                   />
                 </div>
               </div>
