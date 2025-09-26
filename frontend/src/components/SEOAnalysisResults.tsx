@@ -500,7 +500,7 @@ const SEOAnalysisResults: React.FC<SEOAnalysisResultsProps> = ({
         </div>
 
         <div className="seopro-metric-card device-metric">
-          <div className="seopro-metric-icon">📊</div>
+          <div className="seopro-metric-icon">🚀</div>
           <div className="seopro-metric-value">
             {searchPerformance.advancedMetrics?.mobileTrafficRatio?.toFixed(1) || '0.0'}%
           </div>
