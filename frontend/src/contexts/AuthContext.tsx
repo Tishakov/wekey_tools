@@ -17,6 +17,11 @@ export interface User {
   loginCount?: number;
   apiRequestsCount?: number;
   dailyApiLimit?: number;
+  // Дополнительные поля профиля
+  gender?: string;
+  birthDate?: string;
+  phone?: string;
+  country?: string;
 }
 
 // Интерфейс контекста

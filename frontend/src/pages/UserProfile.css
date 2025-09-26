@@ -5,42 +5,69 @@
   margin: 0 auto;
   font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #FFFFFF;
-}
-
-/* Двухколоночная структура */
-.profile-top-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.profile-bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
   gap: 20px;
 }
 
 .profile-header {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 20px;
-  margin-bottom: 20px;
   padding: 30px;
   background: #28282A;
   border: 1px solid #333335;
   border-radius: 16px;
 }
 
+.profile-header-main {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .profile-avatar {
-  width: 80px;
-  height: 80px;
+  width: 105px;
+  height: 105px;
+  border: 5px solid #1c1d1f;
   border-radius: 50%;
   background: linear-gradient(135deg, #5E35F2 0%, #F22987 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-avatar.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(94, 53, 242, 0.3);
+}
+
+.avatar-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+}
+
+.profile-avatar.clickable:hover .avatar-edit-overlay {
+  opacity: 1;
 }
 
 .profile-initials {
@@ -55,23 +82,23 @@
 }
 
 .profile-name {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #FFFFFF;
+  margin: 0 0 0px 0;
+  color: #BCBBBD;
 }
 
 .profile-email {
   font-size: 16px;
   color: #999;
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
 }
 
 .profile-role {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -186,6 +213,25 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Секция аватара внутри profile-header */
+.profile-header .profile-avatar-section {
+  margin-bottom: 0;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .profile-avatar-section h4 {
@@ -199,7 +245,7 @@
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   cursor: pointer;
@@ -277,8 +323,12 @@
   color: #FFFFFF;
 }
 
+.form-group input {
+  height: 40px;
+}
+
 .profile-input, .profile-select {
-  height: 50px;
+  height: 40px;
   padding: 14px 16px;
   background: #1A1A1C;
   border: 1px solid #333335;
@@ -489,8 +539,7 @@
     padding: 20px 15px;
   }
   
-  .profile-top-row,
-  .profile-bottom-row {
+  .profile-container {
     grid-template-columns: 1fr;
     gap: 15px;
   }

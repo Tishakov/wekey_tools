@@ -26,10 +26,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   
   // State for profile editing
   const [isEditing, setIsEditing] = useState(false);
+  const [showAvatarSection, setShowAvatarSection] = useState(false);
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    email: user?.email || ''
+    email: user?.email || '',
+    gender: user?.gender || '',
+    birthDate: user?.birthDate || '',
+    phone: user?.phone || '',
+    country: user?.country || ''
   });
   
   // State for password change
@@ -56,7 +61,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       setProfileData({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        email: user.email || ''
+        email: user.email || '',
+        gender: (user as any)?.gender || '',
+        birthDate: (user as any)?.birthDate || '',
+        phone: (user as any)?.phone || '',
+        country: (user as any)?.country || ''
       });
     }
   }, [user]);
@@ -180,35 +189,53 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   
   return (
     <div className="profile-container">
-      <div className="profile-top-row">
-        <div className="profile-header">
-          <div className="profile-avatar">
-            {user.avatar ? (
-              <img 
-                src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:8880${user.avatar}`} 
-                alt="User avatar" 
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            ) : (
-              <span className="profile-initials">
-                {(user.firstName?.[0] || '') + (user.lastName?.[0] || '')}
+      <div className="profile-header">
+          <div className="profile-header-main">
+            <div 
+              className="profile-avatar clickable"
+              onClick={() => setShowAvatarSection(!showAvatarSection)}
+            >
+              {user.avatar ? (
+                <img 
+                  src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:8880${user.avatar}`} 
+                  alt="User avatar" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '50%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <span className="profile-initials">
+                  {(user.firstName?.[0] || '') + (user.lastName?.[0] || '')}
+                </span>
+              )}
+              <div className="avatar-edit-overlay">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.8478 6.50435H15.9696L14.9326 4.93913C14.5413 4.35217 13.8565 4 13.1522 4H8.84783C8.14348 4 7.4587 4.35217 7.06739 4.93913L6.03043 6.50435H4.15217C2.9587 6.50435 2 7.46304 2 8.65652V16.2478C2 17.4413 2.9587 18.4 4.15217 18.4H17.8478C19.0413 18.4 20 17.4413 20 16.2478V8.65652C20 7.46304 19.0413 6.50435 17.8478 6.50435ZM11 16.6391C8.31957 16.6391 6.14783 14.4674 6.14783 11.787C6.14783 9.10652 8.31957 6.95435 11 6.95435C13.6804 6.95435 15.8522 9.12609 15.8522 11.8065C15.8522 14.4674 13.6804 16.6391 11 16.6391ZM17.5739 9.53696C17.5543 9.53696 17.5348 9.53696 17.4957 9.53696H16.713C16.3609 9.51739 16.087 9.22391 16.1065 8.87174C16.1261 8.53913 16.3804 8.28478 16.713 8.26522H17.4957C17.8478 8.24565 18.1413 8.51956 18.1609 8.87174C18.1804 9.22391 17.9261 9.51739 17.5739 9.53696Z" fill="white"/>
+                  <path d="M10.9998 9.10657C9.51285 9.10657 8.2998 10.3196 8.2998 11.8066C8.2998 13.2935 9.51285 14.487 10.9998 14.487C12.4868 14.487 13.6998 13.274 13.6998 11.787C13.6998 10.3 12.4868 9.10657 10.9998 9.10657Z" fill="white"/>
+                </svg>
+              </div>
+            </div>
+            <div className="profile-info">
+              <h1 className="profile-name">
+                {user.firstName} {user.lastName}
+              </h1>
+              <p className="profile-email">{user.email}</p>
+              <span className={`profile-role ${user.role}`}>
+                {t(`profile.role.${user.role}`)}
               </span>
-            )}
+            </div>
           </div>
-          <div className="profile-info">
-            <h1 className="profile-name">
-              {user.firstName} {user.lastName}
-            </h1>
-            <p className="profile-email">{user.email}</p>
-            <span className={`profile-role ${user.role}`}>
-              {t(`profile.role.${user.role}`)}
-            </span>
-          </div>
+          
+          {/* Секция аватара внутри profile-header */}
+          {showAvatarSection && (
+            <div className="profile-avatar-section">
+              <h4>Фото профиля</h4>
+              <AvatarUpload />
+            </div>
+          )}
         </div>
         
         <div className="profile-achievements">
@@ -233,10 +260,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             {/* Пока что заглушки, потом добавим логику */}
           </div>
         </div>
-      </div>
       
-      <div className="profile-bottom-row">
-        <div className="profile-content">
+      <div className="profile-content">
         <div className="profile-main-content">
           {message && (
             <div className={`profile-message ${message.type}`}>
@@ -263,19 +288,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       setProfileData({
                         firstName: user.firstName || '',
                         lastName: user.lastName || '',
-                        email: user.email || ''
+                        email: user.email || '',
+                        gender: (user as any)?.gender || '',
+                        birthDate: (user as any)?.birthDate || '',
+                        phone: (user as any)?.phone || '',
+                        country: (user as any)?.country || ''
                       });
                     }}
                   >
                     {t('profile.cancel')}
                   </button>
                 )}
-              </div>
-              
-              {/* Секция аватара */}
-              <div className="profile-avatar-section">
-                <h4>Фото профиля</h4>
-                <AvatarUpload />
               </div>
               
               <form onSubmit={handleProfileSubmit} className="profile-form">
@@ -313,6 +336,56 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     disabled={!isEditing}
                     className="profile-input"
                     placeholder={t('profile.emailPlaceholder')}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Пол</label>
+                  <select
+                    value={profileData.gender}
+                    onChange={(e) => setProfileData({...profileData, gender: e.target.value})}
+                    disabled={!isEditing}
+                    className="profile-input"
+                  >
+                    <option value="">Не указан</option>
+                    <option value="male">Мужской</option>
+                    <option value="female">Женский</option>
+                    <option value="other">Другой</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Дата рождения</label>
+                  <input
+                    type="date"
+                    value={profileData.birthDate}
+                    onChange={(e) => setProfileData({...profileData, birthDate: e.target.value})}
+                    disabled={!isEditing}
+                    className="profile-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Телефон</label>
+                  <input
+                    type="tel"
+                    value={profileData.phone}
+                    onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                    disabled={!isEditing}
+                    className="profile-input"
+                    placeholder="+7 (999) 123-45-67"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Страна</label>
+                  <input
+                    type="text"
+                    value={profileData.country}
+                    onChange={(e) => setProfileData({...profileData, country: e.target.value})}
+                    disabled={!isEditing}
+                    className="profile-input"
+                    placeholder="Россия"
                   />
                 </div>
                 
@@ -477,7 +550,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };
