@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import AvatarUpload from '../components/profile/AvatarUpload';
+import CoinTransactions from '../components/profile/CoinTransactions';
 import './UserProfile.css';
 
 // Список популярных стран
@@ -199,7 +200,7 @@ interface PasswordChangeData {
 }
 
 interface UserProfileProps {
-  activeSection: 'personalInfo' | 'password' | 'settings';
+  activeSection: 'personalInfo' | 'password' | 'coins' | 'settings';
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
@@ -1288,8 +1289,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
       )}
 
+      {/* Секция монет и транзакций */}
+      {activeSection === 'coins' && (
+        <div className="profile-section">
+          <CoinTransactions />
+        </div>
+      )}
+
       {/* Пустая правая колонка для password и settings */}
-      {(activeSection === 'password' || activeSection === 'settings') && (
+      {(activeSection === 'password' || activeSection === 'settings' || activeSection === 'coins') && (
         <div className="profile-right-column">
           {/* Пустая правая колонка для будущего контента */}
         </div>

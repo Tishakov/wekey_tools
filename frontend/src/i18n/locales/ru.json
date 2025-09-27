@@ -1634,6 +1634,33 @@
       "user": "Пользователь",
       "premium": "Премиум",
       "admin": "Администратор"
+    },
+    "coins": {
+      "title": "История транзакций",
+      "currentBalance": "Текущий баланс",
+      "loading": "Загрузка...",
+      "error": "Ошибка загрузки данных",
+      "noTransactions": "Транзакции не найдены",
+      "stats": {
+        "totalEarned": "Всего заработано",
+        "totalSpent": "Всего потрачено",
+        "recentActivity": "Недавняя активность"
+      },
+      "filters": {
+        "all": "Все",
+        "earnings": "Поступления",
+        "spending": "Траты",
+        "clearFilters": "Очистить"
+      },
+      "types": {
+        "TOOL_USAGE": "Использование инструмента",
+        "DAILY_BONUS": "Ежедневный бонус",
+        "REGISTRATION_BONUS": "Бонус за регистрацию",
+        "REFERRAL_BONUS": "Реферальный бонус",
+        "ADMIN_ADJUSTMENT": "Корректировка администратора",
+        "PROMO_BONUS": "Промо-бонус",
+        "ACHIEVEMENT_BONUS": "Бонус за достижение"
+      }
     }
   },
   "admin": {

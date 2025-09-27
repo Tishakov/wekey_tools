@@ -17,6 +17,7 @@ const Visitor = require('./Visitor')(sequelize);
 const AnalyticsEvent = require('./AnalyticsEvent')(sequelize);
 const Tool = require('./Tool')(sequelize);
 const CoinOperationReason = require('./CoinOperationReason')(sequelize);
+const CoinTransaction = require('./CoinTransaction')(sequelize);
 
 // Определение ассоциаций
 User.hasMany(ToolUsage, { foreignKey: 'userId', as: 'toolUsages' });
@@ -35,6 +36,10 @@ Payment.belongsTo(Subscription, { foreignKey: 'subscriptionId', as: 'subscriptio
 Visitor.hasMany(AnalyticsEvent, { foreignKey: 'userId', sourceKey: 'userId', as: 'events' });
 AnalyticsEvent.belongsTo(Visitor, { foreignKey: 'userId', targetKey: 'userId', as: 'visitor' });
 
+// Ассоциации для монет
+User.hasMany(CoinTransaction, { foreignKey: 'userId', as: 'coinTransactions' });
+CoinTransaction.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 module.exports = {
   sequelize,
   User,
@@ -44,5 +49,6 @@ module.exports = {
   Visitor,
   AnalyticsEvent,
   Tool,
-  CoinOperationReason
+  CoinOperationReason,
+  CoinTransaction
 };
