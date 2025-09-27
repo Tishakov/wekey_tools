@@ -536,8 +536,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   
   return (
     <div className="profile-page-content">
-      {/* Статистика пользователя */}
-      <div className="user-stats-section">
+      {/* Статистика пользователя - только для personalInfo */}
+      {activeSection === 'personalInfo' && (
+        <div className="user-stats-section">
         <div className="profile-stats-grid">
           <div className="profile-stat-card">
             <div className="profile-stat-icon">🚀</div>
@@ -569,10 +570,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           </div>
         </div>
       </div>
+      )}
       
       <div className="profile-container">
       <div className="profile-left-column">
-        <div className="profile-header">
+        {/* Карточка профиля - только для personalInfo */}
+        {activeSection === 'personalInfo' && (
+          <div className="profile-header">
           <div className="profile-header-main">
             <div 
               className="profile-avatar clickable"
@@ -620,6 +624,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             </div>
           )}
         </div>
+        )}
         
         <div className="profile-content">
         <div className="profile-main-content">
@@ -828,6 +833,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             </div>
           )}
           
+
           {activeSection === 'password' && (
             <div className="profile-section">
               <h2>{t('profile.password.title')}</h2>
@@ -881,7 +887,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
               </form>
             </div>
           )}
-          
+
           {activeSection === 'settings' && (
             <div className="profile-section">
               <h2>{t('profile.settings.title')}</h2>
@@ -935,11 +941,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
               </form>
             </div>
           )}
+
         </div>
         </div>
       </div>
       
-      <div className="profile-right-column">
+      {/* Правая колонка с наградами - только для personalInfo */}
+      {activeSection === 'personalInfo' && (
+        <div className="profile-right-column">
         <div className="profile-achievements">
           <div className="achievements-header">
             <h2>🏆 Награды</h2>
@@ -963,6 +972,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           </div>
         </div>
         
+        {/* Блок "О себе" - только для personalInfo */}
         <div className="profile-about">
           {aboutMessage && aboutMessage.type === 'error' && (
             <div className={`profile-message ${aboutMessage.type} ${messagesFading.aboutMessage ? 'fade-out' : ''}`}>
@@ -1131,7 +1141,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             )}
           </div>
         </div>
-      </div>
+        </div>
+      )}
+
+      {/* Пустая правая колонка для password и settings */}
+      {(activeSection === 'password' || activeSection === 'settings') && (
+        <div className="profile-right-column">
+          {/* Пустая правая колонка для будущего контента */}
+        </div>
+      )}
     </div>
     </div>
   );
