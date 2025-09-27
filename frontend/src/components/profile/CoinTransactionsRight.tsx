@@ -101,41 +101,45 @@ const CoinTransactionsRight: React.FC = () => {
       {/* transactions-filters */}
       <div className="transactions-filters">
         <div className="filter-row">
-          <select
-            value={filters.type}
-            onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
-            className="filter-select"
-          >
-            <option value="">Все типы операций</option>
-            <option value="registration">Регистрация</option>
-            <option value="admin_add">Начисление админом</option>
-            <option value="admin_subtract">Списание админом</option>
-            <option value="tool_usage">Использование инструментов</option>
-            <option value="bonus">Бонусы</option>
-          </select>
+          <div className="filter-top-row">
+            <select
+              value={filters.type}
+              onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+              className="filter-select"
+            >
+              <option value="">Все типы операций</option>
+              <option value="registration">Регистрация</option>
+              <option value="admin_add">Начисление админом</option>
+              <option value="admin_subtract">Списание админом</option>
+              <option value="tool_usage">Использование инструментов</option>
+              <option value="bonus">Бонусы</option>
+            </select>
+          </div>
 
-          <input
-            type="date"
-            value={filters.dateFrom}
-            onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
-            className="filter-date"
-            placeholder="От даты"
-          />
+          <div className="filter-bottom-row">
+            <input
+              type="date"
+              value={filters.dateFrom}
+              onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+              className="filter-date"
+              placeholder="От даты"
+            />
 
-          <input
-            type="date"
-            value={filters.dateTo}
-            onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
-            className="filter-date"
-            placeholder="До даты"
-          />
+            <input
+              type="date"
+              value={filters.dateTo}
+              onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+              className="filter-date"
+              placeholder="До даты"
+            />
 
-          <button
-            onClick={() => setFilters({ type: '', dateFrom: '', dateTo: '' })}
-            className="filter-clear"
-          >
-            Сбросить
-          </button>
+            <button
+              onClick={() => setFilters({ type: '', dateFrom: '', dateTo: '' })}
+              className="filter-clear"
+            >
+              Сбросить
+            </button>
+          </div>
         </div>
       </div>
 

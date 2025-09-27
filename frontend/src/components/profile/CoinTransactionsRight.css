@@ -16,14 +16,23 @@
 }
 
 .filter-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-top-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.filter-bottom-row {
+  display: flex;
   gap: 0.75rem;
   align-items: center;
 }
 
-.filter-select,
-.filter-date {
+.filter-select {
   padding: 0.5rem 0.75rem;
   border: 1px solid #333335;
   border-radius: 8px;
@@ -31,6 +40,16 @@
   background: #1a1a1c;
   color: #FFFFFF;
   width: 100%;
+}
+
+.filter-date {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: #1a1a1c;
+  color: #FFFFFF;
+  flex: 1;
 }
 
 .filter-select:focus,
@@ -226,9 +245,13 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .filter-row {
-    grid-template-columns: 1fr;
+  .filter-bottom-row {
+    flex-direction: column;
     gap: 0.5rem;
+  }
+  
+  .filter-date {
+    flex: none;
   }
   
   .transaction-item {
