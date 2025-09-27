@@ -254,7 +254,7 @@
   border: 1px solid #333335;
   border-radius: 10px;
   color: #BCBBBD;
-  padding: 12px 24px;
+  padding: 12px 24px 12px 12px;
   height: 50px;
   font-size: 16px;
   font-weight: 500;
@@ -296,9 +296,8 @@
 
 /* Иконка в кнопке */
 .action-btn img {
-  width: 16px;
-  height: 16px;
-  filter: brightness(0) saturate(100%) invert(75%) sepia(5%) saturate(356%) hue-rotate(353deg) brightness(101%) contrast(89%);
+  width: 20px;
+  height: 20px;
 }
 
 /* Иконка слева */

@@ -151,30 +151,44 @@ const SiteAudit: React.FC = () => {
   const [result, setResult] = useState<AuditResult | null>(null);
   const [launchCount, setLaunchCount] = useState(0);
   const [copiedColorIndex, setCopiedColorIndex] = useState<number | null>(null);
+  const [toolCost, setToolCost] = useState(1);
   
   // Protocol selector states
   const [protocol, setProtocol] = useState('https://');
   const [protocolDropdownOpen, setProtocolDropdownOpen] = useState(false);
 
-  // Загружаем счетчик запусков из API
+  // Загружаем счетчик запусков и стоимость инструмента из API
   useEffect(() => {
-    const loadLaunchCount = async () => {
+    const loadData = async () => {
       try {
         const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
-        const response = await fetch(`${API_BASE}/api/stats/launch-count/site-audit`);
-        const data = await response.json();
         
-        if (data.success) {
-          setLaunchCount(data.count);
+        // Загружаем счетчик запусков
+        const countResponse = await fetch(`${API_BASE}/api/stats/launch-count/site-audit`);
+        const countData = await countResponse.json();
+        
+        if (countData.success) {
+          setLaunchCount(countData.count);
         } else {
           setLaunchCount(0);
         }
+
+        // Загружаем стоимость инструмента
+        const toolsResponse = await fetch(`${API_BASE}/api/tools/active`);
+        const toolsData = await toolsResponse.json();
+        
+        if (toolsData.success && toolsData.tools) {
+          const siteAuditTool = toolsData.tools.find((tool: any) => tool.id === 'site-audit');
+          if (siteAuditTool && siteAuditTool.coinCost !== undefined) {
+            setToolCost(siteAuditTool.coinCost);
+          }
+        }
       } catch (error) {
-        console.error('Ошибка загрузки счетчика:', error);
+        console.error('Ошибка загрузки данных:', error);
         setLaunchCount(0);
       }
     };
-    loadLaunchCount();
+    loadData();
   }, []);
 
   // Protocol handling functions
@@ -504,6 +518,10 @@ const SiteAudit: React.FC = () => {
             onClick={handleAudit}
             disabled={result?.loading || !url.trim()}
           >
+            <div className="tool-cost-indicator">
+              <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="tool-cost-icon" />
+              <span className="tool-cost-amount">{toolCost}</span>
+            </div>
             {result?.loading ? 'Анализирую...' : 'Показать результат'}
           </button>
           

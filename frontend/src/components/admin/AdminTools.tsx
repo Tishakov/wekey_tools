@@ -36,6 +36,7 @@ const AdminTools: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [pendingCosts, setPendingCosts] = useState<Record<number, number>>({});
 
   const loadTools = async () => {
     try {
@@ -152,7 +153,29 @@ const AdminTools: React.FC = () => {
     }
   };
 
-  const updateToolCost = async (toolId: number, newCost: number) => {
+  const handleCostChange = (toolId: number, newCost: number) => {
+    // Ограничиваем значение от 0 до 100
+    const clampedCost = Math.max(0, Math.min(100, newCost));
+    setPendingCosts(prev => ({
+      ...prev,
+      [toolId]: clampedCost
+    }));
+  };
+
+  const incrementCost = (toolId: number) => {
+    const currentCost = pendingCosts[toolId] !== undefined ? pendingCosts[toolId] : (tools.find(t => t.id === toolId)?.coinCost || 1);
+    handleCostChange(toolId, currentCost + 1);
+  };
+
+  const decrementCost = (toolId: number) => {
+    const currentCost = pendingCosts[toolId] !== undefined ? pendingCosts[toolId] : (tools.find(t => t.id === toolId)?.coinCost || 1);
+    handleCostChange(toolId, currentCost - 1);
+  };
+
+  const saveCost = async (toolId: number) => {
+    const newCost = pendingCosts[toolId];
+    if (newCost === undefined) return;
+
     try {
       const token = localStorage.getItem('adminToken');
       
@@ -175,17 +198,31 @@ const AdminTools: React.FC = () => {
         throw new Error(`Ошибка обновления стоимости: ${response.status}`);
       }
 
-      // Обновляем локальное состояние
+      // Обновляем локальное состояние и убираем из pending
       setTools(Array.isArray(tools) ? tools.map(tool => 
         tool.id === toolId 
           ? { ...tool, coinCost: newCost }
           : tool
       ) : []);
       
+      setPendingCosts(prev => {
+        const updated = { ...prev };
+        delete updated[toolId];
+        return updated;
+      });
+      
     } catch (err) {
       console.error('Error updating tool cost:', err);
       setError(err instanceof Error ? err.message : 'Ошибка обновления стоимости инструмента');
     }
+  };
+
+  const cancelCost = (toolId: number) => {
+    setPendingCosts(prev => {
+      const updated = { ...prev };
+      delete updated[toolId];
+      return updated;
+    });
   };
 
   useEffect(() => {
@@ -352,9 +389,6 @@ const AdminTools: React.FC = () => {
                     <h3 className={`tools-item-title ${tool.isActive ? 'active' : 'inactive'}`}>
                       {tool.name}
                     </h3>
-                    <p className={`tools-item-description ${tool.isActive ? 'active' : 'inactive'}`}>
-                      {tool.description} • {getCategoryName(tool.category)}
-                    </p>
                     <div className={`tools-item-stats ${tool.isActive ? 'active' : 'inactive'}`}>
                       Запусков: <span className="tools-item-stats-count">{tool.usageCount || 0}</span>
                       {tool.lastUsed && (
@@ -366,25 +400,55 @@ const AdminTools: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <div className="tools-item-cost">
-                      <label className="tools-item-cost-label">Стоимость:</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={tool.coinCost || 1}
-                        onChange={(e) => {
-                          const newCost = parseInt(e.target.value) || 1;
-                          updateToolCost(tool.id, newCost);
-                        }}
-                        className="tools-item-cost-input"
-                      />
-                      <span className="tools-item-cost-unit">коинов</span>
-                    </div>
                   </div>
                 </div>
 
                 <div className="tools-item-controls">
+                  <div className="tools-item-cost-wrapper">
+                    {pendingCosts[tool.id] !== undefined && (
+                      <>
+                        <button
+                          onClick={() => cancelCost(tool.id)}
+                          className="tools-item-cost-cancel"
+                        >
+                          Отмена
+                        </button>
+                        <button
+                          onClick={() => saveCost(tool.id)}
+                          className="tools-item-cost-save"
+                        >
+                          Сохранить
+                        </button>
+                      </>
+                    )}
+                    <div className="tools-item-cost-input-wrapper">
+                      <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="tools-item-cost-icon" />
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={pendingCosts[tool.id] !== undefined ? pendingCosts[tool.id] : tool.coinCost || 1}
+                        onChange={(e) => {
+                          const newCost = parseInt(e.target.value) || 1;
+                          handleCostChange(tool.id, newCost);
+                        }}
+                        className="tools-item-cost-input"
+                      />
+                      <div 
+                        className="tools-item-cost-btn minus"
+                        onClick={() => decrementCost(tool.id)}
+                      >
+                        −
+                      </div>
+                      <div 
+                        className="tools-item-cost-btn plus"
+                        onClick={() => incrementCost(tool.id)}
+                      >
+                        +
+                      </div>
+                    </div>
+                  </div>
+
                   <span className={`tools-item-status ${tool.isActive ? 'active' : 'inactive'}`}>
                     {tool.isActive ? 'Активен' : 'Отключен'}
                   </span>

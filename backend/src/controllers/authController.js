@@ -747,6 +747,19 @@ exports.getUserStats = async (req, res) => {
       raw: true
     });
 
+    // Получаем суммарное количество потраченных коинов
+    const { CoinTransaction } = require('../config/database');
+    const coinStats = await CoinTransaction.findAll({
+      attributes: [
+        [require('sequelize').fn('SUM', require('sequelize').col('amount')), 'totalSpent']
+      ],
+      where: { 
+        userId: decoded.userId,
+        type: 'spend' // Только траты, не начисления
+      },
+      raw: true
+    });
+
     // Вычисляем количество дней на платформе
     const createdAt = new Date(user.createdAt);
     const now = new Date();
@@ -756,7 +769,7 @@ exports.getUserStats = async (req, res) => {
       totalToolUsage: parseInt(toolStats[0]?.totalUsage) || 0,
       uniqueToolsUsed: parseInt(toolStats[0]?.uniqueTools) || 0,
       daysOnPlatform: daysOnPlatform,
-      tokensUsed: 0 // Пока не реализовано
+      tokensUsed: Math.abs(parseInt(coinStats[0]?.totalSpent) || 0) // Используем Math.abs, так как траты записываются с минусом
     };
 
     res.json({

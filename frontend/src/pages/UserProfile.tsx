@@ -702,7 +702,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             <div className="profile-stat-icon">🪙</div>
             <div className="profile-stat-info">
               <div className="stat-number">{userStats.tokensUsed}</div>
-              <div className="stat-label">Использовано токенов</div>
+              <div className="stat-label">Потрачено коинов</div>
             </div>
           </div>
           <div className="profile-stat-card">
