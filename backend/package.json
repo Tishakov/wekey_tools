@@ -8,7 +8,10 @@
     "start": "node src/app.js",
     "start:minimal": "node src/app-minimal.js",
     "dev": "nodemon src/app.js",
-    "test": "jest"
+    "test": "jest",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "seed": "sequelize-cli db:seed:all"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

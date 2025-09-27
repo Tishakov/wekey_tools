@@ -22,6 +22,14 @@ export interface User {
   birthDate?: string;
   phone?: string;
   country?: string;
+  bio?: string;
+  profession?: string;
+  interests?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  telegram?: string;
+  website?: string;
 }
 
 // Интерфейс контекста

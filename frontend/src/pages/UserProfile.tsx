@@ -273,6 +273,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       });
     }
   }, [user]);
+
+  // Синхронизация данных "О себе" с пользователем
+  useEffect(() => {
+    if (user) {
+      setAboutData({
+        bio: user.bio || '',
+        profession: user.profession || '',
+        interests: user.interests ? user.interests.split(', ').filter(i => i.trim() !== '') : [],
+        instagram: user.instagram || '',
+        facebook: user.facebook || '',
+        telegram: user.telegram || ''
+      });
+    }
+  }, [user]);
   
   // Handle profile update
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -410,8 +424,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     setAboutMessage(null);
     
     try {
-      // Здесь можно добавить API вызов для сохранения данных "О себе"
-      // await updateAboutData(aboutData);
+      // Отправляем данные "О себе" на сервер
+      await updateProfile({
+        bio: aboutData.bio,
+        profession: aboutData.profession,
+        interests: aboutData.interests.join(', '), // Преобразуем массив в строку
+        instagram: aboutData.instagram,
+        facebook: aboutData.facebook,
+        telegram: aboutData.telegram
+      });
+      
       setIsEditingAbout(false);
       
       // Показываем статус "Сохранено" на 1 секунду

@@ -253,6 +253,18 @@ exports.getProfile = async (req, res) => {
         language: user.language,
         theme: user.theme,
         avatar: user.avatar,
+        gender: user.gender,
+        birthDate: user.birthDate,
+        phone: user.phone,
+        country: user.country,
+        bio: user.bio,
+        profession: user.profession,
+        interests: user.interests,
+        facebook: user.facebook,
+        instagram: user.instagram,
+        linkedin: user.linkedin,
+        telegram: user.telegram,
+        website: user.website,
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
         loginCount: user.loginCount,
@@ -283,7 +295,26 @@ exports.updateProfile = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    const { firstName, lastName, language, theme, currentPassword, newPassword } = req.body;
+    const { 
+      firstName, 
+      lastName, 
+      language, 
+      theme, 
+      currentPassword, 
+      newPassword,
+      gender,
+      birthDate,
+      phone,
+      country,
+      bio,
+      profession,
+      interests,
+      facebook,
+      instagram,
+      linkedin,
+      telegram,
+      website
+    } = req.body;
     
     const { User } = require('../config/database');
     const user = await User.findByPk(decoded.userId);
@@ -316,15 +347,34 @@ exports.updateProfile = async (req, res) => {
       await user.update({ password: newPassword });
     }
 
-    // Обновление других полей
+    // Обновление всех полей
     const updateData = {};
+    
+    // Основные поля
     if (firstName !== undefined) updateData.firstName = firstName;
     if (lastName !== undefined) updateData.lastName = lastName;
     if (language !== undefined) updateData.language = language;
     if (theme !== undefined) updateData.theme = theme;
+    
+    // Дополнительные поля профиля
+    if (gender !== undefined) updateData.gender = gender;
+    if (birthDate !== undefined) updateData.birthDate = birthDate;
+    if (phone !== undefined) updateData.phone = phone;
+    if (country !== undefined) updateData.country = country;
+    if (bio !== undefined) updateData.bio = bio;
+    if (profession !== undefined) updateData.profession = profession;
+    if (interests !== undefined) updateData.interests = interests;
+    
+    // Социальные сети
+    if (facebook !== undefined) updateData.facebook = facebook;
+    if (instagram !== undefined) updateData.instagram = instagram;
+    if (linkedin !== undefined) updateData.linkedin = linkedin;
+    if (telegram !== undefined) updateData.telegram = telegram;
+    if (website !== undefined) updateData.website = website;
 
     if (Object.keys(updateData).length > 0) {
       await user.update(updateData);
+      console.log('✅ Profile updated for user:', user.email, 'Updated fields:', Object.keys(updateData));
     }
 
     // Возвращаем обновленные данные
@@ -341,7 +391,19 @@ exports.updateProfile = async (req, res) => {
         role: updatedUser.role,
         language: updatedUser.language,
         theme: updatedUser.theme,
-        avatar: updatedUser.avatar, // Добавляем поле avatar
+        avatar: updatedUser.avatar,
+        gender: updatedUser.gender,
+        birthDate: updatedUser.birthDate,
+        phone: updatedUser.phone,
+        country: updatedUser.country,
+        bio: updatedUser.bio,
+        profession: updatedUser.profession,
+        interests: updatedUser.interests,
+        facebook: updatedUser.facebook,
+        instagram: updatedUser.instagram,
+        linkedin: updatedUser.linkedin,
+        telegram: updatedUser.telegram,
+        website: updatedUser.website,
         createdAt: updatedUser.createdAt,
         lastLoginAt: updatedUser.lastLoginAt,
         loginCount: updatedUser.loginCount

@@ -41,6 +41,81 @@ module.exports = (sequelize) => {
         len: [1, 50]
       }
     },
+    // Дополнительная информация профиля
+    gender: {
+      type: DataTypes.ENUM('male', 'female', 'other'),
+      allowNull: true
+    },
+    birthDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 20]
+      }
+    },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 100]
+      }
+    },
+    // Блок "О себе"
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    profession: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 100]
+      }
+    },
+    interests: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    // Социальные сети
+    facebook: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 255]
+      }
+    },
+    instagram: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 255]
+      }
+    },
+    linkedin: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 255]
+      }
+    },
+    telegram: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 255]
+      }
+    },
+    website: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [0, 255]
+      }
+    },
     role: {
       type: DataTypes.ENUM('user', 'admin', 'premium'),
       defaultValue: 'user'
