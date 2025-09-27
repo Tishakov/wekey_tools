@@ -169,6 +169,9 @@ const AdminUsers: React.FC = () => {
     loading: false
   });
 
+  // Состояние для анимации закрытия модального окна
+  const [isClosing, setIsClosing] = useState(false);
+
   // Состояние для интерактивного dropdown причин
   const [showReasonsDropdown, setShowReasonsDropdown] = useState(false);
   const [isAddingNewReason, setIsAddingNewReason] = useState(false);
@@ -177,6 +180,7 @@ const AdminUsers: React.FC = () => {
 
   // Refs для обработки кликов
   const reasonsDropdownRef = useRef<HTMLDivElement>(null);
+  const selectedReasonRef = useRef<HTMLDivElement>(null);
 
 
   
@@ -237,16 +241,40 @@ const AdminUsers: React.FC = () => {
   // Обработка клика вне области dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (reasonsDropdownRef.current && !reasonsDropdownRef.current.contains(event.target as Node)) {
+      if (reasonsDropdownRef.current && !reasonsDropdownRef.current.contains(event.target as Node) &&
+          selectedReasonRef.current && !selectedReasonRef.current.contains(event.target as Node)) {
         setShowReasonsDropdown(false);
       }
     };
 
+    const handleResize = () => {
+      if (showReasonsDropdown) {
+        positionDropdown();
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (showReasonsDropdown) {
+          setShowReasonsDropdown(false);
+        } else if (coinModal.show) {
+          closeCoinModal();
+        }
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleResize);
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleResize);
     };
-  }, []);
+  }, [showReasonsDropdown, coinModal.show]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -456,25 +484,50 @@ const AdminUsers: React.FC = () => {
     filtered: filteredReasons
   });
 
+  // Функция для позиционирования dropdown
+  const positionDropdown = () => {
+    if (selectedReasonRef.current && reasonsDropdownRef.current) {
+      const rect = selectedReasonRef.current.getBoundingClientRect();
+      const dropdown = reasonsDropdownRef.current;
+      
+      dropdown.style.position = 'fixed';
+      dropdown.style.top = `${rect.bottom + 4}px`;
+      dropdown.style.left = `${rect.left}px`;
+      dropdown.style.width = `${rect.width}px`;
+    }
+  };
+
   // Обработчики для dropdown
   const handleReasonSelect = (reason: string) => {
     setCoinModal(prev => ({ ...prev, reason }));
     setShowReasonsDropdown(false);
   };
 
+  const toggleDropdown = () => {
+    setShowReasonsDropdown(!showReasonsDropdown);
+    if (!showReasonsDropdown) {
+      setTimeout(positionDropdown, 0);
+    }
+  };
+
   const closeCoinModal = () => {
-    setCoinModal({
-      show: false,
-      user: null,
-      type: null,
-      amount: '',
-      reason: '',
-      customReason: '',
-      loading: false
-    });
+    setIsClosing(true);
     setShowReasonsDropdown(false);
-    setIsAddingNewReason(false);
-    setNewReasonText('');
+    
+    setTimeout(() => {
+      setCoinModal({
+        show: false,
+        user: null,
+        type: null,
+        amount: '',
+        reason: '',
+        customReason: '',
+        loading: false
+      });
+      setIsClosing(false);
+      setIsAddingNewReason(false);
+      setNewReasonText('');
+    }, 300); // Время должно совпадать с длительностью CSS анимации
   };
 
   // Обработчики для управления причинами
@@ -1062,18 +1115,18 @@ const AdminUsers: React.FC = () => {
       )}
 
       {coinModal.show && coinModal.user && coinModal.type && (
-        <div className="coin-modal-overlay">
-          <div className="coin-modal-content">
+        <div 
+          className={`coin-modal-overlay ${isClosing ? 'closing' : ''}`}
+          onClick={closeCoinModal}
+        >
+          <div 
+            className={`coin-modal-content ${isClosing ? 'closing' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="coin-modal-header">
               <h3>
                 {coinModal.type === 'add' ? 'Начислить коины' : 'Списать коины'}
               </h3>
-              <button 
-                className="close-button"
-                onClick={closeCoinModal}
-              >
-                ×
-              </button>
             </div>
             
             <div className="coin-modal-body">
@@ -1124,7 +1177,8 @@ const AdminUsers: React.FC = () => {
                     <div className="reason-input-container">
                       <div 
                         className="selected-reason"
-                        onClick={() => setShowReasonsDropdown(!showReasonsDropdown)}
+                        ref={selectedReasonRef}
+                        onClick={toggleDropdown}
                       >
                         <span className={coinModal.reason ? 'selected-reason-text' : 'selected-reason-placeholder'}>
                           {coinModal.reason || 'Выберите причину операции...'}

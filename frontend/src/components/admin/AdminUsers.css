@@ -786,6 +786,22 @@
   }
 }
 
+@keyframes slideDown {
+  from { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 /* Стили для колонки баланса коинов */
 .user-coin-balance {
   display: flex;
@@ -869,6 +885,10 @@
   animation: fadeIn 0.3s ease;
 }
 
+.coin-modal-overlay.closing {
+  animation: fadeOut 0.3s ease;
+}
+
 .coin-modal-content {
   background: var(--bg-primary);
   border-radius: 16px;
@@ -876,8 +896,12 @@
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: visible;
   animation: slideUp 0.3s ease;
+}
+
+.coin-modal-content.closing {
+  animation: slideDown 0.3s ease;
 }
 
 .coin-modal-header {
@@ -950,7 +974,7 @@
   color: var(--text-secondary);
 }
 
-.balance-amount {
+.user-info-coin .balance-amount {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -960,6 +984,7 @@
   border: 1px solid rgba(255, 206, 51, 0.2);
   color: #FFCE33;
   font-weight: 600;
+  margin-left: 0px;
 }
 
 .coin-icon-small {
@@ -1159,24 +1184,19 @@
 .selected-reason-placeholder {
   flex: 1;
   text-align: left;
-  color: var(--text-secondary);
-  font-style: italic;
+  color: #BCBBBD;
   margin-right: 8px;
 }
 
 .reasons-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  position: fixed;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  max-height: 300px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  max-height: 180px;
   overflow-y: auto;
-  margin-top: 4px;
   animation: dropdownSlide 0.2s ease;
 }
 
@@ -1215,6 +1235,7 @@
   flex: 1;
   cursor: pointer;
   color: var(--text-primary);
+  font-size: 14px;
 }
 
 .reason-text:hover {
@@ -1341,23 +1362,3 @@
   border-color: var(--primary-color);
 }
 
-.close-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.close-button:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
