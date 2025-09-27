@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './CaseChangerTool.css';
@@ -25,6 +25,7 @@ const CaseChangerTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [launchCount, setLaunchCount] = useState(0);
@@ -34,11 +35,24 @@ const CaseChangerTool: React.FC = () => {
 
   // Загружаем счетчик запусков при монтировании компонента
   useEffect(() => {
-    const loadStats = async () => {
-      const count = await statsService.getLaunchCount(TOOL_ID);
-      setLaunchCount(count);
+    const loadLaunchCount = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLaunchCount(data.count);
+        } else {
+          setLaunchCount(0);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки счетчика:', error);
+        setLaunchCount(0);
+      }
     };
-    loadStats();
+    
+    loadLaunchCount();
   }, []);
 
   const handlePasteText = async () => {
@@ -77,47 +91,57 @@ const CaseChangerTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
         }
 
-
     if (!selectedCase) {
       setOutputText('');
       return;
     }
 
-    let result = inputText;
-    
-    // Увеличиваем счетчик запусков и получаем актуальное значение
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-        inputLength: inputText.length
-      });
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
+    // Выполняем операцию с тратой коинов
+    const coinResult = await executeWithCoins(async () => {
+      // Сразу обновляем счетчик в UI (оптимистично)
       setLaunchCount(prev => prev + 1);
+      
+      let result = inputText;
+      
+      // Применяем выбранное правило изменения регистра
+      switch (selectedCase) {
+        case 'lowercase':
+          result = result.toLowerCase();
+          break;
+        case 'uppercase':
+          result = result.toUpperCase();
+          break;
+        case 'capitalize-each':
+          result = capitalizeEachWord(result);
+          break;
+        case 'capitalize-first':
+          result = capitalizeFirstLetter(result);
+          break;
+        case 'capitalize-after-punctuation':
+          result = capitalizeAfterPunctuation(result);
+          break;
+        default:
+          break;
+      }
+      
+      return result;
+    }, {
+      inputLength: inputText.length,
+      outputLength: 1
+    });
+
+    if (coinResult.success) {
+      setOutputText(coinResult.result as string);
+      
+      // Синхронизируем с реальным значением от сервера  
+      if (coinResult.newLaunchCount) {
+        setLaunchCount(coinResult.newLaunchCount);
+      }
+    } else {
+      // Откатываем счетчик в случае ошибки
+      setLaunchCount(prev => prev - 1);
+      console.error('Ошибка изменения регистра:', coinResult.error);
     }
-    
-    // Применяем выбранное правило изменения регистра
-    switch (selectedCase) {
-      case 'lowercase':
-        result = result.toLowerCase();
-        break;
-      case 'uppercase':
-        result = result.toUpperCase();
-        break;
-      case 'capitalize-each':
-        result = capitalizeEachWord(result);
-        break;
-      case 'capitalize-first':
-        result = capitalizeFirstLetter(result);
-        break;
-      case 'capitalize-after-punctuation':
-        result = capitalizeAfterPunctuation(result);
-        break;
-      default:
-        break;
-    }
-    
-    setOutputText(result);
   };
 
   const capitalizeEachWord = (text: string): string => {

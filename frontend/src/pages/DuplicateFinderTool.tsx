@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
-import { statsService } from '../utils/statsService';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import './DuplicateFinderTool.css';
@@ -25,6 +25,7 @@ const DuplicateFinderTool: React.FC = () => {
         closeAuthModal,
         openAuthModal
     } = useAuthRequired();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
@@ -39,7 +40,11 @@ const DuplicateFinderTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(res => res.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(err => console.error('Ошибка загрузки счетчика:', err));
     }, []);
 
     // Очистка результатов при изменении входных данных
@@ -83,60 +88,66 @@ const DuplicateFinderTool: React.FC = () => {
             return;
         }
 
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                inputLength: inputText1.length + inputText2.length
+        // Выполняем операцию с тратой коинов
+        const result = await executeWithCoins(async () => {
+            // Получаем списки слов, фильтруя пустые строки
+            const list1 = inputText1.trim() 
+                ? inputText1.trim().split('\n').filter(line => line.trim()).map(line => line.trim())
+                : [];
+            
+            const list2 = inputText2.trim() 
+                ? inputText2.trim().split('\n').filter(line => line.trim()).map(line => line.trim())
+                : [];
+
+            // Приводим к нужному регистру если нужно
+            const processedList1 = caseSensitive ? list1 : list1.map(item => item.toLowerCase());
+            const processedList2 = caseSensitive ? list2 : list2.map(item => item.toLowerCase());
+
+            // Создаем Set'ы для быстрого поиска
+            const set1 = new Set(processedList1);
+            const set2 = new Set(processedList2);
+
+            // Находим уникальные для первого списка (не пересекаются со вторым)
+            const uniqueInFirst = list1.filter((item) => {
+                const processedItem = caseSensitive ? item : item.toLowerCase();
+                return !set2.has(processedItem);
             });
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
+
+            // Находим общие (пересекающиеся)
+            const commonItems = list1.filter((item) => {
+                const processedItem = caseSensitive ? item : item.toLowerCase();
+                return set2.has(processedItem);
+            });
+
+            // Находим уникальные для второго списка (не пересекаются с первым)
+            const uniqueInSecond = list2.filter((item) => {
+                const processedItem = caseSensitive ? item : item.toLowerCase();
+                return !set1.has(processedItem);
+            });
+
+            // Удаляем дубликаты в каждом результирующем списке
+            const uniqueFirstResult = [...new Set(uniqueInFirst)];
+            const commonResult = [...new Set(commonItems)];
+            const uniqueSecondResult = [...new Set(uniqueInSecond)];
+
+            setOnlyInFirst(uniqueFirstResult.join('\n'));
+            setCommon(commonResult.join('\n'));
+            setOnlyInSecond(uniqueSecondResult.join('\n'));
+            
+            return {
+                onlyInFirst: uniqueFirstResult.join('\n'),
+                common: commonResult.join('\n'),
+                onlyInSecond: uniqueSecondResult.join('\n'),
+                inputLength: inputText1.length + inputText2.length
+            };
+        }, {
+            inputLength: inputText1.length + inputText2.length
+        });
+
+        // Обновляем счетчик после успешного выполнения
+        if (result) {
             setLaunchCount(prev => prev + 1);
         }
-
-        // Получаем списки слов, фильтруя пустые строки
-        const list1 = inputText1.trim() 
-            ? inputText1.trim().split('\n').filter(line => line.trim()).map(line => line.trim())
-            : [];
-        
-        const list2 = inputText2.trim() 
-            ? inputText2.trim().split('\n').filter(line => line.trim()).map(line => line.trim())
-            : [];
-
-        // Приводим к нужному регистру если нужно
-        const processedList1 = caseSensitive ? list1 : list1.map(item => item.toLowerCase());
-        const processedList2 = caseSensitive ? list2 : list2.map(item => item.toLowerCase());
-
-        // Создаем Set'ы для быстрого поиска
-        const set1 = new Set(processedList1);
-        const set2 = new Set(processedList2);
-
-        // Находим уникальные для первого списка (не пересекаются со вторым)
-        const uniqueInFirst = list1.filter((item) => {
-            const processedItem = caseSensitive ? item : item.toLowerCase();
-            return !set2.has(processedItem);
-        });
-
-        // Находим общие (пересекающиеся)
-        const commonItems = list1.filter((item) => {
-            const processedItem = caseSensitive ? item : item.toLowerCase();
-            return set2.has(processedItem);
-        });
-
-        // Находим уникальные для второго списка (не пересекаются с первым)
-        const uniqueInSecond = list2.filter((item) => {
-            const processedItem = caseSensitive ? item : item.toLowerCase();
-            return !set1.has(processedItem);
-        });
-
-        // Удаляем дубликаты в каждом результирующем списке
-        const uniqueFirstResult = [...new Set(uniqueInFirst)];
-        const commonResult = [...new Set(commonItems)];
-        const uniqueSecondResult = [...new Set(uniqueInSecond)];
-
-        setOnlyInFirst(uniqueFirstResult.join('\n'));
-        setCommon(commonResult.join('\n'));
-        setOnlyInSecond(uniqueSecondResult.join('\n'));
     };
 
     // Функции копирования для каждой колонки

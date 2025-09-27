@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { openaiService, type WordInflectionResponse } from '../services/openaiService';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 
@@ -23,6 +24,7 @@ const WordInflectionTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
   const [copied, setCopied] = useState(false);

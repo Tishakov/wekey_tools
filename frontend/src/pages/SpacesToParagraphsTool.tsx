@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './SpacesToParagraphsTool.css';
@@ -24,6 +24,7 @@ const SpacesToParagraphsTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -38,7 +39,11 @@ const SpacesToParagraphsTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(res => res.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(err => console.error('Ошибка загрузки счетчика:', err));
     }, []);
 
     // Очистка результата при изменении входного текста или настроек
@@ -46,21 +51,7 @@ const SpacesToParagraphsTool: React.FC = () => {
         setResult('');
     }, [inputText, removePunctuation, removeSpecialChars, caseOption]);
 
-    // Отслеживание статистики при показе результата
-    useEffect(() => {
-        if (result) {
-            const updateStats = async () => {
-                try {
-                    const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-                    setLaunchCount(newCount);
-                } catch (error) {
-                    console.warn('Failed to update statistics:', error);
-                    setLaunchCount(prev => prev + 1);
-                }
-            };
-            updateStats();
-        }
-    }, [result]);
+    // Статистика теперь обновляется через executeWithCoins
 
     // Функция для удаления знаков препинания
     const removePunctuationFunc = (text: string): string => {
@@ -120,12 +111,24 @@ const SpacesToParagraphsTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
 
-
-        const processedText = processText(inputText);
-        setResult(processedText);
+        // Выполняем операцию с тратой коинов
+        const result = await executeWithCoins(async () => {
+            const processedText = processText(inputText);
+            setResult(processedText);
+            return {
+                processedText,
+                inputLength: inputText.length
+            };
+        }, {
+            inputLength: inputText.length
+        });
+        
+        // Обновляем счетчик после успешного выполнения
+        if (result) {
+            setLaunchCount(prev => prev + 1);
+        }
     };
 
     // Обработчик копирования

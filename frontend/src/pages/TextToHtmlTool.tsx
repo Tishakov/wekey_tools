@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './TextToHtmlTool.css';
@@ -26,6 +27,7 @@ const TextToHtmlTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [mode, setMode] = useState<HtmlMode>('paragraph');
     const [result, setResult] = useState('');
@@ -42,24 +44,7 @@ const TextToHtmlTool: React.FC = () => {
         setResult('');
     }, [inputText, mode]);
 
-    // Отслеживание статистики при показе результата
-    useEffect(() => {
-        if (result) {
-            const updateStats = async () => {
-                try {
-                    const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                        inputLength: inputText.length,
-                        outputLength: result.length
-                    });
-                    setLaunchCount(newCount);
-                } catch (error) {
-                    console.error('Failed to update stats:', error);
-                    setLaunchCount(prev => prev + 1);
-                }
-            };
-            updateStats();
-        }
-    }, [result]);
+    // Статистика теперь обновляется через executeWithCoins
 
     // Функция для конвертации в теги абзацев <p>
     const convertToParagraphs = (text: string): string => {
@@ -131,11 +116,22 @@ const TextToHtmlTool: React.FC = () => {
     const handleShowResult = async () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
-            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+            return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнением
         }
 
-        const processedText = processText(inputText);
-        setResult(processedText);
+        // Выполняем операцию с тратой коинов
+        const executeResult = await executeWithCoins(async () => {
+            const processedText = processText(inputText);
+            setResult(processedText);
+            return processedText;
+        }, {
+            inputLength: inputText.length
+        });
+        
+        // Обновляем счетчик из результата executeWithCoins
+        if (executeResult.success && executeResult.newLaunchCount !== undefined) {
+            setLaunchCount(executeResult.newLaunchCount);
+        }
     };
 
     // Обработчик копирования

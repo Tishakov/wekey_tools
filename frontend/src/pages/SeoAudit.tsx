@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthRequired } from '../hooks/useAuthRequired';
-import { useAuth } from '../contexts/AuthContext';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
-import { statsService } from '../utils/statsService';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './SeoAudit.css';
@@ -647,7 +646,7 @@ const SeoAudit: React.FC = () => {
   const { t } = useTranslation();
   const { createLink } = useLocalizedLink();
   const { requireAuth, isAuthRequiredModalOpen, isAuthModalOpen, closeAuthRequiredModal, closeAuthModal, openAuthModal } = useAuthRequired();
-  const { user } = useAuth();
+  const { executeWithCoins } = useToolWithCoins('seo-audit');
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<SeoAuditResult | null>(null);
   const [launchCount, setLaunchCount] = useState(0);
@@ -806,14 +805,22 @@ const SeoAudit: React.FC = () => {
     setActiveTooltip(null);
   };
 
-  // Загружаем счетчик запусков
+  // Загружаем счетчик запусков из API
   useEffect(() => {
     const loadLaunchCount = async () => {
       try {
-        const count = await statsService.getLaunchCount('seo-audit');
-        setLaunchCount(count);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/seo-audit`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLaunchCount(data.count);
+        } else {
+          setLaunchCount(0);
+        }
       } catch (error) {
         console.error('Ошибка загрузки счетчика:', error);
+        setLaunchCount(0);
       }
     };
     loadLaunchCount();
@@ -843,55 +850,63 @@ const SeoAudit: React.FC = () => {
         loading: true
       });
 
-      // Увеличиваем счетчик использования и получаем новое значение
-      if (user) {
-        try {
-          const newCount = await statsService.incrementAndGetCount('seo-audit');
-          setLaunchCount(newCount);
-        } catch (error) {
-          console.error('Failed to update stats:', error);
-          setLaunchCount(prev => prev + 1);
-        }
-      }
+      // Выполняем SEO анализ с автоматическим списанием коинов
+      const coinResult = await executeWithCoins(async () => {
+        // Сразу обновляем счетчик в UI (оптимистично)
+        setLaunchCount(prev => prev + 1);
+        
+        // Вызов API для SEO анализа
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/tools/seo-audit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            url: fullUrl,
+            waitForFullData: true  // Ждем полные данные от Google PageSpeed
+          })
+        });
 
-      // Вызов API для SEO анализа
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
-      const response = await fetch(`${API_BASE}/api/tools/seo-audit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          
+          if (response.status === 503 && errorData.error) {
+            // Специальная обработка для недоступности Google PageSpeed API
+            throw new Error(errorData.error + (errorData.details ? '\n\n' + errorData.details : ''));
+          }
+          
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log('🔍 SEO Audit results:', data.results);
+        console.log('🔍 Web Vitals:', data.results?.webVitals);
+        console.log('🔍 Google Opportunities Mobile:', data.results?.webVitals?.mobile?.googleOpportunities);
+        console.log('🔍 Google Opportunities Desktop:', data.results?.webVitals?.desktop?.googleOpportunities);
+        console.log('🔍 Data Source Mobile:', data.results?.webVitals?.mobile?.source);
+        console.log('🔍 Data Source Desktop:', data.results?.webVitals?.desktop?.source);
+
+        return data.results;
+      });
+
+      if (coinResult.success) {
+        setResult({
           url: fullUrl,
-          waitForFullData: true  // Ждем полные данные от Google PageSpeed
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+          loading: false,
+          data: coinResult.result
+        });
         
-        if (response.status === 503 && errorData.error) {
-          // Специальная обработка для недоступности Google PageSpeed API
-          throw new Error(errorData.error + (errorData.details ? '\n\n' + errorData.details : ''));
+        // Синхронизируем с реальным значением от сервера
+        if (coinResult.newLaunchCount) {
+          setLaunchCount(coinResult.newLaunchCount);
         }
-        
-        throw new Error(`Ошибка сервера: ${response.status}`);
+      } else {
+        // Откатываем счетчик в случае ошибки
+        setLaunchCount(prev => prev - 1);
+        throw new Error(coinResult.error || 'Не удалось выполнить SEO анализ');
       }
-
-      const data = await response.json();
-
-      console.log('🔍 SEO Audit results:', data.results);
-      console.log('🔍 Web Vitals:', data.results?.webVitals);
-      console.log('🔍 Google Opportunities Mobile:', data.results?.webVitals?.mobile?.googleOpportunities);
-      console.log('🔍 Google Opportunities Desktop:', data.results?.webVitals?.desktop?.googleOpportunities);
-      console.log('🔍 Data Source Mobile:', data.results?.webVitals?.mobile?.source);
-      console.log('🔍 Data Source Desktop:', data.results?.webVitals?.desktop?.source);
-
-      setResult({
-        url: fullUrl,
-        loading: false,
-        data: data.results
-      });
 
     } catch (error) {
       console.error('Ошибка при SEO анализе:', error);

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { openaiService, type TextGenerationResponse } from '../services/openaiService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './TextGeneratorTool.css';
@@ -25,6 +25,7 @@ const TextGeneratorTool: React.FC = () => {
         closeAuthModal,
         openAuthModal
     } = useAuthRequired();
+  const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const { textGenerator } = useToolTranslation();
   const { createLink } = useLocalizedLink();
   
@@ -87,11 +88,23 @@ const TextGeneratorTool: React.FC = () => {
 
   // Загрузка статистики
   useEffect(() => {
-    const loadStats = async () => {
-      const count = await statsService.getLaunchCount(TOOL_ID);
-      setLaunchCount(count);
+    const loadLaunchCount = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLaunchCount(data.count);
+        } else {
+          setLaunchCount(0);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки счетчика:', error);
+        setLaunchCount(0);
+      }
     };
-    loadStats();
+    loadLaunchCount();
   }, []);
 
   // Очистка результата при изменении параметров
@@ -206,57 +219,68 @@ const TextGeneratorTool: React.FC = () => {
         return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
     }
 
-    setAiError('');
-    setIsGenerating(true);
-    
-    try {
-      console.log('🤖 Generating text with AI...');
-      console.log('Parameters:', { language, countMode, characterCount, wordCount, paragraphCount });
+    // Выполняем операцию с тратой коинов
+    const coinResult = await executeWithCoins(async () => {
+      // Сразу обновляем счетчик в UI (оптимистично)
+      setLaunchCount(prev => prev + 1);
       
-      // Для Lorem Ipsum используем старую логику
-      if (language === 'lorem') {
-        let generatedText = '';
-        const currentLength = countMode === 'characters' ? characterCount : wordCount;
-        generatedText = generateLoremIpsum(currentLength, countMode);
-        const finalText = splitIntoParagraphs(generatedText, paragraphCount);
-        setResult(finalText);
-      } else {
-        // Для других языков используем AI
-        const response: TextGenerationResponse = await openaiService.generateText(
-          language,
-          characterCount,
-          wordCount,
-          paragraphCount,
-          countMode as 'characters' | 'words'
-        );
-        
-        if (response.success && response.text) {
-          setResult(response.text);
-          console.log('✅ AI text generated successfully');
-        } else {
-          setAiError(response.error || 'Не удалось сгенерировать текст');
-          console.error('❌ AI generation failed:', response.error);
-        }
-      }
+      setAiError('');
+      setIsGenerating(true);
       
-    } catch (error) {
-      console.error('💥 Error during text generation:', error);
-      setAiError('Произошла ошибка при генерации текста');
-    } finally {
-      setIsGenerating(false);
-      
-      // Обновляем статистику и получаем актуальное значение
       try {
-        const inputLength = countMode === 'characters' ? characterCount : wordCount;
-        const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-          inputLength: inputLength,
-          outputLength: result.length
-        });
-        setLaunchCount(newCount);
+        console.log('🤖 Generating text with AI...');
+        console.log('Parameters:', { language, countMode, characterCount, wordCount, paragraphCount });
+        
+        let generatedText = '';
+        
+        // Для Lorem Ipsum используем старую логику
+        if (language === 'lorem') {
+          const currentLength = countMode === 'characters' ? characterCount : wordCount;
+          generatedText = generateLoremIpsum(currentLength, countMode);
+          const finalText = splitIntoParagraphs(generatedText, paragraphCount);
+          return finalText;
+        } else {
+          // Для других языков используем AI
+          const response: TextGenerationResponse = await openaiService.generateText(
+            language,
+            characterCount,
+            wordCount,
+            paragraphCount,
+            countMode as 'characters' | 'words'
+          );
+          
+          if (response.success && response.text) {
+            console.log('✅ AI text generated successfully');
+            return response.text;
+          } else {
+            setAiError(response.error || 'Не удалось сгенерировать текст');
+            console.error('❌ AI generation failed:', response.error);
+            throw new Error(response.error || 'Не удалось сгенерировать текст');
+          }
+        }
+        
       } catch (error) {
-        console.error('Failed to update stats:', error);
-        setLaunchCount(prev => prev + 1);
+        console.error('💥 Error during text generation:', error);
+        setAiError('Произошла ошибка при генерации текста');
+        throw error;
+      } finally {
+        setIsGenerating(false);
       }
+    }, {
+      inputLength: countMode === 'characters' ? characterCount : wordCount
+    });
+
+    if (coinResult.success) {
+      setResult(coinResult.result);
+      
+      // Синхронизируем с реальным значением от сервера  
+      if (coinResult.newLaunchCount) {
+        setLaunchCount(coinResult.newLaunchCount);
+      }
+    } else {
+      // Откатываем счетчик в случае ошибки
+      setLaunchCount(prev => prev - 1);
+      console.error('Ошибка генерации текста:', coinResult.error);
     }
   };
 

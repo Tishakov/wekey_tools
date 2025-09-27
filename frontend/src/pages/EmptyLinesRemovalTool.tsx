@@ -6,6 +6,7 @@ import SEOHead from '../components/SEOHead';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './EmptyLinesRemovalTool.css';
@@ -25,6 +26,7 @@ const EmptyLinesRemovalTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -57,24 +59,7 @@ const EmptyLinesRemovalTool: React.FC = () => {
         setResult('');
     }, [inputText, removeEmptyLines, filterOption, containsFilter, notContainsFilter]);
 
-    // Отслеживание статистики при показе результата
-    useEffect(() => {
-        if (result) {
-            const updateStats = async () => {
-                try {
-                    const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                        inputLength: inputText.length,
-                        outputLength: result.length
-                    });
-                    setLaunchCount(newCount);
-                } catch (error) {
-                    console.error('Failed to update stats:', error);
-                    setLaunchCount(prev => prev + 1);
-                }
-            };
-            updateStats();
-        }
-    }, [result]);
+    // Статистика теперь обновляется через executeWithCoins
 
     // Основная функция обработки текста
     const processText = (text: string): string => {
@@ -152,12 +137,21 @@ const EmptyLinesRemovalTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
 
-
-        const processedText = processText(inputText);
-        setResult(processedText);
+        // Выполняем операцию с тратой коинов
+        const executeResult = await executeWithCoins(async () => {
+            const processedText = processText(inputText);
+            setResult(processedText);
+            return processedText;
+        }, {
+            inputLength: inputText.length
+        });
+        
+        // Обновляем счетчик из результата executeWithCoins
+        if (executeResult.success && executeResult.newLaunchCount !== undefined) {
+            setLaunchCount(executeResult.newLaunchCount);
+        }
     };
 
     // Обработчик копирования

@@ -4,6 +4,7 @@ import ExcelJS from 'exceljs';
 import ColumnIcon from '../assets/icons/column.svg?react';
 import StringIcon from '../assets/icons/string.svg?react';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import { statsService } from '../utils/statsService';
@@ -37,6 +38,7 @@ const TOOL_ID = 'cross-analytics';
 const AnalyticsTool: React.FC = () => {
   const { t } = useTranslation();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
 
   // Auth Required Hook
   const {

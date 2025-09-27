@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
-import { statsService } from '../utils/statsService';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import { useAuthRequired } from '../hooks/useAuthRequired';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
@@ -100,6 +100,7 @@ const SEOAuditProTool: React.FC = () => {
     openAuthModal
   } = useAuthRequired();
 
+  const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const [launchCount, setLaunchCount] = useState(0);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -118,15 +119,21 @@ const SEOAuditProTool: React.FC = () => {
     const loadLaunchCount = async () => {
       try {
         console.log(`SEO Audit Pro: Loading launch count for tool ID: ${TOOL_ID}`);
-        console.log(`SEO Audit Pro: API Base URL: ${API_BASE}`);
         
-        const count = await statsService.getLaunchCount(TOOL_ID);
-        console.log(`SEO Audit Pro: Successfully loaded launch count: ${count}`);
-        setLaunchCount(count);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          console.log(`SEO Audit Pro: Successfully loaded launch count: ${data.count}`);
+          setLaunchCount(data.count);
+        } else {
+          console.log('SEO Audit Pro: API returned no data, setting count to 0');
+          setLaunchCount(0);
+        }
       } catch (error) {
         console.error('SEO Audit Pro: Error loading launch count:', error);
         console.log('SEO Audit Pro: Falling back to 0 count');
-        // Устанавливаем 0 как fallback
         setLaunchCount(0);
       }
     };
@@ -273,85 +280,110 @@ const SEOAuditProTool: React.FC = () => {
   const handleAnalyzeSiteInternal = async (shouldIncrementCounter = true, customPeriod?: number) => {
     if (!selectedSite) return;
 
-    // Инкрементируем счетчик использования только при первом запуске анализа
-    if (shouldIncrementCounter) {
-      try {
-        const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-        console.log(`SEO Audit Pro: Launch count updated from ${launchCount} to ${newCount}`);
-        setLaunchCount(newCount);
-      } catch (error) {
-        console.error('Error updating launch count:', error);
-        // Продолжаем анализ даже если не удалось обновить счетчик
-      }
-    }
-
     // Очищаем предыдущие результаты
     setResult({
       loading: true
     });
 
-    try {
-      // Получаем сохраненные токены GSC
-      const savedTokens = localStorage.getItem('gsc-tokens');
-      const tokens = savedTokens ? JSON.parse(savedTokens) : null;
-      
-      // Добавляем случайный параметр для предотвращения кэширования
-      const cacheBuster = Date.now();
-      const actualPeriod = customPeriod || selectedPeriod;
-      
-      console.log(`🔍 Запрос анализа для ${selectedSite}, период: ${actualPeriod} дней, cacheBuster: ${cacheBuster}`);
-      
-      const requestBody = {
-        website: selectedSite,
-        tokens: tokens,
-        useMockData: false,
-        period: actualPeriod,
-        cacheBuster
-      };
-      
-      console.log(`📤 Отправляем запрос с телом:`, {
-        website: selectedSite,
-        period: actualPeriod,
-        tokensPresent: !!tokens,
-        cacheBuster
-      });
-      
-      // API запрос к endpoint для анализа реальных GSC данных
-      const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze?_t=${cacheBuster}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
+    if (shouldIncrementCounter) {
+      // Выполняем анализ с автоматическим списанием коинов
+      const coinResult = await executeWithCoins(async () => {
+        // Сразу обновляем счетчик в UI (оптимистично)
+        setLaunchCount(prev => prev + 1);
+        
+        return await performAnalysis(customPeriod);
       });
 
-      if (!response.ok) {
-        throw new Error('Ошибка получения данных GSC');
-      }
-
-      const data = await response.json();
-      console.log('📊 Получены данные анализа:', data);
-
-      if (data.success && data.analysis) {
-        console.log(`✅ SEOAuditProTool: Данные получены для периода ${selectedPeriod}:`, {
-          totalClicks: data.analysis.gscData?.searchPerformance?.totalClicks,
-          totalImpressions: data.analysis.gscData?.searchPerformance?.totalImpressions,
-          averageCTR: data.analysis.gscData?.searchPerformance?.averageCTR
+      if (coinResult.success) {
+        setResult({
+          loading: false,
+          data: coinResult.result
         });
+        
+        // Синхронизируем с реальным значением от сервера
+        if (coinResult.newLaunchCount) {
+          setLaunchCount(coinResult.newLaunchCount);
+        }
+      } else {
+        // Откатываем счетчик в случае ошибки
+        setLaunchCount(prev => prev - 1);
         
         setResult({
           loading: false,
-          data: data.analysis
+          error: coinResult.error || 'Не удалось выполнить анализ'
         });
-      } else {
-        throw new Error(data.error || 'Неизвестная ошибка анализа');
       }
-    } catch (error) {
-      console.error('❌ Ошибка анализа сайта:', error);
-      setResult({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Неизвестная ошибка анализа'
+    } else {
+      // Смена периода без списания коинов
+      try {
+        const result = await performAnalysis(customPeriod);
+        setResult({
+          loading: false,
+          data: result
+        });
+      } catch (error) {
+        console.error('❌ Ошибка смены периода:', error);
+        setResult({
+          loading: false,
+          error: error instanceof Error ? error.message : 'Неизвестная ошибка анализа'
+        });
+      }
+    }
+  };
+
+  // Вспомогательная функция для выполнения анализа
+  const performAnalysis = async (customPeriod?: number): Promise<any> => {
+    // Получаем сохраненные токены GSC
+    const savedTokens = localStorage.getItem('gsc-tokens');
+    const tokens = savedTokens ? JSON.parse(savedTokens) : null;
+    
+    // Добавляем случайный параметр для предотвращения кэширования
+    const cacheBuster = Date.now();
+    const actualPeriod = customPeriod || selectedPeriod;
+    
+    console.log(`🔍 Запрос анализа для ${selectedSite}, период: ${actualPeriod} дней, cacheBuster: ${cacheBuster}`);
+    
+    const requestBody = {
+      website: selectedSite,
+      tokens: tokens,
+      useMockData: false,
+      period: actualPeriod,
+      cacheBuster
+    };
+    
+    console.log(`📤 Отправляем запрос с телом:`, {
+      website: selectedSite,
+      period: actualPeriod,
+      tokensPresent: !!tokens,
+      cacheBuster
+    });
+    
+    // API запрос к endpoint для анализа реальных GSC данных
+    const response = await fetch(`${API_BASE}/api/tools/seo-audit-pro/analyze?_t=${cacheBuster}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error('Ошибка получения данных GSC');
+    }
+
+    const data = await response.json();
+    console.log('📊 Получены данные анализа:', data);
+
+    if (data.success && data.analysis) {
+      console.log(`✅ SEOAuditProTool: Данные получены для периода ${actualPeriod}:`, {
+        totalClicks: data.analysis.gscData?.searchPerformance?.totalClicks,
+        totalImpressions: data.analysis.gscData?.searchPerformance?.totalImpressions,
+        averageCTR: data.analysis.gscData?.searchPerformance?.averageCTR
       });
+      
+      return data.analysis;
+    } else {
+      throw new Error(data.error || 'Неизвестная ошибка анализа');
     }
   };
 

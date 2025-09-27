@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
-import { statsService } from '../utils/statsService';
+import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import './QRGeneratorTool.css';
 
 const TOOL_ID = 'qr-generator';
@@ -33,6 +34,9 @@ interface QRFormData {
 
 const QRGeneratorTool: React.FC = () => {
     const { t } = useTranslation();
+    const { requireAuth } = useAuthRequired();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
+    
     const [isGenerating, setIsGenerating] = useState(false);
     const [qrDataUrl, setQrDataUrl] = useState<string>('');
     const [qrSvg, setQrSvg] = useState<string>('');
@@ -50,7 +54,23 @@ const QRGeneratorTool: React.FC = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        loadLaunchCount();
     }, []);
 
     const handleInputChange = (field: keyof QRFormData, value: any) => {
@@ -137,9 +157,21 @@ const QRGeneratorTool: React.FC = () => {
     const generateQR = async () => {
         if (!validateForm()) return;
 
+        // Проверяем авторизацию
+        if (!requireAuth()) {
+            return;
+        }
+
         setIsGenerating(true);
-        try {
+
+        // Генерация с списанием коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
+            setLaunchCount(prev => prev + 1);
+            
             const content = generateQRContent();
+            
+            let result = {};
             
             if (formData.format === 'png') {
                 const dataUrl = await QRCode.toDataURL(content, {
@@ -150,8 +182,7 @@ const QRGeneratorTool: React.FC = () => {
                         light: formData.backgroundColor
                     }
                 });
-                setQrDataUrl(dataUrl);
-                setQrSvg('');
+                result = { type: 'png', data: dataUrl };
             } else {
                 const svg = await QRCode.toString(content, {
                     type: 'svg',
@@ -162,19 +193,39 @@ const QRGeneratorTool: React.FC = () => {
                         light: formData.backgroundColor
                     }
                 });
-                setQrSvg(svg);
+                result = { type: 'svg', data: svg };
+            }
+            
+            return result;
+        }, {
+            inputLength: generateQRContent().length,
+            outputLength: 1
+        });
+
+        if (coinResult.success) {
+            const result = coinResult.result as { type: string; data: string };
+            
+            if (result.type === 'png') {
+                setQrDataUrl(result.data);
+                setQrSvg('');
+            } else {
+                setQrSvg(result.data);
                 setQrDataUrl('');
             }
-
-            // Трекинг использования
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-            console.log('QR code generated successfully');
-        } catch (error) {
-            console.error('Error generating QR code:', error);
-        } finally {
-            setIsGenerating(false);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+            
+            console.log('QR code generated successfully with coin deduction');
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка генерации QR-кода:', coinResult.error);
         }
+        
+        setIsGenerating(false);
     };
 
     const downloadQR = () => {
@@ -199,15 +250,7 @@ const QRGeneratorTool: React.FC = () => {
         return content.trim().length > 0;
     };
 
-    // Авто-генерация при изменении данных
-    useEffect(() => {
-        if (isFormValid()) {
-            const timeoutId = setTimeout(() => {
-                generateQR();
-            }, 500);
-            return () => clearTimeout(timeoutId);
-        }
-    }, [formData]);
+
 
     const renderContentFields = () => {
         switch (formData.type) {
@@ -521,7 +564,7 @@ const QRGeneratorTool: React.FC = () => {
             <div className="control-buttons">
                 <button 
                     className="action-btn"
-                    onClick={generateQR}
+                    onClick={() => generateQR()}
                     disabled={isGenerating || !isFormValid()}
                 >
                     {isGenerating ? (

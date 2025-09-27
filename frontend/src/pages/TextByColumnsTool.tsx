@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './TextByColumnsTool.css';
@@ -24,6 +25,7 @@ const TextByColumnsTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [copied, setCopied] = useState<boolean[]>([false, false, false, false, false, false]);
     const [launchCount, setLaunchCount] = useState(0);
@@ -89,6 +91,12 @@ const TextByColumnsTool: React.FC = () => {
 
 
         if (!inputText.trim()) {
+            setColumns(['', '', '', '', '', '']);
+            return;
+        }
+        // Выполняем операцию с тратой коинов
+        await executeWithCoins(async () => {
+            if (!inputText.trim()) {
             setColumns(['', '', '', '', '', '']);
             return;
         }
@@ -168,6 +176,9 @@ const TextByColumnsTool: React.FC = () => {
         });
 
         setColumns(newColumns);
+        }, {
+            inputLength: inputText ? inputText.length : 0
+        });
     };
 
     // Функция копирования для конкретной колонки

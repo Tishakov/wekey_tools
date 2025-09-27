@@ -5,10 +5,10 @@ import { useLanguageFromUrl, useLocalizedLink } from '../hooks/useLanguageFromUr
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './UtmGeneratorTool.css';
-import { statsService } from '../utils/statsService';
 
 
 const TOOL_ID = 'utm-generator';
@@ -25,6 +25,7 @@ const UtmGeneratorTool: React.FC = () => {
         closeAuthModal,
         openAuthModal
     } = useAuthRequired();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const { createLink } = useLocalizedLink();
     useLanguageFromUrl();
     
@@ -115,7 +116,24 @@ const UtmGeneratorTool: React.FC = () => {
 
     // Загрузка статистики при монтировании компонента
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        
+        loadLaunchCount();
     }, []);
 
     // Очистка результата при изменении полей
@@ -226,77 +244,85 @@ const UtmGeneratorTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
         }
 
-        const params: string[] = [];
-        
-        // Формируем параметры UTM
-        if (utmSource.trim()) {
-            const value = transliterate ? transliterateText(utmSource) : utmSource;
-            params.push(`utm_source=${encodeURIComponent(value)}`);
-        }
-        if (utmMedium.trim()) {
-            const value = transliterate ? transliterateText(utmMedium) : utmMedium;
-            params.push(`utm_medium=${encodeURIComponent(value)}`);
-        }
-        if (utmCampaign.trim()) {
-            const value = transliterate ? transliterateText(utmCampaign) : utmCampaign;
-            params.push(`utm_campaign=${encodeURIComponent(value)}`);
-        }
-        if (utmContent.trim()) {
-            const value = transliterate ? transliterateText(utmContent) : utmContent;
-            params.push(`utm_content=${encodeURIComponent(value)}`);
-        }
-        if (utmTerm.trim()) {
-            const value = transliterate ? transliterateText(utmTerm) : utmTerm;
-            params.push(`utm_term=${encodeURIComponent(value)}`);
-        }
-
-        // Формируем итоговый результат
-        if (params.length === 0) {
-            setResult('Заполните хотя бы один UTM-параметр');
-            return;
-        }
-
-        const utmString = params.join('&');
-        
-        if (noBaseUrl) {
-            // Только хвост UTM
-            setResult('?' + utmString);
-        } else {
-            // Полная ссылка с протоколом
-            let url = baseUrl.trim();
-            if (!url) {
-                url = 'example.com';
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
+            setLaunchCount(prev => prev + 1);
+            
+            const params: string[] = [];
+            
+            // Формируем параметры UTM
+            if (utmSource.trim()) {
+                const value = transliterate ? transliterateText(utmSource) : utmSource;
+                params.push(`utm_source=${encodeURIComponent(value)}`);
             }
+            if (utmMedium.trim()) {
+                const value = transliterate ? transliterateText(utmMedium) : utmMedium;
+                params.push(`utm_medium=${encodeURIComponent(value)}`);
+            }
+            if (utmCampaign.trim()) {
+                const value = transliterate ? transliterateText(utmCampaign) : utmCampaign;
+                params.push(`utm_campaign=${encodeURIComponent(value)}`);
+            }
+            if (utmContent.trim()) {
+                const value = transliterate ? transliterateText(utmContent) : utmContent;
+                params.push(`utm_content=${encodeURIComponent(value)}`);
+            }
+            if (utmTerm.trim()) {
+                const value = transliterate ? transliterateText(utmTerm) : utmTerm;
+                params.push(`utm_term=${encodeURIComponent(value)}`);
+            }
+
+            // Формируем итоговый результат
+            if (params.length === 0) {
+                return 'Заполните хотя бы один UTM-параметр';
+            }
+
+            const utmString = params.join('&');
             
-            // Разделяем URL на основную часть и параметры
-            const [baseUrlPart, existingParams] = url.split('?');
-            
-            // Применяем транслитерацию только к основной части URL
-            const transliteratedBase = transliterate ? transliterateText(baseUrlPart) : baseUrlPart;
-            
-            // Собираем финальный URL
-            let finalUrl = transliteratedBase;
-            if (existingParams) {
-                finalUrl += '?' + existingParams + '&' + params.join('&');
+            if (noBaseUrl) {
+                // Только хвост UTM
+                return '?' + utmString;
             } else {
-                finalUrl += '?' + params.join('&');
+                // Полная ссылка с протоколом
+                let url = baseUrl.trim();
+                if (!url) {
+                    url = 'example.com';
+                }
+                
+                // Разделяем URL на основную часть и параметры
+                const [baseUrlPart, existingParams] = url.split('?');
+                
+                // Применяем транслитерацию только к основной части URL
+                const transliteratedBase = transliterate ? transliterateText(baseUrlPart) : baseUrlPart;
+                
+                // Собираем финальный URL
+                let finalUrl = transliteratedBase;
+                if (existingParams) {
+                    finalUrl += '?' + existingParams + '&' + params.join('&');
+                } else {
+                    finalUrl += '?' + params.join('&');
+                }
+                
+                return protocol + finalUrl;
             }
-            
-            setResult(protocol + finalUrl);
-        }
+        }, {
+            inputLength: (utmSource + utmMedium + utmCampaign + utmContent + utmTerm + baseUrl).length,
+            outputLength: 1
+        });
 
-        // Увеличиваем счетчик запусков
-        const updateStats = async () => {
-            try {
-                const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-                setLaunchCount(newCount);
-            } catch (error) {
-                console.warn('Failed to update statistics:', error);
-                const count = await statsService.getLaunchCount(TOOL_ID);
-                setLaunchCount(count);
+        if (coinResult.success) {
+            setResult(coinResult.result as string);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
             }
-        };
-        updateStats();
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка генерации UTM:', coinResult.error);
+        }
     };
 
     // Обработчик копирования результата

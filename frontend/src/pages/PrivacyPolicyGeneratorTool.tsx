@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import '../styles/tool-pages.css';
@@ -32,6 +32,7 @@ interface FormData {
 const PrivacyPolicyGeneratorTool: React.FC = () => {
     const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     
     // Auth Required Hook
     const {
@@ -67,7 +68,11 @@ const PrivacyPolicyGeneratorTool: React.FC = () => {
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(res => res.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(err => console.error('Ошибка загрузки счетчика:', err));
     }, []);
 
     const handleInputChange = (field: keyof FormData, value: string | boolean) => {
@@ -201,20 +206,33 @@ Email: ${data.email}
         setIsGenerating(true);
         
         try {
-            let documents = '';
-            
-            if (formData.documentType === 'privacy' || formData.documentType === 'both') {
-                documents += generateDocument(formData, 'privacy');
+            const result = await executeWithCoins(async () => {
+                let documents = '';
+                
+                if (formData.documentType === 'privacy' || formData.documentType === 'both') {
+                    documents += generateDocument(formData, 'privacy');
+                }
+                
+                if (formData.documentType === 'offer' || formData.documentType === 'both') {
+                    if (documents) documents += '\n\n' + '='.repeat(50) + '\n\n';
+                    documents += generateDocument(formData, 'offer');
+                }
+                
+                setResult(documents);
+                
+                return {
+                    documents,
+                    documentType: formData.documentType,
+                    inputLength: JSON.stringify(formData).length
+                };
+            }, {
+                inputLength: JSON.stringify(formData).length
+            });
+
+            // Обновляем счетчик после успешного выполнения
+            if (result) {
+                setLaunchCount(prev => prev + 1);
             }
-            
-            if (formData.documentType === 'offer' || formData.documentType === 'both') {
-                if (documents) documents += '\n\n' + '='.repeat(50) + '\n\n';
-                documents += generateDocument(formData, 'offer');
-            }
-            
-            setResult(documents);
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
             
         } catch (error) {
             console.error('Error generating documents:', error);

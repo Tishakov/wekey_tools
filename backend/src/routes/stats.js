@@ -167,6 +167,36 @@ router.post('/increment',
   }
 );
 
+// GET /api/stats/launch-count/:toolName - Получить количество запусков для конкретного инструмента
+router.get('/launch-count/:toolName',
+  [
+    param('toolName')
+      .notEmpty()
+      .withMessage('Название инструмента обязательно')
+      .isLength({ min: 1, max: 100 })
+      .withMessage('Название инструмента должно быть от 1 до 100 символов')
+  ],
+  handleValidationErrors,
+  async (req, res, next) => {
+    try {
+      const { toolName } = req.params;
+      const normalizedToolName = normalizeToolName(toolName);
+
+      const count = await db.ToolUsage.count({
+        where: { toolName: normalizedToolName }
+      });
+
+      res.json({
+        success: true,
+        toolName,
+        count: count
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 // GET /api/stats/tool/:toolName - Получить статистику для конкретного инструмента
 router.get('/tool/:toolName',
   [

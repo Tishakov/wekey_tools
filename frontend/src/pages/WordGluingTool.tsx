@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './WordGluingTool.css';
@@ -23,6 +24,7 @@ const WordGluingTool: React.FC = () => {
         closeAuthModal,
         openAuthModal
     } = useAuthRequired();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const { createLink } = useLocalizedLink();
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
@@ -85,81 +87,79 @@ const WordGluingTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
-
 
         if (!inputText1.trim() || !inputText2.trim()) {
             setResult('');
             return;
         }
 
-        const lines1 = inputText1.trim().split('\n').filter(line => line.trim());
-        const lines2 = inputText2.trim().split('\n').filter(line => line.trim());
-        
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
+        // Выполняем операцию с тратой коинов
+        await executeWithCoins(async () => {
+            const lines1 = inputText1.trim().split('\n').filter(line => line.trim());
+            const lines2 = inputText2.trim().split('\n').filter(line => line.trim());
+            
+            // Определяем соединитель
+            let connectorStr = '';
+            switch (connector) {
+                case 'nothing':
+                    connectorStr = '';
+                    break;
+                case 'space':
+                    connectorStr = ' ';
+                    break;
+                case 'comma-space':
+                    connectorStr = ', ';
+                    break;
+                case 'dot-space':
+                    connectorStr = '. ';
+                    break;
+                case 'semicolon':
+                    connectorStr = ';';
+                    break;
+                case 'colon':
+                    connectorStr = ':';
+                    break;
+                case 'dash':
+                    connectorStr = '-';
+                    break;
+                case 'long-dash':
+                    connectorStr = ' — ';
+                    break;
+                case 'other':
+                    connectorStr = customConnector;
+                    break;
+                default:
+                    connectorStr = '';
+            }
+
+            // Склеиваем слова
+            const maxLength = Math.max(lines1.length, lines2.length);
+            const resultLines: string[] = [];
+            
+            for (let i = 0; i < maxLength; i++) {
+                const word1 = lines1[i] || '';
+                const word2 = lines2[i] || '';
+                
+                if (word1 && word2) {
+                    resultLines.push(word1 + connectorStr + word2);
+                } else if (word1) {
+                    resultLines.push(word1);
+                } else if (word2) {
+                    resultLines.push(word2);
+                }
+            }
+
+            setResult(resultLines.join('\n'));
+            
+            // Увеличиваем счетчик запусков
             const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
                 inputLength: inputText1.length + inputText2.length
             });
             setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
-
-        // Определяем соединитель
-        let connectorStr = '';
-        switch (connector) {
-            case 'nothing':
-                connectorStr = '';
-                break;
-            case 'space':
-                connectorStr = ' ';
-                break;
-            case 'comma-space':
-                connectorStr = ', ';
-                break;
-            case 'dot-space':
-                connectorStr = '. ';
-                break;
-            case 'semicolon':
-                connectorStr = ';';
-                break;
-            case 'colon':
-                connectorStr = ':';
-                break;
-            case 'dash':
-                connectorStr = '-';
-                break;
-            case 'long-dash':
-                connectorStr = ' — ';
-                break;
-            case 'other':
-                connectorStr = customConnector;
-                break;
-            default:
-                connectorStr = '';
-        }
-
-        // Склеиваем слова
-        const maxLength = Math.max(lines1.length, lines2.length);
-        const resultLines: string[] = [];
-        
-        for (let i = 0; i < maxLength; i++) {
-            const word1 = lines1[i] || '';
-            const word2 = lines2[i] || '';
-            
-            if (word1 && word2) {
-                resultLines.push(word1 + connectorStr + word2);
-            } else if (word1) {
-                resultLines.push(word1);
-            } else if (word2) {
-                resultLines.push(word2);
-            }
-        }
-
-        setResult(resultLines.join('\n'));
+        }, {
+            inputLength: inputText1.length + inputText2.length
+        });
     };
 
     // Копирование результата

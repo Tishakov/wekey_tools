@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './RemoveLineBreaksTool.css';
@@ -24,6 +25,7 @@ const RemoveLineBreaksTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -73,6 +75,12 @@ const RemoveLineBreaksTool: React.FC = () => {
 
 
         if (!inputText.trim()) {
+            setResult('');
+            return;
+        }
+        // Выполняем операцию с тратой коинов
+        await executeWithCoins(async () => {
+            if (!inputText.trim()) {
             setResult('');
             return;
         }
@@ -129,6 +137,9 @@ const RemoveLineBreaksTool: React.FC = () => {
 
         const resultText = lines.join(replacementStr);
         setResult(resultText);
+        }, {
+            inputLength: inputText ? inputText.length : 0
+        });
     };
 
     // Копирование результата

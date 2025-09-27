@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './EmojiTool.css';
@@ -27,6 +28,7 @@ const EmojiTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [text, setText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [launchCount, setLaunchCount] = useState(0);

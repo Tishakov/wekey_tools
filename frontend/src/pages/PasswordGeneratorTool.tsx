@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
-import { coinService } from '../services/coinService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { useAuthRequired } from '../hooks/useAuthRequired';
-import { useAuth } from '../contexts/AuthContext';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import '../styles/tool-pages.css';
@@ -18,7 +16,7 @@ const PasswordGeneratorTool: React.FC = () => {
     const { t } = useTranslation();
     const { common, passwordGenerator } = useToolTranslation();
     const { createLink } = useLocalizedLink();
-    const { user, updateUser } = useAuth();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     
     // Auth Required Hook
     const {
@@ -56,7 +54,23 @@ const PasswordGeneratorTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        loadLaunchCount();
     }, []);
 
     // Закрытие дропдауна при клике вне его
@@ -142,40 +156,33 @@ const PasswordGeneratorTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
         }
 
-        // Тратим коин за использование инструмента
-        try {
-            const coinResult = await coinService.spendCoinsWithValidation(TOOL_ID, 1);
-            if (!coinResult.success) {
-                alert(coinResult.error || 'Ошибка при списании коинов');
-                return;
-            }
-            console.log('🪙 Коин потрачен успешно, новый баланс:', coinResult.newBalance);
-            
-            // Обновляем баланс пользователя в контексте
-            if (user && coinResult.newBalance !== undefined) {
-                updateUser({ ...user, coinBalance: coinResult.newBalance });
-            }
-        } catch (error) {
-            console.error('Ошибка при списании коинов:', error);
-            alert('Ошибка при списании коинов. Попробуйте еще раз.');
-            return;
-        }
-
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
             setLaunchCount(prev => prev + 1);
-        }
+            
+            const passwords = [];
+            for (let i = 0; i < passwordCount; i++) {
+                passwords.push(generateSinglePassword());
+            }
+            
+            return passwords.join('\n');
+        }, {
+            outputLength: passwordCount * passwordLength
+        });
 
-        const passwords = [];
-        for (let i = 0; i < passwordCount; i++) {
-            passwords.push(generateSinglePassword());
+        if (coinResult.success) {
+            setResult(coinResult.result);
+            
+            // Синхронизируем с реальным значением от сервера
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка генерации паролей:', coinResult.error);
         }
-        
-        setResult(passwords.join('\n'));
     };
 
     // Функция копирования

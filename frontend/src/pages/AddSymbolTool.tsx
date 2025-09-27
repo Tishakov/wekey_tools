@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import SEOHead from '../components/SEOHead';
-import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './AddSymbolTool.css';
@@ -25,6 +25,7 @@ const AddSymbolTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [launchCount, setLaunchCount] = useState(0);
@@ -40,11 +41,24 @@ const AddSymbolTool: React.FC = () => {
 
   // Загружаем счетчик запусков при монтировании компонента
   useEffect(() => {
-    const loadStats = async () => {
-      const count = await statsService.getLaunchCount(TOOL_ID);
-      setLaunchCount(count);
+    const loadLaunchCount = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLaunchCount(data.count);
+        } else {
+          setLaunchCount(0);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки счетчика:', error);
+        setLaunchCount(0);
+      }
     };
-    loadStats();
+    
+    loadLaunchCount();
   }, []);
 
   // Очистка результата при изменении входных данных или настроек
@@ -93,73 +107,87 @@ const AddSymbolTool: React.FC = () => {
       setOutputText('');
       return;
     }
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
+            setLaunchCount(prev => prev + 1);
+            
+            if (!symbolToAdd.trim()) {
+                return '';
+            }
 
-    // Увеличиваем счетчик запусков и получаем актуальное значение
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-        inputLength: inputText.length
-      });
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
-    }
+            // Получаем список исключений
+            const exceptionList = exceptions
+                .toLowerCase()
+                .split(/[\n,]/)
+                .map(word => word.trim())
+                .filter(word => word.length > 0);
 
-    // Получаем список исключений
-    const exceptionList = exceptions
-      .toLowerCase()
-      .split(/[\n,]/)
-      .map(word => word.trim())
-      .filter(word => word.length > 0);
+            // Обрабатываем каждую строку
+            const lines = inputText.split('\n');
+            const processedLines = lines.map(line => {
+                if (line.trim() === '') return line; // Пустые строки не обрабатываем
 
-    // Обрабатываем каждую строку
-    const lines = inputText.split('\n');
-    const processedLines = lines.map(line => {
-      if (line.trim() === '') return line; // Пустые строки не обрабатываем
+                // Предобработка текста: удаляем лишние пробелы
+                let cleanLine = line.trim(); // Убираем пробелы в начале и конце
+                cleanLine = cleanLine.replace(/\s+/g, ' '); // Заменяем множественные пробелы на одинарные
 
-      // Предобработка текста: удаляем лишние пробелы
-      let cleanLine = line.trim(); // Убираем пробелы в начале и конце
-      cleanLine = cleanLine.replace(/\s+/g, ' '); // Заменяем множественные пробелы на одинарные
+                // Если выбран конкретный режим - обрабатываем всю строку целиком
+                if (additionMode) {
+                    // Но сначала проверяем, есть ли слова из исключений в строке
+                    const lineWords = cleanLine.toLowerCase().split(/\s+/);
+                    const hasException = lineWords.some(word => 
+                        exceptionList.includes(word) // Точное совпадение целого слова
+                    );
 
-      // Если выбран конкретный режим - обрабатываем всю строку целиком
-      if (additionMode) {
-        // Но сначала проверяем, есть ли слова из исключений в строке
-        const lineWords = cleanLine.toLowerCase().split(/\s+/);
-        const hasException = lineWords.some(word => 
-          exceptionList.includes(word) // Точное совпадение целого слова
-        );
+                    if (hasException) {
+                        return cleanLine; // Не добавляем символ к строкам с исключениями
+                    }
 
-        if (hasException) {
-          return cleanLine; // Не добавляем символ к строкам с исключениями
+                    switch (additionMode) {
+                        case 'start':
+                            return symbolToAdd + cleanLine;
+                        case 'end':
+                            return cleanLine + symbolToAdd;
+                        case 'both':
+                            return symbolToAdd + cleanLine + symbolToAdd;
+                        default:
+                            return cleanLine;
+                    }
+                }
+
+                // По умолчанию (если ничего не выбрано) - добавляем символ перед каждым словом отдельно
+                const words = cleanLine.split(/\s+/);
+                const wordsWithSymbol = words.map(word => {
+                    // Проверяем каждое слово на исключения
+                    const wordLower = word.toLowerCase();
+                    if (exceptionList.includes(wordLower)) {
+                        return word; // Не добавляем символ к словам-исключениям
+                    }
+                    return symbolToAdd + word; // Добавляем символ к обычным словам
+                });
+                return wordsWithSymbol.join(' ');
+            });
+
+            return processedLines.join('\n');
+        }, {
+            inputLength: inputText ? inputText.length : 0,
+            outputLength: 1
+        });
+
+        if (coinResult.success) {
+            setOutputText(coinResult.result as string);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка добавления символов:', coinResult.error);
         }
-
-        switch (additionMode) {
-          case 'start':
-            return symbolToAdd + cleanLine;
-          case 'end':
-            return cleanLine + symbolToAdd;
-          case 'both':
-            return symbolToAdd + cleanLine + symbolToAdd;
-          default:
-            return cleanLine;
-        }
-      }
-
-      // По умолчанию (если ничего не выбрано) - добавляем символ перед каждым словом отдельно
-      const words = cleanLine.split(/\s+/);
-      const wordsWithSymbol = words.map(word => {
-        // Проверяем каждое слово на исключения
-        const wordLower = word.toLowerCase();
-        if (exceptionList.includes(wordLower)) {
-          return word; // Не добавляем символ к словам-исключениям
-        }
-        return symbolToAdd + word; // Добавляем символ к обычным словам
-      });
-      return wordsWithSymbol.join(' ');
-    });
-
-    setOutputText(processedLines.join('\n'));
-  };
+    };
 
   const handleCopyResult = async () => {
     try {

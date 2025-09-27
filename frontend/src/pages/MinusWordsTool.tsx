@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './MinusWordsTool.css';
-import { statsService } from '../utils/statsService';
 
 
 const TOOL_ID = 'minus-words';
@@ -24,6 +24,7 @@ const MinusWordsTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     // Состояния компонента
     const [inputText, setInputText] = useState('');
     const [words, setWords] = useState<string[]>([]);
@@ -33,7 +34,24 @@ const MinusWordsTool: React.FC = () => {
 
     // Загрузка статистики при монтировании компонента
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        
+        loadLaunchCount();
     }, []);
 
     // Обработчик вставки из буфера обмена
@@ -52,43 +70,53 @@ const MinusWordsTool: React.FC = () => {
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
         }
-
-        // Увеличиваем счетчик запусков
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
             setLaunchCount(prev => prev + 1);
-        }
-
-
-        if (!inputText.trim()) {
-            setWords([]);
-            return;
-        }
-        
-        // Разбиваем текст на строки, затем каждую строку на слова
-        const lines = inputText.split('\n');
-        const processedLines: string[] = [];
-        
-        lines.forEach(line => {
-            if (line.trim()) {
-                // Обрабатываем каждую строку: убираем знаки препинания и разбиваем на слова
-                const wordsInLine = line
-                    .replace(/[^\u0400-\u04FF\w\s]/g, ' ')
-                    .split(/\s+/)
-                    .filter(word => word.trim().length > 0)
-                    .map(word => word.trim());
-                
-                if (wordsInLine.length > 0) {
-                    processedLines.push(wordsInLine.join(' '));
-                }
+            
+            if (!inputText.trim()) {
+                return [];
             }
-            // Убрали блок else с добавлением пустых строк
+            
+            // Разбиваем текст на строки, затем каждую строку на слова
+            const lines = inputText.split('\n');
+            const processedLines: string[] = [];
+            
+            lines.forEach(line => {
+                if (line.trim()) {
+                    // Обрабатываем каждую строку: убираем знаки препинания и разбиваем на слова
+                    const wordsInLine = line
+                        .replace(/[^\u0400-\u04FF\w\s]/g, ' ')
+                        .split(/\s+/)
+                        .filter(word => word.trim().length > 0)
+                        .map(word => word.trim());
+                    
+                    if (wordsInLine.length > 0) {
+                        processedLines.push(wordsInLine.join(' '));
+                    }
+                }
+                // Убрали блок else с добавлением пустых строк
+            });
+            
+            return processedLines;
+        }, {
+            inputLength: inputText ? inputText.length : 0,
+            outputLength: 1
         });
-        
-        setWords(processedLines);
+
+        if (coinResult.success) {
+            setWords(coinResult.result as string[]);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка обработки минус-слов:', coinResult.error);
+        }
     };
 
     // Обработчик клика по слову - добавляет в минус-слова или убирает

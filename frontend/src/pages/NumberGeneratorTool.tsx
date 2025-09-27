@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
-import { statsService } from '../utils/statsService';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './NumberGeneratorTool.css';
@@ -26,6 +26,7 @@ const NumberGeneratorTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     
     // Основные состояния
     const [fromNumber, setFromNumber] = useState(1);
@@ -42,7 +43,23 @@ const NumberGeneratorTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        loadLaunchCount();
     }, []);
 
     // Обновление времени каждую секунду
@@ -72,61 +89,72 @@ const NumberGeneratorTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
         }
 
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-            setLaunchCount(newCount);
-        } catch (error) {
-            // Если API недоступен, увеличиваем локально
-            console.error('Failed to update stats:', error);
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
             setLaunchCount(prev => prev + 1);
-        }
-
-        const numbers: number[] = [];
-        let availableNumbers = new Set<number>();
-        
-        // Создаем набор доступных чисел
-        for (let i = fromNumber; i <= toNumber; i++) {
-            availableNumbers.add(i);
-        }
-
-        // В режиме "без повторов" убираем уже использованные числа
-        if (noRepeats) {
-            usedNumbers.forEach(num => {
-                availableNumbers.delete(num);
-            });
-
-            // Проверяем, достаточно ли уникальных чисел
-            if (availableNumbers.size < resultCount) {
-                setResult(`${t('numberGeneratorTool.errors.noMoreUniqueNumbers', { from: fromNumber, to: toNumber })}\n${t('numberGeneratorTool.errors.useResetButton')}`);
-                return;
+            
+            const numbers: number[] = [];
+            let availableNumbers = new Set<number>();
+            
+            // Создаем набор доступных чисел
+            for (let i = fromNumber; i <= toNumber; i++) {
+                availableNumbers.add(i);
             }
-        }
 
-        // Генерируем числа
-        const availableArray = Array.from(availableNumbers);
-        
-        for (let i = 0; i < resultCount; i++) {
+            // В режиме "без повторов" убираем уже использованные числа
             if (noRepeats) {
-                // В режиме без повторов выбираем из доступных
-                const randomIndex = Math.floor(Math.random() * availableArray.length);
-                const selectedNumber = availableArray[randomIndex];
-                numbers.push(selectedNumber);
-                
-                // Удаляем выбранное число из доступных
-                availableArray.splice(randomIndex, 1);
-                
-                // Добавляем в использованные
-                setUsedNumbers(prev => new Set([...prev, selectedNumber]));
-            } else {
-                // Обычная генерация с возможными повторами
-                const randomNumber = generateRandomNumber(fromNumber, toNumber);
-                numbers.push(randomNumber);
-            }
-        }
+                usedNumbers.forEach(num => {
+                    availableNumbers.delete(num);
+                });
 
-        // Форматируем результат
-        setResult(numbers.join('\n'));
+                // Проверяем, достаточно ли уникальных чисел
+                if (availableNumbers.size < resultCount) {
+                    const errorMessage = `${t('numberGeneratorTool.errors.noMoreUniqueNumbers', { from: fromNumber, to: toNumber })}\n${t('numberGeneratorTool.errors.useResetButton')}`;
+                    return errorMessage;
+                }
+            }
+
+            // Генерируем числа
+            const availableArray = Array.from(availableNumbers);
+            
+            for (let i = 0; i < resultCount; i++) {
+                if (noRepeats) {
+                    // В режиме без повторов выбираем из доступных
+                    const randomIndex = Math.floor(Math.random() * availableArray.length);
+                    const selectedNumber = availableArray[randomIndex];
+                    numbers.push(selectedNumber);
+                    
+                    // Удаляем выбранное число из доступных
+                    availableArray.splice(randomIndex, 1);
+                    
+                    // Добавляем в использованные
+                    setUsedNumbers(prev => new Set([...prev, selectedNumber]));
+                } else {
+                    // Обычная генерация с возможными повторами
+                    const randomNumber = generateRandomNumber(fromNumber, toNumber);
+                    numbers.push(randomNumber);
+                }
+            }
+
+            // Форматируем результат
+            return numbers.join('\n');
+        }, {
+            outputLength: resultCount
+        });
+
+        if (coinResult.success) {
+            setResult(coinResult.result);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка генерации чисел:', coinResult.error);
+        }
     };
 
     // Функция копирования результата

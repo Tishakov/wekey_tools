@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import SEOHead from '../components/SEOHead';
@@ -17,6 +18,7 @@ type DuplicateMode = 'remove-duplicates' | 'remove-all-duplicates' | 'remove-uni
 const DuplicateRemovalTool: React.FC = () => {
     const { t } = useTranslation();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     
     // Auth Required Hook
     const {
@@ -54,24 +56,7 @@ const DuplicateRemovalTool: React.FC = () => {
         setResult('');
     }, [inputText, mode]);
 
-    // Отслеживание статистики при показе результата
-    useEffect(() => {
-        if (result) {
-            const updateStats = async () => {
-                try {
-                    const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                        inputLength: inputText.length,
-                        outputLength: result.length
-                    });
-                    setLaunchCount(newCount);
-                } catch (error) {
-                    console.error('Failed to update stats:', error);
-                    setLaunchCount(prev => prev + 1);
-                }
-            };
-            updateStats();
-        }
-    }, [result]);
+    // Статистика теперь обновляется через executeWithCoins
 
     // Функция для удаления дубликатов (оставить уникальные)
     const removeDuplicates = (text: string): string => {
@@ -169,11 +154,21 @@ const DuplicateRemovalTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
 
-        const processedText = processText(inputText);
-        setResult(processedText);
+        // Выполняем операцию с тратой коинов
+        const executeResult = await executeWithCoins(async () => {
+            const processedText = processText(inputText);
+            setResult(processedText);
+            return processedText;
+        }, {
+            inputLength: inputText.length
+        });
+        
+        // Обновляем счетчик из результата executeWithCoins
+        if (executeResult.success && executeResult.newLaunchCount !== undefined) {
+            setLaunchCount(executeResult.newLaunchCount);
+        }
     };
 
     // Обработчик копирования

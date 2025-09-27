@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './TextOptimizerTool.css';
@@ -24,6 +24,7 @@ const TextOptimizerTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -47,9 +48,26 @@ interface OptimizationOptions {
     applyAll: boolean;
 }
 
-type OptimizationOption = keyof OptimizationOptions;    // Загрузка статистики запусков при монтировании
+type OptimizationOption = keyof OptimizationOptions;        // Загрузка статистики при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        
+        loadLaunchCount();
     }, []);
 
     // Очистка результата при изменении входного текста или настроек
@@ -57,21 +75,8 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
         setResult('');
     }, [inputText, options]);
 
-    // Отслеживание статистики при показе результата
-    useEffect(() => {
-        if (result) {
-            const updateStats = async () => {
-                try {
-                    const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-                    setLaunchCount(newCount);
-                } catch (error) {
-                    console.warn('Failed to update statistics:', error);
-                    setLaunchCount(prev => prev + 1);
-                }
-            };
-            updateStats();
-        }
-    }, [result]);
+    // Убираем автоматическое отслеживание статистики при изменении результата
+    // Теперь статистика обновляется только при ручном запуске через executeWithCoins
 
     // Функция для удаления лишних пробелов (в начале и конце строк)
     const removeTrimSpaces = (text: string): string => {
@@ -156,12 +161,32 @@ type OptimizationOption = keyof OptimizationOptions;    // Загрузка ст
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
 
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
+            setLaunchCount(prev => prev + 1);
+            
+            const optimizedText = optimizeText(inputText);
+            return optimizedText;
+        }, {
+            inputLength: inputText ? inputText.length : 0,
+            outputLength: 1
+        });
 
-        const optimizedText = optimizeText(inputText);
-        setResult(optimizedText);
+        if (coinResult.success) {
+            setResult(coinResult.result as string);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка оптимизации текста:', coinResult.error);
+        }
     };
 
     // Обработчик копирования

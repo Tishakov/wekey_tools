@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
-import { statsService } from '../utils/statsService';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import '../styles/tool-pages.css';
@@ -25,6 +25,7 @@ interface CountStats {
 const CharCounterTool: React.FC = () => {
     const { t } = useTranslation();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     
     // Auth Required Hook
     const {
@@ -56,7 +57,24 @@ const CharCounterTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        
+        loadLaunchCount();
     }, []);
 
     // Очистка результатов при изменении входных данных или настроек
@@ -96,9 +114,9 @@ const CharCounterTool: React.FC = () => {
     };
 
     // Основная функция подсчета статистики
-    const calculateStats = async () => {
+    const calculateStats = (): CountStats => {
         if (!inputText.trim()) {
-            setStats({
+            return {
                 characters: 0,
                 charactersNoSpaces: 0,
                 words: 0,
@@ -107,20 +125,7 @@ const CharCounterTool: React.FC = () => {
                 specialChars: 0,
                 paragraphs: 0,
                 sentences: 0
-            });
-            return;
-        }
-
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                inputLength: inputText.length,
-                outputLength: inputText.length
-            });
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
+            };
         }
 
         // Получаем список исключений (только если включена опция)
@@ -168,7 +173,7 @@ const CharCounterTool: React.FC = () => {
         const sentenceMatches = text.match(/[.!?]+/g);
         const sentences = sentenceMatches ? sentenceMatches.length : 0;
 
-        setStats({
+        return {
             characters,
             charactersNoSpaces,
             words,
@@ -177,7 +182,7 @@ const CharCounterTool: React.FC = () => {
             specialChars,
             paragraphs,
             sentences
-        });
+        };
     };
 
     // Обработчик кнопки "Показать результат"
@@ -185,10 +190,31 @@ const CharCounterTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
 
-        calculateStats();
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
+            setLaunchCount(prev => prev + 1);
+            
+            return calculateStats();
+        }, {
+            inputLength: inputText.length,
+            outputLength: 1
+        });
+
+        if (coinResult.success) {
+            setStats(coinResult.result as CountStats);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка подсчета символов:', coinResult.error);
+        }
     };
 
     // Обработчик кнопки "Скопировать результат"

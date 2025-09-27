@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
-import { statsService } from '../utils/statsService';
 import SEOHead from '../components/SEOHead';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './FindReplaceTool.css';
@@ -25,6 +25,7 @@ const FindReplaceTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const [inputText, setInputText] = useState('');
   const [searchText, setSearchText] = useState('');
   const [replaceText, setReplaceText] = useState('');
@@ -35,11 +36,24 @@ const FindReplaceTool: React.FC = () => {
   const [replaceMode, setReplaceMode] = useState<'custom' | 'empty' | 'paragraph'>('custom');
 
   useEffect(() => {
-    const loadStats = async () => {
-      const count = await statsService.getLaunchCount(TOOL_ID);
-      setLaunchCount(count);
+    const loadLaunchCount = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLaunchCount(data.count);
+        } else {
+          setLaunchCount(0);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки счетчика:', error);
+        setLaunchCount(0);
+      }
     };
-    loadStats();
+    
+    loadLaunchCount();
 
     // Устанавливаем правильную высоту полей при загрузке
     setTimeout(() => {
@@ -121,23 +135,31 @@ const FindReplaceTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
 
         }
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
+            setLaunchCount(prev => prev + 1);
+            
+            const processedText = processText(inputText);
+            return processedText;
+        }, {
+            inputLength: inputText ? inputText.length : 0,
+            outputLength: 1
+        });
 
-
-    const processedText = processText(inputText);
-    setResult(processedText);
-    
-    // Увеличиваем счетчик запусков и получаем актуальное значение
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-        inputLength: inputText.length,
-        outputLength: processedText.length
-      });
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
-    }
-  };
+        if (coinResult.success) {
+            setResult(coinResult.result as string);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка поиска и замены:', coinResult.error);
+        }
+    };
 
   const handleCopy = async () => {
     if (result) {

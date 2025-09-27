@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './WordMixerTool.css';
@@ -24,6 +24,7 @@ const WordMixerTool: React.FC = () => {
         closeAuthModal,
         openAuthModal
     } = useAuthRequired();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const { createLink } = useLocalizedLink();
     const [inputText1, setInputText1] = useState('');
     const [inputText2, setInputText2] = useState('');
@@ -35,7 +36,24 @@ const WordMixerTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const loadLaunchCount = async () => {
+            try {
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+                const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    setLaunchCount(data.count);
+                } else {
+                    setLaunchCount(0);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки счетчика:', error);
+                setLaunchCount(0);
+            }
+        };
+        
+        loadLaunchCount();
     }, []);
 
     // Очистка результата при изменении входных данных
@@ -106,66 +124,74 @@ const WordMixerTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
         }
 
-        // Получаем списки слов, фильтруя пустые строки
-        const words1 = inputText1.trim() ? inputText1.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
-        const words2 = inputText2.trim() ? inputText2.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
-        const words3 = inputText3.trim() ? inputText3.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
-        const words4 = inputText4.trim() ? inputText4.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
-
-        // Собираем только непустые списки в правильном порядке
-        const nonEmptyLists: string[][] = [];
-        if (words1.length > 0) nonEmptyLists.push(words1);
-        if (words2.length > 0) nonEmptyLists.push(words2);
-        if (words3.length > 0) nonEmptyLists.push(words3);
-        if (words4.length > 0) nonEmptyLists.push(words4);
-
-        // Если нет непустых списков, результат пустой
-        if (nonEmptyLists.length === 0) {
-            setResult('');
-            return;
-        }
-
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const totalInput = [inputText1, inputText2, inputText3, inputText4].join('\n');
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                inputLength: totalInput.length
-            });
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
+        // Выполняем операцию с тратой коинов
+        const coinResult = await executeWithCoins(async () => {
+            // Сразу обновляем счетчик в UI (оптимистично)
             setLaunchCount(prev => prev + 1);
-        }
-
-        // Алгоритм миксации: создаем все возможные комбинации и сохраняем промежуточные результаты
-        let currentCombinations = nonEmptyLists[0].map(word => [word]);
-        const allResults: string[] = [];
-
-        // Если есть только один список, просто возвращаем его
-        if (nonEmptyLists.length === 1) {
-            setResult(currentCombinations.map(combination => combination.join(' ')).join('\n'));
-            return;
-        }
-
-        // Последовательно комбинируем с каждым следующим списком
-        for (let i = 1; i < nonEmptyLists.length; i++) {
-            const nextList = nonEmptyLists[i];
-            const newCombinations: string[][] = [];
             
-            for (const combination of currentCombinations) {
-                for (const word of nextList) {
-                    newCombinations.push([...combination, word]);
-                }
+            // Получаем списки слов, фильтруя пустые строки
+            const words1 = inputText1.trim() ? inputText1.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
+            const words2 = inputText2.trim() ? inputText2.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
+            const words3 = inputText3.trim() ? inputText3.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
+            const words4 = inputText4.trim() ? inputText4.trim().split('\n').filter(line => line.trim()).map(line => line.trim()) : [];
+
+            // Собираем только непустые списки в правильном порядке
+            const nonEmptyLists: string[][] = [];
+            if (words1.length > 0) nonEmptyLists.push(words1);
+            if (words2.length > 0) nonEmptyLists.push(words2);
+            if (words3.length > 0) nonEmptyLists.push(words3);
+            if (words4.length > 0) nonEmptyLists.push(words4);
+
+            // Если нет непустых списков, результат пустой
+            if (nonEmptyLists.length === 0) {
+                return '';
             }
-            
-            currentCombinations = newCombinations;
-        }
-            
-        // Добавляем результат этого этапа к общему результату
-        const stageResults = currentCombinations.map(combination => combination.join(' '));
-        allResults.push(...stageResults);
 
-        setResult(allResults.join('\n'));
+            // Алгоритм миксации: создаем все возможные комбинации и сохраняем промежуточные результаты
+            let currentCombinations = nonEmptyLists[0].map(word => [word]);
+            const allResults: string[] = [];
+
+            // Если есть только один список, просто возвращаем его
+            if (nonEmptyLists.length === 1) {
+                return currentCombinations.map(combination => combination.join(' ')).join('\n');
+            }
+
+            // Последовательно комбинируем с каждым следующим списком
+            for (let i = 1; i < nonEmptyLists.length; i++) {
+                const nextList = nonEmptyLists[i];
+                const newCombinations: string[][] = [];
+                
+                for (const combination of currentCombinations) {
+                    for (const word of nextList) {
+                        newCombinations.push([...combination, word]);
+                    }
+                }
+                
+                currentCombinations = newCombinations;
+            }
+                
+            // Добавляем результат этого этапа к общему результату
+            const stageResults = currentCombinations.map(combination => combination.join(' '));
+            allResults.push(...stageResults);
+
+            return allResults.join('\n');
+        }, {
+            inputLength: [inputText1, inputText2, inputText3, inputText4].join('\n').length,
+            outputLength: 1
+        });
+
+        if (coinResult.success) {
+            setResult(coinResult.result as string);
+            
+            // Синхронизируем с реальным значением от сервера  
+            if (coinResult.newLaunchCount) {
+                setLaunchCount(coinResult.newLaunchCount);
+            }
+        } else {
+            // Откатываем счетчик в случае ошибки
+            setLaunchCount(prev => prev - 1);
+            console.error('Ошибка миксации слов:', coinResult.error);
+        }
     };
 
     // Копирование результата

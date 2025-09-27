@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './TextSortingTool.css';
@@ -24,6 +25,7 @@ const TextSortingTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
@@ -51,21 +53,7 @@ const TextSortingTool: React.FC = () => {
         setResult('');
     }, [inputText, sortOption]);
 
-    // Отслеживание статистики при показе результата
-    useEffect(() => {
-        if (result) {
-            const updateStats = async () => {
-                try {
-                    const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-                    setLaunchCount(newCount);
-                } catch (error) {
-                    console.warn('Failed to update statistics:', error);
-                    setLaunchCount(prev => prev + 1);
-                }
-            };
-            updateStats();
-        }
-    }, [result]);
+    // Статистика теперь обновляется через executeWithCoins
 
     // Функция сортировки по алфавиту (А-Я)
     const sortAlphabeticallyAsc = (lines: string[]): string[] => {
@@ -142,12 +130,21 @@ const TextSortingTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
-
         }
 
-
-        const sortedText = sortText(inputText);
-        setResult(sortedText);
+        // Выполняем операцию с тратой коинов
+        const executeResult = await executeWithCoins(async () => {
+            const sortedText = sortText(inputText);
+            setResult(sortedText);
+            return sortedText;
+        }, {
+            inputLength: inputText.length
+        });
+        
+        // Обновляем счетчик из результата executeWithCoins
+        if (executeResult.success && executeResult.newLaunchCount !== undefined) {
+            setLaunchCount(executeResult.newLaunchCount);
+        }
     };
 
     // Обработчик копирования

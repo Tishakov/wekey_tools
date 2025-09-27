@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { openaiService, type SynonymResponse } from '../services/openaiService';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 
@@ -21,6 +21,7 @@ const SynonymGeneratorTool: React.FC = () => {
         closeAuthModal,
         openAuthModal
     } = useAuthRequired();
+  const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
@@ -34,7 +35,23 @@ const SynonymGeneratorTool: React.FC = () => {
 
   // Загружаем статистику при инициализации
   useEffect(() => {
-    statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+    const loadLaunchCount = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLaunchCount(data.count);
+        } else {
+          setLaunchCount(0);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки счетчика:', error);
+        setLaunchCount(0);
+      }
+    };
+    loadLaunchCount();
   }, []);
 
   // Обработка текста и генерация синонимов через ChatGPT
@@ -49,40 +66,52 @@ const SynonymGeneratorTool: React.FC = () => {
       return;
     }
 
-    setAiError('');
-    setIsGenerating(true);
-    
-    try {
-      console.log('🤖 Generating synonyms with AI for:', inputText);
-      console.log('🌐 Selected language:', selectedLanguage);
-      
-      const response: SynonymResponse = await openaiService.generateSynonyms(inputText, selectedLanguage);
-      
-      if (response.success && response.synonyms) {
-        setResult(response.synonyms.join('\n'));
-        console.log('✅ AI synonyms generated:', response.synonyms.length, 'items');
-      } else {
-        setAiError(response.error || t('synonymGenerator.errors.noSynonyms'));
-        console.error('❌ AI generation failed:', response.error);
-      }
-      
-    } catch (error) {
-      console.error('💥 Error during synonym generation:', error);
-      setAiError(t('synonymGenerator.errors.generic'));
-    } finally {
-      setIsGenerating(false);
-    }
-    
-    // Обновляем статистику и получаем актуальное значение
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-        inputLength: inputText.length,
-        outputLength: result.length
-      });
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
+    // Выполняем операцию с тратой коинов
+    const coinResult = await executeWithCoins(async () => {
+      // Сразу обновляем счетчик в UI (оптимистично)
       setLaunchCount(prev => prev + 1);
+      
+      setAiError('');
+      setIsGenerating(true);
+      
+      try {
+        console.log('🤖 Generating synonyms with AI for:', inputText);
+        console.log('🌐 Selected language:', selectedLanguage);
+        
+        const response: SynonymResponse = await openaiService.generateSynonyms(inputText, selectedLanguage);
+        
+        if (response.success && response.synonyms) {
+          const synonymResult = response.synonyms.join('\n');
+          console.log('✅ AI synonyms generated:', response.synonyms.length, 'items');
+          return synonymResult;
+        } else {
+          setAiError(response.error || t('synonymGenerator.errors.noSynonyms'));
+          console.error('❌ AI generation failed:', response.error);
+          throw new Error(response.error || 'Не удалось сгенерировать синонимы');
+        }
+        
+      } catch (error) {
+        console.error('💥 Error during synonym generation:', error);
+        setAiError(t('synonymGenerator.errors.generic'));
+        throw error;
+      } finally {
+        setIsGenerating(false);
+      }
+    }, {
+      inputLength: inputText.length
+    });
+
+    if (coinResult.success) {
+      setResult(coinResult.result);
+      
+      // Синхронизируем с реальным значением от сервера  
+      if (coinResult.newLaunchCount) {
+        setLaunchCount(coinResult.newLaunchCount);
+      }
+    } else {
+      // Откатываем счетчик в случае ошибки
+      setLaunchCount(prev => prev - 1);
+      console.error('Ошибка генерации синонимов:', coinResult.error);
     }
   };
 

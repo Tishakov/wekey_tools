@@ -6,6 +6,7 @@ import SEOHead from '../components/SEOHead';
 import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './TransliterationTool.css';
@@ -25,6 +26,7 @@ const TransliterationTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
   const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [launchCount, setLaunchCount] = useState(0);
@@ -60,9 +62,9 @@ const TransliterationTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
 
         }
-
-
-    let result = inputText;
+        // Выполняем операцию с тратой коинов
+        await executeWithCoins(async () => {
+            let result = inputText;
     
     // Увеличиваем счетчик запусков и получаем актуальное значение
     try {
@@ -102,7 +104,10 @@ const TransliterationTool: React.FC = () => {
     }
     
     setOutputText(result);
-  };
+        }, {
+            inputLength: inputText ? inputText.length : 0
+        });
+    };
 
   const handleCopyResult = async () => {
     try {

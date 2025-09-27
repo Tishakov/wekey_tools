@@ -5,6 +5,7 @@ import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import './MatchTypesTool.css';
@@ -27,6 +28,7 @@ const MatchTypesTool: React.FC = () => {
         openAuthModal
     } = useAuthRequired();
     const { createLink } = useLocalizedLink();
+    const { executeWithCoins } = useToolWithCoins(TOOL_ID);
     const [inputText, setInputText] = useState('');
     const [outputText, setOutputText] = useState('');
     const [matchType, setMatchType] = useState<MatchType>('broad'); // По умолчанию "Широкое соответствие"
@@ -65,6 +67,12 @@ const MatchTypesTool: React.FC = () => {
 
 
         if (!inputText.trim()) {
+            setOutputText('');
+            return;
+        }
+        // Выполняем операцию с тратой коинов
+        await executeWithCoins(async () => {
+            if (!inputText.trim()) {
             setOutputText('');
             return;
         }
@@ -115,6 +123,9 @@ const MatchTypesTool: React.FC = () => {
         });
 
         setOutputText(processedLines.join('\n'));
+        }, {
+            inputLength: inputText ? inputText.length : 0
+        });
     };
 
     // Функция копирования результата
