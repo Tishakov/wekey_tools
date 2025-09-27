@@ -358,11 +358,11 @@ const AdminUsers: React.FC = () => {
   };
 
   // Функции для работы с коинами
-  const handleCoinAction = (user: User, type: 'add' | 'subtract') => {
+  const handleCoinAction = (user: User, type: 'add' | 'subtract' | 'edit') => {
     setCoinModal({
       show: true,
       user,
-      type,
+      type: type === 'edit' ? 'add' : type, // По умолчанию открываем в режиме начисления
       amount: '',
       reason: '',
       customReason: '',
@@ -644,10 +644,6 @@ const AdminUsers: React.FC = () => {
           aValue = a.lastLoginAt ? new Date(a.lastLoginAt) : new Date(0);
           bValue = b.lastLoginAt ? new Date(b.lastLoginAt) : new Date(0);
           break;
-        case 'loginCount':
-          aValue = a.loginCount;
-          bValue = b.loginCount;
-          break;
         case 'totalUsage':
           aValue = a.toolStats.totalUsage;
           bValue = b.toolStats.totalUsage;
@@ -655,6 +651,10 @@ const AdminUsers: React.FC = () => {
         case 'uniqueTools':
           aValue = a.toolStats.uniqueTools;
           bValue = b.toolStats.uniqueTools;
+          break;
+        case 'coinBalance':
+          aValue = a.coinBalance;
+          bValue = b.coinBalance;
           break;
         default:
           return 0;
@@ -873,14 +873,6 @@ const AdminUsers: React.FC = () => {
                   </span>
                 )}
               </th>
-              <th onClick={() => handleSort('loginCount')} className="sortable">
-                Входов
-                {sortField === 'loginCount' && (
-                  <span className="sort-indicator">
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
               <th onClick={() => handleSort('totalUsage')} className="sortable">
                 Использований
                 {sortField === 'totalUsage' && (
@@ -962,11 +954,6 @@ const AdminUsers: React.FC = () => {
                   </td>
                   <td>
                     <div className="user-stats">
-                      <div className="user-stats-number">{user.loginCount}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="user-stats">
                       <div className="user-stats-number">{user.toolStats.totalUsage}</div>
                     </div>
                   </td>
@@ -980,21 +967,12 @@ const AdminUsers: React.FC = () => {
                       <div className="coin-balance-display">
                         <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="coin-icon" />
                         <span className="coin-amount">{user.coinBalance || 0}</span>
-                      </div>
-                      <div className="coin-actions">
                         <button 
-                          className="coin-action-btn add-btn" 
-                          title="Начислить коины"
-                          onClick={() => handleCoinAction(user, 'add')}
+                          className="coin-edit-btn" 
+                          title="Изменить баланс"
+                          onClick={() => handleCoinAction(user, 'edit')}
                         >
-                          +
-                        </button>
-                        <button 
-                          className="coin-action-btn subtract-btn" 
-                          title="Списать коины"
-                          onClick={() => handleCoinAction(user, 'subtract')}
-                        >
-                          −
+                          <img src="/icons/refresh_coin.svg" alt="Изменить баланс" className="coin-edit-icon" />
                         </button>
                       </div>
                     </div>
@@ -1005,7 +983,7 @@ const AdminUsers: React.FC = () => {
                         className="user-action-btn view-btn"
                         title="Детальная информация"
                       >
-                        👁️
+                        <img src="/icons/eye_users.svg" alt="View" width="16" height="16" />
                       </button>
                       {user.role !== 'admin' && (
                         <button 
@@ -1013,7 +991,7 @@ const AdminUsers: React.FC = () => {
                           onClick={() => handleDeleteUser(user)}
                           title="Удалить пользователя"
                         >
-                          🗑️
+                          <img src="/icons/trash.svg" alt="Delete" width="16" height="16" />
                         </button>
                       )}
                     </div>
@@ -1124,12 +1102,31 @@ const AdminUsers: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="coin-modal-header">
-              <h3>
-                {coinModal.type === 'add' ? 'Начислить коины' : 'Списать коины'}
-              </h3>
+              <h3>Изменить баланс</h3>
             </div>
             
             <div className="coin-modal-body">
+              {/* Переключатель типа операции */}
+              <div className="coin-operation-toggle">
+                <div className="toggle-options">
+                  <button
+                    type="button"
+                    className={`toggle-option ${coinModal.type === 'add' ? 'active' : ''}`}
+                    onClick={() => setCoinModal(prev => ({ ...prev, type: 'add' }))}
+                  >
+                    <span className="toggle-icon">+</span>
+                    Начислить
+                  </button>
+                  <button
+                    type="button"
+                    className={`toggle-option ${coinModal.type === 'subtract' ? 'active' : ''}`}
+                    onClick={() => setCoinModal(prev => ({ ...prev, type: 'subtract' }))}
+                  >
+                    <span className="toggle-icon">−</span>
+                    Списать
+                  </button>
+                </div>
+              </div>
               <div className="user-info-coin">
                 <div className="user-avatar-coin">
                   {coinModal.user.avatar ? (
@@ -1149,7 +1146,7 @@ const AdminUsers: React.FC = () => {
                     }
                   </div>
                   <div className="user-email-coin">{coinModal.user.email}</div>
-                  <div className="current-balance">
+                  <div className="coin-current-balance">
                     Текущий баланс: 
                     <span className="balance-amount">
                       <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="coin-icon-small" />

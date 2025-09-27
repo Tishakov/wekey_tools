@@ -35,13 +35,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activeSection, onSectio
       id: 'coins',
       name: t('profile.coins.title'),
       icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-          <path d="M14.5 8a2.5 2.5 0 0 0-5 0v2a2.5 2.5 0 0 0 5 0" stroke="currentColor" strokeWidth="2" fill="none"/>
-          <path d="M14.5 14a2.5 2.5 0 0 1-5 0v-2a2.5 2.5 0 0 1 5 0" stroke="currentColor" strokeWidth="2" fill="none"/>
-          <line x1="12" y1="6" x2="12" y2="8" stroke="currentColor" strokeWidth="2"/>
-          <line x1="12" y1="16" x2="12" y2="18" stroke="currentColor" strokeWidth="2"/>
-        </svg>
+        <img src="/icons/transaction_history.svg" alt="Transaction History" width="24" height="24" />
       )
     },
     {

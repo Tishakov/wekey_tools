@@ -159,8 +159,8 @@
 
 .transaction-icon {
   font-size: 32px;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,7 +177,6 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
 }
 
 .transaction-reason {

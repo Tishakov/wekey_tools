@@ -137,8 +137,8 @@
 
 .transaction-icon {
   font-size: 1.25rem;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,7 +155,6 @@
 .transaction-title {
   font-weight: 500;
   color: #FFFFFF;
-  margin-bottom: 0.1rem;
   font-size: 0.875rem;
 }
 
