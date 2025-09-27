@@ -768,6 +768,18 @@ router.get('/analytics/historical', async (req, res, next) => {
           
           const uniqueUsers = await ToolUsage.count({
             distinct: true,
+            col: 'userId',
+            where: {
+              userId: { [require('sequelize').Op.not]: null }, // Только авторизованные пользователи
+              createdAt: {
+                [require('sequelize').Op.between]: [dayStart, dayEnd]
+              }
+            }
+          });
+
+          // Считаем посетителей как уникальные сессии из ToolUsage (более надежно)
+          const dailyVisitors = await ToolUsage.count({
+            distinct: true,
             col: 'sessionId',
             where: {
               createdAt: {
@@ -776,21 +788,42 @@ router.get('/analytics/historical', async (req, res, next) => {
             }
           });
 
-          const { Visitor } = require('../models');
-          const dailyVisitors = await Visitor.count({
+          // Получаем данные о потраченных коинах за день
+          const { CoinTransaction } = require('../models');
+          const dailyCoinsSpent = await CoinTransaction.sum('amount', {
+            where: {
+              amount: {
+                [require('sequelize').Op.lt]: 0 // Только отрицательные транзакции (потраченные коины)
+              },
+              createdAt: {
+                [require('sequelize').Op.between]: [dayStart, dayEnd]
+              }
+            }
+          });
+
+          // Получаем данные о регистрациях за день
+          const { User } = require('../models');
+          const dailyRegistrations = await User.count({
             where: {
               createdAt: {
                 [require('sequelize').Op.between]: [dayStart, dayEnd]
               }
             }
           });
+
+          // Вычисляем среднее коинов на пользователя за день
+          const absoluteCoinsSpent = Math.abs(dailyCoinsSpent || 0);
+          const avgCoinsPerUser = uniqueUsers > 0 ? (absoluteCoinsSpent / uniqueUsers) : 0;
           
           data.push({
             date: dateStr,
             visitors: dailyVisitors || 0,
             toolUsers: uniqueUsers || 0,
             usageCount: dailyUsage || 0,
-            conversionRate: dailyVisitors > 0 ? ((uniqueUsers / dailyVisitors) * 100).toFixed(2) : "0.00"
+            conversionRate: dailyVisitors > 0 ? ((uniqueUsers / dailyVisitors) * 100).toFixed(2) : "0.00",
+            coinsSpent: absoluteCoinsSpent,
+            registrations: dailyRegistrations || 0,
+            avgCoinsPerUser: Math.round(avgCoinsPerUser * 100) / 100 // Округляем до 2 знаков
           });
         } catch (error) {
           console.error('Error fetching daily stats for', dateStr, ':', error);
@@ -800,7 +833,10 @@ router.get('/analytics/historical', async (req, res, next) => {
             visitors: 0,
             toolUsers: 0,
             usageCount: 0,
-            conversionRate: "0.00"
+            conversionRate: "0.00",
+            coinsSpent: 0,
+            registrations: 0,
+            avgCoinsPerUser: 0
           });
         }
         
@@ -928,8 +964,9 @@ router.get('/period-stats', async (req, res, next) => {
       
       const uniqueUsers = await ToolUsage.count({
         distinct: true,
-        col: 'sessionId',
+        col: 'userId',
         where: {
+          userId: { [require('sequelize').Op.not]: null }, // Только авторизованные пользователи
           createdAt: {
             [require('sequelize').Op.between]: [startDate, endDate]
           }
@@ -946,14 +983,43 @@ router.get('/period-stats', async (req, res, next) => {
         }
       });
 
-      const { Visitor } = require('../models');
-      const totalVisitors = await Visitor.count({
+      // Считаем посетителей как уникальные сессии из ToolUsage (более надежно)
+      const totalVisitors = await ToolUsage.count({
+        distinct: true,
+        col: 'sessionId',
         where: {
           createdAt: {
             [require('sequelize').Op.between]: [startDate, endDate]
           }
         }
       });
+
+      // Подсчитываем общее количество потраченных коинов
+      const { CoinTransaction } = require('../models');
+      const totalCoinsSpent = await CoinTransaction.sum('amount', {
+        where: {
+          amount: {
+            [require('sequelize').Op.lt]: 0 // Только отрицательные транзакции (потраченные коины)
+          },
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        }
+      });
+
+      // Подсчитываем регистрации за период
+      const { User } = require('../models');
+      const totalRegistrations = await User.count({
+        where: {
+          createdAt: {
+            [require('sequelize').Op.between]: [startDate, endDate]
+          }
+        }
+      });
+
+      // Вычисляем среднее коинов на пользователя
+      const absoluteCoinsSpent = Math.abs(totalCoinsSpent || 0);
+      const avgCoinsPerUser = uniqueUsers > 0 ? (absoluteCoinsSpent / uniqueUsers) : 0;
       
       const response = {
         success: true,
@@ -961,7 +1027,10 @@ router.get('/period-stats', async (req, res, next) => {
           totalUsage: totalUsage || 0,
           uniqueUsers: uniqueUsers || 0,
           activeTools: activeTools || 0,
-          totalVisitors: totalVisitors || 0
+          totalVisitors: totalVisitors || 0,
+          totalCoinsSpent: absoluteCoinsSpent,
+          totalRegistrations: totalRegistrations || 0,
+          avgCoinsPerUser: Math.round(avgCoinsPerUser * 100) / 100 // Округляем до 2 знаков
         }
       };
       
@@ -975,7 +1044,11 @@ router.get('/period-stats', async (req, res, next) => {
         stats: {
           totalUsage: 0,
           uniqueUsers: 0,
-          activeTools: 0
+          activeTools: 0,
+          totalVisitors: 0,
+          totalCoinsSpent: 0,
+          totalRegistrations: 0,
+          avgCoinsPerUser: 0
         }
       });
     }

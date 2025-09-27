@@ -27,6 +27,9 @@ const AdminPanel: React.FC = () => {
     uniqueUsers: number;
     activeTools: number;
     totalVisitors: number;
+    totalCoinsSpent: number;
+    totalRegistrations: number;
+    avgCoinsPerUser: number;
   } | null>(null);
   const [periodToolsData, setPeriodToolsData] = useState<Array<{
     toolName: string;
@@ -227,7 +230,10 @@ const AdminPanel: React.FC = () => {
           totalUsage: 0,
           uniqueUsers: 0,
           activeTools: 0,
-          totalVisitors: 0
+          totalVisitors: 0,
+          totalCoinsSpent: 0,
+          totalRegistrations: 0,
+          avgCoinsPerUser: 0
         });
       }
     } catch (error) {
@@ -237,7 +243,10 @@ const AdminPanel: React.FC = () => {
         totalUsage: 0,
         uniqueUsers: 0,
         activeTools: 0,
-        totalVisitors: 0
+        totalVisitors: 0,
+        totalCoinsSpent: 0,
+        totalRegistrations: 0,
+        avgCoinsPerUser: 0
       });
     }
   };
@@ -368,6 +377,7 @@ const AdminPanel: React.FC = () => {
       
       setHistoricalData(data);
       console.log('✅ [ADMIN] Historical data loaded:', data.length, 'days');
+      console.log('🔄 [ADMIN] Sample historical data:', data.slice(0, 3));
     } catch (error) {
       console.error('❌ [ADMIN] Error fetching historical data:', error);
       setError('Ошибка загрузки исторических данных');
@@ -571,7 +581,7 @@ const AdminPanel: React.FC = () => {
               <div className="stat-card">
                 <h3>Конверсия</h3>
                 <div className="stat-conversion">
-                  {periodStats?.totalVisitors && periodStats.totalVisitors > 0 
+                  {periodStats?.totalVisitors && periodStats.totalVisitors > 0
                     ? `${((periodStats.uniqueUsers / periodStats.totalVisitors) * 100).toFixed(1)}%`
                     : '0%'
                   }
@@ -579,8 +589,18 @@ const AdminPanel: React.FC = () => {
               </div>
 
               <div className="stat-card">
-                <h3>Использовано токенов</h3>
-                <div className="stat-number">0</div>
+                <h3>Использовано коинов</h3>
+                <div className="stat-number">{periodStats?.totalCoinsSpent || 0}</div>
+              </div>
+
+              <div className="stat-card">
+                <h3>Регистраций</h3>
+                <div className="stat-number">{periodStats?.totalRegistrations || 0}</div>
+              </div>
+
+              <div className="stat-card">
+                <h3>Среднее коинов/польз.</h3>
+                <div className="stat-number">{periodStats?.avgCoinsPerUser || 0}</div>
               </div>
             </div>
 
@@ -695,10 +715,18 @@ const AdminPanel: React.FC = () => {
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
                   <AnalyticsChart 
-                    data={historicalData.map(item => ({
-                      date: item.date,
-                      value: item.visitors > 0 ? parseFloat(((item.toolUsers / item.visitors) * 100).toFixed(1)) : 0
-                    }))} 
+                    data={(() => {
+                      const conversionData = historicalData.map(item => {
+                        const conversionRate = item.visitors > 0 ? parseFloat(((item.toolUsers / item.visitors) * 100).toFixed(1)) : 0;
+                        console.log(`🔄 Conversion debug - Date: ${item.date}, Visitors: ${item.visitors}, ToolUsers: ${item.toolUsers}, Rate: ${conversionRate}%`);
+                        return {
+                          date: item.date,
+                          value: conversionRate
+                        };
+                      });
+                      console.log('🔄 Full conversion data:', conversionData);
+                      return conversionData;
+                    })()} 
                     color="#ef4444"
                     title="Динамика конверсии (%)"
                   />
@@ -706,14 +734,49 @@ const AdminPanel: React.FC = () => {
               </div>
               
               <div className="chart-card">
-                <h3>Использовано токенов</h3>
+                <h3>Использовано коинов</h3>
                 {loadingHistorical ? (
                   <div className="chart-loading">Загрузка данных...</div>
                 ) : (
                   <AnalyticsChart 
-                    data={[]} 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.coinsSpent
+                    }))} 
                     color="#06b6d4"
-                    title="Динамика использования токенов"
+                    title="Динамика использования коинов"
+                  />
+                )}
+              </div>
+
+              <div className="chart-card">
+                <h3>Регистраций</h3>
+                {loadingHistorical ? (
+                  <div className="chart-loading">Загрузка данных...</div>
+                ) : (
+                  <AnalyticsChart 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.registrations
+                    }))} 
+                    color="#22c55e"
+                    title="Динамика регистраций"
+                  />
+                )}
+              </div>
+
+              <div className="chart-card">
+                <h3>Среднее коинов/польз.</h3>
+                {loadingHistorical ? (
+                  <div className="chart-loading">Загрузка данных...</div>
+                ) : (
+                  <AnalyticsChart 
+                    data={historicalData.map(item => ({
+                      date: item.date,
+                      value: item.avgCoinsPerUser
+                    }))} 
+                    color="#a855f7"
+                    title="Среднее коинов на пользователя"
                   />
                 )}
               </div>

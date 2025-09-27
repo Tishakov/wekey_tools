@@ -8,6 +8,9 @@ interface HistoricalDataPoint {
   toolUsers: number;
   usageCount: number;
   conversionRate: string;
+  coinsSpent: number;
+  registrations: number;
+  avgCoinsPerUser: number;
 }
 
 interface HistoricalResponse {
