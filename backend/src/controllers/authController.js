@@ -697,6 +697,67 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
+// Получение статистики пользователя
+exports.getUserStats = async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Токен не предоставлен'
+      });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    const { User, ToolUsage } = require('../config/database');
+    const user = await User.findByPk(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Получаем статистику использования инструментов
+    const toolStats = await ToolUsage.findAll({
+      attributes: [
+        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'totalUsage'],
+        [require('sequelize').fn('COUNT', require('sequelize').fn('DISTINCT', require('sequelize').col('toolName'))), 'uniqueTools']
+      ],
+      where: { userId: decoded.userId },
+      raw: true
+    });
+
+    // Вычисляем количество дней на платформе
+    const createdAt = new Date(user.createdAt);
+    const now = new Date();
+    const daysOnPlatform = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+
+    const stats = {
+      totalToolUsage: parseInt(toolStats[0]?.totalUsage) || 0,
+      uniqueToolsUsed: parseInt(toolStats[0]?.uniqueTools) || 0,
+      daysOnPlatform: daysOnPlatform,
+      tokensUsed: 0 // Пока не реализовано
+    };
+
+    res.json({
+      success: true,
+      stats
+    });
+
+  } catch (error) {
+    console.error('❌ Get user stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
 // Обновление токена
 exports.refreshToken = async (req, res) => {
   try {

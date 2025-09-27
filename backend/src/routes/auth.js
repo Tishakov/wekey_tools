@@ -62,6 +62,9 @@ router.post('/admin-login',
 // GET /api/auth/profile - Получение профиля пользователя
 router.get('/profile', authController.getProfile);
 
+// GET /api/auth/stats - Получение статистики пользователя
+router.get('/stats', authController.getUserStats);
+
 // PUT /api/auth/profile - Обновление профиля пользователя
 router.put('/profile',
   [

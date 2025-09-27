@@ -247,6 +247,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [aboutMessage, setAboutMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [userStats, setUserStats] = useState({
+    totalToolUsage: 0,
+    uniqueToolsUsed: 0,
+    daysOnPlatform: 0,
+    tokensUsed: 0
+  });
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [showAttentionAnimation, setShowAttentionAnimation] = useState(false);
   const [messagesFading, setMessagesFading] = useState({ message: false, aboutMessage: false });
@@ -281,11 +287,38 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         bio: user.bio || '',
         profession: user.profession || '',
         interests: user.interests ? user.interests.split(', ').filter(i => i.trim() !== '') : [],
-        instagram: user.instagram || '',
-        facebook: user.facebook || '',
-        telegram: user.telegram || ''
+        instagram: convertToSimpleFormat(user.instagram || '', 'instagram'),
+        facebook: convertToSimpleFormat(user.facebook || '', 'facebook'),
+        telegram: convertToSimpleFormat(user.telegram || '', 'telegram')
       });
     }
+  }, [user]);
+
+  // Загрузка статистики пользователя
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      if (!user || !localStorage.getItem('wekey_token')) return;
+      
+      try {
+        const response = await fetch('http://localhost:8880/api/auth/stats', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('wekey_token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setUserStats(result.stats);
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки статистики:', error);
+      }
+    };
+
+    fetchUserStats();
   }, [user]);
   
   // Handle profile update
@@ -429,9 +462,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         bio: aboutData.bio,
         profession: aboutData.profession,
         interests: aboutData.interests.join(', '), // Преобразуем массив в строку
-        instagram: aboutData.instagram,
-        facebook: aboutData.facebook,
-        telegram: aboutData.telegram
+        instagram: convertToFullUrl(aboutData.instagram, 'instagram'),
+        facebook: convertToFullUrl(aboutData.facebook, 'facebook'),
+        telegram: convertToFullUrl(aboutData.telegram, 'telegram')
       });
       
       setIsEditingAbout(false);
@@ -472,41 +505,130 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const validateSocialUrl = (url: string, platform: 'instagram' | 'facebook' | 'telegram'): string | null => {
     if (!url.trim()) return null; // Пустые поля разрешены
     
+    const trimmedUrl = url.trim();
+    
+    // Паттерны для различных форматов
     const patterns = {
       instagram: [
-        // Instagram domains
+        // Полные URL
         /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/[\w\.-]+\/?$/i,
-        // Short format
-        /^https?:\/\/(www\.)?ig\.me\/[\w\.-]+\/?$/i
+        // Упрощенные форматы
+        /^(www\.)?(instagram\.com|instagr\.am)\/[\w\.-]+\/?$/i,
+        /^instagram\.com\/[\w\.-]+\/?$/i,
+        /^@?[\w\.-]+$/i // username или @username
       ],
       facebook: [
-        // Facebook domains
-        /^https?:\/\/(www\.)?(facebook\.com|fb\.com|m\.facebook\.com)\/[\w\.-]+\/?$/i,
-        // Facebook pages
-        /^https?:\/\/(www\.)?facebook\.com\/(pages\/)?[\w\.-]+\/[\d]+\/?$/i,
-        // Short format
-        /^https?:\/\/(www\.)?fb\.me\/[\w\.-]+\/?$/i
+        // Полные URL
+        /^https?:\/\/(www\.)?(facebook\.com|fb\.com)\/[\w\.-]+\/?$/i,
+        // Упрощенные форматы
+        /^(www\.)?(facebook\.com|fb\.com)\/[\w\.-]+\/?$/i,
+        /^facebook\.com\/[\w\.-]+\/?$/i,
+        /^@?[\w\.-]+$/i // username или @username
       ],
       telegram: [
-        // Telegram domains
-        /^https?:\/\/(www\.)?(telegram\.org|telegram\.me|t\.me)\/[\w\.-]+\/?$/i,
-        // Username format
-        /^@[\w\.-]+$/i
+        // Полные URL
+        /^https?:\/\/(www\.)?(telegram\.me|t\.me)\/[\w\.-]+\/?$/i,
+        // Упрощенные форматы
+        /^(www\.)?(telegram\.me|t\.me)\/[\w\.-]+\/?$/i,
+        /^t\.me\/[\w\.-]+\/?$/i,
+        /^@[\w\.-]+$/i // @username
       ]
     };
 
-    const isValid = patterns[platform].some(pattern => pattern.test(url));
+    const isValid = patterns[platform].some(pattern => pattern.test(trimmedUrl));
     
     if (!isValid) {
       const platformMessages = {
-        instagram: 'Ссылка должна содержать instagram.com, instagr.am, ig.me',
-        facebook: 'Ссылка должна содержать facebook.com, fb.com, fb.me',
-        telegram: 'Ссылка должна содержать t.me, telegram.me или @username'
+        instagram: 'Введите username или instagram.com/username',
+        facebook: 'Введите username или facebook.com/username',
+        telegram: 'Введите @username или t.me/username'
       };
       return platformMessages[platform];
     }
     
     return null;
+  };
+
+  // Функция для конвертации упрощенного формата в полный URL
+  const convertToFullUrl = (url: string, platform: 'instagram' | 'facebook' | 'telegram'): string => {
+    if (!url.trim()) return '';
+    
+    const trimmedUrl = url.trim();
+    
+    // Если уже полный URL, возвращаем как есть
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return trimmedUrl;
+    }
+    
+    // Конвертируем упрощенные форматы
+    switch (platform) {
+      case 'instagram':
+        if (trimmedUrl.includes('instagram.com/')) {
+          return `https://${trimmedUrl}`;
+        }
+        // Если просто username или @username
+        const instagramUsername = trimmedUrl.replace(/^@/, '');
+        return `https://instagram.com/${instagramUsername}`;
+        
+      case 'facebook':
+        if (trimmedUrl.includes('facebook.com/')) {
+          return `https://${trimmedUrl}`;
+        }
+        // Если просто username или @username
+        const facebookUsername = trimmedUrl.replace(/^@/, '');
+        return `https://facebook.com/${facebookUsername}`;
+        
+      case 'telegram':
+        if (trimmedUrl.includes('t.me/')) {
+          return `https://${trimmedUrl}`;
+        }
+        // Если @username
+        if (trimmedUrl.startsWith('@')) {
+          const telegramUsername = trimmedUrl.replace(/^@/, '');
+          return `https://t.me/${telegramUsername}`;
+        }
+        // Если просто username
+        return `https://t.me/${trimmedUrl}`;
+        
+      default:
+        return trimmedUrl;
+    }
+  };
+
+  // Функция для конвертации полного URL в упрощенный формат для отображения
+  const convertToSimpleFormat = (url: string, platform: 'instagram' | 'facebook' | 'telegram'): string => {
+    if (!url.trim()) return '';
+    
+    const trimmedUrl = url.trim();
+    
+    try {
+      switch (platform) {
+        case 'instagram':
+          // Убираем https://, www., оставляем instagram.com/username
+          return trimmedUrl
+            .replace(/^https?:\/\/(www\.)?/, '')
+            .replace(/\/$/, '');
+            
+        case 'facebook':
+          // Убираем https://, www., оставляем facebook.com/username
+          return trimmedUrl
+            .replace(/^https?:\/\/(www\.)?/, '')
+            .replace(/\/$/, '');
+            
+        case 'telegram':
+          // Для Telegram показываем @username если это t.me ссылка
+          if (trimmedUrl.includes('t.me/')) {
+            const username = trimmedUrl.replace(/^https?:\/\/(www\.)?t\.me\//, '');
+            return `@${username}`;
+          }
+          return trimmedUrl;
+          
+        default:
+          return trimmedUrl;
+      }
+    } catch {
+      return trimmedUrl;
+    }
   };
 
   const handleSocialChange = (platform: 'instagram' | 'facebook' | 'telegram', value: string) => {
@@ -565,28 +687,28 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           <div className="profile-stat-card">
             <div className="profile-stat-icon">🚀</div>
             <div className="profile-stat-info">
-              <div className="stat-number">0</div>
+              <div className="stat-number">{userStats.totalToolUsage}</div>
               <div className="stat-label">Запусков инструментов</div>
             </div>
           </div>
           <div className="profile-stat-card">
             <div className="profile-stat-icon">🛠️</div>
             <div className="profile-stat-info">
-              <div className="stat-number">0/25</div>
+              <div className="stat-number">{userStats.uniqueToolsUsed}/31</div>
               <div className="stat-label">Использовано инструментов</div>
             </div>
           </div>
           <div className="profile-stat-card">
             <div className="profile-stat-icon">🪙</div>
             <div className="profile-stat-info">
-              <div className="stat-number">0</div>
+              <div className="stat-number">{userStats.tokensUsed}</div>
               <div className="stat-label">Использовано токенов</div>
             </div>
           </div>
           <div className="profile-stat-card">
             <div className="profile-stat-icon">📅</div>
             <div className="profile-stat-info">
-              <div className="stat-number">0</div>
+              <div className="stat-number">{userStats.daysOnPlatform}</div>
               <div className="stat-label">Количество дней на платформе</div>
             </div>
           </div>
@@ -1105,7 +1227,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       value={aboutData.instagram}
                       onChange={isEditingAbout ? (e) => handleSocialChange('instagram', e.target.value) : undefined}
                       className={`profile-input ${socialValidationErrors.instagram ? 'error' : ''}`}
-                      placeholder="https://instagram.com/username"
+                      placeholder="instagram.com/username"
                       disabled={!isEditingAbout}
                     />
                     {socialValidationErrors.instagram && (
@@ -1121,7 +1243,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       value={aboutData.facebook}
                       onChange={isEditingAbout ? (e) => handleSocialChange('facebook', e.target.value) : undefined}
                       className={`profile-input ${socialValidationErrors.facebook ? 'error' : ''}`}
-                      placeholder="https://facebook.com/username"
+                      placeholder="facebook.com/username"
                       disabled={!isEditingAbout}
                     />
                     {socialValidationErrors.facebook && (
@@ -1137,7 +1259,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       value={aboutData.telegram}
                       onChange={isEditingAbout ? (e) => handleSocialChange('telegram', e.target.value) : undefined}
                       className={`profile-input ${socialValidationErrors.telegram ? 'error' : ''}`}
-                      placeholder="https://t.me/username или @username"
+                      placeholder="t.me/username или @username"
                       disabled={!isEditingAbout}
                     />
                     {socialValidationErrors.telegram && (

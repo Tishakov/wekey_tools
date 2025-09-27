@@ -29,7 +29,7 @@ module.exports = (sequelize) => {
           'synonym-generator', 'word-declension', 'text-by-columns',
           'char-counter', 'match-types', 'number-generator',
           'password-generator', 'emoji', 'site-audit', 'seo-audit', 
-          'seo-audit-pro', 'seoauditpro', 'privacy-policy-generator', 'qr-generator'
+          'seoauditpro', 'privacy-policy-generator', 'qr-generator'
         ]]
       }
     },

@@ -54,7 +54,7 @@ const toolNameValidator = body('toolName')
     'add-symbol', 'find-replace', 'text-generator',
     'synonym-generator', 'word-declension', 'text-by-columns',
     'char-counter', 'match-types', 'number-generator',
-    'password-generator', 'emoji', 'site-audit', 'seo-audit', 'seo-audit-pro', 'seoauditpro',
+    'password-generator', 'emoji', 'site-audit', 'seo-audit', 'seoauditpro',
     'privacy-policy-generator', 'qr-generator',
     // Форматы с подчеркиваниями
     'case_changer_tool', 'remove_duplicates_tool', 'duplicate_finder_tool',
