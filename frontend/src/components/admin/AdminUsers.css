@@ -1100,3 +1100,264 @@
   outline: none;
   border-color: var(--accent-color);
 }
+
+/* Новые стили для интерактивного dropdown причин */
+.reason-selector {
+  position: relative;
+}
+
+.reason-input-container {
+  position: relative;
+}
+
+.selected-reason {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.selected-reason:hover {
+  border-color: var(--accent-color);
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.dropdown-toggle:hover {
+  color: var(--text-primary);
+}
+
+.selected-reason-text {
+  flex: 1;
+  text-align: left;
+  color: var(--text-primary);
+  margin-right: 8px;
+}
+
+.selected-reason-placeholder {
+  flex: 1;
+  text-align: left;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-right: 8px;
+}
+
+.reasons-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 4px;
+  animation: dropdownSlide 0.2s ease;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reason-item {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.reason-item:last-child {
+  border-bottom: none;
+}
+
+.reason-item:hover {
+  background: var(--bg-secondary);
+}
+
+.reason-display-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reason-text {
+  flex: 1;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.reason-text:hover {
+  color: var(--accent-color);
+}
+
+.reason-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.reason-item:hover .reason-actions {
+  opacity: 1;
+}
+
+.reason-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  font-size: 12px;
+}
+
+.reason-actions button:hover {
+  background: var(--bg-secondary);
+}
+
+.reason-edit-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reason-edit-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--accent-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.reason-edit-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.reason-edit-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.save-btn, .cancel-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.save-btn {
+  color: var(--success-color, #10B981);
+}
+
+.save-btn:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  color: var(--error-color, #EF4444);
+}
+
+.cancel-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.reason-item.adding {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reason-item.add-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.reason-item.add-new:hover {
+  background: var(--bg-secondary);
+  color: var(--primary-color);
+}
+
+.add-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.new-reason-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--accent-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.new-reason-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}

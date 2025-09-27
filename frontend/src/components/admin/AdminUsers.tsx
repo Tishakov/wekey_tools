@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AdminUsers.css';
 
 interface User {
@@ -19,6 +19,104 @@ interface User {
     lastToolUsage: string | null;
   };
 }
+
+interface CoinOperationReason {
+  id: number;
+  reason: string;
+  type: 'add' | 'subtract' | 'both';
+  sortOrder: number;
+  isActive: boolean;
+}
+
+// Компонент для элемента причины с inline редактированием
+interface ReasonItemProps {
+  reason: CoinOperationReason;
+  onSelect: (reason: string) => void;
+  onEdit: (id: number, newText: string) => void;
+  onDelete: (id: number) => void;
+}
+
+const ReasonItem: React.FC<ReasonItemProps> = ({ reason, onSelect, onEdit, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(reason.reason);
+
+  const handleSave = () => {
+    if (editText.trim() && editText !== reason.reason) {
+      onEdit(reason.id, editText.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditText(reason.reason);
+    setIsEditing(false);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  return (
+    <div className="reason-item">
+      {isEditing ? (
+        <div className="reason-edit-mode">
+          <input
+            type="text"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="reason-edit-input"
+            autoFocus
+          />
+          <div className="reason-edit-actions">
+            <button 
+              onClick={handleSave}
+              className="save-btn"
+              disabled={!editText.trim()}
+            >
+              ✓
+            </button>
+            <button 
+              onClick={handleCancel}
+              className="cancel-btn"
+            >
+              ✗
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="reason-display-mode">
+          <span 
+            className="reason-text"
+            onClick={() => onSelect(reason.reason)}
+          >
+            {reason.reason}
+          </span>
+          <div className="reason-actions">
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="edit-btn"
+              title="Редактировать"
+            >
+              ✏️
+            </button>
+            <button 
+              onClick={() => onDelete(reason.id)}
+              className="delete-btn"
+              title="Удалить"
+            >
+              🗑️
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface UsersResponse {
   success: boolean;
@@ -71,22 +169,16 @@ const AdminUsers: React.FC = () => {
     loading: false
   });
 
-  // Состояние для управления списком причин
-  const [reasonsModal, setReasonsModal] = useState<{
-    show: boolean;
-    loading: boolean;
-  }>({
-    show: false,
-    loading: false
-  });
+  // Состояние для интерактивного dropdown причин
+  const [showReasonsDropdown, setShowReasonsDropdown] = useState(false);
+  const [isAddingNewReason, setIsAddingNewReason] = useState(false);
+  const [newReasonText, setNewReasonText] = useState('');
+  const [coinReasons, setCoinReasons] = useState<CoinOperationReason[]>([]);
 
-  const [coinReasons, setCoinReasons] = useState<{
-    add: Array<{ id: number; reason: string; type: string; sortOrder: number }>;
-    subtract: Array<{ id: number; reason: string; type: string; sortOrder: number }>;
-  }>({
-    add: [],
-    subtract: []
-  });
+  // Refs для обработки кликов
+  const reasonsDropdownRef = useRef<HTMLDivElement>(null);
+
+
   
   // Состояние для сортировки
   const [sortField, setSortField] = useState<string | null>(null);
@@ -140,6 +232,20 @@ const AdminUsers: React.FC = () => {
 
   useEffect(() => {
     fetchUsers(1);
+  }, []);
+
+  // Обработка клика вне области dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (reasonsDropdownRef.current && !reasonsDropdownRef.current.contains(event.target as Node)) {
+        setShowReasonsDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const handlePageChange = (page: number) => {
@@ -306,7 +412,57 @@ const AdminUsers: React.FC = () => {
     }
   };
 
-  const cancelCoinAction = () => {
+  // Функции для работы с причинами операций
+  const loadCoinReasons = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.log('❌ No admin token found');
+        return;
+      }
+
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      console.log('🔄 Loading coin reasons from:', `${API_BASE}/api/admin/coin-reasons`);
+      
+      // Загружаем все причины
+      const response = await fetch(`${API_BASE}/api/admin/coin-reasons`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Loaded coin reasons:', data);
+        setCoinReasons(data.data || []);
+      } else {
+        console.error('❌ Failed to load coin reasons:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('❌ Error loading coin reasons:', error);
+    }
+  };
+
+
+
+  // Фильтрация причин по типу операции
+  const filteredReasons = coinReasons.filter(reason => 
+    reason.type === coinModal.type || reason.type === 'both'
+  );
+  
+  // Отладка
+  console.log('🔍 Debug reasons:', {
+    coinModal: coinModal.type,
+    allReasons: coinReasons.length,
+    filteredReasons: filteredReasons.length,
+    filtered: filteredReasons
+  });
+
+  // Обработчики для dropdown
+  const handleReasonSelect = (reason: string) => {
+    setCoinModal(prev => ({ ...prev, reason }));
+    setShowReasonsDropdown(false);
+  };
+
+  const closeCoinModal = () => {
     setCoinModal({
       show: false,
       user: null,
@@ -316,54 +472,86 @@ const AdminUsers: React.FC = () => {
       customReason: '',
       loading: false
     });
+    setShowReasonsDropdown(false);
+    setIsAddingNewReason(false);
+    setNewReasonText('');
   };
 
-  // Функции для работы с причинами операций
-  const loadCoinReasons = async () => {
+  // Обработчики для управления причинами
+  const handleAddNewReason = async () => {
+    if (!newReasonText.trim() || !coinModal.type) return;
+
     try {
       const token = localStorage.getItem('adminToken');
-      if (!token) return;
-
       const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       
-      // Загружаем причины для начисления и списания
-      const [addResponse, subtractResponse] = await Promise.all([
-        fetch(`${API_BASE}/api/admin/coin-reasons?type=add`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+      const response = await fetch(`${API_BASE}/api/admin/coin-reasons`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          reason: newReasonText.trim(),
+          type: coinModal.type,
+          sortOrder: coinReasons.length + 1
         }),
-        fetch(`${API_BASE}/api/admin/coin-reasons?type=subtract`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
-      ]);
+      });
 
-      if (addResponse.ok && subtractResponse.ok) {
-        const [addData, subtractData] = await Promise.all([
-          addResponse.json(),
-          subtractResponse.json()
-        ]);
-
-        if (addData.success && subtractData.success) {
-          setCoinReasons({
-            add: addData.data,
-            subtract: subtractData.data
-          });
-        }
+      if (response.ok) {
+        await loadCoinReasons();
+        setNewReasonText('');
+        setIsAddingNewReason(false);
       }
     } catch (error) {
-      console.error('Error loading coin reasons:', error);
+      console.error('Ошибка добавления причины:', error);
     }
   };
 
-  const handleCoinReasonChange = (value: string) => {
-    if (value === 'custom') {
-      setCoinModal(prev => ({ ...prev, reason: 'custom', customReason: '' }));
-    } else {
-      setCoinModal(prev => ({ ...prev, reason: value, customReason: '' }));
+  const handleEditReason = async (id: number, newText: string) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      
+      const response = await fetch(`${API_BASE}/api/admin/coin-reasons/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          reason: newText
+        }),
+      });
+
+      if (response.ok) {
+        await loadCoinReasons();
+      }
+    } catch (error) {
+      console.error('Ошибка редактирования причины:', error);
     }
   };
 
-  const handleCustomReasonChange = (value: string) => {
-    setCoinModal(prev => ({ ...prev, customReason: value }));
+  const handleDeleteReason = async (id: number) => {
+    if (!confirm('Удалить эту причину?')) return;
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      
+      const response = await fetch(`${API_BASE}/api/admin/coin-reasons/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        await loadCoinReasons();
+      }
+    } catch (error) {
+      console.error('Ошибка удаления причины:', error);
+    }
   };
 
   // Функция для обработки сортировки
@@ -880,6 +1068,12 @@ const AdminUsers: React.FC = () => {
               <h3>
                 {coinModal.type === 'add' ? 'Начислить коины' : 'Списать коины'}
               </h3>
+              <button 
+                className="close-button"
+                onClick={closeCoinModal}
+              >
+                ×
+              </button>
             </div>
             
             <div className="coin-modal-body">
@@ -926,38 +1120,92 @@ const AdminUsers: React.FC = () => {
                 
                 <div className="coin-form-field">
                   <label>Причина операции:</label>
-                  <select
-                    value={coinModal.reason}
-                    onChange={(e) => handleCoinReasonChange(e.target.value)}
-                    disabled={coinModal.loading}
-                    className="coin-reason-select"
-                  >
-                    <option value="">Выберите причину...</option>
-                    {coinModal.type && coinReasons[coinModal.type]?.map((reason) => (
-                      <option key={reason.id} value={reason.reason}>
-                        {reason.reason}
-                      </option>
-                    ))}
-                    <option value="custom">🖊️ Свой вариант...</option>
-                  </select>
-                  
-                  {coinModal.reason === 'custom' && (
-                    <textarea
-                      value={coinModal.customReason}
-                      onChange={(e) => handleCustomReasonChange(e.target.value)}
-                      placeholder="Введите причину операции..."
-                      disabled={coinModal.loading}
-                      rows={3}
-                      className="custom-reason-textarea"
-                    />
-                  )}
+                  <div className="reason-selector">
+                    <div className="reason-input-container">
+                      <div 
+                        className="selected-reason"
+                        onClick={() => setShowReasonsDropdown(!showReasonsDropdown)}
+                      >
+                        <span className={coinModal.reason ? 'selected-reason-text' : 'selected-reason-placeholder'}>
+                          {coinModal.reason || 'Выберите причину операции...'}
+                        </span>
+                        <button 
+                          type="button"
+                          className="dropdown-toggle"
+                        >
+                          ▼
+                        </button>
+                      </div>
+                      
+                      {showReasonsDropdown && (
+                        <div 
+                          className="reasons-dropdown"
+                          ref={reasonsDropdownRef}
+                        >
+                          {filteredReasons.map(reason => (
+                            <ReasonItem
+                              key={reason.id}
+                              reason={reason}
+                              onSelect={handleReasonSelect}
+                              onEdit={(id, newText) => handleEditReason(id, newText)}
+                              onDelete={handleDeleteReason}
+                            />
+                          ))}
+                          
+                          {isAddingNewReason ? (
+                            <div className="reason-item adding">
+                              <input
+                                type="text"
+                                value={newReasonText}
+                                onChange={(e) => setNewReasonText(e.target.value)}
+                                placeholder="Новая причина..."
+                                className="new-reason-input"
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleAddNewReason();
+                                  }
+                                }}
+                                autoFocus
+                              />
+                              <div className="reason-actions">
+                                <button 
+                                  onClick={handleAddNewReason}
+                                  className="save-btn"
+                                  disabled={!newReasonText.trim()}
+                                >
+                                  ✓
+                                </button>
+                                <button 
+                                  onClick={() => {
+                                    setIsAddingNewReason(false);
+                                    setNewReasonText('');
+                                  }}
+                                  className="cancel-btn"
+                                >
+                                  ✗
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div 
+                              className="reason-item add-new"
+                              onClick={() => setIsAddingNewReason(true)}
+                            >
+                              <span className="add-icon">+</span>
+                              Добавить новую причину
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             
             <div className="coin-modal-footer">
               <button 
-                onClick={cancelCoinAction}
+                onClick={closeCoinModal}
                 className="coin-modal-btn cancel-btn"
                 disabled={coinModal.loading}
               >
