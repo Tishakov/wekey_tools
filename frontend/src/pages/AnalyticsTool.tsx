@@ -7,7 +7,6 @@ import { useAuthRequired } from '../hooks/useAuthRequired';
 import { useToolWithCoins } from '../hooks/useToolWithCoins';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
-import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import './AnalyticsTool.css';
 import { openaiService, type AnalyticsData } from '../services/openaiService';
@@ -211,8 +210,10 @@ const AnalyticsTool: React.FC = () => {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const count = await statsService.getLaunchCount(TOOL_ID);
-        setLaunchCount(count);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        const response = await fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`);
+        const data = await response.json();
+        setLaunchCount(data.count);
       } catch (error) {
         console.warn('Failed to load statistics:', error);
         setLaunchCount(0);
@@ -258,20 +259,16 @@ const AnalyticsTool: React.FC = () => {
       return;
     }
     
-    // Увеличиваем счетчик использования для анализа ИИ
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
-    }
-    
     setIsAnalyzing(true);
     setAiError('');
     setAiResponse('');
     
+    // Оптимистично обновляем счетчик сразу
+    setLaunchCount(prev => prev + 1);
+    
     try {
+      // Выполняем операцию с тратой коинов
+      const result = await executeWithCoins(async () => {
       // Подготавливаем данные для анализа
       const analyticsData: AnalyticsData = {
         businessType: landingType, // используем landingType как businessType для совместимости
@@ -287,18 +284,31 @@ const AnalyticsTool: React.FC = () => {
       console.log('📊 Analytics data prepared:', analyticsData);
       
       // Получаем анализ от ИИ
-      const result = await openaiService.getAnalysis(analyticsData);
+      const analysisResult = await openaiService.getAnalysis(analyticsData);
       
-      console.log('📈 Analysis result:', result);
+      console.log('📈 Analysis result:', analysisResult);
       
-      if (result.success && result.analysis) {
-        setAiResponse(result.analysis);
+      if (analysisResult.success && analysisResult.analysis) {
+        setAiResponse(analysisResult.analysis);
         console.log('✅ Analysis set to state');
+        
+        return {
+          analysis: analysisResult.analysis,
+          niche: niche.trim(),
+          inputLength: niche.length
+        };
       } else {
-        console.error('❌ Analysis failed:', result.error);
-        setAiError(result.error || t('analyticsTool.aiAnalysis.error'));
+        console.error('❌ Analysis failed:', analysisResult.error);
+        setAiError(analysisResult.error || t('analyticsTool.aiAnalysis.error'));
+        throw new Error(analysisResult.error || 'Analysis failed');
       }
+    }, {
+      inputLength: niche.length
+    });
+
     } catch (error) {
+      // Откатываем счетчик при ошибке
+      setLaunchCount(prev => prev - 1);
       console.error('💥 Error during AI analysis:', error);
       setAiError(t('analyticsTool.aiAnalysis.error'));
     } finally {
@@ -769,16 +779,12 @@ const AnalyticsTool: React.FC = () => {
       return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
     }
 
-    // Увеличиваем счетчик использования для экспорта
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
-    }
+    // Оптимистично обновляем счетчик сразу
+    setLaunchCount(prev => prev + 1);
 
     try {
+      // Выполняем операцию с тратой коинов
+      const result = await executeWithCoins(async () => {
       let exportData;
       
       if (format === 'vertical') {
@@ -922,7 +928,19 @@ const AnalyticsTool: React.FC = () => {
       });
       
       console.log('Файл успешно экспортирован:', fileName);
+      
+        return {
+          fileName,
+          format,
+          dataLength: exportData.length
+        };
+      }, {
+        inputLength: JSON.stringify(metrics).length
+      });
+
     } catch (error) {
+      // Откатываем счетчик при ошибке
+      setLaunchCount(prev => prev - 1);
       console.error('Ошибка при экспорте:', error);
       alert('Произошла ошибка при экспорте данных');
     }
