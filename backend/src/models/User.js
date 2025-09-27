@@ -202,6 +202,16 @@ module.exports = (sequelize) => {
     googleTokenExpiry: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    // Система коинов
+    coinBalance: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
+        min: 0
+      },
+      comment: 'User coin balance for using tools'
     }
   }, {
     tableName: 'users',

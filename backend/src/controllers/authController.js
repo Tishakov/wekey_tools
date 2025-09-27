@@ -82,7 +82,8 @@ exports.login = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
+        coinBalance: user.coinBalance
       }
     });
 
@@ -132,6 +133,19 @@ exports.register = async (req, res) => {
       role: 'user' // По умолчанию обычный пользователь
     });
 
+    // Добавляем регистрационный бонус коинов
+    const { CoinTransaction } = require('../config/database');
+    try {
+      await CoinTransaction.registrationBonus(user.id, 100);
+      console.log('🪙 Регистрационный бонус 100 коинов добавлен пользователю:', email);
+    } catch (coinError) {
+      console.error('❌ Ошибка при добавлении регистрационного бонуса:', coinError);
+      // Не прерываем регистрацию из-за ошибки с коинами
+    }
+
+    // Перезагружаем пользователя для получения актуального баланса
+    await user.reload();
+
     // Создание JWT токена
     const token = jwt.sign(
       { 
@@ -154,7 +168,8 @@ exports.register = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
+        coinBalance: user.coinBalance
       }
     });
 
@@ -269,7 +284,8 @@ exports.getProfile = async (req, res) => {
         lastLoginAt: user.lastLoginAt,
         loginCount: user.loginCount,
         apiRequestsCount: user.apiRequestsCount,
-        dailyApiLimit: user.dailyApiLimit
+        dailyApiLimit: user.dailyApiLimit,
+        coinBalance: user.coinBalance
       }
     });
 

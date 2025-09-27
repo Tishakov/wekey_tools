@@ -1,0 +1,64 @@
+/* CoinBalance.css - Стили для отображения баланса коинов */
+
+.coin-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.coin-balance:hover {
+  background: #333335;
+  border-color: #444446;
+}
+
+.coin-balance-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.coin-balance-amount {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .coin-balance {
+    padding: 6px 10px;
+  }
+
+  .coin-balance-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .coin-balance-amount {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .coin-balance {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .coin-balance-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .coin-balance-amount {
+    font-size: 12px;
+  }
+}

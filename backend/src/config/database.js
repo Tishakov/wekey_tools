@@ -38,6 +38,7 @@ const User = require('../models/User')(sequelize);
 const ToolUsage = require('../models/ToolUsage')(sequelize);
 const Subscription = require('../models/Subscription')(sequelize);
 const Payment = require('../models/Payment')(sequelize);
+const CoinTransaction = require('../models/CoinTransaction')(sequelize);
 
 // Определение ассоциаций между моделями
 const db = {
@@ -46,7 +47,8 @@ const db = {
   User,
   ToolUsage,
   Subscription,
-  Payment
+  Payment,
+  CoinTransaction
 };
 
 // Связи между таблицами
@@ -61,5 +63,8 @@ Payment.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 Subscription.hasMany(Payment, { foreignKey: 'subscriptionId', as: 'payments' });
 Payment.belongsTo(Subscription, { foreignKey: 'subscriptionId', as: 'subscription' });
+
+User.hasMany(CoinTransaction, { foreignKey: 'userId', as: 'coinTransactions' });
+CoinTransaction.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 module.exports = db;

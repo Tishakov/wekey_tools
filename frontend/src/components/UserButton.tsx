@@ -175,7 +175,7 @@ const UserButton: React.FC = () => {
                     </defs>
                   </svg>
                   Мой баланс
-                  <span className="balance-amount">100</span>
+                  <span className="balance-amount">{user?.coinBalance ?? 0}</span>
                 </button>
                 
                 <div className="user-dropdown-divider"></div>

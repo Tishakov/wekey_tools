@@ -30,6 +30,7 @@ export interface User {
   linkedin?: string;
   telegram?: string;
   website?: string;
+  coinBalance?: number;
 }
 
 // Интерфейс контекста

@@ -101,6 +101,7 @@ try {
   const siteAuditRoutes = require('./routes/siteAudit');
   const seoAuditRoutes = require('./routes/seoAudit');
   const seoAuditProRoutes = require('./routes/seoAuditPro');
+  const coinsRoutes = require('./routes/coins');
 
   app.use('/api/auth', authRoutes);
   app.use('/auth', oauthRoutes); // OAuth маршруты без /api префикса
@@ -108,6 +109,7 @@ try {
   app.use('/api/stats', statsRoutes);
   app.use('/api/analytics', analyticsRoutes); // Подключаем User tracking аналитику
   app.use('/api/users', usersRoutes);
+  app.use('/api/coins', coinsRoutes); // Подключаем систему коинов
   app.use('/api', toolsRoutes); // Подключаем управление инструментами
   app.use('/api/tools', siteAuditRoutes); // Подключаем анализ сайтов
   app.use('/api/tools', seoAuditRoutes); // Подключаем SEO аудит

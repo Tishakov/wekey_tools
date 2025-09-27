@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statsService } from '../utils/statsService';
+import { coinService } from '../services/coinService';
 import { useToolTranslation } from '../i18n/useToolTranslation';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { useAuthRequired } from '../hooks/useAuthRequired';
+import { useAuth } from '../contexts/AuthContext';
 import AuthRequiredModal from '../components/AuthRequiredModal';
 import AuthModal from '../components/AuthModal';
 import '../styles/tool-pages.css';
@@ -16,6 +18,7 @@ const PasswordGeneratorTool: React.FC = () => {
     const { t } = useTranslation();
     const { common, passwordGenerator } = useToolTranslation();
     const { createLink } = useLocalizedLink();
+    const { user, updateUser } = useAuth();
     
     // Auth Required Hook
     const {
@@ -137,6 +140,25 @@ const PasswordGeneratorTool: React.FC = () => {
         // Проверяем авторизацию перед выполнением
         if (!requireAuth()) {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
+        }
+
+        // Тратим коин за использование инструмента
+        try {
+            const coinResult = await coinService.spendCoinsWithValidation(TOOL_ID, 1);
+            if (!coinResult.success) {
+                alert(coinResult.error || 'Ошибка при списании коинов');
+                return;
+            }
+            console.log('🪙 Коин потрачен успешно, новый баланс:', coinResult.newBalance);
+            
+            // Обновляем баланс пользователя в контексте
+            if (user && coinResult.newBalance !== undefined) {
+                updateUser({ ...user, coinBalance: coinResult.newBalance });
+            }
+        } catch (error) {
+            console.error('Ошибка при списании коинов:', error);
+            alert('Ошибка при списании коинов. Попробуйте еще раз.');
+            return;
         }
 
         // Увеличиваем счетчик запусков и получаем актуальное значение
