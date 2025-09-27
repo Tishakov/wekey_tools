@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import SEOHead from '../components/SEOHead';
-import { statsService } from '../utils/statsService';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
 import { useToolWithCoins } from '../hooks/useToolWithCoins';
@@ -44,7 +43,11 @@ const TransliterationTool: React.FC = () => {
 
   // Загружаем счетчик запусков при монтировании компонента
   useEffect(() => {
-    statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+    fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+      .then(res => res.json())
+      .then(data => setLaunchCount(data.count))
+      .catch(err => console.error('Ошибка загрузки счетчика:', err));
   }, []);
 
   const handlePasteText = async () => {
@@ -62,20 +65,12 @@ const TransliterationTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнение
 
         }
+        // Оптимистично обновляем счетчик сразу
+        setLaunchCount(prev => prev + 1);
+
         // Выполняем операцию с тратой коинов
-        await executeWithCoins(async () => {
+        const executeResult = await executeWithCoins(async () => {
             let result = inputText;
-    
-    // Увеличиваем счетчик запусков и получаем актуальное значение
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-        inputLength: inputText.length
-      });
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
-    }
     
     // ОСНОВНАЯ ФУНКЦИЯ: Всегда применяем транслитерацию
     result = transliterate(result);
@@ -103,10 +98,20 @@ const TransliterationTool: React.FC = () => {
       result = result.split('\n').map(line => line.trim()).join('\n');
     }
     
-    setOutputText(result);
+            setOutputText(result);
+            
+            return {
+                transliteratedText: result,
+                inputLength: inputText ? inputText.length : 0
+            };
         }, {
             inputLength: inputText ? inputText.length : 0
         });
+
+        // Если операция не удалась, откатываем счетчик
+        if (!executeResult) {
+            setLaunchCount(prev => prev - 1);
+        }
     };
 
   const handleCopyResult = async () => {

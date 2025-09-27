@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
@@ -36,7 +35,11 @@ const TextToHtmlTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(res => res.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(err => console.error('Ошибка загрузки счетчика:', err));
     }, []);
 
     // Очистка результата при изменении входного текста или режима
@@ -119,18 +122,24 @@ const TextToHtmlTool: React.FC = () => {
             return; // Если пользователь не авторизован, показываем модальное окно и прерываем выполнением
         }
 
+        // Оптимистично обновляем счетчик сразу
+        setLaunchCount(prev => prev + 1);
+
         // Выполняем операцию с тратой коинов
-        const executeResult = await executeWithCoins(async () => {
+        const result = await executeWithCoins(async () => {
             const processedText = processText(inputText);
             setResult(processedText);
-            return processedText;
+            return {
+                processedText,
+                inputLength: inputText.length
+            };
         }, {
             inputLength: inputText.length
         });
         
-        // Обновляем счетчик из результата executeWithCoins
-        if (executeResult.success && executeResult.newLaunchCount !== undefined) {
-            setLaunchCount(executeResult.newLaunchCount);
+        // Если операция не удалась, откатываем счетчик
+        if (!result) {
+            setLaunchCount(prev => prev - 1);
         }
     };
 

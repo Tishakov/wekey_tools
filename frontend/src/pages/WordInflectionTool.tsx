@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import { openaiService, type WordInflectionResponse } from '../services/openaiService';
 import { useAuthRequired } from '../hooks/useAuthRequired';
@@ -37,7 +36,11 @@ const WordInflectionTool: React.FC = () => {
 
   // Загружаем статистику при инициализации
   useEffect(() => {
-    statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+    fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+      .then(res => res.json())
+      .then(data => setLaunchCount(data.count))
+      .catch(err => console.error('Ошибка загрузки счетчика:', err));
   }, []);
 
   // Обработка текста и генерация склонений через ChatGPT
@@ -55,38 +58,49 @@ const WordInflectionTool: React.FC = () => {
     setAiError('');
     setIsGenerating(true);
     
+    // Оптимистично обновляем счетчик сразу
+    setLaunchCount(prev => prev + 1);
+    
     try {
+      // Выполняем операцию с тратой коинов
+      const result = await executeWithCoins(async () => {
       console.log('🤖 Generating word inflections with AI for:', inputText);
       console.log('🌐 Selected language:', selectedLanguage);
       
       const response: WordInflectionResponse = await openaiService.generateWordInflections(inputText, selectedLanguage);
       
-      if (response.success && response.inflections) {
-        setResult(response.inflections.join('\n'));
-        console.log('✅ AI inflections generated:', response.inflections.length, 'items');
-      } else {
-        setAiError(response.error || t('wordInflection.ai.error'));
-        console.error('❌ AI generation failed:', response.error);
+        if (response.success && response.inflections) {
+          setResult(response.inflections.join('\n'));
+          console.log('✅ AI inflections generated:', response.inflections.length, 'items');
+          
+          return {
+            inflections: response.inflections.join('\n'),
+            inputLength: inputText.length,
+            outputLength: response.inflections.join('\n').length
+          };
+        } else {
+          setAiError(response.error || t('wordInflection.ai.error'));
+          console.error('❌ AI generation failed:', response.error);
+          throw new Error(response.error || 'Generation failed');
+        }
+      }, {
+        inputLength: inputText.length
+      });
+
+      // Если операция не удалась, откатываем счетчик
+      if (!result) {
+        setLaunchCount(prev => prev - 1);
       }
-      
     } catch (error) {
+      // Откатываем счетчик при ошибке
+      setLaunchCount(prev => prev - 1);
       console.error('💥 Error during word inflection generation:', error);
       setAiError(t('wordInflection.ai.error'));
     } finally {
       setIsGenerating(false);
     }
     
-    // Обновляем статистику и получаем актуальное значение
-    try {
-      const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-        inputLength: inputText.length,
-        outputLength: result.length
-      });
-      setLaunchCount(newCount);
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      setLaunchCount(prev => prev + 1);
-    }
+
   };
 
   // Обработка копирования

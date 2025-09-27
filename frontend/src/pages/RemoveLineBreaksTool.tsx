@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
@@ -37,7 +36,14 @@ const RemoveLineBreaksTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(response => response.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(error => {
+                console.error('Error loading launch count:', error);
+                setLaunchCount(0);
+            });
     }, []);
 
     // Очистка результата при изменении входных данных или настроек
@@ -78,23 +84,12 @@ const RemoveLineBreaksTool: React.FC = () => {
             setResult('');
             return;
         }
-        // Выполняем операцию с тратой коинов
-        await executeWithCoins(async () => {
-            if (!inputText.trim()) {
-            setResult('');
-            return;
-        }
 
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                inputLength: inputText.length
-            });
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
+        // Оптимистично обновляем счетчик сразу
+        setLaunchCount(prev => prev + 1);
+
+        // Выполняем операцию с тратой коинов
+        const result = await executeWithCoins(async () => {
 
         // Определяем символ замены
         let replacementStr = '';
@@ -137,9 +132,19 @@ const RemoveLineBreaksTool: React.FC = () => {
 
         const resultText = lines.join(replacementStr);
         setResult(resultText);
+        
+        return {
+            resultText,
+            inputLength: inputText.length
+        };
         }, {
             inputLength: inputText ? inputText.length : 0
         });
+
+        // Если операция не удалась, откатываем счетчик
+        if (!result) {
+            setLaunchCount(prev => prev - 1);
+        }
     };
 
     // Копирование результата

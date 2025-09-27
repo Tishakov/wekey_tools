@@ -8,7 +8,6 @@ import './EmojiTool.css';
 import '../styles/tool-pages.css';
 import { EmojiImage } from '../utils/emojiUtils';
 import { Link } from 'react-router-dom';
-import { statsService } from '../utils/statsService';
 import { emojiDatabase } from '../data/emoji/index';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import SEOHead from '../components/SEOHead';
@@ -63,16 +62,14 @@ const EmojiTool: React.FC = () => {
 
     // Загрузка статистики (без увеличения счетчика)
     useEffect(() => {
-        const loadStats = async () => {
-            try {
-                const count = await statsService.getLaunchCount(TOOL_ID);
-                setLaunchCount(count);
-            } catch (error) {
-                console.warn('Failed to load statistics:', error);
+        const API_BASE = 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(response => response.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(error => {
+                console.error('Error loading launch count:', error);
                 setLaunchCount(0);
-            }
-        };
-        loadStats();
+            });
     }, []);
 
     // Фильтрация emoji по поисковому запросу и категории
@@ -100,14 +97,24 @@ const EmojiTool: React.FC = () => {
 
         // Увеличиваем счетчик только при первом использовании эмодзи в сессии
         if (!hasUsedEmojiInSession) {
-            try {
-                const newCount = await statsService.incrementAndGetCount(TOOL_ID);
-                setLaunchCount(newCount);
+            // Оптимистично обновляем счетчик сразу
+            setLaunchCount(prev => prev + 1);
+            
+            // Выполняем операцию с тратой коинов
+            const result = await executeWithCoins(async () => {
                 setHasUsedEmojiInSession(true);
-            } catch (error) {
-                console.error('Failed to update stats:', error);
-                setLaunchCount(prev => prev + 1);
-                setHasUsedEmojiInSession(true);
+                return {
+                    emojiUsed: emoji,
+                    timestamp: Date.now()
+                };
+            }, {
+                inputLength: text.length
+            });
+            
+            // Если операция не удалась, откатываем изменения
+            if (!result) {
+                setLaunchCount(prev => prev - 1);
+                return; // Прерываем выполнение, не вставляем эмодзи
             }
         }
 

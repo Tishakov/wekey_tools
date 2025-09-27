@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
@@ -40,7 +39,11 @@ const TextByColumnsTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(res => res.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(err => console.error('Ошибка загрузки счетчика:', err));
     }, []);
 
     // Очистка результата при изменении входных данных или настроек
@@ -94,23 +97,11 @@ const TextByColumnsTool: React.FC = () => {
             setColumns(['', '', '', '', '', '']);
             return;
         }
-        // Выполняем операцию с тратой коинов
-        await executeWithCoins(async () => {
-            if (!inputText.trim()) {
-            setColumns(['', '', '', '', '', '']);
-            return;
-        }
+        // Оптимистично обновляем счетчик сразу
+        setLaunchCount(prev => prev + 1);
 
-        // Увеличиваем счетчик запусков и получаем актуальное значение
-        try {
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
-                inputLength: inputText.length
-            });
-            setLaunchCount(newCount);
-        } catch (error) {
-            console.error('Failed to update stats:', error);
-            setLaunchCount(prev => prev + 1);
-        }
+        // Выполняем операцию с тратой коинов
+        const result = await executeWithCoins(async () => {
 
         // Определяем символ разделителя
         let separatorStr = '';
@@ -175,10 +166,20 @@ const TextByColumnsTool: React.FC = () => {
             }
         });
 
-        setColumns(newColumns);
+            setColumns(newColumns);
+            
+            return {
+                columns: newColumns,
+                inputLength: inputText ? inputText.length : 0
+            };
         }, {
             inputLength: inputText ? inputText.length : 0
         });
+
+        // Если операция не удалась, откатываем счетчик
+        if (!result) {
+            setLaunchCount(prev => prev - 1);
+        }
     };
 
     // Функция копирования для конкретной колонки

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statsService } from '../utils/statsService';
 import { useLocalizedLink } from '../hooks/useLanguageFromUrl';
 import '../styles/tool-pages.css';
 import { useAuthRequired } from '../hooks/useAuthRequired';
@@ -38,7 +37,11 @@ const WordGluingTool: React.FC = () => {
 
     // Загрузка статистики запусков при монтировании
     useEffect(() => {
-        statsService.getLaunchCount(TOOL_ID).then(setLaunchCount);
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+        fetch(`${API_BASE}/api/stats/launch-count/${TOOL_ID}`)
+            .then(res => res.json())
+            .then(data => setLaunchCount(data.count))
+            .catch(err => console.error('Ошибка загрузки счетчика:', err));
     }, []);
 
     // Очистка результата при изменении входных данных или настроек
@@ -94,8 +97,11 @@ const WordGluingTool: React.FC = () => {
             return;
         }
 
+        // Оптимистично обновляем счетчик сразу
+        setLaunchCount(prev => prev + 1);
+
         // Выполняем операцию с тратой коинов
-        await executeWithCoins(async () => {
+        const result = await executeWithCoins(async () => {
             const lines1 = inputText1.trim().split('\n').filter(line => line.trim());
             const lines2 = inputText2.trim().split('\n').filter(line => line.trim());
             
@@ -152,14 +158,18 @@ const WordGluingTool: React.FC = () => {
 
             setResult(resultLines.join('\n'));
             
-            // Увеличиваем счетчик запусков
-            const newCount = await statsService.incrementAndGetCount(TOOL_ID, {
+            return {
+                result: resultLines.join('\n'),
                 inputLength: inputText1.length + inputText2.length
-            });
-            setLaunchCount(newCount);
+            };
         }, {
             inputLength: inputText1.length + inputText2.length
         });
+
+        // Если операция не удалась, откатываем счетчик
+        if (!result) {
+            setLaunchCount(prev => prev - 1);
+        }
     };
 
     // Копирование результата
