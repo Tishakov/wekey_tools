@@ -18,6 +18,24 @@ interface User {
     uniqueTools: number;
     lastToolUsage: string | null;
   };
+  // Дополнительные поля профиля
+  gender?: 'male' | 'female' | 'other' | null;
+  birthDate?: string | null;
+  phone?: string | null;
+  country?: string | null;
+  bio?: string | null;
+  profession?: string | null;
+  interests?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  linkedin?: string | null;
+  telegram?: string | null;
+  website?: string | null;
+  language?: 'ru' | 'ua' | 'en';
+  theme?: 'dark' | 'light';
+  isEmailVerified?: boolean;
+  isGoogleUser?: boolean;
+  lastLogin?: string | null;
 }
 
 interface CoinOperationReason {
@@ -193,6 +211,22 @@ const AdminUsers: React.FC = () => {
     roles: [] as string[],
     statuses: [] as string[]
   });
+
+  // Состояние для управления раскрытыми аккордеонами
+  const [expandedUsers, setExpandedUsers] = useState<Set<number>>(new Set());
+
+  // Функция для переключения аккордеона пользователя
+  const toggleUserDetails = (userId: number) => {
+    setExpandedUsers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(userId)) {
+        newSet.delete(userId);
+      } else {
+        newSet.add(userId);
+      }
+      return newSet;
+    });
+  };
 
   const fetchUsers = async (page: number = 1) => {
     try {
@@ -725,6 +759,16 @@ const AdminUsers: React.FC = () => {
     });
   };
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Не указано';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const getRoleLabel = (role: string) => {
     switch (role) {
       case 'admin': return 'Админ';
@@ -909,7 +953,8 @@ const AdminUsers: React.FC = () => {
               </tr>
             ) : (
               processedUsers.map((user) => (
-                <tr key={user.id}>
+                <React.Fragment key={user.id}>
+                  <tr>
                   <td>
                     <div className="user-info">
                       <div className="user-avatar">
@@ -980,8 +1025,9 @@ const AdminUsers: React.FC = () => {
                   <td>
                     <div className="user-actions">
                       <button 
-                        className="user-action-btn view-btn"
+                        className={`user-action-btn view-btn ${expandedUsers.has(user.id) ? 'active' : ''}`}
                         title="Детальная информация"
+                        onClick={() => toggleUserDetails(user.id)}
                       >
                         <img src="/icons/eye_users.svg" alt="View" width="16" height="16" />
                       </button>
@@ -996,7 +1042,173 @@ const AdminUsers: React.FC = () => {
                       )}
                     </div>
                   </td>
-                </tr>
+                  </tr>
+                  
+                  {/* Аккордеон с детальной информацией */}
+                  {expandedUsers.has(user.id) && (
+                    <tr className="user-details-row">
+                      <td colSpan={7} className="user-details-cell">
+                        <div className="user-details-accordion">
+                          <div className="user-details-grid">
+                            
+                            {/* Личная информация */}
+                            <div className="user-details-section">
+                              <h4 className="user-details-section-title">Личная информация</h4>
+                              <div className="user-details-items">
+                                {user.gender && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Пол:</span>
+                                    <span className="user-details-value">
+                                      {user.gender === 'male' ? 'Мужской' : user.gender === 'female' ? 'Женский' : 'Другой'}
+                                    </span>
+                                  </div>
+                                )}
+                                {user.birthDate && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Дата рождения:</span>
+                                    <span className="user-details-value">{formatDate(user.birthDate)}</span>
+                                  </div>
+                                )}
+                                {user.phone && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Телефон:</span>
+                                    <span className="user-details-value">{user.phone}</span>
+                                  </div>
+                                )}
+                                {user.country && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Страна:</span>
+                                    <span className="user-details-value">{user.country}</span>
+                                  </div>
+                                )}
+                                <div className="user-details-item">
+                                  <span className="user-details-label">Язык:</span>
+                                  <span className="user-details-value">
+                                    {user.language === 'ru' ? 'Русский' : user.language === 'ua' ? 'Украинский' : 'Английский'}
+                                  </span>
+                                </div>
+                                <div className="user-details-item">
+                                  <span className="user-details-label">Тема:</span>
+                                  <span className="user-details-value">
+                                    {user.theme === 'dark' ? 'Тёмная' : 'Светлая'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Профессиональная информация */}
+                            <div className="user-details-section">
+                              <h4 className="user-details-section-title">О себе</h4>
+                              <div className="user-details-items">
+                                {user.profession && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Профессия:</span>
+                                    <span className="user-details-value">{user.profession}</span>
+                                  </div>
+                                )}
+                                {user.bio && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Коротко о себе:</span>
+                                    <span className="user-details-value">{user.bio}</span>
+                                  </div>
+                                )}
+                                {user.interests && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Интересы:</span>
+                                    <span className="user-details-value">{user.interests}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Социальные сети */}
+                            {(user.facebook || user.instagram || user.linkedin || user.telegram || user.website) && (
+                              <div className="user-details-section">
+                                <h4 className="user-details-section-title">Социальные сети</h4>
+                                <div className="user-details-items">
+                                  {user.facebook && (
+                                    <div className="user-details-item">
+                                      <span className="user-details-label">Facebook:</span>
+                                      <a href={user.facebook} target="_blank" rel="noopener noreferrer" className="user-details-link">
+                                        {user.facebook}
+                                      </a>
+                                    </div>
+                                  )}
+                                  {user.instagram && (
+                                    <div className="user-details-item">
+                                      <span className="user-details-label">Instagram:</span>
+                                      <a href={user.instagram} target="_blank" rel="noopener noreferrer" className="user-details-link">
+                                        {user.instagram}
+                                      </a>
+                                    </div>
+                                  )}
+                                  {user.linkedin && (
+                                    <div className="user-details-item">
+                                      <span className="user-details-label">LinkedIn:</span>
+                                      <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="user-details-link">
+                                        {user.linkedin}
+                                      </a>
+                                    </div>
+                                  )}
+                                  {user.telegram && (
+                                    <div className="user-details-item">
+                                      <span className="user-details-label">Telegram:</span>
+                                      <a href={user.telegram} target="_blank" rel="noopener noreferrer" className="user-details-link">
+                                        {user.telegram}
+                                      </a>
+                                    </div>
+                                  )}
+                                  {user.website && (
+                                    <div className="user-details-item">
+                                      <span className="user-details-label">Сайт:</span>
+                                      <a href={user.website} target="_blank" rel="noopener noreferrer" className="user-details-link">
+                                        {user.website}
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Системная информация */}
+                            <div className="user-details-section">
+                              <h4 className="user-details-section-title">Системная информация</h4>
+                              <div className="user-details-items">
+                                <div className="user-details-item">
+                                  <span className="user-details-label">Email подтвержден:</span>
+                                  <span className={`user-details-value ${user.isEmailVerified ? 'verified' : 'not-verified'}`}>
+                                    {user.isEmailVerified ? 'Да' : 'Нет'}
+                                  </span>
+                                </div>
+                                <div className="user-details-item">
+                                  <span className="user-details-label">Google пользователь:</span>
+                                  <span className="user-details-value">{user.isGoogleUser ? 'Да' : 'Нет'}</span>
+                                </div>
+                                <div className="user-details-item">
+                                  <span className="user-details-label">Количество входов:</span>
+                                  <span className="user-details-value">{user.loginCount}</span>
+                                </div>
+                                {user.lastLogin && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Последний вход:</span>
+                                    <span className="user-details-value">{formatDateTime(user.lastLogin)}</span>
+                                  </div>
+                                )}
+                                {user.toolStats.lastToolUsage && (
+                                  <div className="user-details-item">
+                                    <span className="user-details-label">Последнее использование инструмента:</span>
+                                    <span className="user-details-value">{formatDateTime(user.toolStats.lastToolUsage)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>
