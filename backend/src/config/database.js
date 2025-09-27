@@ -39,6 +39,7 @@ const ToolUsage = require('../models/ToolUsage')(sequelize);
 const Subscription = require('../models/Subscription')(sequelize);
 const Payment = require('../models/Payment')(sequelize);
 const CoinTransaction = require('../models/CoinTransaction')(sequelize);
+const CoinOperationReason = require('../models/CoinOperationReason')(sequelize);
 
 // Определение ассоциаций между моделями
 const db = {
@@ -48,7 +49,8 @@ const db = {
   ToolUsage,
   Subscription,
   Payment,
-  CoinTransaction
+  CoinTransaction,
+  CoinOperationReason
 };
 
 // Связи между таблицами

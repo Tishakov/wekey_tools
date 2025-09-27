@@ -12,6 +12,7 @@ interface User {
   createdAt: string;
   lastLoginAt: string | null;
   loginCount: number;
+  coinBalance: number;
   toolStats: {
     totalUsage: number;
     uniqueTools: number;
@@ -49,6 +50,42 @@ const AdminUsers: React.FC = () => {
     show: false,
     user: null,
     loading: false
+  });
+
+  // Состояние для управления коинами
+  const [coinModal, setCoinModal] = useState<{
+    show: boolean;
+    user: User | null;
+    type: 'add' | 'subtract' | null;
+    amount: string;
+    reason: string;
+    customReason: string;
+    loading: boolean;
+  }>({
+    show: false,
+    user: null,
+    type: null,
+    amount: '',
+    reason: '',
+    customReason: '',
+    loading: false
+  });
+
+  // Состояние для управления списком причин
+  const [reasonsModal, setReasonsModal] = useState<{
+    show: boolean;
+    loading: boolean;
+  }>({
+    show: false,
+    loading: false
+  });
+
+  const [coinReasons, setCoinReasons] = useState<{
+    add: Array<{ id: number; reason: string; type: string; sortOrder: number }>;
+    subtract: Array<{ id: number; reason: string; type: string; sortOrder: number }>;
+  }>({
+    add: [],
+    subtract: []
   });
   
   // Состояние для сортировки
@@ -184,6 +221,149 @@ const AdminUsers: React.FC = () => {
       user: null,
       loading: false
     });
+  };
+
+  // Функции для работы с коинами
+  const handleCoinAction = (user: User, type: 'add' | 'subtract') => {
+    setCoinModal({
+      show: true,
+      user,
+      type,
+      amount: '',
+      reason: '',
+      customReason: '',
+      loading: false
+    });
+    
+    // Загружаем список причин при открытии модального окна
+    loadCoinReasons();
+  };
+
+  const handleCoinAmountChange = (value: string) => {
+    // Разрешаем только цифры
+    if (/^\d*$/.test(value)) {
+      setCoinModal(prev => ({ ...prev, amount: value }));
+    }
+  };
+
+  const confirmCoinAction = async () => {
+    const finalReason = coinModal.reason === 'custom' ? coinModal.customReason : coinModal.reason;
+    
+    if (!coinModal.user || !coinModal.type || !coinModal.amount || !finalReason) return;
+
+    try {
+      setCoinModal(prev => ({ ...prev, loading: true }));
+      
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        throw new Error('Токен авторизации не найден');
+      }
+
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      const response = await fetch(`${API_BASE}/api/admin/users/${coinModal.user.id}/coins`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: coinModal.type,
+          amount: parseInt(coinModal.amount),
+          reason: finalReason
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Обновляем баланс пользователя в локальном состоянии
+        setUsers(prev => prev.map(u => 
+          u.id === coinModal.user!.id 
+            ? { ...u, coinBalance: data.data.newBalance }
+            : u
+        ));
+        
+        // Закрываем модальное окно
+        setCoinModal({
+          show: false,
+          user: null,
+          type: null,
+          amount: '',
+          reason: '',
+          customReason: '',
+          loading: false
+        });
+        
+        console.log('✅ Баланс коинов успешно обновлен:', data.data);
+      } else {
+        throw new Error(data.message || 'Ошибка обновления баланса коинов');
+      }
+    } catch (err) {
+      console.error('Error updating coin balance:', err);
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка при обновлении баланса');
+      
+      setCoinModal(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const cancelCoinAction = () => {
+    setCoinModal({
+      show: false,
+      user: null,
+      type: null,
+      amount: '',
+      reason: '',
+      customReason: '',
+      loading: false
+    });
+  };
+
+  // Функции для работы с причинами операций
+  const loadCoinReasons = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
+      
+      // Загружаем причины для начисления и списания
+      const [addResponse, subtractResponse] = await Promise.all([
+        fetch(`${API_BASE}/api/admin/coin-reasons?type=add`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`${API_BASE}/api/admin/coin-reasons?type=subtract`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      if (addResponse.ok && subtractResponse.ok) {
+        const [addData, subtractData] = await Promise.all([
+          addResponse.json(),
+          subtractResponse.json()
+        ]);
+
+        if (addData.success && subtractData.success) {
+          setCoinReasons({
+            add: addData.data,
+            subtract: subtractData.data
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading coin reasons:', error);
+    }
+  };
+
+  const handleCoinReasonChange = (value: string) => {
+    if (value === 'custom') {
+      setCoinModal(prev => ({ ...prev, reason: 'custom', customReason: '' }));
+    } else {
+      setCoinModal(prev => ({ ...prev, reason: value, customReason: '' }));
+    }
+  };
+
+  const handleCustomReasonChange = (value: string) => {
+    setCoinModal(prev => ({ ...prev, customReason: value }));
   };
 
   // Функция для обработки сортировки
@@ -476,13 +656,21 @@ const AdminUsers: React.FC = () => {
                   </span>
                 )}
               </th>
+              <th onClick={() => handleSort('coinBalance')} className="sortable">
+                Баланс коинов
+                {sortField === 'coinBalance' && (
+                  <span className="sort-indicator">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
               <th>Действия</th>
             </tr>
           </thead>
           <tbody>
             {processedUsers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="admin-users-empty">
+                <td colSpan={8} className="admin-users-empty">
                   {users.length === 0 ? 'Пользователи не найдены' : 'Нет пользователей, соответствующих фильтрам'}
                 </td>
               </tr>
@@ -544,6 +732,30 @@ const AdminUsers: React.FC = () => {
                   <td>
                     <div className="user-stats">
                       <div className="user-stats-number">{user.toolStats.uniqueTools}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="user-coin-balance">
+                      <div className="coin-balance-display">
+                        <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="coin-icon" />
+                        <span className="coin-amount">{user.coinBalance || 0}</span>
+                      </div>
+                      <div className="coin-actions">
+                        <button 
+                          className="coin-action-btn add-btn" 
+                          title="Начислить коины"
+                          onClick={() => handleCoinAction(user, 'add')}
+                        >
+                          +
+                        </button>
+                        <button 
+                          className="coin-action-btn subtract-btn" 
+                          title="Списать коины"
+                          onClick={() => handleCoinAction(user, 'subtract')}
+                        >
+                          −
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td>
@@ -655,6 +867,110 @@ const AdminUsers: React.FC = () => {
                 disabled={deleteModal.loading}
               >
                 {deleteModal.loading ? 'Удаление...' : 'Да, удалить'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {coinModal.show && coinModal.user && coinModal.type && (
+        <div className="coin-modal-overlay">
+          <div className="coin-modal-content">
+            <div className="coin-modal-header">
+              <h3>
+                {coinModal.type === 'add' ? 'Начислить коины' : 'Списать коины'}
+              </h3>
+            </div>
+            
+            <div className="coin-modal-body">
+              <div className="user-info-coin">
+                <div className="user-avatar-coin">
+                  {coinModal.user.avatar ? (
+                    <img 
+                      src={coinModal.user.avatar.startsWith('http') ? coinModal.user.avatar : `http://localhost:8880${coinModal.user.avatar}`} 
+                      alt="User avatar" 
+                    />
+                  ) : (
+                    getInitials(coinModal.user.firstName, coinModal.user.lastName)
+                  )}
+                </div>
+                <div className="user-details-coin">
+                  <div className="user-name-coin">
+                    {coinModal.user.firstName && coinModal.user.lastName 
+                      ? `${coinModal.user.firstName} ${coinModal.user.lastName}`
+                      : coinModal.user.firstName || coinModal.user.lastName || 'Без имени'
+                    }
+                  </div>
+                  <div className="user-email-coin">{coinModal.user.email}</div>
+                  <div className="current-balance">
+                    Текущий баланс: 
+                    <span className="balance-amount">
+                      <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="coin-icon-small" />
+                      {coinModal.user.coinBalance || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="coin-form">
+                <div className="coin-form-field">
+                  <label>Количество коинов:</label>
+                  <input
+                    type="text"
+                    value={coinModal.amount}
+                    onChange={(e) => handleCoinAmountChange(e.target.value)}
+                    placeholder="Введите количество"
+                    disabled={coinModal.loading}
+                  />
+                </div>
+                
+                <div className="coin-form-field">
+                  <label>Причина операции:</label>
+                  <select
+                    value={coinModal.reason}
+                    onChange={(e) => handleCoinReasonChange(e.target.value)}
+                    disabled={coinModal.loading}
+                    className="coin-reason-select"
+                  >
+                    <option value="">Выберите причину...</option>
+                    {coinModal.type && coinReasons[coinModal.type]?.map((reason) => (
+                      <option key={reason.id} value={reason.reason}>
+                        {reason.reason}
+                      </option>
+                    ))}
+                    <option value="custom">🖊️ Свой вариант...</option>
+                  </select>
+                  
+                  {coinModal.reason === 'custom' && (
+                    <textarea
+                      value={coinModal.customReason}
+                      onChange={(e) => handleCustomReasonChange(e.target.value)}
+                      placeholder="Введите причину операции..."
+                      disabled={coinModal.loading}
+                      rows={3}
+                      className="custom-reason-textarea"
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="coin-modal-footer">
+              <button 
+                onClick={cancelCoinAction}
+                className="coin-modal-btn cancel-btn"
+                disabled={coinModal.loading}
+              >
+                Отмена
+              </button>
+              <button 
+                onClick={confirmCoinAction}
+                className={`coin-modal-btn confirm-btn ${coinModal.type === 'add' ? 'add-btn' : 'subtract-btn'}`}
+                disabled={coinModal.loading || !coinModal.amount || 
+                  (!coinModal.reason || (coinModal.reason === 'custom' && !coinModal.customReason))}
+              >
+                {coinModal.loading ? 'Обработка...' : 
+                  coinModal.type === 'add' ? 'Начислить' : 'Списать'}
               </button>
             </div>
           </div>

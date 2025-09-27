@@ -211,6 +211,7 @@ router.get('/users', async (req, res, next) => {
 
       return {
         ...user.toJSON(),
+        coinBalance: user.coinBalance || 0,
         toolStats: {
           totalUsage: parseInt(userStats?.totalUsage || 0),
           uniqueTools: parseInt(userStats?.uniqueTools || 0),
@@ -385,6 +386,226 @@ router.delete('/users/:userId', async (req, res, next) => {
     res.status(500).json({
       success: false,
       message: 'Ошибка при удалении пользователя',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/admin/coin-reasons - Получить список причин для операций с коинами
+router.get('/coin-reasons', async (req, res, next) => {
+  try {
+    const { type } = req.query; // 'add', 'subtract', или не указан (все)
+    
+    const { CoinOperationReason } = require('../config/database');
+    const reasons = await CoinOperationReason.getByType(type);
+    
+    res.json({
+      success: true,
+      data: reasons
+    });
+  } catch (error) {
+    console.error('❌ Error fetching coin reasons:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при получении списка причин',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/admin/coin-reasons - Создать новую причину
+router.post('/coin-reasons', async (req, res, next) => {
+  try {
+    const { type, reason, sortOrder = 0 } = req.body;
+    
+    if (!['add', 'subtract', 'both'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Тип операции должен быть "add", "subtract" или "both"'
+      });
+    }
+    
+    if (!reason || reason.trim().length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Причина должна содержать минимум 3 символа'
+      });
+    }
+    
+    const { CoinOperationReason } = require('../config/database');
+    const newReason = await CoinOperationReason.createReason(type, reason.trim(), sortOrder);
+    
+    res.json({
+      success: true,
+      data: newReason,
+      message: 'Причина успешно создана'
+    });
+  } catch (error) {
+    console.error('❌ Error creating coin reason:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при создании причины',
+      error: error.message
+    });
+  }
+});
+
+// PUT /api/admin/coin-reasons/:id - Обновить причину
+router.put('/coin-reasons/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { type, reason, sortOrder, isActive } = req.body;
+    
+    const { CoinOperationReason } = require('../config/database');
+    const existingReason = await CoinOperationReason.findByPk(id);
+    
+    if (!existingReason) {
+      return res.status(404).json({
+        success: false,
+        message: 'Причина не найдена'
+      });
+    }
+    
+    const updateData = {};
+    if (type && ['add', 'subtract', 'both'].includes(type)) updateData.type = type;
+    if (reason && reason.trim().length >= 3) updateData.reason = reason.trim();
+    if (typeof sortOrder === 'number') updateData.sortOrder = sortOrder;
+    if (typeof isActive === 'boolean') updateData.isActive = isActive;
+    
+    await existingReason.update(updateData);
+    
+    res.json({
+      success: true,
+      data: existingReason,
+      message: 'Причина успешно обновлена'
+    });
+  } catch (error) {
+    console.error('❌ Error updating coin reason:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при обновлении причины',
+      error: error.message
+    });
+  }
+});
+
+// DELETE /api/admin/coin-reasons/:id - Удалить причину (мягкое удаление)
+router.delete('/coin-reasons/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    const { CoinOperationReason } = require('../config/database');
+    const existingReason = await CoinOperationReason.findByPk(id);
+    
+    if (!existingReason) {
+      return res.status(404).json({
+        success: false,
+        message: 'Причина не найдена'
+      });
+    }
+    
+    // Мягкое удаление - просто деактивируем
+    await existingReason.update({ isActive: false });
+    
+    res.json({
+      success: true,
+      message: 'Причина успешно удалена'
+    });
+  } catch (error) {
+    console.error('❌ Error deleting coin reason:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при удалении причины',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/admin/users/:userId/coins - Управление коинами пользователя
+router.post('/users/:userId/coins', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { type, amount, reason } = req.body;
+
+    // Валидация входных данных
+    if (!['add', 'subtract'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Тип операции должен быть "add" или "subtract"'
+      });
+    }
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Количество коинов должно быть положительным числом'
+      });
+    }
+
+    if (!reason || reason.trim().length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Укажите причину операции (минимум 3 символа)'
+      });
+    }
+
+    // Проверяем существование пользователя
+    const user = await db.User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Для списания проверяем достаточность средств
+    if (type === 'subtract' && user.coinBalance < amount) {
+      return res.status(400).json({
+        success: false,
+        message: 'Недостаточно коинов для списания'
+      });
+    }
+
+    console.log(`💰 Admin coin operation: ${type} ${amount} coins for user ${user.email}`);
+
+    const { CoinTransaction } = require('../config/database');
+    
+    // Создаем транзакцию коинов
+    const transactionType = type === 'add' ? 'admin_add' : 'admin_subtract';
+    const transactionAmount = type === 'add' ? amount : -amount;
+    
+    const result = await CoinTransaction.createTransaction(
+      parseInt(userId), 
+      transactionType, 
+      transactionAmount, 
+      {
+        description: reason,
+        metadata: { 
+          adminOperation: true,
+          adminUserId: req.user?.userId || null
+        }
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Коины успешно ${type === 'add' ? 'начислены' : 'списаны'}`,
+      data: {
+        transactionId: result.transaction.id,
+        newBalance: result.newBalance,
+        operation: {
+          type,
+          amount,
+          reason
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error managing user coins:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при управлении коинами пользователя',
       error: error.message
     });
   }
