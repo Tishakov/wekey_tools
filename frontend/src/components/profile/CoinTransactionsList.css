@@ -1,0 +1,184 @@
+/* CoinTransactionsList.css */
+.coin-transactions-list {
+  flex: 1;
+}
+
+/* Фильтры */
+.transactions-filters {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.filter-reset {
+  padding: 0.5rem 1rem;
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  height: fit-content;
+}
+
+.filter-reset:hover {
+  background: #4b5563;
+}
+
+/* Список транзакций */
+.transactions-list {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.no-transactions {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.transactions-table {
+  width: 100%;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 150px 1fr 100px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 100px;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.table-row:hover {
+  background: #f9fafb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.col-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.col-description {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.col-amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.col-amount.earning {
+  color: #059669;
+}
+
+.col-amount.spending {
+  color: #dc2626;
+}
+
+/* Пагинация */
+.transactions-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.transactions-pagination button {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.transactions-pagination button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.transactions-pagination button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .transactions-filters {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 120px 1fr 80px;
+    padding: 0.5rem;
+  }
+  
+  .col-date,
+  .col-description,
+  .col-amount {
+    font-size: 0.8rem;
+  }
+}

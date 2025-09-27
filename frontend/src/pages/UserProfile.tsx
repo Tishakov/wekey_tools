@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import AvatarUpload from '../components/profile/AvatarUpload';
-import CoinTransactions from '../components/profile/CoinTransactions';
+import CoinTransactionsLeft from '../components/profile/CoinTransactionsLeft';
+import CoinTransactionsRight from '../components/profile/CoinTransactionsRight';
 import './UserProfile.css';
 
 // Список популярных стран
@@ -1087,6 +1088,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
             </div>
           )}
 
+        {/* Контент для coins в левой колонке */}
+        {activeSection === 'coins' && (
+          <CoinTransactionsLeft />
+        )}
+
         </div>
         </div>
       </div>
@@ -1289,17 +1295,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
       )}
 
-      {/* Секция монет и транзакций */}
-      {activeSection === 'coins' && (
-        <div className="profile-section">
-          <CoinTransactions />
+      {/* Правая колонка для password и settings */}
+      {(activeSection === 'password' || activeSection === 'settings') && (
+        <div className="profile-right-column">
+          {/* Пустая правая колонка для будущего контента */}
         </div>
       )}
 
-      {/* Пустая правая колонка для password и settings */}
-      {(activeSection === 'password' || activeSection === 'settings' || activeSection === 'coins') && (
+      {/* Правая колонка для coins */}
+      {activeSection === 'coins' && (
         <div className="profile-right-column">
-          {/* Пустая правая колонка для будущего контента */}
+          <CoinTransactionsRight />
         </div>
       )}
     </div>
