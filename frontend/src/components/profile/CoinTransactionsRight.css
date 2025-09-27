@@ -9,9 +9,9 @@
 
 /* Filters */
 .transactions-filters {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 16px;
   padding: 1rem;
 }
 
@@ -25,48 +25,50 @@
 .filter-select,
 .filter-date {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid #333335;
+  border-radius: 8px;
   font-size: 0.875rem;
-  background: white;
+  background: #1a1a1c;
+  color: #FFFFFF;
   width: 100%;
 }
 
 .filter-select:focus,
 .filter-date:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
 .filter-clear {
   padding: 0.5rem 0.75rem;
-  background: #6b7280;
+  background: #f59e0b;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.875rem;
   white-space: nowrap;
+  transition: background 0.2s ease;
 }
 
 .filter-clear:hover {
-  background: #4b5563;
+  background: #d97706;
 }
 
 /* Transaction List */
 .transactions-list {
   flex: 1;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 16px;
   overflow: hidden;
 }
 
 .loading {
   padding: 2rem;
   text-align: center;
-  color: #6b7280;
+  color: #FFFFFF;
   font-size: 0.875rem;
 }
 
@@ -81,13 +83,13 @@
 }
 
 .no-transactions h3 {
-  color: #374151;
+  color: #FFFFFF;
   margin-bottom: 0.5rem;
   font-size: 1rem;
 }
 
 .no-transactions p {
-  color: #6b7280;
+  color: #B0B0B0;
   margin: 0;
   font-size: 0.875rem;
 }
@@ -102,12 +104,12 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #333335;
   transition: background-color 0.15s ease;
 }
 
 .transaction-item:hover {
-  background: #f9fafb;
+  background: #2a2a2c;
 }
 
 .transaction-item:last-child {
@@ -121,7 +123,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: #1a1a1c;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -133,20 +135,20 @@
 
 .transaction-title {
   font-weight: 500;
-  color: #374151;
+  color: #FFFFFF;
   margin-bottom: 0.1rem;
   font-size: 0.875rem;
 }
 
 .transaction-reason {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #B0B0B0;
   margin-bottom: 0.1rem;
 }
 
 .transaction-date {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: #808080;
 }
 
 .transaction-amount {
@@ -166,11 +168,11 @@
 }
 
 .amount.positive {
-  color: #059669;
+  color: #10b981;
 }
 
 .amount.negative {
-  color: #dc2626;
+  color: #ef4444;
 }
 
 .amount-coin-icon {
@@ -180,7 +182,7 @@
 
 .balance-after {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: #808080;
 }
 
 /* Pagination */
@@ -189,34 +191,37 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background: #1a1a1c;
+  border-top: 1px solid #333335;
 }
 
 .pagination-btn {
   padding: 0.4rem 0.6rem;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.8rem;
-  color: #374151;
+  color: #FFFFFF;
   min-width: 32px;
+  transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: #f59e0b;
+  border-color: #f59e0b;
 }
 
 .pagination-btn:disabled {
-  background: #f9fafb;
-  color: #9ca3af;
+  background: #1a1a1c;
+  color: #666666;
   cursor: not-allowed;
+  border-color: #2a2a2c;
 }
 
 .pagination-info {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #B0B0B0;
 }
 
 /* Адаптивность */
