@@ -1608,31 +1608,43 @@
 }
 
 .user-details-items {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
 }
 
 .user-details-item {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.user-details-item:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .user-details-label {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
-  min-width: 120px;
-  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
 }
 
 .user-details-value {
   color: var(--text-primary);
   font-size: 14px;
-  text-align: right;
+  font-weight: 600;
   word-break: break-word;
+  line-height: 1.4;
 }
 
 .user-details-value.verified {
@@ -1647,12 +1659,47 @@
   color: var(--primary-color);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 600;
   word-break: break-all;
-  text-align: right;
+  padding: 6px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: inline-block;
 }
 
 .user-details-link:hover {
-  text-decoration: underline;
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateX(2px);
+}
+
+.user-details-item.social-link {
+  position: relative;
+}
+
+.user-details-item.social-link::before {
+  content: '🔗';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0.5;
+  font-size: 12px;
+}
+
+.user-details-item.status-verified .user-details-value {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.user-details-item.status-not-verified .user-details-value {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
 }
 
 /* Адаптивность для аккордеона */
@@ -1670,15 +1717,13 @@
     padding: 16px;
   }
   
-  .user-details-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+  .user-details-items {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   
-  .user-details-value,
-  .user-details-link {
-    text-align: left;
+  .user-details-item {
+    padding: 10px;
   }
 }
 

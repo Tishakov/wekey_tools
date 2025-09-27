@@ -1057,40 +1057,40 @@ const AdminUsers: React.FC = () => {
                               <div className="user-details-items">
                                 {user.gender && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Пол:</span>
+                                    <span className="user-details-label">Пол</span>
                                     <span className="user-details-value">
-                                      {user.gender === 'male' ? 'Мужской' : user.gender === 'female' ? 'Женский' : 'Другой'}
+                                      {user.gender === 'male' ? '👨 Мужской' : user.gender === 'female' ? '👩 Женский' : '⚧ Другой'}
                                     </span>
                                   </div>
                                 )}
                                 {user.birthDate && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Дата рождения:</span>
-                                    <span className="user-details-value">{formatDate(user.birthDate)}</span>
+                                    <span className="user-details-label">Дата рождения</span>
+                                    <span className="user-details-value">🎂 {formatDate(user.birthDate)}</span>
                                   </div>
                                 )}
                                 {user.phone && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Телефон:</span>
-                                    <span className="user-details-value">{user.phone}</span>
+                                    <span className="user-details-label">Телефон</span>
+                                    <span className="user-details-value">📞 {user.phone}</span>
                                   </div>
                                 )}
                                 {user.country && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Страна:</span>
-                                    <span className="user-details-value">{user.country}</span>
+                                    <span className="user-details-label">Страна</span>
+                                    <span className="user-details-value">🌍 {user.country}</span>
                                   </div>
                                 )}
                                 <div className="user-details-item">
-                                  <span className="user-details-label">Язык:</span>
+                                  <span className="user-details-label">Язык интерфейса</span>
                                   <span className="user-details-value">
-                                    {user.language === 'ru' ? 'Русский' : user.language === 'ua' ? 'Украинский' : 'Английский'}
+                                    {user.language === 'ru' ? '🇷🇺 Русский' : user.language === 'ua' ? '🇺🇦 Украинский' : '🇬🇧 Английский'}
                                   </span>
                                 </div>
                                 <div className="user-details-item">
-                                  <span className="user-details-label">Тема:</span>
+                                  <span className="user-details-label">Тема</span>
                                   <span className="user-details-value">
-                                    {user.theme === 'dark' ? 'Тёмная' : 'Светлая'}
+                                    {user.theme === 'dark' ? '🌙 Тёмная' : '☀️ Светлая'}
                                   </span>
                                 </div>
                               </div>
@@ -1102,20 +1102,20 @@ const AdminUsers: React.FC = () => {
                               <div className="user-details-items">
                                 {user.profession && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Профессия:</span>
-                                    <span className="user-details-value">{user.profession}</span>
+                                    <span className="user-details-label">Профессия</span>
+                                    <span className="user-details-value">💼 {user.profession}</span>
                                   </div>
                                 )}
                                 {user.bio && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Коротко о себе:</span>
-                                    <span className="user-details-value">{user.bio}</span>
+                                    <span className="user-details-label">Коротко о себе</span>
+                                    <span className="user-details-value">📝 {user.bio}</span>
                                   </div>
                                 )}
                                 {user.interests && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Интересы:</span>
-                                    <span className="user-details-value">{user.interests}</span>
+                                    <span className="user-details-label">Интересы</span>
+                                    <span className="user-details-value">⭐ {user.interests}</span>
                                   </div>
                                 )}
                               </div>
@@ -1127,42 +1127,42 @@ const AdminUsers: React.FC = () => {
                                 <h4 className="user-details-section-title">Социальные сети</h4>
                                 <div className="user-details-items">
                                   {user.facebook && (
-                                    <div className="user-details-item">
-                                      <span className="user-details-label">Facebook:</span>
+                                    <div className="user-details-item social-link">
+                                      <span className="user-details-label">Facebook</span>
                                       <a href={user.facebook} target="_blank" rel="noopener noreferrer" className="user-details-link">
-                                        {user.facebook}
+                                        👥 {user.facebook.replace(/https?:\/\//, '').substring(0, 40)}...
                                       </a>
                                     </div>
                                   )}
                                   {user.instagram && (
-                                    <div className="user-details-item">
-                                      <span className="user-details-label">Instagram:</span>
+                                    <div className="user-details-item social-link">
+                                      <span className="user-details-label">Instagram</span>
                                       <a href={user.instagram} target="_blank" rel="noopener noreferrer" className="user-details-link">
-                                        {user.instagram}
+                                        📸 {user.instagram.replace(/https?:\/\//, '').substring(0, 40)}...
                                       </a>
                                     </div>
                                   )}
                                   {user.linkedin && (
-                                    <div className="user-details-item">
-                                      <span className="user-details-label">LinkedIn:</span>
+                                    <div className="user-details-item social-link">
+                                      <span className="user-details-label">LinkedIn</span>
                                       <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="user-details-link">
-                                        {user.linkedin}
+                                        💼 {user.linkedin.replace(/https?:\/\//, '').substring(0, 40)}...
                                       </a>
                                     </div>
                                   )}
                                   {user.telegram && (
-                                    <div className="user-details-item">
-                                      <span className="user-details-label">Telegram:</span>
+                                    <div className="user-details-item social-link">
+                                      <span className="user-details-label">Telegram</span>
                                       <a href={user.telegram} target="_blank" rel="noopener noreferrer" className="user-details-link">
-                                        {user.telegram}
+                                        💬 {user.telegram.replace(/https?:\/\//, '').substring(0, 40)}...
                                       </a>
                                     </div>
                                   )}
                                   {user.website && (
-                                    <div className="user-details-item">
-                                      <span className="user-details-label">Сайт:</span>
+                                    <div className="user-details-item social-link">
+                                      <span className="user-details-label">Веб-сайт</span>
                                       <a href={user.website} target="_blank" rel="noopener noreferrer" className="user-details-link">
-                                        {user.website}
+                                        🌐 {user.website.replace(/https?:\/\//, '').substring(0, 40)}...
                                       </a>
                                     </div>
                                   )}
@@ -1174,30 +1174,32 @@ const AdminUsers: React.FC = () => {
                             <div className="user-details-section">
                               <h4 className="user-details-section-title">Системная информация</h4>
                               <div className="user-details-items">
-                                <div className="user-details-item">
-                                  <span className="user-details-label">Email подтвержден:</span>
-                                  <span className={`user-details-value ${user.isEmailVerified ? 'verified' : 'not-verified'}`}>
-                                    {user.isEmailVerified ? 'Да' : 'Нет'}
+                                <div className={`user-details-item ${user.isEmailVerified ? 'status-verified' : 'status-not-verified'}`}>
+                                  <span className="user-details-label">Email статус</span>
+                                  <span className="user-details-value">
+                                    {user.isEmailVerified ? '✅ Подтвержден' : '❌ Не подтвержден'}
                                   </span>
                                 </div>
                                 <div className="user-details-item">
-                                  <span className="user-details-label">Google пользователь:</span>
-                                  <span className="user-details-value">{user.isGoogleUser ? 'Да' : 'Нет'}</span>
+                                  <span className="user-details-label">Тип аккаунта</span>
+                                  <span className="user-details-value">
+                                    {user.isGoogleUser ? '🔍 Google аккаунт' : '📧 Email регистрация'}
+                                  </span>
                                 </div>
                                 <div className="user-details-item">
-                                  <span className="user-details-label">Количество входов:</span>
-                                  <span className="user-details-value">{user.loginCount}</span>
+                                  <span className="user-details-label">Активность</span>
+                                  <span className="user-details-value">🔢 {user.loginCount} входов</span>
                                 </div>
                                 {user.lastLogin && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Последний вход:</span>
-                                    <span className="user-details-value">{formatDateTime(user.lastLogin)}</span>
+                                    <span className="user-details-label">Последний вход</span>
+                                    <span className="user-details-value">🕐 {formatDateTime(user.lastLogin)}</span>
                                   </div>
                                 )}
                                 {user.toolStats.lastToolUsage && (
                                   <div className="user-details-item">
-                                    <span className="user-details-label">Последнее использование инструмента:</span>
-                                    <span className="user-details-value">{formatDateTime(user.toolStats.lastToolUsage)}</span>
+                                    <span className="user-details-label">Последний инструмент</span>
+                                    <span className="user-details-value">🛠️ {formatDateTime(user.toolStats.lastToolUsage)}</span>
                                   </div>
                                 )}
                               </div>
