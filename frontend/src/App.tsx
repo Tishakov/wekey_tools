@@ -66,8 +66,12 @@ function App() {
           <Route path="/admin/logs" element={<AdminPanel />} />
           <Route path="/admin/integrations" element={<AdminPanel />} />
           
-          {/* Профиль пользователя - отдельный layout */}
-          <Route path="/:lang/profile" element={<ProfilePage />} />
+          {/* Профиль пользователя - отдельный layout с подразделами */}
+          <Route path="/:lang/profile" element={<Navigate to="personal-info" replace />} />
+          <Route path="/:lang/profile/personal-info" element={<ProfilePage />} />
+          <Route path="/:lang/profile/password" element={<ProfilePage />} />
+          <Route path="/:lang/profile/transaction-history" element={<ProfilePage />} />
+          <Route path="/:lang/profile/settings" element={<ProfilePage />} />
           
           {/* Многоязычные роуты */}
           <Route path="/:lang" element={<Layout><Outlet /></Layout>}>
