@@ -4,6 +4,100 @@ const { CoinTransaction, User, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const { protect } = require('../middleware/auth');
 
+// Функция для получения понятного названия инструмента
+function getToolDisplayName(toolKey) {
+  const displayNames = {
+    'add_symbol_tool': 'Добавление символов',
+    'analytics_tool': 'Аналитика',
+    'case_changer_tool': 'Изменение регистра',
+    'char_counter_tool': 'Счетчик символов',
+    'cross_analytics_tool': 'Кросс-аналитика',
+    'duplicate_finder_tool': 'Поиск дубликатов',
+    'duplicate_removal_tool': 'Удаление дубликатов',
+    'emoji_tool': 'Эмодзи',
+    'empty_lines_removal_tool': 'Удаление пустых строк',
+    'find_replace_tool': 'Найти и заменить',
+    'match_types_tool': 'Типы соответствий',
+    'minus_words_tool': 'Минус-слова',
+    'number_generator_tool': 'Генератор чисел',
+    'password_generator_tool': 'Генератор паролей',
+    'privacy_policy_generator_tool': 'Генератор политики конфиденциальности',
+    'qr_generator_tool': 'Генератор QR-кодов',
+    'remove_line_breaks_tool': 'Удаление переносов строк',
+    'seo_audit_tool': 'SEO аудит',
+    'seo_audit_pro_tool': 'SEO аудит Pro',
+    'site_audit_tool': 'Аудит сайта',
+    'spaces_to_paragraphs_tool': 'Пробелы в абзацы',
+    'synonym_generator_tool': 'Генератор синонимов',
+    'text_by_columns_tool': 'Текст по столбцам',
+    'text_generator_tool': 'Генератор текста',
+    'text_optimizer_tool': 'Оптимизатор текста',
+    'text_sorting_tool': 'Сортировка слов и строк',
+    'text_to_html_tool': 'Текст в HTML',
+    'transliteration_tool': 'Транслитерация',
+    'utm_generator_tool': 'Генератор UTM-меток',
+    'word_gluing_tool': 'Склейка слов',
+    'word_inflection_tool': 'Склонение слов',
+    'word_mixer_tool': 'Миксация слов',
+    // Поддержка старых названий без _tool
+    'transliteration': 'Транслитерация',
+    'utm-generator': 'Генератор UTM-меток',
+    'char-counter': 'Счетчик символов',
+    'text-optimizer': 'Оптимизатор текста',
+    'duplicate-finder': 'Поиск дубликатов',
+    'duplicate-removal': 'Удаление дубликатов',
+    'text-to-html': 'Текст в HTML',
+    'synonym-generator': 'Генератор синонимов',
+    'word-declension': 'Склонение слов',
+    'password-generator': 'Генератор паролей',
+    'text-generator': 'Генератор текста',
+    'number-generator': 'Генератор чисел',
+    'add-symbol': 'Добавление символов',
+    'case-changer': 'Изменение регистра',
+    'word-mixer': 'Миксация слов',
+    'find-replace': 'Найти и заменить',
+    'minus-words': 'Минус-слова',
+    'spaces-to-paragraphs': 'Пробелы в абзацы',
+    'text-sorting': 'Сортировка слов и строк',
+    'remove-empty-lines': 'Удаление пустых строк',
+    'emoji': 'Эмодзи',
+    'cross-analytics': 'Кросс-аналитика',
+    'word-gluing': 'Склейка слов',
+    'remove-line-breaks': 'Удаление переносов строк',
+    'text-by-columns': 'Текст по столбцам',
+    'match-types': 'Типы соответствий',
+    'site-audit': 'Аудит сайта',
+    'seo-audit': 'SEO аудит',
+    'seo-audit-pro': 'SEO аудит Pro',
+    'privacy-policy-generator': 'Генератор политики конфиденциальности',
+    'qr-generator': 'Генератор QR-кодов'
+  };
+  return displayNames[toolKey] || toolKey;
+}
+
+// Функция для обработки описания транзакции
+function processTransactionDescription(description) {
+  if (!description) return description;
+  
+  // Обработка "Tool usage: toolName"
+  const toolUsageMatch = description.match(/^Tool usage:\s*(.+)$/);
+  if (toolUsageMatch) {
+    const toolName = toolUsageMatch[1];
+    const displayName = getToolDisplayName(toolName);
+    return `Инструмент: ${displayName}`;
+  }
+  
+  // Обработка других типов описаний
+  const translations = {
+    'Registration bonus': 'Бонус за регистрацию',
+    'Admin bonus': 'Бонус от администратора',
+    'Correction balance': 'Корректировка баланса',
+    'Gift from administration': 'Подарок от администрации'
+  };
+  
+  return translations[description] || description;
+}
+
 // Получение истории транзакций текущего пользователя
 router.get('/coin-transactions', protect, async (req, res) => {
   try {
@@ -50,10 +144,16 @@ router.get('/coin-transactions', protect, async (req, res) => {
       attributes: ['coinBalance']
     });
 
+    // Обработка описаний транзакций
+    const processedTransactions = transactions.map(transaction => ({
+      ...transaction.toJSON(),
+      description: processTransactionDescription(transaction.description)
+    }));
+
     res.json({
       success: true,
       data: {
-        transactions,
+        transactions: processedTransactions,
         currentBalance: user.coinBalance || 0,
         pagination: {
           total: count,

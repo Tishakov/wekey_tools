@@ -210,8 +210,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: #1a1a1c;
-  border-top: 1px solid #333335;
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 0px 0px 16px 16px;
 }
 
 .pagination-btn {

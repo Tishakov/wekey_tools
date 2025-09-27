@@ -61,10 +61,10 @@ const CoinTransactionsLeft: React.FC = () => {
 
       {/* current-balance */}
       <div className="current-balance">
-        <div className="balance-card">
+        <div className="coin-balance-card">
           <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="balance-coin-icon" />
           <div className="balance-info">
-            <div className="balance-amount">{currentBalance}</div>
+            <div className="coin-transactions-balance-amount">{currentBalance}</div>
             <div className="balance-label">Текущий баланс</div>
           </div>
         </div>
@@ -73,27 +73,27 @@ const CoinTransactionsLeft: React.FC = () => {
       {/* coin-stats */}
       {stats && (
         <div className="coin-stats">
-          <div className="stat-card">
+          <div className="coin-stat-card">
             <div className="stat-icon">📈</div>
             <div className="stat-content">
-              <div className="stat-value">{stats.totalReceived}</div>
-              <div className="stat-label">Получено</div>
+              <div className="coin-stat-value">{stats.totalReceived}</div>
+              <div className="coin-stat-label">Получено</div>
             </div>
           </div>
           
-          <div className="stat-card">
+          <div className="coin-stat-card">
             <div className="stat-icon">📉</div>
             <div className="stat-content">
-              <div className="stat-value">{stats.totalSpent}</div>
-              <div className="stat-label">Потрачено</div>
+              <div className="coin-stat-value">{stats.totalSpent}</div>
+              <div className="coin-stat-label">Потрачено</div>
             </div>
           </div>
           
-          <div className="stat-card">
+          <div className="coin-stat-card">
             <div className="stat-icon">🧾</div>
             <div className="stat-content">
-              <div className="stat-value">{stats.transactionCount}</div>
-              <div className="stat-label">Операций</div>
+              <div className="coin-stat-value">{stats.transactionCount}</div>
+              <div className="coin-stat-label">Операций</div>
             </div>
           </div>
         </div>

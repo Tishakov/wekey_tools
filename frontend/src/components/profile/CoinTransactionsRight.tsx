@@ -88,6 +88,54 @@ const CoinTransactionsRight: React.FC = () => {
     }
   };
 
+  const formatOperationReason = (reason: string, type: string) => {
+    // Если это использование инструмента, форматируем название
+    if (type === 'tool_usage' && reason.startsWith('Tool usage: ')) {
+      const toolName = reason.replace('Tool usage: ', '');
+      const toolNameRu = getToolNameInRussian(toolName);
+      return `Инструмент: ${toolNameRu}`;
+    }
+    return reason;
+  };
+
+  const getToolNameInRussian = (toolName: string) => {
+    const toolNames: { [key: string]: string } = {
+      'transliteration': 'Транслитерация',
+      'utm-generator': 'Генератор UTM-меток',
+      'char-counter': 'Счетчик символов',
+      'text-optimizer': 'Оптимизатор текста',
+      'duplicate-finder': 'Поиск дубликатов',
+      'duplicate-removal': 'Удаление дубликатов',
+      'text-to-html': 'Текст в HTML',
+      'synonym-generator': 'Генератор синонимов',
+      'word-declension': 'Склонение слов',
+      'password-generator': 'Генератор паролей',
+      'text-generator': 'Генератор текста',
+      'number-generator': 'Генератор чисел',
+      'add-symbol': 'Добавление символов',
+      'case-changer': 'Изменение регистра',
+      'word-mixer': 'Перемешивание слов',
+      'find-replace': 'Найти и заменить',
+      'minus-words': 'Минус-слова',
+      'spaces-to-paragraphs': 'Пробелы в абзацы',
+      'text-sorting': 'Сортировка текста',
+      'remove-empty-lines': 'Удаление пустых строк',
+      'emoji': 'Эмодзи',
+      'cross-analytics': 'Кросс-аналитика',
+      'word-gluing': 'Склеивание слов',
+      'remove-line-breaks': 'Удаление переносов строк',
+      'text-by-columns': 'Текст по колонкам',
+      'match-types': 'Типы соответствий',
+      'site-audit': 'Аудит сайта',
+      'seo-audit': 'SEO аудит',
+      'seo-audit-pro': 'SEO аудит Pro',
+      'privacy-policy-generator': 'Генератор политики конфиденциальности',
+      'qr-generator': 'Генератор QR-кодов'
+    };
+    
+    return toolNames[toolName] || toolName;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU');
   };
@@ -166,7 +214,7 @@ const CoinTransactionsRight: React.FC = () => {
                     {getOperationTitle(transaction.type)}
                   </div>
                   <div className="transaction-reason">
-                    {transaction.description}
+                    {formatOperationReason(transaction.description, transaction.type)}
                   </div>
                   <div className="transaction-date">
                     {formatDate(transaction.createdAt)}

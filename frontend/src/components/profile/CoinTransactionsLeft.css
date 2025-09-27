@@ -24,7 +24,7 @@
   margin-bottom: 1.5rem;
 }
 
-.balance-card {
+.coin-balance-card {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -46,7 +46,7 @@
   flex: 1;
 }
 
-.balance-amount {
+.coin-transactions-balance-amount {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
@@ -65,7 +65,7 @@
   gap: 0.75rem;
 }
 
-.stat-card {
+.coin-stat-card {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -76,7 +76,7 @@
   transition: all 0.2s ease;
 }
 
-.stat-card:hover {
+.coin-stat-card:hover {
   border-color: #444446;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -91,7 +91,7 @@
   flex: 1;
 }
 
-.stat-value {
+.coin-stat-value {
   font-size: 1.25rem;
   font-weight: 600;
   color: #FFFFFF;
@@ -99,27 +99,27 @@
   margin-bottom: 0.1rem;
 }
 
-.stat-label {
+.coin-stat-label {
   font-size: 0.8rem;
   color: #B0B0B0;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .balance-card {
+  .coin-balance-card {
     flex-direction: column;
     text-align: center;
   }
   
-  .balance-amount {
+  .coin-transactions-balance-amount {
     font-size: 2rem;
   }
   
-  .stat-card {
+  .coin-stat-card {
     padding: 1rem;
   }
   
-  .stat-value {
+  .coin-stat-value {
     font-size: 1.25rem;
   }
 }
