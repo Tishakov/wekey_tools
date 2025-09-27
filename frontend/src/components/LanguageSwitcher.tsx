@@ -45,7 +45,6 @@ const LanguageSwitcher: React.FC = () => {
         aria-label="Выбрать язык"
       >
         <span className="language-code">{currentLang.code.toUpperCase()}</span>
-        <span className={`language-arrow ${isOpen ? 'open' : ''}`}>▼</span>
       </button>
       
       {isOpen && (

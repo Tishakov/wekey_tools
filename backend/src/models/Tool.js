@@ -51,6 +51,12 @@ module.exports = (sequelize) => {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
     field: 'updated_at'
+  },
+  coinCost: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    allowNull: false,
+    field: 'coin_cost'
   }
 }, {
   tableName: 'tools',

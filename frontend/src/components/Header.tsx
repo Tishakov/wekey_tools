@@ -9,11 +9,10 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-content">
         <div className="header-left">
-          {/* Здесь может быть логотип или другой контент */}
+          <LanguageSwitcher />
         </div>
         
         <div className="header-right">
-          <LanguageSwitcher />
           <CoinBalance />
           <UserButton />
         </div>

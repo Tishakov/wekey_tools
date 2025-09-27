@@ -31,6 +31,7 @@ router.get('/tools', protect, async (req, res) => {
         category: tool.category,
         isActive: tool.isActive,
         order: tool.order,
+        coinCost: tool.coinCost || 1,
         createdAt: tool.createdAt,
         updatedAt: tool.updatedAt,
         usageCount: usageCount,
@@ -67,7 +68,8 @@ router.get('/tools/active', async (req, res) => {
         description: tool.description,
         icon: tool.icon,
         path: tool.path,
-        category: tool.category
+        category: tool.category,
+        coinCost: tool.coinCost || 1
       }))
     });
   } catch (error) {
@@ -111,6 +113,50 @@ router.patch('/tools/:id/toggle', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Ошибка при переключении статуса инструмента'
+    });
+  }
+});
+
+// Обновить стоимость инструмента
+router.patch('/tools/:id/cost', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { coinCost } = req.body;
+    
+    if (coinCost === undefined || coinCost < 0 || coinCost > 100) {
+      return res.status(400).json({
+        success: false,
+        error: 'Стоимость должна быть числом от 0 до 100'
+      });
+    }
+
+    const tool = await Tool.findByPk(id);
+    if (!tool) {
+      return res.status(404).json({
+        success: false,
+        error: 'Инструмент не найден'
+      });
+    }
+
+    // Обновляем стоимость
+    tool.coinCost = coinCost;
+    await tool.save();
+
+    res.json({
+      success: true,
+      tool: {
+        id: tool.id,
+        toolId: tool.toolId,
+        name: tool.name,
+        coinCost: tool.coinCost
+      },
+      message: `Стоимость инструмента "${tool.name}" изменена на ${coinCost} коинов`
+    });
+  } catch (error) {
+    console.error('Ошибка при обновлении стоимости инструмента:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Ошибка при обновлении стоимости инструмента'
     });
   }
 });

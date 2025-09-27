@@ -13,6 +13,7 @@ interface Tool {
   order: number;
   createdAt: string;
   updatedAt: string;
+  coinCost: number;
   usageCount?: number;
   lastUsed?: string | null;
 }
@@ -148,6 +149,42 @@ const AdminTools: React.FC = () => {
     } catch (err) {
       console.error('Error toggling tool:', err);
       setError(err instanceof Error ? err.message : 'Ошибка изменения статуса инструмента');
+    }
+  };
+
+  const updateToolCost = async (toolId: number, newCost: number) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('Токен авторизации не найден');
+      }
+
+      const response = await fetch(`http://localhost:8880/api/tools/${toolId}/cost`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ coinCost: newCost })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Update cost server error:', errorText);
+        throw new Error(`Ошибка обновления стоимости: ${response.status}`);
+      }
+
+      // Обновляем локальное состояние
+      setTools(Array.isArray(tools) ? tools.map(tool => 
+        tool.id === toolId 
+          ? { ...tool, coinCost: newCost }
+          : tool
+      ) : []);
+      
+    } catch (err) {
+      console.error('Error updating tool cost:', err);
+      setError(err instanceof Error ? err.message : 'Ошибка обновления стоимости инструмента');
     }
   };
 
@@ -328,6 +365,21 @@ const AdminTools: React.FC = () => {
                           Последний: {new Date(tool.lastUsed).toLocaleString('ru-RU')}
                         </span>
                       )}
+                    </div>
+                    <div className="tools-item-cost">
+                      <label className="tools-item-cost-label">Стоимость:</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={tool.coinCost || 1}
+                        onChange={(e) => {
+                          const newCost = parseInt(e.target.value) || 1;
+                          updateToolCost(tool.id, newCost);
+                        }}
+                        className="tools-item-cost-input"
+                      />
+                      <span className="tools-item-cost-unit">коинов</span>
                     </div>
                   </div>
                 </div>

@@ -7,23 +7,24 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 12px;
+  padding: 8px 10px;
   background-color: #1C1D1F;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #BCBBBD;
-  font-size: 12px;
-  font-weight: 500;
+  border: 1px solid #333335;
+  border-radius: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  color: #484848;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);
-  min-width: 50px;
 }
 
 .language-switcher-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #333335;
+  border-color: #444446;
+  color: #BCBBBD;
 }
 
 .language-code {
@@ -31,14 +32,7 @@
   letter-spacing: 0.5px;
 }
 
-.language-arrow {
-  font-size: 8px;
-  transition: transform 0.2s ease;
-}
 
-.language-arrow.open {
-  transform: rotate(180deg);
-}
 
 .language-dropdown {
   position: absolute;

@@ -180,6 +180,41 @@
   color: #999;
 }
 
+/* Поле стоимости */
+.tools-item-cost {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tools-item-cost-label {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+
+.tools-item-cost-input {
+  width: 60px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #1C1D1F;
+  color: #BCBBBD;
+  font-size: 12px;
+  text-align: center;
+}
+
+.tools-item-cost-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.tools-item-cost-unit {
+  font-size: 12px;
+  color: #888;
+}
+
 .tools-item-controls {
   display: flex;
   align-items: center;

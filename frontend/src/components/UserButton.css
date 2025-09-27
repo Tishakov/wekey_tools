@@ -57,7 +57,7 @@
 .user-btn-avatar {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #5E35F2 0%, #F22987 100%);
+  /* background: linear-gradient(135deg, #5E35F2 0%, #F22987 100%); */
   border-radius: 50%;
   display: flex;
   align-items: center;
