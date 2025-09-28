@@ -37,6 +37,12 @@ router.get('/google/callback', (req, res, next) => {
     return res.redirect(`http://localhost:5173/gsc-callback.html?code=${encodeURIComponent(code)}`);
   }
   
+  // Проверяем, это подключение Google к существующему аккаунту
+  if (req.query.state && req.query.state.startsWith('connect_')) {
+    // Это подключение Google аккаунта к существующему пользователю
+    return handleGoogleConnect(req, res, next);
+  }
+  
   // Обычная авторизация пользователя
   next();
 }, passport.authenticate('google', { session: false }),
@@ -142,5 +148,64 @@ router.post('/google/unlink', passport.authenticate('jwt', { session: false }), 
     });
   }
 });
+
+// Обработка подключения Google аккаунта к существующему пользователю
+const handleGoogleConnect = async (req, res, next) => {
+  try {
+    const { User } = require('../config/database');
+    const userId = req.query.state.replace('connect_', '');
+    
+    // Проверяем существование пользователя
+    const existingUser = await User.findByPk(userId);
+    if (!existingUser) {
+      return res.redirect(`http://localhost:5173/profile/password?error=${encodeURIComponent('Пользователь не найден')}`);
+    }
+    
+    // Получаем данные Google пользователя через Passport
+    passport.authenticate('google', { session: false }, async (err, googleProfile) => {
+      try {
+        if (err || !googleProfile) {
+          return res.redirect(`http://localhost:5173/profile/password?error=${encodeURIComponent('Ошибка авторизации Google')}`);
+        }
+        
+        // Проверяем совпадение email
+        if (googleProfile.email !== existingUser.email) {
+          return res.redirect(`http://localhost:5173/profile/password?error=${encodeURIComponent('Email аккаунта Google не совпадает с текущим email аккаунта')}`);
+        }
+        
+        // Проверяем, не подключен ли уже этот Google аккаунт к другому пользователю
+        const googleUserExists = await User.findOne({ 
+          where: { 
+            googleId: googleProfile.googleId,
+            id: { [require('sequelize').Op.ne]: userId }
+          } 
+        });
+        
+        if (googleUserExists) {
+          return res.redirect(`http://localhost:5173/profile/password?error=${encodeURIComponent('Этот Google аккаунт уже подключен к другому пользователю')}`);
+        }
+        
+        // Подключаем Google аккаунт к существующему пользователю
+        existingUser.googleId = googleProfile.googleId;
+        existingUser.isGoogleUser = false; // Остается классическим пользователем, но с подключенным Google
+        existingUser.avatar = existingUser.avatar || googleProfile.avatar; // Обновляем аватар если его нет
+        await existingUser.save();
+        
+        console.log('✅ Google account connected successfully to user:', existingUser.email);
+        
+        // Редиректим обратно на страницу профиля с успехом
+        res.redirect(`http://localhost:5173/profile/password?success=${encodeURIComponent('Google аккаунт успешно подключен')}`);
+        
+      } catch (error) {
+        console.error('❌ Error connecting Google account:', error);
+        res.redirect(`http://localhost:5173/profile/password?error=${encodeURIComponent('Внутренняя ошибка сервера')}`);
+      }
+    })(req, res, next);
+    
+  } catch (error) {
+    console.error('❌ Error in handleGoogleConnect:', error);
+    res.redirect(`http://localhost:5173/profile/password?error=${encodeURIComponent('Внутренняя ошибка сервера')}`);
+  }
+};
 
 module.exports = router;

@@ -139,4 +139,7 @@ router.post('/update-settings',
 // POST /auth/refresh - Обновление токена
 router.post('/refresh', authController.refreshToken);
 
+// GET /api/auth/google/connect - Подключение Google аккаунта к существующему пользователю
+router.get('/google/connect', authController.connectGoogleAccount);
+
 module.exports = router;

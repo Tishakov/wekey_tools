@@ -299,6 +299,34 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     }
   }, [user]);
 
+  // Обработка URL параметров для результатов подключения Google
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const success = urlParams.get('success');
+    
+    if (error) {
+      setMessage({ type: 'error', text: decodeURIComponent(error) });
+      // Очищаем URL от параметров
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (success) {
+      setMessage({ type: 'success', text: decodeURIComponent(success) });
+      setGoogleConnected(true);
+      setGoogleEmail(user?.email || null);
+      // Очищаем URL от параметров
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Автоматически скрываем сообщение через 3 секунды
+      setTimeout(() => {
+        setPasswordMessageFading(true);
+        setTimeout(() => {
+          setMessage(null);
+          setPasswordMessageFading(false);
+        }, 300);
+      }, 3000);
+    }
+  }, [user]);
+
   // Синхронизация данных "О себе" с пользователем
   useEffect(() => {
     if (user) {
@@ -410,44 +438,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       setLoading(true);
       
       // Предупреждаем пользователя о требовании совпадения email
-      const confirmMessage = `Для подключения Google аккаунта убедитесь, что email в Google совпадает с текущим email аккаунта: ${user?.email}\n\nПродолжить?`;
+      const confirmMessage = `Для подключения Google аккаунта email в Google должен совпадать с текущим email аккаунта: ${user?.email}\n\nПродолжить?`;
       
       if (!window.confirm(confirmMessage)) {
         setLoading(false);
         return;
       }
       
-      // Здесь будет логика подключения Google OAuth
-      // В реальной реализации нужно:
-      // 1. Инициировать OAuth flow
-      // 2. Получить данные Google пользователя
-      // 3. Проверить совпадение email
-      // 4. Обновить профиль пользователя
-      
-      // Пока что имитируем процесс
-      setTimeout(() => {
-        // Имитируем получение email от Google
-        const googleEmailFromOAuth = user?.email; // В реальности получаем от Google API
-        
-        if (googleEmailFromOAuth !== user?.email) {
-          setMessage({ 
-            type: 'error', 
-            text: 'Email от Google не совпадает с email вашего аккаунта. Используйте тот же email.' 
-          });
-          setLoading(false);
-          return;
-        }
-        
-        setGoogleConnected(true);
-        setGoogleEmail(user?.email || null);
-        setMessage({ type: 'success', text: 'Google аккаунт успешно подключен' });
-        setLoading(false);
-      }, 1000);
+      // Перенаправляем на backend для инициации Google OAuth
+      const connectUrl = `http://localhost:8880/api/auth/google/connect?userId=${user?.id}`;
+      window.location.href = connectUrl;
       
     } catch (error) {
       setMessage({ 
         type: 'error', 
-        text: 'Ошибка подключения Google аккаунта' 
+        text: error instanceof Error ? error.message : 'Ошибка подключения Google аккаунта' 
       });
       setLoading(false);
     }

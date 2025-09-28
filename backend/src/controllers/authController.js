@@ -992,3 +992,61 @@ exports.getTopTools = async (req, res) => {
     });
   }
 };
+
+// Подключение Google аккаунта к существующему пользователю
+const connectGoogleAccount = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID пользователя не указан'
+      });
+    }
+    
+    // Импортируем модели
+    const { User } = require('../config/database');
+    
+    // Проверяем существование пользователя
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+    
+    // Проверяем, что пользователь не создан через Google изначально
+    if (user.isGoogleUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Этот аккаунт уже использует Google для входа'
+      });
+    }
+    
+    // Сохраняем ID пользователя в сессии для проверки после OAuth
+    req.session = req.session || {};
+    req.session.connectUserId = userId;
+    req.session.connectUserEmail = user.email;
+    
+    // Перенаправляем на Google OAuth с указанием режима подключения
+    const googleAuthUrl = `https://accounts.google.com/oauth/authorize?` +
+      `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
+      `redirect_uri=${encodeURIComponent(process.env.GOOGLE_REDIRECT_URI)}&` +
+      `response_type=code&` +
+      `scope=email profile&` +
+      `state=connect_${userId}`;
+    
+    res.redirect(googleAuthUrl);
+    
+  } catch (error) {
+    console.error('❌ Ошибка подключения Google аккаунта:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера'
+    });
+  }
+};
+
+exports.connectGoogleAccount = connectGoogleAccount;
