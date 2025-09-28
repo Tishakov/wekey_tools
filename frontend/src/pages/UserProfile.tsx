@@ -695,13 +695,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
         )}
         
-        <div className="profile-content">
-        <div className="profile-main-content">
-          {message && message.type === 'error' && (
-            <div className={`profile-message ${message.type} ${messagesFading.message ? 'fade-out' : ''}`}>
-              {message.text}
-            </div>
-          )}
+        {/* Блок profile-content только для не-dashboard секций */}
+        {activeSection !== 'dashboard' && (
+          <div className="profile-content">
+          <div className="profile-main-content">
+            {message && message.type === 'error' && (
+              <div className={`profile-message ${message.type} ${messagesFading.message ? 'fade-out' : ''}`}>
+                {message.text}
+              </div>
+            )}
           
 
           
@@ -1016,8 +1018,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           <CoinTransactionsLeft />
         )}
 
-        </div>
-        </div>
+          </div>
+          </div>
+        )}
       </div>
       
       {/* Правая колонка с блоком "О себе" - только для personalInfo */}
