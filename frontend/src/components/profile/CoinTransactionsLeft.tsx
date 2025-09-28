@@ -53,52 +53,57 @@ const CoinTransactionsLeft: React.FC = () => {
   }
 
   return (
-    <div className="transaction-stat">
-      {/* coin-transactions-header */}
-      <div className="coin-transactions-header">
-        <h2>История операций с коинами</h2>
-      </div>
-
-      {/* current-balance */}
-      <div className="current-balance">
-        <div className="coin-balance-card">
-          <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="balance-coin-icon" />
-          <div className="balance-info">
-            <div className="coin-transactions-balance-amount">{currentBalance}</div>
-            <div className="balance-label">Текущий баланс</div>
-          </div>
-        </div>
-      </div>
-
-      {/* coin-stats */}
-      {stats && (
-        <div className="coin-stats">
-          <div className="coin-stat-card">
-            <div className="stat-icon">📈</div>
-            <div className="stat-content">
-              <div className="coin-stat-value">{stats.totalReceived}</div>
-              <div className="coin-stat-label">Получено</div>
+    <>
+      {/* coin-dashboard - новая компоновка */}
+      <div className="coin-dashboard">
+        {/* Топ секция с балансом и статусом */}
+        <div className="dashboard-top">
+          <div className="balance-section">
+            <img src="/icons/coin_rocket_v1.svg" alt="Коин" className="balance-coin-icon" />
+            <div className="balance-info">
+              <div className="coin-transactions-balance-amount">{currentBalance}</div>
+              <div className="balance-label">Текущий баланс</div>
             </div>
           </div>
           
-          <div className="coin-stat-card">
-            <div className="stat-icon">📉</div>
-            <div className="stat-content">
-              <div className="coin-stat-value">{stats.totalSpent}</div>
-              <div className="coin-stat-label">Потрачено</div>
-            </div>
-          </div>
-          
-          <div className="coin-stat-card">
-            <div className="stat-icon">🧾</div>
-            <div className="stat-content">
-              <div className="coin-stat-value">{stats.transactionCount}</div>
-              <div className="coin-stat-label">Операций</div>
-            </div>
-          </div>
+          <button className="balance-status" onClick={() => {
+            // Здесь будет логика пополнения баланса
+            console.log('Пополнить баланс');
+          }}>
+            <div className="status-text">Пополнить</div>
+          </button>
         </div>
-      )}
-    </div>
+
+        {/* Статистика в горизонтальном расположении */}
+        {stats && (
+          <div className="coin-stats">
+            <div className="coin-stat-card">
+              <div className="coin-stat-icon">📈</div>
+              <div className="stat-content">
+                <div className="coin-stat-value">{stats.totalReceived}</div>
+                <div className="coin-stat-label">Получено</div>
+              </div>
+            </div>
+            
+            <div className="coin-stat-card">
+              <div className="coin-stat-icon">📉</div>
+              <div className="stat-content">
+                <div className="coin-stat-value">{stats.totalSpent}</div>
+                <div className="coin-stat-label">Потрачено</div>
+              </div>
+            </div>
+            
+            <div className="coin-stat-card">
+              <div className="coin-stat-icon">🧾</div>
+              <div className="stat-content">
+                <div className="coin-stat-value">{stats.transactionCount}</div>
+                <div className="coin-stat-label">Операций</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
