@@ -57,46 +57,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ column = 'left' }) => {
     );
   }
 
-  // Левая колонка - основная статистика и прогресс
+  // Левая колонка - прогресс изучения платформы
   if (column === 'left') {
     return (
       <div className="user-dashboard">
-        {/* Основная статистика */}
-        <div className="dashboard-stats-section">
-          <div className="dashboard-stats-grid">
-            <div className="dashboard-stat-card">
-              <div className="dashboard-stat-icon">🚀</div>
-              <div className="dashboard-stat-info">
-                <div className="dashboard-stat-number">{userStats.totalToolUsage}</div>
-                <div className="dashboard-stat-label">Запусков инструментов</div>
-              </div>
-            </div>
-            <div className="dashboard-stat-card">
-              <div className="dashboard-stat-icon">🛠️</div>
-              <div className="dashboard-stat-info">
-                <div className="dashboard-stat-number">{userStats.uniqueToolsUsed}/31</div>
-                <div className="dashboard-stat-label">Использовано инструментов</div>
-              </div>
-            </div>
-            <div className="dashboard-stat-card">
-              <div className="dashboard-stat-icon">
-                <img src="/icons/coin_rocket_v1.svg" alt="Coins" width="40" height="40" />
-              </div>
-              <div className="dashboard-stat-info">
-                <div className="dashboard-stat-number">{userStats.tokensUsed}</div>
-                <div className="dashboard-stat-label">Потрачено коинов</div>
-              </div>
-            </div>
-            <div className="dashboard-stat-card">
-              <div className="dashboard-stat-icon">📅</div>
-              <div className="dashboard-stat-info">
-                <div className="dashboard-stat-number">{userStats.daysOnPlatform}</div>
-                <div className="dashboard-stat-label">Дней на платформе</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Прогресс использования инструментов */}
         <div className="dashboard-progress-section">
           <h2>📈 Прогресс изучения платформы</h2>

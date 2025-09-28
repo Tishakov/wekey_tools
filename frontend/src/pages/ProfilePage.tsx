@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ProfileLayout from '../components/ProfileLayout';
 import ProfileSidebar from '../components/ProfileSidebar';
 import UserProfile from './UserProfile';
+import DashboardStats from '../components/profile/DashboardStats';
 import './ProfilePage.css';
 
 // Маппинг URL параметров к разделам
@@ -46,6 +47,9 @@ const ProfilePage: React.FC = () => {
           onSectionChange={handleSectionChange}
         />
         <div className="profile-page-content">
+          {/* Статистика дашборда на всю ширину - только для дашборда */}
+          {activeSection === 'dashboard' && <DashboardStats />}
+          
           <UserProfile 
             activeSection={activeSection}
           />
