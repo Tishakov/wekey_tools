@@ -1,0 +1,116 @@
+/* Графики дашборда */
+.dashboard-charts {
+  width: 100%;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.chart-card {
+  background: #28282A;
+  border-radius: 16px;
+  border: 1px solid #333335;
+  padding: 24px;
+}
+
+.chart-card h3 {
+  margin: 0 0 10px 0;
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Круговая диаграмма */
+.pie-chart-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.pie-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  flex: 1;
+  color: #BCBBBD;
+  font-weight: 500;
+}
+
+.legend-value {
+  color: #ffffff;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: right;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card {
+    padding: 20px;
+  }
+  
+  .pie-chart-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .pie-legend {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .charts-grid {
+    gap: 16px;
+  }
+  
+  .chart-card {
+    padding: 16px;
+  }
+  
+  .chart-loading {
+    height: 150px;
+    font-size: 12px;
+  }
+}

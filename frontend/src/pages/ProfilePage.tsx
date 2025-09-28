@@ -4,6 +4,7 @@ import ProfileLayout from '../components/ProfileLayout';
 import ProfileSidebar from '../components/ProfileSidebar';
 import UserProfile from './UserProfile';
 import DashboardStats from '../components/profile/DashboardStats';
+import DashboardCharts from '../components/profile/DashboardCharts';
 import './ProfilePage.css';
 
 // Маппинг URL параметров к разделам
@@ -49,6 +50,9 @@ const ProfilePage: React.FC = () => {
         <div className="profile-page-content">
           {/* Статистика дашборда на всю ширину - только для дашборда */}
           {activeSection === 'dashboard' && <DashboardStats />}
+          
+          {/* Графики дашборда на всю ширину - только для дашборда */}
+          {activeSection === 'dashboard' && <DashboardCharts />}
           
           <UserProfile 
             activeSection={activeSection}
