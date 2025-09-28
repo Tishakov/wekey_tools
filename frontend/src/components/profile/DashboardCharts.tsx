@@ -236,7 +236,7 @@ const DashboardCharts: React.FC = () => {
                 }))} 
                 color="#3b82f6"
                 title="Использований инструментов"
-                height={220}
+                height={240}
               />
             )}
           </div>
