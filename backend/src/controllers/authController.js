@@ -851,3 +851,139 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
+// Получение данных активности для графика за последние 30 дней
+exports.getActivityChart = async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Токен не предоставлен'
+      });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    const { User, ToolUsage } = require('../config/database');
+    const user = await User.findByPk(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Получаем данные за последние 30 дней
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const activityData = await ToolUsage.findAll({
+      attributes: [
+        [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
+        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'usageCount']
+      ],
+      where: { 
+        userId: decoded.userId,
+        createdAt: {
+          [require('sequelize').Op.gte]: thirtyDaysAgo
+        }
+      },
+      group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
+      order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+      raw: true
+    });
+
+    // Создаем массив всех дней за последние 30 дней
+    const chartData = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      // Ищем данные для этой даты
+      const dayData = activityData.find(item => item.date === dateStr);
+      
+      chartData.push({
+        date: dateStr,
+        usageCount: dayData ? parseInt(dayData.usageCount) : 0
+      });
+    }
+
+    res.json({
+      success: true,
+      data: chartData
+    });
+
+  } catch (error) {
+    console.error('❌ Get activity chart error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+// Получение топ-5 самых используемых инструментов
+exports.getTopTools = async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Токен не предоставлен'
+      });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    const { User, ToolUsage } = require('../config/database');
+    const user = await User.findByPk(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Получаем топ-5 инструментов
+    const topToolsData = await ToolUsage.findAll({
+      attributes: [
+        'toolName',
+        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+      ],
+      where: { userId: decoded.userId },
+      group: ['toolName'],
+      order: [[require('sequelize').fn('COUNT', require('sequelize').col('id')), 'DESC']],
+      limit: 5,
+      raw: true
+    });
+
+    // Вычисляем общее количество использований для процентов
+    const totalUsage = topToolsData.reduce((sum, tool) => sum + parseInt(tool.count), 0);
+
+    // Форматируем данные с процентами
+    const formattedData = topToolsData.map(tool => ({
+      name: tool.toolName,
+      count: parseInt(tool.count),
+      percentage: totalUsage > 0 ? Math.round((parseInt(tool.count) / totalUsage) * 100) : 0
+    }));
+
+    res.json({
+      success: true,
+      data: formattedData
+    });
+
+  } catch (error) {
+    console.error('❌ Get top tools error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};

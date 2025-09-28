@@ -1,23 +1,23 @@
 /* Графики дашборда */
-.dashboard-charts {
+.dashboard-charts-container {
   width: 100%;
 }
 
-.charts-grid {
+.dashboard-charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 40px;
 }
 
-.chart-card {
+.dashboard-chart-card {
   background: #28282A;
   border-radius: 16px;
   border: 1px solid #333335;
   padding: 24px;
 }
 
-.chart-card h3 {
+.dashboard-chart-card h3 {
   margin: 0 0 10px 0;
   color: #BCBBBD;
   font-size: 14px;
@@ -38,6 +38,11 @@
   display: flex;
   align-items: center;
   gap: 24px;
+}
+
+.pie-chart-container .recharts-responsive-container {
+  width: 160px !important;
+  min-width: 160px !important;
 }
 
 .pie-legend {
@@ -61,6 +66,12 @@
   flex-shrink: 0;
 }
 
+.legend-color-0 { background-color: #5E35F2; }
+.legend-color-1 { background-color: #F22987; }
+.legend-color-2 { background-color: #3b82f6; }
+.legend-color-3 { background-color: #10b981; }
+.legend-color-4 { background-color: #f59e0b; }
+
 .legend-name {
   flex: 1;
   color: #BCBBBD;
@@ -74,19 +85,41 @@
   text-align: right;
 }
 
+/* Custom Tooltip */
+.custom-pie-tooltip {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.custom-pie-tooltip-title {
+  margin: 0 0 4px 0;
+  font-weight: bold;
+}
+
+.custom-pie-tooltip-details {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
 /* Адаптивность */
 @media (max-width: 1200px) {
-  .charts-grid {
+  .dashboard-charts-grid {
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   }
 }
 
 @media (max-width: 900px) {
-  .charts-grid {
+  .dashboard-charts-grid {
     grid-template-columns: 1fr;
   }
   
-  .chart-card {
+  .dashboard-chart-card {
     padding: 20px;
   }
   
@@ -101,11 +134,11 @@
 }
 
 @media (max-width: 600px) {
-  .charts-grid {
+  .dashboard-charts-grid {
     gap: 16px;
   }
   
-  .chart-card {
+  .dashboard-chart-card {
     padding: 16px;
   }
   

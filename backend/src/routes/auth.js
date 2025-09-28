@@ -65,6 +65,12 @@ router.get('/profile', authController.getProfile);
 // GET /api/auth/stats - Получение статистики пользователя
 router.get('/stats', authController.getUserStats);
 
+// GET /api/auth/activity-chart - Получение данных активности для графика
+router.get('/activity-chart', authController.getActivityChart);
+
+// GET /api/auth/top-tools - Получение топ-5 инструментов
+router.get('/top-tools', authController.getTopTools);
+
 // PUT /api/auth/profile - Обновление профиля пользователя
 router.put('/profile',
   [

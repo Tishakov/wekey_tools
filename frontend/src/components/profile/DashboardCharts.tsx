@@ -45,20 +45,26 @@ const DashboardCharts: React.FC = () => {
 
         if (activityResponse.ok) {
           const activityResult = await activityResponse.json();
-          if (activityResult.success) {
-            // Генерируем данные за последние 30 дней (пока моковые)
-            const mockActivityData = generateMockActivityData();
-            setActivityData(mockActivityData);
+          if (activityResult.success && activityResult.data) {
+            setActivityData(activityResult.data);
+          } else {
+            // Используем моковые данные при отсутствии реальных
+            setActivityData(generateMockActivityData());
           }
+        } else {
+          setActivityData(generateMockActivityData());
         }
 
         if (topToolsResponse.ok) {
           const topToolsResult = await topToolsResponse.json();
-          if (topToolsResult.success) {
-            // Пока используем моковые данные
-            const mockTopTools = generateMockTopToolsData();
-            setTopToolsData(mockTopTools);
+          if (topToolsResult.success && topToolsResult.data && topToolsResult.data.length > 0) {
+            setTopToolsData(topToolsResult.data);
+          } else {
+            // Используем моковые данные при отсутствии реальных
+            setTopToolsData(generateMockTopToolsData());
           }
+        } else {
+          setTopToolsData(generateMockTopToolsData());
         }
       } catch (error) {
         console.error('Ошибка загрузки данных графиков:', error);
@@ -128,24 +134,75 @@ const DashboardCharts: React.FC = () => {
   // Цвета для круговой диаграммы
   const pieColors = ['#5E35F2', '#F22987', '#3b82f6', '#10b981', '#f59e0b'];
 
+  // Функция для форматирования названий инструментов
+  const formatToolName = (toolName: string): string => {
+    // Словарь стандартных переводов названий инструментов (из fix_tool_names.js)
+    const toolTranslations: { [key: string]: string } = {
+      // Основные инструменты
+      'add-symbol': 'Добавление символа',
+      'case-changer': 'Изменения регистра',
+      'char-counter': 'Количество символов', 
+      'cross-analytics': 'Сквозная аналитика',
+      'duplicate-finder': 'Поиск дубликатов',
+      'remove-duplicates': 'Удаление дубликатов',
+      'remove-empty-lines': 'Удаление пустых строк',
+      'emoji': 'Эмодзи',
+      'find-replace': 'Найти и заменить',
+      'match-types': 'Типы соответствия',
+      'minus-words': 'Обработка минус-слов',
+      'number-generator': 'Генератор чисел',
+      'password-generator': 'Генератор паролей',
+      'remove-line-breaks': 'Удаление переносов',
+      'spaces-to-paragraphs': 'Пробелы на абзацы',
+      'synonym-generator': 'Генератор синонимов',
+      'text-by-columns': 'Текст по столбцам',
+      'text-generator': 'Генератор текста',
+      'text-optimizer': 'Оптимизатор текста',
+      'text-sorting': 'Сортировка слов и строк',
+      'text-to-html': 'Текст в HTML',
+      'transliteration': 'Транслитерация',
+      'utm-generator': 'Генератор UTM-меток',
+      'word-declension': 'Склонение слов',
+      'word-gluing': 'Склейка слов',
+      'word-mixer': 'Миксация слов',
+      
+      // SEO инструменты
+      'seo-analyzer': 'SEO анализатор',
+      'meta-tags-generator': 'Генератор мета-тегов',
+      'sitemap-generator': 'Генератор карты сайта',
+      'robots-txt-generator': 'Генератор robots.txt',
+      'schema-markup-generator': 'Генератор Schema разметки',
+      
+      // Английские названия из базы данных
+      'Remove Empty Lines': 'Удаление пустых строк',
+      'Site Audit': 'Аудит сайта',
+      'Remove Duplicates': 'Удаление дубликатов',
+      'Number Generator': 'Генератор чисел',
+      'Password Generator': 'Генератор паролей'
+    };
+
+    // Если есть перевод - используем его, иначе форматируем название
+    if (toolTranslations[toolName]) {
+      return toolTranslations[toolName];
+    }
+
+    // Форматируем название: убираем дефисы, делаем первую букву заглавной
+    return toolName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   // Кастомный tooltip для круговой диаграммы
   const CustomPieTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div style={{
-          backgroundColor: '#1e1e1e',
-          border: '1px solid #333',
-          borderRadius: '8px',
-          padding: '12px',
-          color: '#fff',
-          fontSize: '14px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-        }}>
-          <p style={{ margin: '0 0 4px 0', fontWeight: 'bold' }}>
-            {data.payload.name}
+        <div className="custom-pie-tooltip">
+          <p className="custom-pie-tooltip-title">
+            {formatToolName(data.payload.name)}
           </p>
-          <p style={{ margin: 0, color: '#9ca3af', fontSize: '12px' }}>
+          <p className="custom-pie-tooltip-details">
             Использований: {data.payload.count} ({data.payload.percentage}%)
           </p>
         </div>
@@ -159,10 +216,10 @@ const DashboardCharts: React.FC = () => {
   }
 
   return (
-    <div className="dashboard-charts">
-      <div className="charts-grid">
+    <div className="dashboard-charts-container">
+      <div className="dashboard-charts-grid">
         {/* График активности по дням */}
-        <div className="chart-card">
+        <div className="dashboard-chart-card">
           <h3>Активность за 30 дней</h3>
           {loading ? (
             <div className="chart-loading">Загрузка данных...</div>
@@ -179,7 +236,7 @@ const DashboardCharts: React.FC = () => {
         </div>
 
         {/* Круговая диаграмма топ-5 инструментов */}
-        <div className="chart-card">
+        <div className="dashboard-chart-card">
           <h3>Топ-5 инструментов</h3>
           {loading ? (
             <div className="chart-loading">Загрузка данных...</div>
@@ -188,7 +245,7 @@ const DashboardCharts: React.FC = () => {
               <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie
-                    data={topToolsData}
+                    data={topToolsData as any}
                     cx="50%"
                     cy="50%"
                     innerRadius={40}
@@ -209,10 +266,9 @@ const DashboardCharts: React.FC = () => {
                 {topToolsData.map((tool, index) => (
                   <div key={tool.name} className="legend-item">
                     <div 
-                      className="legend-color" 
-                      style={{ backgroundColor: pieColors[index % pieColors.length] }}
+                      className={`legend-color legend-color-${index}`}
                     ></div>
-                    <span className="legend-name">{tool.name}</span>
+                    <span className="legend-name">{formatToolName(tool.name)}</span>
                     <span className="legend-value">{tool.percentage}%</span>
                   </div>
                 ))}
