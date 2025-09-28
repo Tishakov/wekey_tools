@@ -48,11 +48,30 @@ const DashboardCharts: React.FC = () => {
           if (activityResult.success && activityResult.data) {
             setActivityData(activityResult.data);
           } else {
-            // Используем моковые данные при отсутствии реальных
-            setActivityData(generateMockActivityData());
+            // Для нового пользователя показываем пустые данные (все нули)
+            const emptyData = [];
+            for (let i = 29; i >= 0; i--) {
+              const date = new Date();
+              date.setDate(date.getDate() - i);
+              emptyData.push({
+                date: date.toISOString().split('T')[0],
+                usageCount: 0
+              });
+            }
+            setActivityData(emptyData);
           }
         } else {
-          setActivityData(generateMockActivityData());
+          // При ошибке API тоже показываем пустые данные
+          const emptyData = [];
+          for (let i = 29; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            emptyData.push({
+              date: date.toISOString().split('T')[0],
+              usageCount: 0
+            });
+          }
+          setActivityData(emptyData);
         }
 
         if (topToolsResponse.ok) {
@@ -60,11 +79,12 @@ const DashboardCharts: React.FC = () => {
           if (topToolsResult.success && topToolsResult.data && topToolsResult.data.length > 0) {
             setTopToolsData(topToolsResult.data);
           } else {
-            // Используем моковые данные при отсутствии реальных
-            setTopToolsData(generateMockTopToolsData());
+            // Для нового пользователя показываем пустые данные
+            setTopToolsData([]);
           }
         } else {
-          setTopToolsData(generateMockTopToolsData());
+          // При ошибке API тоже показываем пустые данные
+          setTopToolsData([]);
         }
       } catch (error) {
         console.error('Ошибка загрузки данных графиков:', error);
@@ -236,7 +256,7 @@ const DashboardCharts: React.FC = () => {
                 }))} 
                 color="#3b82f6"
                 title="Использований инструментов"
-                height={240}
+                height={220}
               />
             )}
           </div>
