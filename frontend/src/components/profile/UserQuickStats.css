@@ -1,0 +1,66 @@
+/* Быстрая статистика */
+.dashboard-quick-stats h2 {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-quick-stats-grid {
+  display: flex;
+  flex-direction: column;
+  background: #28282A;
+  border-radius: 16px;
+  border: 1px solid #333335;
+  padding: 20px;
+}
+
+.dashboard-quick-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #333335;
+}
+
+.dashboard-quick-stat:last-child {
+  border-bottom: none;
+}
+
+.dashboard-quick-stat-label {
+  color: #BCBBBD;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dashboard-quick-stat-value {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dashboard-error {
+  color: #BCBBBD;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .dashboard-quick-stats-grid {
+    padding: 16px;
+  }
+  
+  .dashboard-quick-stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .dashboard-quick-stat-value {
+    align-self: flex-end;
+  }
+}

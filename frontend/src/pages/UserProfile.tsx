@@ -5,6 +5,7 @@ import AvatarUpload from '../components/profile/AvatarUpload';
 import CoinTransactionsLeft from '../components/profile/CoinTransactionsLeft';
 import CoinTransactionsRight from '../components/profile/CoinTransactionsRight';
 import UserDashboard from '../components/profile/UserDashboard';
+import UserQuickStats from '../components/profile/UserQuickStats';
 import './UserProfile.css';
 
 // Список популярных стран
@@ -641,6 +642,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         {/* Дашборд - левая колонка */}
         {activeSection === 'dashboard' && (
           <UserDashboard column="left" />
+        )}
+        
+        {/* Быстрая статистика - только для dashboard */}
+        {activeSection === 'dashboard' && (
+          <UserQuickStats />
         )}
         
         {/* Карточка профиля - только для personalInfo */}

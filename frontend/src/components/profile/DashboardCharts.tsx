@@ -264,7 +264,8 @@ const DashboardCharts: React.FC = () => {
 
         {/* Круговая диаграмма топ-5 инструментов */}
         <div className="dashboard-chart-card dashboard-pie-chart">
-          <h3>Топ-5 инструментов</h3>
+          <h3>ТОП-5 инструментов</h3>
+          <p className="chart-subtitle">За все время</p>
           <div className="chart-content">
             {loading ? (
               <div className="chart-loading">Загрузка данных...</div>

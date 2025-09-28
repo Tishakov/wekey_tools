@@ -760,10 +760,10 @@ exports.getUserStats = async (req, res) => {
       raw: true
     });
 
-    // Вычисляем количество дней на платформе
+    // Вычисляем количество дней на платформе (+ 1, чтобы в день регистрации был уже 1 день)
     const createdAt = new Date(user.createdAt);
     const now = new Date();
-    const daysOnPlatform = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+    const daysOnPlatform = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24)) + 1;
 
     const stats = {
       totalToolUsage: parseInt(toolStats[0]?.totalUsage) || 0,

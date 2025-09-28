@@ -185,39 +185,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ column = 'left' }) => {
         </div>
       </div>
 
-      {/* Быстрая статистика */}
-      <div className="dashboard-quick-stats">
-        <h2>⚡ Быстрая статистика</h2>
-        <div className="dashboard-quick-stats-grid">
-          <div className="dashboard-quick-stat">
-            <span className="dashboard-quick-stat-label">Среднее использование в день:</span>
-            <span className="dashboard-quick-stat-value">
-              {userStats.daysOnPlatform > 0 
-                ? Math.round(userStats.totalToolUsage / userStats.daysOnPlatform * 10) / 10
-                : 0
-              } инструментов
-            </span>
-          </div>
-          <div className="dashboard-quick-stat">
-            <span className="dashboard-quick-stat-label">Среднее коинов на инструмент:</span>
-            <span className="dashboard-quick-stat-value">
-              {userStats.totalToolUsage > 0 
-                ? Math.round(userStats.tokensUsed / userStats.totalToolUsage * 10) / 10
-                : 0
-              } коинов
-            </span>
-          </div>
-          <div className="dashboard-quick-stat">
-            <span className="dashboard-quick-stat-label">Уровень исследования:</span>
-            <span className="dashboard-quick-stat-value">
-              {userStats.uniqueToolsUsed < 5 ? 'Новичок' :
-               userStats.uniqueToolsUsed < 15 ? 'Исследователь' :
-               userStats.uniqueToolsUsed < 25 ? 'Эксперт' :
-               userStats.uniqueToolsUsed === 31 ? 'Мастер' : 'Профи'}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

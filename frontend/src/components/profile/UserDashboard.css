@@ -79,10 +79,6 @@
 }
 
 /* Достижения */
-.dashboard-achievements-section {
-  margin-bottom: 40px;
-}
-
 .dashboard-achievements-section h2 {
   color: #ffffff;
   font-size: 1.5rem;
@@ -165,44 +161,7 @@
   font-weight: 600;
 }
 
-/* Быстрая статистика */
-.dashboard-quick-stats {
-  margin-bottom: 20px;
-}
 
-.dashboard-quick-stats h2 {
-  color: #ffffff;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
-.dashboard-quick-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-}
-
-.dashboard-quick-stat {
-  background: #2a2a2a;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #3a3a3a;
-}
-
-.dashboard-quick-stat-label {
-  color: #a0a0a0;
-  font-size: 0.9rem;
-}
-
-.dashboard-quick-stat-value {
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 1rem;
-}
 
 /* Ошибка */
 .dashboard-error {
@@ -227,10 +186,6 @@
   }
   
   .dashboard-achievements-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .dashboard-quick-stats-grid {
     grid-template-columns: 1fr;
   }
   
