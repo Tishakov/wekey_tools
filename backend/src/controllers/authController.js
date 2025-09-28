@@ -126,54 +126,48 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Создание нового пользователя
+    // Создание нового пользователя (БЕЗ верификации email)
     const user = await User.create({
       email,
       password, // Пароль будет автоматически захеширован в модели
       firstName,
       lastName,
-      role: 'user' // По умолчанию обычный пользователь
+      role: 'user', // По умолчанию обычный пользователь
+      isEmailVerified: false // Email пока не подтвержден
     });
 
-    // Добавляем регистрационный бонус коинов
-    const { CoinTransaction } = require('../config/database');
-    try {
-      await CoinTransaction.registrationBonus(user.id, 100);
-      console.log('🪙 Регистрационный бонус 100 коинов добавлен пользователю:', email);
-    } catch (coinError) {
-      console.error('❌ Ошибка при добавлении регистрационного бонуса:', coinError);
-      // Не прерываем регистрацию из-за ошибки с коинами
-    }
+    // Генерируем и отправляем код подтверждения
+    const verificationCode = user.generateVerificationCode();
+    user.lastVerificationSent = new Date();
+    await user.save();
 
-    // Перезагружаем пользователя для получения актуального баланса
-    await user.reload();
-
-    // Создание JWT токена
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email, 
-        role: user.role 
-      },
-      JWT_SECRET,
-      { expiresIn: '24h' }
+    // Отправляем email с кодом
+    const EmailService = require('../services/EmailService');
+    const emailResult = await EmailService.sendVerificationEmail(
+      email, 
+      verificationCode, 
+      firstName || 'пользователь'
     );
 
-    console.log('✅ Новый пользователь зарегистрирован:', email);
+    if (!emailResult.success) {
+      console.error('❌ Ошибка отправки email верификации:', emailResult.error);
+      // Можно продолжить регистрацию, но уведомить пользователя
+    }
+
+    console.log('📧 Код верификации отправлен на:', email);
+
+    console.log('✅ Новый пользователь зарегистрирован (требует подтверждения):', email);
 
     res.status(201).json({
       success: true,
-      message: 'Пользователь успешно зарегистрирован',
-      token,
+      message: 'Регистрация прошла успешно. Проверьте email для подтверждения аккаунта.',
+      requiresVerification: true,
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role,
-        coinBalance: user.coinBalance,
-        isGoogleUser: user.isGoogleUser,
-        googleId: user.googleId ? true : false
+        isEmailVerified: user.isEmailVerified
       }
     });
 
@@ -1050,3 +1044,179 @@ const connectGoogleAccount = async (req, res) => {
 };
 
 exports.connectGoogleAccount = connectGoogleAccount;
+
+// Подтверждение email кодом
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email и код подтверждения обязательны'
+      });
+    }
+
+    const { User } = require('../config/database');
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email уже подтвержден'
+      });
+    }
+
+    // Увеличиваем счетчик попыток
+    await user.incrementVerificationAttempt();
+
+    // Проверяем валидность кода
+    if (!user.isVerificationCodeValid(code)) {
+      let message = 'Неверный код подтверждения';
+      
+      if (user.verificationAttempts >= 5) {
+        message = 'Превышено количество попыток. Запросите новый код.';
+      } else if (!user.verificationCodeExpires || new Date() > user.verificationCodeExpires) {
+        message = 'Код подтверждения истек. Запросите новый код.';
+      }
+
+      return res.status(400).json({
+        success: false,
+        message,
+        attemptsLeft: Math.max(0, 5 - user.verificationAttempts)
+      });
+    }
+
+    // Код верный - подтверждаем email
+    await user.clearVerificationCode();
+
+    // Добавляем регистрационный бонус коинов ПОСЛЕ подтверждения email
+    const { CoinTransaction } = require('../config/database');
+    try {
+      await CoinTransaction.registrationBonus(user.id, 100);
+      console.log('🪙 Регистрационный бонус 100 коинов добавлен пользователю:', email);
+    } catch (coinError) {
+      console.error('❌ Ошибка при добавлении регистрационного бонуса:', coinError);
+    }
+
+    // Перезагружаем пользователя для получения актуального баланса
+    await user.reload();
+
+    // Создаем JWT токен для авторизованного пользователя
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        email: user.email, 
+        role: user.role 
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    console.log('✅ Email подтвержден для пользователя:', email);
+
+    res.json({
+      success: true,
+      message: 'Email успешно подтвержден! Добро пожаловать в Wekey Tools!',
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        coinBalance: user.coinBalance,
+        isEmailVerified: user.isEmailVerified,
+        isGoogleUser: user.isGoogleUser
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Ошибка при подтверждении email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера'
+    });
+  }
+};
+
+// Повторная отправка кода подтверждения
+exports.resendVerificationCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email обязателен'
+      });
+    }
+
+    const { User } = require('../config/database');
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email уже подтвержден'
+      });
+    }
+
+    // Проверяем, можно ли отправить повторно
+    if (!user.canResendVerification()) {
+      return res.status(429).json({
+        success: false,
+        message: 'Можно запросить новый код только через 1 минуту после предыдущей отправки'
+      });
+    }
+
+    // Генерируем новый код
+    const verificationCode = user.generateVerificationCode();
+    user.lastVerificationSent = new Date();
+    await user.save();
+
+    // Отправляем email
+    const EmailService = require('../services/EmailService');
+    const emailResult = await EmailService.sendVerificationEmail(
+      email, 
+      verificationCode, 
+      user.firstName || 'пользователь'
+    );
+
+    if (!emailResult.success) {
+      console.error('❌ Ошибка отправки email верификации:', emailResult.error);
+      return res.status(500).json({
+        success: false,
+        message: 'Ошибка отправки email. Попробуйте позже.'
+      });
+    }
+
+    console.log('📧 Повторный код верификации отправлен на:', email);
+
+    res.json({
+      success: true,
+      message: 'Новый код подтверждения отправлен на ваш email'
+    });
+
+  } catch (error) {
+    console.error('❌ Ошибка при повторной отправке кода:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Внутренняя ошибка сервера'
+    });
+  }
+};

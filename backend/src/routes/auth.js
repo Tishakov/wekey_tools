@@ -142,4 +142,30 @@ router.post('/refresh', authController.refreshToken);
 // GET /api/auth/google/connect - Подключение Google аккаунта к существующему пользователю
 router.get('/google/connect', authController.connectGoogleAccount);
 
+// POST /api/auth/verify-email - Подтверждение email кодом
+router.post('/verify-email',
+  [
+    body('email')
+      .isEmail()
+      .normalizeEmail({ gmail_remove_dots: false })
+      .withMessage('Введите корректный email'),
+    body('code')
+      .isLength({ min: 6, max: 6 })
+      .isNumeric()
+      .withMessage('Код должен содержать 6 цифр')
+  ],
+  authController.verifyEmail
+);
+
+// POST /api/auth/resend-verification - Повторная отправка кода подтверждения
+router.post('/resend-verification',
+  [
+    body('email')
+      .isEmail()
+      .normalizeEmail({ gmail_remove_dots: false })
+      .withMessage('Введите корректный email')
+  ],
+  authController.resendVerificationCode
+);
+
 module.exports = router;

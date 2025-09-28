@@ -40,7 +40,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
+  register: (email: string, password: string, firstName?: string, lastName?: string) => Promise<any>;
   logout: () => void;
   updateProfile: (data: Partial<User> & { currentPassword?: string; newPassword?: string }) => Promise<void>;
   updateUser: (user: User) => void;
@@ -176,7 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string, 
     firstName?: string, 
     lastName?: string
-  ): Promise<void> => {
+  ): Promise<any> => {
     setIsLoading(true);
     
     try {
@@ -191,12 +191,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Если требуется верификация email, возвращаем результат
+        if (data.requiresVerification) {
+          return data; // Возвращаем объект с requiresVerification: true
+        }
+        
+        // Обычная регистрация (например, через Google)
         const { token: newToken, user: userData } = data;
         
         // Сохраняем токен
         localStorage.setItem('wekey_token', newToken);
         setToken(newToken);
         setUser(userData);
+        return data;
       } else {
         throw new Error(data.message || 'Ошибка регистрации');
       }

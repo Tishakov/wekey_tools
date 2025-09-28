@@ -170,6 +170,30 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true
     },
+    // Система подтверждения email кодом
+    verificationCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [6, 6] // Строго 6 символов
+      }
+    },
+    verificationCodeExpires: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    verificationAttempts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min: 0,
+        max: 5 // Максимум 5 попыток
+      }
+    },
+    lastVerificationSent: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     passwordResetToken: {
       type: DataTypes.STRING,
       allowNull: true
@@ -266,11 +290,54 @@ module.exports = (sequelize) => {
     return this.apiRequestsCount < this.dailyApiLimit;
   };
 
+  // Методы для email верификации
+  User.prototype.generateVerificationCode = function() {
+    // Генерируем 6-значный код
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    this.verificationCode = code;
+    this.verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 минут
+    this.verificationAttempts = 0;
+    return code;
+  };
+
+  User.prototype.isVerificationCodeValid = function(code) {
+    return (
+      this.verificationCode === code &&
+      this.verificationCodeExpires &&
+      new Date() < this.verificationCodeExpires &&
+      this.verificationAttempts < 5
+    );
+  };
+
+  User.prototype.canResendVerification = function() {
+    if (!this.lastVerificationSent) return true;
+    
+    const timeSinceLastSend = Date.now() - new Date(this.lastVerificationSent).getTime();
+    const oneMinute = 60 * 1000;
+    
+    return timeSinceLastSend > oneMinute; // Можно отправлить повторно через 1 минуту
+  };
+
+  User.prototype.incrementVerificationAttempt = async function() {
+    this.verificationAttempts += 1;
+    await this.save();
+    return this.verificationAttempts;
+  };
+
+  User.prototype.clearVerificationCode = async function() {
+    this.verificationCode = null;
+    this.verificationCodeExpires = null;
+    this.verificationAttempts = 0;
+    this.isEmailVerified = true;
+    await this.save();
+  };
+
   User.prototype.toJSON = function() {
     const user = { ...this.get() };
     delete user.password;
     delete user.emailVerificationToken;
     delete user.passwordResetToken;
+    delete user.verificationCode; // Не отправляем код на фронтенд
     return user;
   };
 
