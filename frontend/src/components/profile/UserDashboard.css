@@ -3,30 +3,12 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-}
-
-.dashboard-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.dashboard-header h1 {
-  font-size: 2rem;
-  color: #ffffff;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.dashboard-header p {
-  color: #a0a0a0;
-  font-size: 1.1rem;
-  margin: 0;
 }
 
 /* Основная статистика */
 .dashboard-stats-section {
   margin-bottom: 40px;
+  margin-top: 0;
 }
 
 .dashboard-stats-grid {
@@ -291,10 +273,6 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .user-dashboard {
-    padding: 16px;
-  }
-  
   .dashboard-stats-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -317,10 +295,6 @@
   }
   
   .dashboard-stat-number {
-    font-size: 1.8rem;
-  }
-  
-  .dashboard-header h1 {
     font-size: 1.8rem;
   }
 }

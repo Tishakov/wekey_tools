@@ -55,11 +55,6 @@ const UserDashboard: React.FC = () => {
 
   return (
     <div className="user-dashboard">
-      <div className="dashboard-header">
-        <h1>📊 Дашборд</h1>
-        <p>Обзор вашей активности на платформе</p>
-      </div>
-      
       {/* Основная статистика */}
       <div className="dashboard-stats-section">
         <div className="dashboard-stats-grid">
@@ -78,7 +73,9 @@ const UserDashboard: React.FC = () => {
             </div>
           </div>
           <div className="dashboard-stat-card">
-            <div className="dashboard-stat-icon">🪙</div>
+            <div className="dashboard-stat-icon">
+              <img src="/icons/coin_rocket_v1.svg" alt="Coins" width="40" height="40" />
+            </div>
             <div className="dashboard-stat-info">
               <div className="dashboard-stat-number">{userStats.tokensUsed}</div>
               <div className="dashboard-stat-label">Потрачено коинов</div>
