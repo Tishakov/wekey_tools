@@ -197,7 +197,6 @@ interface UserSettings {
 }
 
 interface PasswordChangeData {
-  currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
@@ -235,7 +234,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
 
   // State for password change
   const [passwordData, setPasswordData] = useState<PasswordChangeData>({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
@@ -247,6 +245,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     theme: 'dark'
   });
   
+  // Google account connection state
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [isOriginalGoogleUser, setIsOriginalGoogleUser] = useState(false); // Пользователь зарегистрирован изначально через Google
+
   // Loading and error states
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -275,6 +278,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         phone: (user as any)?.phone || '',
         country: (user as any)?.country || ''
       });
+
+      // Инициализируем Google статус на основе данных пользователя
+      const isGoogleUser = (user as any)?.isGoogleUser || false;
+      const hasGoogleId = (user as any)?.googleId || false;
+      const hasPassword = (user as any)?.password !== null && (user as any)?.password !== undefined;
+      
+
+      
+      // Определяем, является ли пользователь изначально Google пользователем
+      // (зарегистрирован через Google и не имеет пароля)
+      const originalGoogleUser = isGoogleUser && !hasPassword;
+      
+      setGoogleConnected(isGoogleUser || hasGoogleId);
+      setIsOriginalGoogleUser(originalGoogleUser);
+      if (isGoogleUser) {
+        setGoogleEmail(user.email);
+      }
     }
   }, [user]);
 
@@ -344,14 +364,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     }
     
     try {
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
+      const response = await fetch('http://localhost:8880/api/auth/update-profile', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('wekey_token')}`
         },
         body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword
         })
       });
@@ -362,13 +381,101 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       }
       
       setMessage({ type: 'success', text: t('profile.passwordChanged') });
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswordData({ newPassword: '', confirmPassword: '' });
     } catch (error) {
       setMessage({ 
         type: 'error', 
         text: error instanceof Error ? error.message : t('profile.passwordChangeError') 
       });
     } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Google account connection
+  const handleGoogleConnect = async () => {
+    try {
+      setLoading(true);
+      
+      // Предупреждаем пользователя о требовании совпадения email
+      const confirmMessage = `Для подключения Google аккаунта убедитесь, что email в Google совпадает с текущим email аккаунта: ${user?.email}\n\nПродолжить?`;
+      
+      if (!window.confirm(confirmMessage)) {
+        setLoading(false);
+        return;
+      }
+      
+      // Здесь будет логика подключения Google OAuth
+      // В реальной реализации нужно:
+      // 1. Инициировать OAuth flow
+      // 2. Получить данные Google пользователя
+      // 3. Проверить совпадение email
+      // 4. Обновить профиль пользователя
+      
+      // Пока что имитируем процесс
+      setTimeout(() => {
+        // Имитируем получение email от Google
+        const googleEmailFromOAuth = user?.email; // В реальности получаем от Google API
+        
+        if (googleEmailFromOAuth !== user?.email) {
+          setMessage({ 
+            type: 'error', 
+            text: 'Email от Google не совпадает с email вашего аккаунта. Используйте тот же email.' 
+          });
+          setLoading(false);
+          return;
+        }
+        
+        setGoogleConnected(true);
+        setGoogleEmail(user?.email || null);
+        setMessage({ type: 'success', text: 'Google аккаунт успешно подключен' });
+        setLoading(false);
+      }, 1000);
+      
+    } catch (error) {
+      setMessage({ 
+        type: 'error', 
+        text: 'Ошибка подключения Google аккаунта' 
+      });
+      setLoading(false);
+    }
+  };
+
+  // Handle Google account disconnection  
+  const handleGoogleDisconnect = async () => {
+    // Если пользователь зарегистрирован изначально через Google, запрещаем отключение
+    if (isOriginalGoogleUser) {
+      setMessage({ 
+        type: 'error', 
+        text: 'Нельзя отключить Google аккаунт, так как вы зарегистрированы через Google. Это ваш единственный способ входа.' 
+      });
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      const confirmMessage = 'Вы уверены, что хотите отключить Google аккаунт? После отключения вы сможете входить только по паролю.';
+      
+      if (!window.confirm(confirmMessage)) {
+        setLoading(false);
+        return;
+      }
+      
+      // Здесь будет логика отключения Google OAuth
+      // Пока что имитируем успешное отключение
+      setTimeout(() => {
+        setGoogleConnected(false);
+        setGoogleEmail(null);
+        setMessage({ type: 'success', text: 'Google аккаунт отключен' });
+        setLoading(false);
+      }, 1000);
+      
+    } catch (error) {
+      setMessage({ 
+        type: 'error', 
+        text: 'Ошибка отключения Google аккаунта' 
+      });
       setLoading(false);
     }
   };
@@ -913,21 +1020,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
 
           {activeSection === 'password' && (
             <div className="profile-section">
-              <h2>{t('profile.password.title')}</h2>
-              <form onSubmit={handlePasswordSubmit} className="profile-form">
-                <div className="form-group">
-                  <label>{t('profile.currentPassword')}</label>
-                  <input
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                    className="profile-input"
-                    placeholder={t('profile.currentPasswordPlaceholder')}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
+              {!isOriginalGoogleUser ? (
+                <>
+                  <h2>{t('profile.password.title')}</h2>
+                  <form onSubmit={handlePasswordSubmit} className="profile-form">
+                    <div className="form-group">
                   <label>{t('profile.newPassword')}</label>
                   <input
                     type="password"
@@ -962,6 +1059,38 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                   </button>
                 </div>
               </form>
+                </>
+              ) : (
+                // Блок для Google пользователей - объяснение почему нет смены пароля
+                <div className="google-user-password-info">
+                  <h2>🔐 Безопасность аккаунта</h2>
+                  <div className="google-info-card">
+                    <div className="google-info-icon">🛡️</div>
+                    <div className="google-info-content">
+                      <h3>Вы используете Google аккаунт</h3>
+                      <p>
+                        Ваш аккаунт защищен системой безопасности Google. 
+                        Вам не нужно устанавливать отдельный пароль, так как 
+                        вход осуществляется через безопасную авторизацию Google.
+                      </p>
+                      <div className="google-security-features">
+                        <div className="security-feature">
+                          <span className="feature-icon">✓</span>
+                          <span>Двухфакторная аутентификация Google</span>
+                        </div>
+                        <div className="security-feature">
+                          <span className="feature-icon">✓</span>
+                          <span>Автоматические обновления безопасности</span>
+                        </div>
+                        <div className="security-feature">
+                          <span className="feature-icon">✓</span>
+                          <span>Защита от подозрительной активности</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1204,10 +1333,104 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
       )}
 
-      {/* Правая колонка для password и settings */}
-      {(activeSection === 'password' || activeSection === 'settings') && (
+      {/* Правая колонка для password */}
+      {activeSection === 'password' && (
         <div className="profile-right-column">
-          {/* Пустая правая колонка для будущего контента */}
+          {/* Блок подключения Google аккаунта */}
+          <div className="google-account-section">
+            <h3>🔗 Подключение Google аккаунта</h3>
+            <div className="google-account-content">
+              {googleConnected ? (
+                <div className="google-connected">
+                  <div className="google-status">
+                    <div className="google-icon">✅</div>
+                    <div className="google-info">
+                      <div className="google-status-text">
+                        {isOriginalGoogleUser 
+                          ? 'Аккаунт создан через Google' 
+                          : 'Google аккаунт подключен'
+                        }
+                      </div>
+                      <div className="google-email">{googleEmail || user?.email}</div>
+                      {isOriginalGoogleUser && (
+                        <div className="google-note">
+                          Это ваш основной способ входа в систему
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {!isOriginalGoogleUser && (
+                    <button 
+                      className="google-disconnect-btn"
+                      onClick={handleGoogleDisconnect}
+                      disabled={loading}
+                    >
+                      {loading ? 'Отключение...' : 'Отключить Google'}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="google-not-connected">
+                  <div className="google-status">
+                    <div className="google-icon">⚪</div>
+                    <div className="google-info">
+                      <div className="google-status-text">Google аккаунт не подключен</div>
+                      <div className="google-description">
+                        Подключите Google аккаунт для быстрого входа
+                      </div>
+                    </div>
+                  </div>
+                  <button 
+                    className="google-connect-btn"
+                    onClick={handleGoogleConnect}
+                    disabled={loading}
+                  >
+                    {loading ? 'Подключение...' : 'Подключить Google'}
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            <div className="google-account-benefits">
+              {googleConnected ? (
+                isOriginalGoogleUser ? (
+                  <>
+                    <h4>Ваш аккаунт Google:</h4>
+                    <ul>
+                      <li>Безопасный вход через Google</li>
+                      <li>Не требует запоминания пароля</li>
+                      <li>Защищен системой безопасности Google</li>
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <h4>Google аккаунт подключен:</h4>
+                    <ul>
+                      <li>Можете входить через Google или по паролю</li>
+                      <li>Дополнительная безопасность аккаунта</li>
+                      <li>Быстрый доступ к сервисам</li>
+                    </ul>
+                  </>
+                )
+              ) : (
+                <>
+                  <h4>Преимущества подключения:</h4>
+                  <ul>
+                    <li>Быстрый вход без пароля</li>
+                    <li>Дополнительная безопасность</li>
+                    <li>Email должен совпадать с текущим: {user?.email}</li>
+                  </ul>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Правая колонка для settings */}
+      {activeSection === 'settings' && (
+        <div className="profile-right-column">
+          {/* Пустая правая колонка для settings */}
         </div>
       )}
 

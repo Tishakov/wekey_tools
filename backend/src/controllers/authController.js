@@ -83,7 +83,9 @@ exports.login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        coinBalance: user.coinBalance
+        coinBalance: user.coinBalance,
+        isGoogleUser: user.isGoogleUser,
+        googleId: user.googleId ? true : false
       }
     });
 
@@ -169,7 +171,9 @@ exports.register = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        coinBalance: user.coinBalance
+        coinBalance: user.coinBalance,
+        isGoogleUser: user.isGoogleUser,
+        googleId: user.googleId ? true : false
       }
     });
 
@@ -257,6 +261,12 @@ exports.getProfile = async (req, res) => {
       loginCount: user.loginCount + 1
     });
 
+    console.log('🔍 User Google data debug:', {
+      isGoogleUser: user.isGoogleUser,
+      googleId: user.googleId ? 'SET' : 'NOT_SET',
+      hasGoogleId: !!user.googleId
+    });
+
     res.json({
       success: true,
       user: {
@@ -285,7 +295,9 @@ exports.getProfile = async (req, res) => {
         loginCount: user.loginCount,
         apiRequestsCount: user.apiRequestsCount,
         dailyApiLimit: user.dailyApiLimit,
-        coinBalance: user.coinBalance
+        coinBalance: user.coinBalance,
+        isGoogleUser: user.isGoogleUser,
+        googleId: user.googleId ? true : false // Возвращаем только наличие, не сам ID
       }
     });
 
@@ -344,23 +356,16 @@ exports.updateProfile = async (req, res) => {
 
     // Если требуется смена пароля
     if (newPassword) {
-      if (!currentPassword) {
+      if (newPassword.length < 8) {
         return res.status(400).json({
           success: false,
-          message: 'Для смены пароля укажите текущий пароль'
-        });
-      }
-
-      const isCurrentPasswordValid = await user.checkPassword(currentPassword);
-      if (!isCurrentPasswordValid) {
-        return res.status(400).json({
-          success: false,
-          message: 'Неверный текущий пароль'
+          message: 'Новый пароль должен содержать минимум 8 символов'
         });
       }
 
       // Новый пароль будет автоматически захеширован в модели
       await user.update({ password: newPassword });
+      console.log('✅ Password updated successfully for user:', user.email);
     }
 
     // Обновление всех полей

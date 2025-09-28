@@ -1372,3 +1372,226 @@ input[type="date"]::-webkit-calendar-cell.today {
   color: #5E35F2;
   font-weight: 500;
 }
+
+/* Google Account Section */
+.google-account-section {
+  background: #28282A;
+  border-radius: 16px;
+  border: 1px solid #333335;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.google-account-section h3 {
+  margin: 0 0 20px 0;
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.google-account-content {
+  margin-bottom: 24px;
+}
+
+.google-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.google-icon {
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-info {
+  flex: 1;
+}
+
+.google-status-text {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.google-email {
+  color: #BCBBBD;
+  font-size: 14px;
+}
+
+.google-description {
+  color: #BCBBBD;
+  font-size: 14px;
+}
+
+.google-note {
+  color: #10b981;
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.google-connect-btn,
+.google-disconnect-btn {
+  background: #5E35F2;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.google-connect-btn:hover {
+  background: #4c2bc7;
+  transform: translateY(-1px);
+}
+
+.google-disconnect-btn {
+  background: #dc2626;
+}
+
+.google-disconnect-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.google-account-benefits {
+  padding-top: 20px;
+  border-top: 1px solid #333335;
+}
+
+.google-account-benefits h4 {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.google-account-benefits ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.google-account-benefits li {
+  color: #BCBBBD;
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding-left: 16px;
+  position: relative;
+}
+
+.google-account-benefits li:before {
+  content: "✓";
+  color: #10b981;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.google-account-benefits li:last-child {
+  margin-bottom: 0;
+}
+
+/* Google User Password Info */
+.google-user-password-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.google-user-password-info h2 {
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.google-info-card {
+  background: #28282A;
+  border-radius: 16px;
+  border: 1px solid #333335;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.google-info-icon {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(94, 53, 242, 0.1);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.google-info-content {
+  flex: 1;
+}
+
+.google-info-content h3 {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.google-info-content p {
+  color: #BCBBBD;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+}
+
+.google-security-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.security-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #BCBBBD;
+  font-size: 13px;
+}
+
+.feature-icon {
+  color: #10b981;
+  font-weight: bold;
+  width: 16px;
+  text-align: center;
+}
+
+/* Адаптивность для Google info */
+@media (max-width: 768px) {
+  .google-info-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .google-info-icon {
+    align-self: center;
+  }
+}
