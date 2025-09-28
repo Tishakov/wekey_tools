@@ -1102,48 +1102,77 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
               </form>
                 </div>
               ) : null}
+
             </div>
           )}
 
           {activeSection === 'settings' && (
-            <div>
-              <h2>{t('profile.settings.title')}</h2>
+            <div className="account-settings">
               <form onSubmit={handleSettingsSubmit} className="profile-form">
-                <div className="form-group">
-                  <label>{t('profile.defaultLanguage')}</label>
-                  <select
-                    value={settings.defaultLanguage}
-                    onChange={(e) => setSettings({...settings, defaultLanguage: e.target.value})}
-                    className="profile-select"
-                  >
-                    <option value="ru">{t('profile.languages.ru')}</option>
-                    <option value="en">{t('profile.languages.en')}</option>
-                    <option value="uk">{t('profile.languages.uk')}</option>
-                  </select>
+                {/* Основные настройки */}
+                <div className="settings-section">
+                  <h3 className="settings-section-title">🌍 Основные настройки</h3>
+                  
+                  <div className="settings-item">
+                    <div className="settings-item-info">
+                      <div className="settings-item-icon">🌐</div>
+                      <div className="settings-item-content">
+                        <label className="settings-item-label">{t('profile.defaultLanguage')}</label>
+                        <p className="settings-item-description">Выберите язык интерфейса по умолчанию</p>
+                      </div>
+                    </div>
+                    <select
+                      value={settings.defaultLanguage}
+                      onChange={(e) => setSettings({...settings, defaultLanguage: e.target.value})}
+                      className="settings-select"
+                    >
+                      <option value="ru">{t('profile.languages.ru')}</option>
+                      <option value="en">{t('profile.languages.en')}</option>
+                      <option value="uk">{t('profile.languages.uk')}</option>
+                    </select>
+                  </div>
+
+                  <div className="settings-item">
+                    <div className="settings-item-info">
+                      <div className="settings-item-icon">🎨</div>
+                      <div className="settings-item-content">
+                        <label className="settings-item-label">{t('profile.theme')}</label>
+                        <p className="settings-item-description">Тема оформления интерфейса</p>
+                      </div>
+                    </div>
+                    <select
+                      value={settings.theme}
+                      onChange={(e) => setSettings({...settings, theme: e.target.value as 'light' | 'dark'})}
+                      className="settings-select"
+                    >
+                      <option value="dark">{t('profile.themes.dark')}</option>
+                      <option value="light">{t('profile.themes.light')}</option>
+                    </select>
+                  </div>
                 </div>
-                
-                <div className="form-group checkbox-group">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={settings.emailNotifications}
-                      onChange={(e) => setSettings({...settings, emailNotifications: e.target.checked})}
-                      className="profile-checkbox"
-                    />
-                    <span className="checkbox-text">{t('profile.emailNotifications')}</span>
-                  </label>
-                </div>
-                
-                <div className="form-group">
-                  <label>{t('profile.theme')}</label>
-                  <select
-                    value={settings.theme}
-                    onChange={(e) => setSettings({...settings, theme: e.target.value as 'light' | 'dark'})}
-                    className="profile-select"
-                  >
-                    <option value="dark">{t('profile.themes.dark')}</option>
-                    <option value="light">{t('profile.themes.light')}</option>
-                  </select>
+
+                {/* Уведомления */}
+                <div className="settings-section">
+                  <h3 className="settings-section-title">📧 Уведомления</h3>
+                  
+                  <div className="settings-item">
+                    <div className="settings-item-info">
+                      <div className="settings-item-icon">📬</div>
+                      <div className="settings-item-content">
+                        <label className="settings-item-label">{t('profile.emailNotifications')}</label>
+                        <p className="settings-item-description">Получать уведомления на email о важных событиях</p>
+                      </div>
+                    </div>
+                    <label className="settings-toggle">
+                      <input
+                        type="checkbox"
+                        checked={settings.emailNotifications}
+                        onChange={(e) => setSettings({...settings, emailNotifications: e.target.checked})}
+                        className="settings-toggle-input"
+                      />
+                      <span className="settings-toggle-slider"></span>
+                    </label>
+                  </div>
                 </div>
                 
                 <div className="form-actions">

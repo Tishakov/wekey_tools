@@ -21,20 +21,54 @@
   --text-primary: #BCBBBD;
   --text-secondary: #BCBBBD;
   --text-muted: #888888;
+  
+  /* Переменные для скроллбара */
+  --scrollbar-width: 8px;
+  --scrollbar-track: #1C1D1F;
+  --scrollbar-thumb: #333335;
+  --scrollbar-thumb-hover: #444446;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  /* Резервируем место для скроллбара, предотвращая смещение контента */
+  scrollbar-gutter: stable;
+  /* Fallback для старых браузеров */
+  overflow-y: auto;
+  /* Firefox scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--bg-primary);
-  color: #BCBBBD;
-  font-family: 'Gilroy';
 }
+
+/* Стилизация скроллбара для темной темы */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+
 
 #root {
   min-height: 100vh;
