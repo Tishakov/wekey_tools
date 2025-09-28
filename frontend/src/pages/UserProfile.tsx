@@ -258,6 +258,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const [showAttentionAnimation, setShowAttentionAnimation] = useState(false);
   const [messagesFading] = useState({ message: false, aboutMessage: false });
   const [savedStatus, setSavedStatus] = useState({ profile: false, about: false });
+  const [passwordMessageFading, setPasswordMessageFading] = useState(false);
   const [socialValidationErrors, setSocialValidationErrors] = useState<{
     instagram?: string;
     facebook?: string;
@@ -364,7 +365,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     }
     
     try {
-      const response = await fetch('http://localhost:8880/api/auth/update-profile', {
+      const response = await fetch('http://localhost:8880/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -382,6 +383,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       
       setMessage({ type: 'success', text: t('profile.passwordChanged') });
       setPasswordData({ newPassword: '', confirmPassword: '' });
+      setPasswordMessageFading(false);
+      
+      // Автоматически скрываем сообщение через 3 секунды
+      setTimeout(() => {
+        setPasswordMessageFading(true);
+        // Удаляем сообщение после анимации исчезновения
+        setTimeout(() => {
+          setMessage(null);
+          setPasswordMessageFading(false);
+        }, 300);
+      }, 3000);
     } catch (error) {
       setMessage({ 
         type: 'error', 
@@ -808,10 +820,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
         )}
         
-        {/* Блок profile-content только для не-dashboard секций */}
+        {/* Контент для не-dashboard секций */}
         {activeSection !== 'dashboard' && (
-          <div className="profile-content">
-          <div className="profile-main-content">
+          <div>
             {message && message.type === 'error' && (
               <div className={`profile-message ${message.type} ${messagesFading.message ? 'fade-out' : ''}`}>
                 {message.text}
@@ -821,7 +832,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
 
           
           {activeSection === 'personalInfo' && (
-            <div className="profile-section">
+            <div className="account-profile">
               <div className="profile-section-header">
                 <h2>📋 Профиль</h2>
                 {!isEditing ? (
@@ -1019,11 +1030,36 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           
 
           {activeSection === 'password' && (
-            <div className="profile-section">
+            <div>
+              {/* Блок информации о пароле для Google пользователей */}
+              {isOriginalGoogleUser && (
+                <div className="google-account-section">
+                  <div className="google-user-password-info">
+                    <h2>🔐 Смена пароля</h2>
+                    <div className="google-info-card">
+                      <div className="google-info-icon">🛡️</div>
+                      <div className="google-info-content">
+                        <h3>Вы используете Google аккаунт</h3>
+                        <p>
+                          Ваш профиль надежно защищён системой безопасности Google. 
+                          Устанавливать отдельный пароль не требуется — вход выполняется 
+                          через безопасную авторизацию Google.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {!isOriginalGoogleUser ? (
-                <>
-                  <h2>{t('profile.password.title')}</h2>
-                  <form onSubmit={handlePasswordSubmit} className="profile-form">
+                <div className="account-password">
+                  <h2>🔐 Смена пароля</h2>
+                  {message && message.type === 'success' && (
+                    <div className={`password-success-message ${passwordMessageFading ? 'fade-out' : ''}`}>
+                      ✅ {message.text}
+                    </div>
+                  )}
+                  <form onSubmit={handlePasswordSubmit} className="password-form">
                     <div className="form-group">
                   <label>{t('profile.newPassword')}</label>
                   <input
@@ -1059,43 +1095,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                   </button>
                 </div>
               </form>
-                </>
-              ) : (
-                // Блок для Google пользователей - объяснение почему нет смены пароля
-                <div className="google-user-password-info">
-                  <h2>🔐 Безопасность аккаунта</h2>
-                  <div className="google-info-card">
-                    <div className="google-info-icon">🛡️</div>
-                    <div className="google-info-content">
-                      <h3>Вы используете Google аккаунт</h3>
-                      <p>
-                        Ваш аккаунт защищен системой безопасности Google. 
-                        Вам не нужно устанавливать отдельный пароль, так как 
-                        вход осуществляется через безопасную авторизацию Google.
-                      </p>
-                      <div className="google-security-features">
-                        <div className="security-feature">
-                          <span className="feature-icon">✓</span>
-                          <span>Двухфакторная аутентификация Google</span>
-                        </div>
-                        <div className="security-feature">
-                          <span className="feature-icon">✓</span>
-                          <span>Автоматические обновления безопасности</span>
-                        </div>
-                        <div className="security-feature">
-                          <span className="feature-icon">✓</span>
-                          <span>Защита от подозрительной активности</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
 
           {activeSection === 'settings' && (
-            <div className="profile-section">
+            <div>
               <h2>{t('profile.settings.title')}</h2>
               <form onSubmit={handleSettingsSubmit} className="profile-form">
                 <div className="form-group">
@@ -1153,7 +1159,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           <CoinTransactionsLeft />
         )}
 
-          </div>
           </div>
         )}
       </div>
@@ -1338,12 +1343,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         <div className="profile-right-column">
           {/* Блок подключения Google аккаунта */}
           <div className="google-account-section">
-            <h3>🔗 Подключение Google аккаунта</h3>
+            <h3><img src="/icons/google_gmail.svg" alt="Google" style={{width: '20px', height: '20px', marginRight: '8px', verticalAlign: 'middle'}} /> Подключение Google аккаунта</h3>
             <div className="google-account-content">
               {googleConnected ? (
                 <div className="google-connected">
                   <div className="google-status">
-                    <div className="google-icon">✅</div>
+                    <div className="google-icon">
+                      <img src="/icons/google_gmail.svg" alt="Google" />
+                    </div>
                     <div className="google-info">
                       <div className="google-status-text">
                         {isOriginalGoogleUser 
@@ -1354,7 +1361,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                       <div className="google-email">{googleEmail || user?.email}</div>
                       {isOriginalGoogleUser && (
                         <div className="google-note">
-                          Это ваш основной способ входа в систему
+                          Это ваш способ входа в аккаунт
                         </div>
                       )}
                     </div>
@@ -1372,7 +1379,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
               ) : (
                 <div className="google-not-connected">
                   <div className="google-status">
-                    <div className="google-icon">⚪</div>
+                    <div className="google-icon"><img src="/icons/google_gmail.svg" alt="Google" /></div>
                     <div className="google-info">
                       <div className="google-status-text">Google аккаунт не подключен</div>
                       <div className="google-description">
@@ -1388,39 +1395,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
                     {loading ? 'Подключение...' : 'Подключить Google'}
                   </button>
                 </div>
-              )}
-            </div>
-            
-            <div className="google-account-benefits">
-              {googleConnected ? (
-                isOriginalGoogleUser ? (
-                  <>
-                    <h4>Ваш аккаунт Google:</h4>
-                    <ul>
-                      <li>Безопасный вход через Google</li>
-                      <li>Не требует запоминания пароля</li>
-                      <li>Защищен системой безопасности Google</li>
-                    </ul>
-                  </>
-                ) : (
-                  <>
-                    <h4>Google аккаунт подключен:</h4>
-                    <ul>
-                      <li>Можете входить через Google или по паролю</li>
-                      <li>Дополнительная безопасность аккаунта</li>
-                      <li>Быстрый доступ к сервисам</li>
-                    </ul>
-                  </>
-                )
-              ) : (
-                <>
-                  <h4>Преимущества подключения:</h4>
-                  <ul>
-                    <li>Быстрый вход без пароля</li>
-                    <li>Дополнительная безопасность</li>
-                    <li>Email должен совпадать с текущим: {user?.email}</li>
-                  </ul>
-                </>
               )}
             </div>
           </div>

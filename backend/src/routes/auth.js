@@ -9,7 +9,7 @@ router.post('/login',
   [
     body('email')
       .isEmail()
-      .normalizeEmail()
+      .normalizeEmail({ gmail_remove_dots: false })
       .withMessage('Введите корректный email'),
     body('password')
       .notEmpty()
@@ -23,7 +23,7 @@ router.post('/register',
   [
     body('email')
       .isEmail()
-      .normalizeEmail()
+      .normalizeEmail({ gmail_remove_dots: false })
       .withMessage('Введите корректный email'),
     body('password')
       .isLength({ min: 6 })
@@ -50,7 +50,7 @@ router.post('/admin-login',
   [
     body('email')
       .isEmail()
-      .normalizeEmail()
+      .normalizeEmail({ gmail_remove_dots: false })
       .withMessage('Введите корректный email'),
     body('password')
       .notEmpty()

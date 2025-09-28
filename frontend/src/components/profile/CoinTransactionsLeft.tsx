@@ -53,7 +53,7 @@ const CoinTransactionsLeft: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="transaction-stat">
       {/* coin-transactions-header */}
       <div className="coin-transactions-header">
         <h2>История операций с коинами</h2>
@@ -98,7 +98,7 @@ const CoinTransactionsLeft: React.FC = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

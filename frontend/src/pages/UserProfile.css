@@ -1375,11 +1375,18 @@ input[type="date"]::-webkit-calendar-cell.today {
 
 /* Google Account Section */
 .google-account-section {
-  background: #28282A;
-  border-radius: 16px;
-  border: 1px solid #333335;
-  padding: 24px;
-  margin-bottom: 20px;
+  background: linear-gradient(135deg, #2a2a2c 0%, #28282a 100%);
+  border-radius: 20px;
+  border: 1px solid #3a3a3c;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.google-account-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .google-account-section h3 {
@@ -1389,27 +1396,36 @@ input[type="date"]::-webkit-calendar-cell.today {
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.google-account-content {
-  margin-bottom: 24px;
+  gap: 12px;
+  letter-spacing: -0.5px;
 }
 
 .google-status {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #2a2a2c 0%, #28282a 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .google-icon {
-  font-size: 24px;
-  width: 32px;
-  height: 32px;
+  /* filter: brightness(0) invert(1); */
+  background: linear-gradient(135deg, rgba(94, 53, 242, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(94, 53, 242, 0.2);
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.google-icon img {
+  width: 36px;
+  height: 36px;
+  /* filter: brightness(0) invert(1); */
 }
 
 .google-info {
@@ -1420,129 +1436,147 @@ input[type="date"]::-webkit-calendar-cell.today {
   color: #FFFFFF;
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
 
 .google-email {
-  color: #BCBBBD;
+  color: #A1A1AA;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .google-description {
-  color: #BCBBBD;
+  color: #A1A1AA;
   font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .google-note {
-  color: #10b981;
-  font-size: 12px;
-  font-style: italic;
-  margin-top: 4px;
+  color: #10B981;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 6px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .google-connect-btn,
 .google-disconnect-btn {
-  background: #5E35F2;
+  background: linear-gradient(135deg, #5E35F2 0%, #7C3AED 100%);
   color: #FFFFFF;
   border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 14px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
+  box-shadow: 0 4px 15px rgba(94, 53, 242, 0.3);
+  letter-spacing: -0.3px;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.google-connect-btn::before,
+.google-disconnect-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.google-connect-btn:hover::before,
+.google-disconnect-btn:hover::before {
+  left: 100%;
 }
 
 .google-connect-btn:hover {
-  background: #4c2bc7;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #4c2bc7 0%, #6d28d9 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(94, 53, 242, 0.4);
 }
 
 .google-disconnect-btn {
-  background: #dc2626;
+  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
 }
 
 .google-disconnect-btn:hover {
-  background: #b91c1c;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
 }
 
-.google-account-benefits {
-  padding-top: 20px;
-  border-top: 1px solid #333335;
-}
 
-.google-account-benefits h4 {
-  color: #FFFFFF;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-}
-
-.google-account-benefits ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.google-account-benefits li {
-  color: #BCBBBD;
-  font-size: 13px;
-  margin-bottom: 8px;
-  padding-left: 16px;
-  position: relative;
-}
-
-.google-account-benefits li:before {
-  content: "✓";
-  color: #10b981;
-  font-weight: bold;
-  position: absolute;
-  left: 0;
-}
-
-.google-account-benefits li:last-child {
-  margin-bottom: 0;
-}
 
 /* Google User Password Info */
 .google-user-password-info {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .google-user-password-info h2 {
   color: #FFFFFF;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  letter-spacing: -0.8px;
 }
 
 .google-info-card {
-  background: #28282A;
-  border-radius: 16px;
-  border: 1px solid #333335;
-  padding: 24px;
+  background: linear-gradient(135deg, #2a2a2c 0%, #28282a 100%);
+  border-radius: 24px;
+  border: 1px solid #3a3a3c;
+  padding: 32px;
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: flex-start;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.google-info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #5E35F2, #10B981, #F59E0B);
+}
+
+.google-info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(94, 53, 242, 0.3);
 }
 
 .google-info-icon {
-  font-size: 32px;
-  width: 48px;
-  height: 48px;
+  font-size: 36px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(94, 53, 242, 0.1);
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(94, 53, 242, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+  border-radius: 20px;
   flex-shrink: 0;
+  border: 2px solid rgba(94, 53, 242, 0.2);
+  box-shadow: 0 4px 20px rgba(94, 53, 242, 0.1);
 }
 
 .google-info-content {
@@ -1551,47 +1585,193 @@ input[type="date"]::-webkit-calendar-cell.today {
 
 .google-info-content h3 {
   color: #FFFFFF;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  margin: 0 0 12px 0;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.5px;
 }
 
 .google-info-content p {
-  color: #BCBBBD;
+  color: #A1A1AA;
   font-size: 14px;
-  line-height: 1.5;
-  margin: 0 0 20px 0;
+  line-height: 1.3;
+  margin: 0 0 0 0;
+  font-weight: 500;
 }
 
-.google-security-features {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-.security-feature {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #BCBBBD;
-  font-size: 13px;
-}
-
-.feature-icon {
-  color: #10b981;
-  font-weight: bold;
-  width: 16px;
-  text-align: center;
-}
 
 /* Адаптивность для Google info */
 @media (max-width: 768px) {
+  .google-account-section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .google-account-section h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  .google-status {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .google-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+  
+  .google-connect-btn,
+  .google-disconnect-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
   .google-info-card {
     flex-direction: column;
     text-align: center;
+    padding: 24px;
+    gap: 20px;
   }
   
   .google-info-icon {
     align-self: center;
+    width: 56px;
+    height: 56px;
+    font-size: 32px;
   }
+  
+  .google-user-password-info h2 {
+    font-size: 24px;
+  }
+  
+  .google-info-content h3 {
+    font-size: 20px;
+  }
+}
+
+/* Account Profile Block */
+.account-profile {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 16px;
+  padding: 30px;
+}
+
+/* Account Password Block */
+.account-password {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 16px;
+  padding: 30px;
+}
+
+.account-password h2 {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.8px;
+}
+
+.password-success-message {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22C55E;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.4s ease-out;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.password-success-message.fade-out {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.password-form {
+  margin-top: 24px;
+}
+
+.password-form .form-group {
+  margin-bottom: 20px;
+}
+
+.password-form .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.password-form .profile-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: #1A1A1C;
+  border: 1px solid #333335;
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.password-form .profile-input:focus {
+  outline: none;
+  border-color: #5E35F2;
+}
+
+.password-form .form-actions {
+  margin-top: 24px;
+}
+
+.password-form .profile-save-button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #5E35F2 0%, #7C3AED 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.password-form .profile-save-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(94, 53, 242, 0.4);
+}
+
+/* Transaction Statistics Block */
+.transaction-stat {
+  background: #28282A;
+  border: 1px solid #333335;
+  border-radius: 16px;
+  padding: 30px;
 }

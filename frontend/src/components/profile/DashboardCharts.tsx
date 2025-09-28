@@ -282,6 +282,7 @@ const DashboardCharts: React.FC = () => {
                         outerRadius={60}
                         paddingAngle={4}
                         dataKey="count"
+                        stroke="#28282A"
                       >
                         {topToolsData.map((_, index) => (
                           <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
