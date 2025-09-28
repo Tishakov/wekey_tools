@@ -250,7 +250,7 @@ const DashboardCharts: React.FC = () => {
                     cy="50%"
                     innerRadius={40}
                     outerRadius={70}
-                    paddingAngle={2}
+                    paddingAngle={4}
                     dataKey="count"
                   >
                     {topToolsData.map((_, index) => (
