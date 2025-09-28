@@ -178,7 +178,11 @@ const DashboardCharts: React.FC = () => {
       'Site Audit': 'Аудит сайта',
       'Remove Duplicates': 'Удаление дубликатов',
       'Number Generator': 'Генератор чисел',
-      'Password Generator': 'Генератор паролей'
+      'Password Generator': 'Генератор паролей',
+      
+      // Дополнительные варианты написания
+      'site-audit': 'Аудит сайта',
+      'siteaudit': 'Аудит сайта'
     };
 
     // Если есть перевод - используем его, иначе форматируем название
@@ -219,62 +223,69 @@ const DashboardCharts: React.FC = () => {
     <div className="dashboard-charts-container">
       <div className="dashboard-charts-grid">
         {/* График активности по дням */}
-        <div className="dashboard-chart-card">
+        <div className="dashboard-chart-card dashboard-activity-chart">
           <h3>Активность за 30 дней</h3>
-          {loading ? (
-            <div className="chart-loading">Загрузка данных...</div>
-          ) : (
-            <AnalyticsChart 
-              data={activityData.map(item => ({
-                date: item.date,
-                value: item.usageCount
-              }))} 
-              color="#3b82f6"
-              title="Использований инструментов"
-            />
-          )}
+          <div className="chart-content">
+            {loading ? (
+              <div className="chart-loading">Загрузка данных...</div>
+            ) : (
+              <AnalyticsChart 
+                data={activityData.map(item => ({
+                  date: item.date,
+                  value: item.usageCount
+                }))} 
+                color="#3b82f6"
+                title="Использований инструментов"
+                height={220}
+              />
+            )}
+          </div>
         </div>
 
         {/* Круговая диаграмма топ-5 инструментов */}
-        <div className="dashboard-chart-card">
+        <div className="dashboard-chart-card dashboard-pie-chart">
           <h3>Топ-5 инструментов</h3>
-          {loading ? (
-            <div className="chart-loading">Загрузка данных...</div>
-          ) : (
-            <div className="pie-chart-container">
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie
-                    data={topToolsData as any}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={40}
-                    outerRadius={70}
-                    paddingAngle={4}
-                    dataKey="count"
-                  >
-                    {topToolsData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomPieTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-              
-              {/* Легенда */}
-              <div className="pie-legend">
-                {topToolsData.map((tool, index) => (
-                  <div key={tool.name} className="legend-item">
-                    <div 
-                      className={`legend-color legend-color-${index}`}
-                    ></div>
-                    <span className="legend-name">{formatToolName(tool.name)}</span>
-                    <span className="legend-value">{tool.percentage}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="chart-content">
+            {loading ? (
+              <div className="chart-loading">Загрузка данных...</div>
+            ) : (
+              <>
+                <div className="pie-chart-wrapper">
+                  <ResponsiveContainer width="100%" height={140}>
+                    <PieChart>
+                      <Pie
+                        data={topToolsData as any}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={30}
+                        outerRadius={60}
+                        paddingAngle={4}
+                        dataKey="count"
+                      >
+                        {topToolsData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomPieTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                {/* Легенда */}
+                <div className="pie-legend">
+                  {topToolsData.map((tool, index) => (
+                    <div key={tool.name} className="legend-item">
+                      <div 
+                        className={`legend-color legend-color-${index}`}
+                      ></div>
+                      <span className="legend-name">{formatToolName(tool.name)}</span>
+                      <span className="legend-value">{tool.percentage}%</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

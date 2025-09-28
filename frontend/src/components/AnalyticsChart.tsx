@@ -10,12 +10,14 @@ interface AnalyticsChartProps {
   data: ChartData[];
   color?: string;
   title?: string;
+  height?: number;
 }
 
 const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ 
   data, 
   color = '#3b82f6',
-  title = 'Analytics Chart'
+  title = 'Analytics Chart',
+  height = 180
 }) => {
   // Если нет данных, показываем сообщение о пустом графике
   if (data.length === 0) {
@@ -110,7 +112,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({
 
   return (
     <div className="analytics-chart">
-      <ResponsiveContainer width="100%" height={180}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 35, left: 30 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
