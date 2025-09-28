@@ -636,8 +636,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   }
   
   return (
-    <div className="profile-page-content">
-      <div className="profile-container">
+    <div className="profile-container">
       <div className="profile-left-column">
         {/* Дашборд - левая колонка */}
         {activeSection === 'dashboard' && (
@@ -1216,7 +1215,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
           <CoinTransactionsRight />
         </div>
       )}
-    </div>
     </div>
   );
 };
