@@ -1580,6 +1580,9 @@
       "password": "Пароль",
       "settings": "Налаштування"
     },
+    "dashboard": {
+      "title": "Дашборд"
+    },
     "personalInfo": {
       "title": "Особиста інформація"
     },

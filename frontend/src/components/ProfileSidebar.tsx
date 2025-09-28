@@ -12,6 +12,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ activeSection, onSectio
 
   const profileSections = [
     {
+      id: 'dashboard',
+      name: t('profile.dashboard.title'),
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
+        </svg>
+      )
+    },
+    {
       id: 'personalInfo',
       name: t('profile.personalInfo.title'),
       icon: (

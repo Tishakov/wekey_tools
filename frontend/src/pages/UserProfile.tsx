@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import AvatarUpload from '../components/profile/AvatarUpload';
 import CoinTransactionsLeft from '../components/profile/CoinTransactionsLeft';
 import CoinTransactionsRight from '../components/profile/CoinTransactionsRight';
+import UserDashboard from '../components/profile/UserDashboard';
 import './UserProfile.css';
 
 // Список популярных стран
@@ -201,7 +202,7 @@ interface PasswordChangeData {
 }
 
 interface UserProfileProps {
-  activeSection: 'personalInfo' | 'password' | 'coins' | 'settings';
+  activeSection: 'dashboard' | 'personalInfo' | 'password' | 'coins' | 'settings';
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
@@ -249,15 +250,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [aboutMessage, setAboutMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [userStats, setUserStats] = useState({
-    totalToolUsage: 0,
-    uniqueToolsUsed: 0,
-    daysOnPlatform: 0,
-    tokensUsed: 0
-  });
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [showAttentionAnimation, setShowAttentionAnimation] = useState(false);
-  const [messagesFading, setMessagesFading] = useState({ message: false, aboutMessage: false });
+  const [messagesFading] = useState({ message: false, aboutMessage: false });
   const [savedStatus, setSavedStatus] = useState({ profile: false, about: false });
   const [socialValidationErrors, setSocialValidationErrors] = useState<{
     instagram?: string;
@@ -296,32 +291,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     }
   }, [user]);
 
-  // Загрузка статистики пользователя
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      if (!user || !localStorage.getItem('wekey_token')) return;
-      
-      try {
-        const response = await fetch('http://localhost:8880/api/auth/stats', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('wekey_token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            setUserStats(result.stats);
-          }
-        }
-      } catch (error) {
-        console.error('Ошибка загрузки статистики:', error);
-      }
-    };
-
-    fetchUserStats();
-  }, [user]);
   
   // Handle profile update
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -486,22 +456,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
     }
   };
 
-  // Функции для плавного скрытия сообщений
-  const fadeOutMessage = () => {
-    setMessagesFading(prev => ({ ...prev, message: true }));
-    setTimeout(() => {
-      setMessage(null);
-      setMessagesFading(prev => ({ ...prev, message: false }));
-    }, 300); // Время анимации fade-out
-  };
 
-  const fadeOutAboutMessage = () => {
-    setMessagesFading(prev => ({ ...prev, aboutMessage: true }));
-    setTimeout(() => {
-      setAboutMessage(null);
-      setMessagesFading(prev => ({ ...prev, aboutMessage: false }));
-    }, 300); // Время анимации fade-out
-  };
 
   // Валидация социальных сетей
   const validateSocialUrl = (url: string, platform: 'instagram' | 'facebook' | 'telegram'): string | null => {
@@ -682,40 +637,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   
   return (
     <div className="profile-page-content">
-      {/* Статистика пользователя - только для personalInfo */}
-      {activeSection === 'personalInfo' && (
-        <div className="user-stats-section">
-        <div className="profile-stats-grid">
-          <div className="profile-stat-card">
-            <div className="profile-stat-icon">🚀</div>
-            <div className="profile-stat-info">
-              <div className="stat-number">{userStats.totalToolUsage}</div>
-              <div className="stat-label">Запусков инструментов</div>
-            </div>
-          </div>
-          <div className="profile-stat-card">
-            <div className="profile-stat-icon">🛠️</div>
-            <div className="profile-stat-info">
-              <div className="stat-number">{userStats.uniqueToolsUsed}/31</div>
-              <div className="stat-label">Использовано инструментов</div>
-            </div>
-          </div>
-          <div className="profile-stat-card">
-            <div className="profile-stat-icon">🪙</div>
-            <div className="profile-stat-info">
-              <div className="stat-number">{userStats.tokensUsed}</div>
-              <div className="stat-label">Потрачено коинов</div>
-            </div>
-          </div>
-          <div className="profile-stat-card">
-            <div className="profile-stat-icon">📅</div>
-            <div className="profile-stat-info">
-              <div className="stat-number">{userStats.daysOnPlatform}</div>
-              <div className="stat-label">Количество дней на платформе</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Дашборд - полная статистика пользователя */}
+      {activeSection === 'dashboard' && (
+        <UserDashboard />
       )}
       
       <div className="profile-container">
@@ -1097,32 +1021,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
         </div>
       </div>
       
-      {/* Правая колонка с наградами - только для personalInfo */}
+      {/* Правая колонка с блоком "О себе" - только для personalInfo */}
       {activeSection === 'personalInfo' && (
-        <div className="profile-right-column">
-        <div className="profile-achievements">
-          <div className="achievements-header">
-            <h2>🏆 Награды</h2>
-          </div>
-          <div className="achievements-content">
-            <div className="achievement-item">
-              <div className="achievement-icon">🥇</div>
-              <div className="achievement-info">
-                <div className="achievement-title">Первые шаги</div>
-                <div className="achievement-desc">Зарегистрировались на платформе</div>
-              </div>
-            </div>
-            <div className="achievement-item">
-              <div className="achievement-icon">⚡</div>
-              <div className="achievement-info">
-                <div className="achievement-title">Активный пользователь</div>
-                <div className="achievement-desc">Использовали 5+ инструментов</div>
-              </div>
-            </div>
-            {/* Пока что заглушки, потом добавим логику */}
-          </div>
-        </div>
-        
+        <div className="profile-right-column">        
         {/* Блок "О себе" - только для personalInfo */}
         <div className="profile-about">
           {aboutMessage && aboutMessage.type === 'error' && (

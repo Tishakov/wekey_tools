@@ -1589,6 +1589,9 @@
       "password": "Пароль",
       "settings": "Настройки"
     },
+    "dashboard": {
+      "title": "Дашборд"
+    },
     "personalInfo": {
       "title": "Личная информация"
     },

@@ -7,6 +7,7 @@ import './ProfilePage.css';
 
 // Маппинг URL параметров к разделам
 const sectionMapping = {
+  'dashboard': 'dashboard' as const,
   'personal-info': 'personalInfo' as const,
   'password': 'password' as const,
   'transaction-history': 'coins' as const,
@@ -14,6 +15,7 @@ const sectionMapping = {
 };
 
 const reverseSectionMapping = {
+  'dashboard': 'dashboard',
   'personalInfo': 'personal-info',
   'password': 'password',
   'coins': 'transaction-history',
@@ -26,12 +28,12 @@ const ProfilePage: React.FC = () => {
   const location = useLocation();
   
   // Получаем текущий раздел из URL
-  const currentPath = location.pathname.split('/').pop() || 'personal-info';
-  const activeSection = sectionMapping[currentPath as keyof typeof sectionMapping] || 'personalInfo';
+  const currentPath = location.pathname.split('/').pop() || 'dashboard';
+  const activeSection = sectionMapping[currentPath as keyof typeof sectionMapping] || 'dashboard';
 
   // Функция для изменения раздела через навигацию
   const handleSectionChange = (section: string) => {
-    const typedSection = section as 'personalInfo' | 'password' | 'coins' | 'settings';
+    const typedSection = section as 'dashboard' | 'personalInfo' | 'password' | 'coins' | 'settings';
     const urlSection = reverseSectionMapping[typedSection];
     navigate(`/${lang}/profile/${urlSection}`);
   };
