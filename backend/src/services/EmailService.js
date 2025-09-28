@@ -69,7 +69,7 @@ class EmailService {
       throw new Error('Gmail credentials не настроены. Установите GMAIL_USER и GMAIL_PASS');
     }
 
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.GMAIL_USER,
@@ -87,7 +87,7 @@ class EmailService {
       throw new Error('Mailtrap credentials не настроены. Установите MAILTRAP_USER и MAILTRAP_PASS');
     }
 
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: process.env.MAILTRAP_HOST || 'live.smtp.mailtrap.io',
       port: parseInt(process.env.MAILTRAP_PORT) || 587,
       secure: process.env.EMAIL_SECURE !== 'false', // true для 465, false для других портов
@@ -107,7 +107,7 @@ class EmailService {
     }
 
     // SendGrid через nodemailer
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: 'smtp.sendgrid.net',
       port: 587,
       secure: false,
