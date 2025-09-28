@@ -9,7 +9,11 @@ interface UserStats {
   tokensUsed: number;
 }
 
-const UserDashboard: React.FC = () => {
+interface UserDashboardProps {
+  column?: 'left' | 'right';
+}
+
+const UserDashboard: React.FC<UserDashboardProps> = ({ column = 'left' }) => {
   const { user } = useAuth();
   const [userStats, setUserStats] = useState<UserStats>({
     totalToolUsage: 0,
@@ -53,87 +57,95 @@ const UserDashboard: React.FC = () => {
     );
   }
 
+  // Левая колонка - основная статистика и прогресс
+  if (column === 'left') {
+    return (
+      <div className="user-dashboard">
+        {/* Основная статистика */}
+        <div className="dashboard-stats-section">
+          <div className="dashboard-stats-grid">
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon">🚀</div>
+              <div className="dashboard-stat-info">
+                <div className="dashboard-stat-number">{userStats.totalToolUsage}</div>
+                <div className="dashboard-stat-label">Запусков инструментов</div>
+              </div>
+            </div>
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon">🛠️</div>
+              <div className="dashboard-stat-info">
+                <div className="dashboard-stat-number">{userStats.uniqueToolsUsed}/31</div>
+                <div className="dashboard-stat-label">Использовано инструментов</div>
+              </div>
+            </div>
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon">
+                <img src="/icons/coin_rocket_v1.svg" alt="Coins" width="40" height="40" />
+              </div>
+              <div className="dashboard-stat-info">
+                <div className="dashboard-stat-number">{userStats.tokensUsed}</div>
+                <div className="dashboard-stat-label">Потрачено коинов</div>
+              </div>
+            </div>
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon">📅</div>
+              <div className="dashboard-stat-info">
+                <div className="dashboard-stat-number">{userStats.daysOnPlatform}</div>
+                <div className="dashboard-stat-label">Дней на платформе</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Прогресс использования инструментов */}
+        <div className="dashboard-progress-section">
+          <h2>📈 Прогресс изучения платформы</h2>
+          <div className="dashboard-progress-grid">
+            <div className="dashboard-progress-card">
+              <div className="dashboard-progress-header">
+                <h3>Исследование инструментов</h3>
+                <span className="dashboard-progress-percent">
+                  {Math.round((userStats.uniqueToolsUsed / 31) * 100)}%
+                </span>
+              </div>
+              <div className="dashboard-progress-bar">
+                <div 
+                  className="dashboard-progress-fill"
+                  style={{ width: `${(userStats.uniqueToolsUsed / 31) * 100}%` }}
+                ></div>
+              </div>
+              <p>Попробовано {userStats.uniqueToolsUsed} из 31 инструмента</p>
+            </div>
+            
+            <div className="dashboard-progress-card">
+              <div className="dashboard-progress-header">
+                <h3>Активность</h3>
+                <span className="dashboard-progress-percent">
+                  {userStats.totalToolUsage > 100 ? '100+' : userStats.totalToolUsage}
+                </span>
+              </div>
+              <div className="dashboard-progress-bar">
+                <div 
+                  className="dashboard-progress-fill activity"
+                  style={{ width: `${Math.min((userStats.totalToolUsage / 100) * 100, 100)}%` }}
+                ></div>
+              </div>
+              <p>
+                {userStats.totalToolUsage < 100 
+                  ? `${100 - userStats.totalToolUsage} запусков до активного пользователя`
+                  : 'Вы активный пользователь! 🎉'
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Правая колонка - достижения и быстрая статистика
   return (
     <div className="user-dashboard">
-      {/* Основная статистика */}
-      <div className="dashboard-stats-section">
-        <div className="dashboard-stats-grid">
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-icon">🚀</div>
-            <div className="dashboard-stat-info">
-              <div className="dashboard-stat-number">{userStats.totalToolUsage}</div>
-              <div className="dashboard-stat-label">Запусков инструментов</div>
-            </div>
-          </div>
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-icon">🛠️</div>
-            <div className="dashboard-stat-info">
-              <div className="dashboard-stat-number">{userStats.uniqueToolsUsed}/31</div>
-              <div className="dashboard-stat-label">Использовано инструментов</div>
-            </div>
-          </div>
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-icon">
-              <img src="/icons/coin_rocket_v1.svg" alt="Coins" width="40" height="40" />
-            </div>
-            <div className="dashboard-stat-info">
-              <div className="dashboard-stat-number">{userStats.tokensUsed}</div>
-              <div className="dashboard-stat-label">Потрачено коинов</div>
-            </div>
-          </div>
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-icon">📅</div>
-            <div className="dashboard-stat-info">
-              <div className="dashboard-stat-number">{userStats.daysOnPlatform}</div>
-              <div className="dashboard-stat-label">Дней на платформе</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Прогресс использования инструментов */}
-      <div className="dashboard-progress-section">
-        <h2>📈 Прогресс изучения платформы</h2>
-        <div className="dashboard-progress-grid">
-          <div className="dashboard-progress-card">
-            <div className="dashboard-progress-header">
-              <h3>Исследование инструментов</h3>
-              <span className="dashboard-progress-percent">
-                {Math.round((userStats.uniqueToolsUsed / 31) * 100)}%
-              </span>
-            </div>
-            <div className="dashboard-progress-bar">
-              <div 
-                className="dashboard-progress-fill"
-                style={{ width: `${(userStats.uniqueToolsUsed / 31) * 100}%` }}
-              ></div>
-            </div>
-            <p>Попробовано {userStats.uniqueToolsUsed} из 31 инструмента</p>
-          </div>
-          
-          <div className="dashboard-progress-card">
-            <div className="dashboard-progress-header">
-              <h3>Активность</h3>
-              <span className="dashboard-progress-percent">
-                {userStats.totalToolUsage > 100 ? '100+' : userStats.totalToolUsage}
-              </span>
-            </div>
-            <div className="dashboard-progress-bar">
-              <div 
-                className="dashboard-progress-fill activity"
-                style={{ width: `${Math.min((userStats.totalToolUsage / 100) * 100, 100)}%` }}
-              ></div>
-            </div>
-            <p>
-              {userStats.totalToolUsage < 100 
-                ? `${100 - userStats.totalToolUsage} запусков до активного пользователя`
-                : 'Вы активный пользователь! 🎉'
-              }
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Награды и достижения */}
       <div className="dashboard-achievements-section">
         <h2>🏆 Награды и достижения</h2>

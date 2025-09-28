@@ -637,13 +637,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
   
   return (
     <div className="profile-page-content">
-      {/* Дашборд - полная статистика пользователя */}
-      {activeSection === 'dashboard' && (
-        <UserDashboard />
-      )}
-      
       <div className="profile-container">
       <div className="profile-left-column">
+        {/* Дашборд - левая колонка */}
+        {activeSection === 'dashboard' && (
+          <UserDashboard column="left" />
+        )}
+        
         {/* Карточка профиля - только для personalInfo */}
         {activeSection === 'personalInfo' && (
           <div className="profile-header">
@@ -1200,6 +1200,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ activeSection }) => {
       {(activeSection === 'password' || activeSection === 'settings') && (
         <div className="profile-right-column">
           {/* Пустая правая колонка для будущего контента */}
+        </div>
+      )}
+
+      {/* Правая колонка для дашборда */}
+      {activeSection === 'dashboard' && (
+        <div className="profile-right-column">
+          <UserDashboard column="right" />
         </div>
       )}
 
