@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNewsletters } from '../../hooks/useNewslettersAndNews';
+import SimpleEmailBuilder from './EmailBuilder/SimpleEmailBuilder';
+import type { EmailBlock } from './EmailBuilder/SimpleEmailBuilder';
 import './CreateNewsletter.css';
 
 const CreateNewsletter: React.FC = () => {
@@ -18,7 +20,126 @@ const CreateNewsletter: React.FC = () => {
     sendImmediately: false
   });
   
+  const [emailBlocks, setEmailBlocks] = useState<EmailBlock[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [useAdvancedBuilder, setUseAdvancedBuilder] = useState(false);
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+
+  // Interactive block component for right panel
+  const InteractiveBlockComponent = ({ 
+    block, 
+    index, 
+    isSelected,
+    onUpdate, 
+    onDelete, 
+    onSelect,
+    onMove 
+  }: {
+    block: EmailBlock;
+    index: number;
+    isSelected: boolean;
+    onUpdate: (updates: Partial<EmailBlock>) => void;
+    onDelete: () => void;
+    onSelect: () => void;
+    onMove: (direction: 'up' | 'down') => void;
+  }) => {
+    
+    const handleContentChange = (newContent: string) => {
+      onUpdate({ content: newContent });
+    };
+
+    const renderBlockHTML = (block: EmailBlock): string => {
+      const { padding, backgroundColor, alignment } = block.settings;
+      const paddingStyle = `${padding?.top || 15}px ${padding?.right || 20}px ${padding?.bottom || 15}px ${padding?.left || 20}px`;
+      const containerStyle = `padding: ${paddingStyle}; background-color: ${backgroundColor || 'transparent'}; text-align: ${alignment || 'left'};`;
+
+      switch (block.type) {
+        case 'text':
+          return `<div style="${containerStyle}">${block.content}</div>`;
+        case 'image':
+          return `<div style="${containerStyle}"><img src="${block.content.src}" alt="${block.content.alt}" style="max-width: 100%; height: auto;" /></div>`;
+        case 'button':
+          return `<div style="${containerStyle}"><a href="${block.content.url}" style="display: inline-block; padding: 10px 20px; background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; text-decoration: none; border-radius: 4px;">${block.content.text}</a></div>`;
+        case 'divider':
+          return `<div style="${containerStyle}"><hr style="border: none; height: 1px; background-color: #ccc;" /></div>`;
+        case 'spacer':
+          return `<div style="height: ${block.content.height}px;"></div>`;
+        default:
+          return '';
+      }
+    };
+
+    return (
+      <div 
+        className={`block-preview ${isSelected ? 'selected' : ''}`}
+        onClick={() => onSelect()}
+      >
+        <div className="block-controls">
+          <div className="block-controls-left">
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMove('up');
+              }}
+              disabled={index === 0}
+              className="control-btn"
+            >
+              ↑
+            </button>
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMove('down');
+              }}
+              disabled={index === emailBlocks.length - 1}
+              className="control-btn"
+            >
+              ↓
+            </button>
+          </div>
+          <div className="block-controls-right">
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="control-btn delete"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        
+        {block.type === 'text' ? (
+          <div
+            className="editable-text"
+            contentEditable
+            suppressContentEditableWarning={true}
+            onBlur={(e) => handleContentChange(e.currentTarget.innerHTML)}
+            dangerouslySetInnerHTML={{ __html: block.content }}
+            style={{ 
+              minHeight: '20px',
+              border: isSelected ? '2px dashed #007acc' : '1px solid transparent',
+              padding: '8px',
+              borderRadius: '4px'
+            }}
+          />
+        ) : (
+          <div 
+            dangerouslySetInnerHTML={{ __html: renderBlockHTML(block) }}
+            style={{ 
+              border: isSelected ? '2px dashed #007acc' : '1px solid transparent',
+              borderRadius: '4px'
+            }}
+          />
+        )}
+      </div>
+    );
+  };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -184,122 +305,156 @@ const CreateNewsletter: React.FC = () => {
             {/* Содержание */}
             <div className="newsletter-form-section">
               <div className="newsletter-form-group">
-                <label htmlFor="content">Текст рассылки *</label>
-                
-                {/* Панель инструментов форматирования */}
-                <div className="formatting-toolbar">
-                  <div className="toolbar-group">
+                <div className="newsletter-editor-mode-selector">
+                  <label>Режим создания письма</label>
+                  <div className="mode-buttons">
                     <button
                       type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('b')}
-                      title="Жирный текст"
+                      className={!useAdvancedBuilder ? 'active' : ''}
+                      onClick={() => setUseAdvancedBuilder(false)}
                     >
-                      <strong>B</strong>
+                      📝 Простой редактор
                     </button>
                     <button
                       type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('i')}
-                      title="Курсив"
+                      className={useAdvancedBuilder ? 'active' : ''}
+                      onClick={() => setUseAdvancedBuilder(true)}
                     >
-                      <em>I</em>
-                    </button>
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('u')}
-                      title="Подчеркнутый"
-                    >
-                      <u>U</u>
-                    </button>
-                  </div>
-                  
-                  <div className="toolbar-separator"></div>
-                  
-                  <div className="toolbar-group">
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('h1')}
-                      title="Заголовок 1"
-                    >
-                      H1
-                    </button>
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('h2')}
-                      title="Заголовок 2"
-                    >
-                      H2
-                    </button>
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('p')}
-                      title="Абзац"
-                    >
-                      P
-                    </button>
-                  </div>
-                  
-                  <div className="toolbar-separator"></div>
-                  
-                  <div className="toolbar-group">
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertText('<br>')}
-                      title="Перенос строки"
-                    >
-                      ↵
-                    </button>
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertText('<hr>')}
-                      title="Горизонтальная линия"
-                    >
-                      ―
-                    </button>
-                  </div>
-                  
-                  <div className="toolbar-separator"></div>
-                  
-                  <div className="toolbar-group">
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertFormatting('a href=""')}
-                      title="Ссылка"
-                    >
-                      🔗
-                    </button>
-                    <button
-                      type="button"
-                      className="toolbar-btn"
-                      onClick={() => insertText('<img src="" alt="">')}
-                      title="Изображение"
-                    >
-                      🖼️
+                      🧱 Блочный конструктор
                     </button>
                   </div>
                 </div>
-                
-                <textarea
-                  ref={contentTextareaRef}
-                  id="content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  placeholder="Содержание вашей рассылки..."
-                  rows={12}
-                  required
-                />
-                <div className="newsletter-form-hint">
-                  💡 Поддерживается HTML разметка для форматирования текста
-                </div>
+
+                {!useAdvancedBuilder ? (
+                  <>
+                    <label htmlFor="content">Текст рассылки *</label>
+                    
+                    {/* Панель инструментов форматирования */}
+                    <div className="formatting-toolbar">
+                      <div className="toolbar-group">
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('b')}
+                          title="Жирный текст"
+                        >
+                          <strong>B</strong>
+                        </button>
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('i')}
+                          title="Курсив"
+                        >
+                          <em>I</em>
+                        </button>
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('u')}
+                          title="Подчеркнутый"
+                        >
+                          <u>U</u>
+                        </button>
+                      </div>
+                      
+                      <div className="toolbar-separator"></div>
+                      
+                      <div className="toolbar-group">
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('h1')}
+                          title="Заголовок 1"
+                        >
+                          H1
+                        </button>
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('h2')}
+                          title="Заголовок 2"
+                        >
+                          H2
+                        </button>
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('p')}
+                          title="Абзац"
+                        >
+                          P
+                        </button>
+                      </div>
+                      
+                      <div className="toolbar-separator"></div>
+                      
+                      <div className="toolbar-group">
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertText('<br>')}
+                          title="Перенос строки"
+                        >
+                          ↵
+                        </button>
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertText('<hr>')}
+                          title="Горизонтальная линия"
+                        >
+                          ―
+                        </button>
+                      </div>
+                      
+                      <div className="toolbar-separator"></div>
+                      
+                      <div className="toolbar-group">
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertFormatting('a href=""')}
+                          title="Ссылка"
+                        >
+                          🔗
+                        </button>
+                        <button
+                          type="button"
+                          className="toolbar-btn"
+                          onClick={() => insertText('<img src="" alt="">')}
+                          title="Изображение"
+                        >
+                          🖼️
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <textarea
+                      ref={contentTextareaRef}
+                      id="content"
+                      name="content"
+                      value={formData.content}
+                      onChange={handleInputChange}
+                      placeholder="Содержание вашей рассылки..."
+                      rows={12}
+                      required
+                    />
+                    <div className="newsletter-form-hint">
+                      💡 Поддерживается HTML разметка для форматирования текста
+                    </div>
+                  </>
+                ) : (
+                  <div className="newsletter-advanced-builder">
+                    <SimpleEmailBuilder
+                      initialBlocks={emailBlocks}
+                      onBlocksChange={setEmailBlocks}
+                      onContentChange={(html: string) => {
+                        setFormData(prev => ({ ...prev, content: html }));
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -438,11 +593,51 @@ const CreateNewsletter: React.FC = () => {
                 </div>
               </div>
               
-              <div className="newsletter-email-body">
-                <div dangerouslySetInnerHTML={{ 
-                  __html: formData.content || '<p>Содержание письма появится здесь...</p>' 
-                }} />
-              </div>
+              {useAdvancedBuilder ? (
+                <div className="newsletter-email-body interactive">
+                  {emailBlocks.length === 0 ? (
+                    <div className="empty-state">
+                      <p>Добавьте блоки для создания письма</p>
+                    </div>
+                  ) : (
+                    emailBlocks.map((block, index) => (
+                      <InteractiveBlockComponent
+                        key={block.id}
+                        block={block}
+                        index={index}
+                        isSelected={selectedBlockId === block.id}
+                        onUpdate={(updates: Partial<EmailBlock>) => {
+                          setEmailBlocks(prev => prev.map(b => 
+                            b.id === block.id ? { ...b, ...updates } : b
+                          ));
+                        }}
+                        onDelete={() => {
+                          setEmailBlocks(prev => prev.filter(b => b.id !== block.id));
+                        }}
+                        onSelect={() => setSelectedBlockId(block.id)}
+                        onMove={(direction: 'up' | 'down') => {
+                          const currentIndex = emailBlocks.findIndex(b => b.id === block.id);
+                          if (direction === 'up' && currentIndex > 0) {
+                            const newBlocks = [...emailBlocks];
+                            [newBlocks[currentIndex], newBlocks[currentIndex - 1]] = [newBlocks[currentIndex - 1], newBlocks[currentIndex]];
+                            setEmailBlocks(newBlocks);
+                          } else if (direction === 'down' && currentIndex < emailBlocks.length - 1) {
+                            const newBlocks = [...emailBlocks];
+                            [newBlocks[currentIndex], newBlocks[currentIndex + 1]] = [newBlocks[currentIndex + 1], newBlocks[currentIndex]];
+                            setEmailBlocks(newBlocks);
+                          }
+                        }}
+                      />
+                    ))
+                  )}
+                </div>
+              ) : (
+                <div className="newsletter-email-body">
+                  <div dangerouslySetInnerHTML={{ 
+                    __html: formData.content || '<p>Содержание письма появится здесь...</p>' 
+                  }} />
+                </div>
+              )}
             </div>
         </div>
       </div>

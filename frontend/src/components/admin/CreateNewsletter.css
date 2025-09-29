@@ -86,9 +86,9 @@
 
 .newsletter-form {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 40px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
   display: flex;
@@ -124,23 +124,26 @@
 .newsletter-form-group label {
   font-weight: 600;
   color: #e2e8f0;
-  font-size: 15px;
-  margin-bottom: 8px;
+  font-size: 11px;
+  margin-bottom: 4px;
+  text-transform: none;
+  letter-spacing: 0.5px;
 }
 
 .newsletter-form-group input,
 .newsletter-form-group select,
 .newsletter-form-group textarea {
-  padding: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  font-size: 16px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-size: 12px;
   transition: all 0.2s ease;
   background: rgba(0, 0, 0, 0.2);
   color: #ffffff;
   font-family: inherit;
   width: 100%;
   box-sizing: border-box;
+  min-height: 40px;
 }
 
 .newsletter-form-group input:focus,
@@ -312,14 +315,16 @@
 .cancel-btn,
 .draft-btn,
 .create-btn {
-  padding: 12px 24px;
+  padding: 6px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 16px;
-  min-width: 140px;
+  font-size: 11px;
+  min-width: 80px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .cancel-btn {
@@ -391,7 +396,10 @@
 .newsletter-preview-header h3 {
   margin: 0;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
 }
 
 .newsletter-email-preview {
@@ -414,11 +422,11 @@
 }
 
 .newsletter-email-subject {
-  font-weight: 500;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 13px;
   color: #202124;
-  margin-bottom: 4px;
-  line-height: 1.4;
+  margin-bottom: 2px;
+  line-height: 1.3;
   width: 100%;
   box-sizing: border-box;
   font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
@@ -497,18 +505,18 @@
 }
 
 .newsletter-email-body h1 {
-  font-size: 24px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .newsletter-email-body h2 {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .newsletter-email-body h3 {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .newsletter-email-body a {
@@ -678,4 +686,160 @@
   color: #a1a1aa;
   min-width: 100px;
   text-align: right;
+}
+
+/* Селектор режима редактора */
+.newsletter-editor-mode-selector {
+  margin-bottom: 20px;
+}
+
+.newsletter-editor-mode-selector label {
+  display: block;
+  margin-bottom: 12px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.mode-buttons button {
+  flex: 1;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mode-buttons button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.mode-buttons button.active {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+/* Продвинутый конструктор */
+.newsletter-advanced-builder {
+  margin-top: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1a1a1a;
+  padding: 0;
+}
+
+.newsletter-email-body.interactive {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  background: #fff;
+  min-height: 500px;
+  position: relative;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+/* Interactive Block Preview */
+.block-preview {
+  position: relative;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.block-preview:hover {
+  background-color: #f8f9fa;
+}
+
+.block-preview.selected {
+  background-color: #e3f2fd;
+  box-shadow: 0 0 0 2px #2196f3;
+}
+
+.block-controls {
+  position: absolute;
+  top: -30px;
+  right: 0;
+  display: flex;
+  gap: 5px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.block-preview:hover .block-controls,
+.block-preview.selected .block-controls {
+  opacity: 1;
+}
+
+.block-controls-left {
+  display: flex;
+  gap: 2px;
+}
+
+.block-controls-right {
+  display: flex;
+  gap: 2px;
+}
+
+.control-btn {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.control-btn.delete {
+  background: #ff4444;
+  color: white;
+  border-color: #ff4444;
+}
+
+.control-btn.delete:hover {
+  background: #cc0000;
+  border-color: #cc0000;
+}
+
+.editable-text {
+  outline: none;
+  transition: all 0.2s;
+  word-wrap: break-word;
+}
+
+.editable-text:focus {
+  background-color: #f8f9fa;
+  border-color: #007acc !important;
 }
