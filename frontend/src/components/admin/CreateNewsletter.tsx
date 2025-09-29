@@ -430,7 +430,12 @@ const CreateNewsletter: React.FC = () => {
             <div className="newsletter-email-preview">
               <div className="newsletter-email-header">
                 <div className="newsletter-email-subject">{formData.subject || 'Тема письма'}</div>
-                <div className="newsletter-email-from">От: WeKey Tools</div>
+                <div className="newsletter-email-from">
+                  <div>
+                    <div>Wekey Tools &lt;noreply@wekey.tools&gt;</div>
+                    <div>кому: мне</div>
+                  </div>
+                </div>
               </div>
               
               <div className="newsletter-email-body">
