@@ -22,7 +22,7 @@ const CreateNewsletter: React.FC = () => {
   
   const [emailBlocks, setEmailBlocks] = useState<EmailBlock[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [useAdvancedBuilder, setUseAdvancedBuilder] = useState(false);
+  const [useAdvancedBuilder, setUseAdvancedBuilder] = useState(true);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
 
   // Interactive block component for right panel
@@ -93,7 +93,10 @@ const CreateNewsletter: React.FC = () => {
     return (
       <div 
         className={`block-preview ${isSelected ? 'selected' : ''}`}
-        onClick={() => onSelect()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect();
+        }}
       >
         <div className="interactive-block-controls">
           <button 
@@ -517,7 +520,6 @@ const CreateNewsletter: React.FC = () => {
                       checked={formData.sendImmediately}
                       onChange={handleInputChange}
                     />
-                    <span className="checkmark">⚡</span>
                     Отправить немедленно после создания
                   </label>
                 </div>
@@ -619,9 +621,20 @@ const CreateNewsletter: React.FC = () => {
               </div>
               
               {useAdvancedBuilder ? (
-                <div className="newsletter-email-body interactive">
+                <div 
+                  className="newsletter-email-body interactive"
+                  onClick={(e) => {
+                    // Сбрасываем выделение при клике в пустое место
+                    if (e.target === e.currentTarget) {
+                      setSelectedBlockId(null);
+                    }
+                  }}
+                >
                   {emailBlocks.length === 0 ? (
-                    <div className="empty-state">
+                    <div 
+                      className="empty-state"
+                      onClick={() => setSelectedBlockId(null)}
+                    >
                       <p>Добавьте блоки для создания письма</p>
                     </div>
                   ) : (
@@ -637,6 +650,10 @@ const CreateNewsletter: React.FC = () => {
                           ));
                         }}
                         onDelete={() => {
+                          // Clear selection if deleting the selected block
+                          if (selectedBlockId === block.id) {
+                            setSelectedBlockId(null);
+                          }
                           setEmailBlocks(prev => prev.filter(b => b.id !== block.id));
                         }}
                         onSelect={() => setSelectedBlockId(block.id)}

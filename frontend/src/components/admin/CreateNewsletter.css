@@ -287,11 +287,6 @@
   font-weight: bold;
 }
 
-.checkmark {
-  font-size: 1.2rem;
-  margin-right: 0.25rem;
-}
-
 .form-actions {
   display: flex;
   justify-content: space-between;
@@ -715,6 +710,7 @@
   margin-bottom: 12px;
   color: #ffffff;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .mode-buttons {

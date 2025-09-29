@@ -186,40 +186,57 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
 
   return (
     <div className="simple-email-builder">
-      <div className="builder-sidebar">
-        <div className="block-toolbox">
+      <div 
+        className="builder-sidebar"
+        onClick={(e) => {
+          // Сбрасываем выделение при клике в пустое место сайдбара
+          if (e.target === e.currentTarget && onBlockSelect) {
+            onBlockSelect(null);
+          }
+        }}
+      >
+        <div className="block-toolbox" onClick={(e) => e.stopPropagation()}>
           <h4>Добавить блок</h4>
           <div className="toolbox-buttons-container">
             <div className="toolbox-buttons">
-              <button type="button" onClick={() => addBlock('text')} className="block-btn">
+              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('text'); }} className="block-btn">
                 📝 Текст
               </button>
-              <button type="button" onClick={() => addBlock('image')} className="block-btn">
+              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('image'); }} className="block-btn">
                 🖼️ Изображение
               </button>
-              <button type="button" onClick={() => addBlock('button')} className="block-btn">
+              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('button'); }} className="block-btn">
                 🔘 Кнопка
               </button>
-              <button type="button" onClick={() => addBlock('divider')} className="block-btn">
+              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('divider'); }} className="block-btn">
                 ➖ Разделитель
               </button>
-              <button type="button" onClick={() => addBlock('spacer')} className="block-btn">
+              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('spacer'); }} className="block-btn">
                 📏 Отступ
               </button>
             </div>
           </div>
         </div>
 
-        <div className="block-settings">
+        <div className="block-settings" onClick={(e) => e.stopPropagation()}>
           {selectedBlockId ? (
-            <>
-              <div className="block-settings-scroll-container">
-                <BlockSettings 
-                  block={blocks.find(b => b.id === selectedBlockId)!}
-                  onUpdate={(updates: Partial<EmailBlock>) => updateBlock(selectedBlockId, updates)}
-                />
-              </div>
-            </>
+            (() => {
+              const selectedBlock = blocks.find(b => b.id === selectedBlockId);
+              return selectedBlock ? (
+                <>
+                  <div className="block-settings-scroll-container">
+                    <BlockSettings 
+                      block={selectedBlock}
+                      onUpdate={(updates: Partial<EmailBlock>) => updateBlock(selectedBlockId, updates)}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="block-settings-empty">
+                  Выберите блок для редактирования его настроек
+                </div>
+              );
+            })()
           ) : (
             <div className="block-settings-empty">
               Выберите блок для редактирования его настроек
