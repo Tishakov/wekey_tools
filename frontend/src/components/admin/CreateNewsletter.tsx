@@ -394,30 +394,6 @@ const CreateNewsletter: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
-              {/* Индикатор прогресса заполнения */}
-              <div className="form-progress">
-                <div className="progress-label">Готовность формы:</div>
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ 
-                      width: `${Math.round(
-                        ((formData.title ? 1 : 0) + 
-                         (formData.subject ? 1 : 0) + 
-                         (formData.content ? 1 : 0)) / 3 * 100
-                      )}%` 
-                    }}
-                  ></div>
-                </div>
-                <div className="progress-text">
-                  {Math.round(
-                    ((formData.title ? 1 : 0) + 
-                     (formData.subject ? 1 : 0) + 
-                     (formData.content ? 1 : 0)) / 3 * 100
-                  )}% завершено
-                </div>
-              </div>
             </div>
           </form>
 
@@ -425,6 +401,30 @@ const CreateNewsletter: React.FC = () => {
         <div className="newsletter-preview-container">
           <div className="newsletter-preview-header">
             <h3>👁️ Предварительный просмотр</h3>
+          </div>
+          
+          {/* Индикатор прогресса заполнения */}
+          <div className="form-progress">
+            <div className="progress-label">Готовность формы:</div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ 
+                  width: `${Math.round(
+                    ((formData.title ? 1 : 0) + 
+                     (formData.subject ? 1 : 0) + 
+                     (formData.content ? 1 : 0)) / 3 * 100
+                  )}%` 
+                }}
+              ></div>
+            </div>
+            <div className="progress-text">
+              {Math.round(
+                ((formData.title ? 1 : 0) + 
+                 (formData.subject ? 1 : 0) + 
+                 (formData.content ? 1 : 0)) / 3 * 100
+              )}% завершено
+            </div>
           </div>
             
             <div className="newsletter-email-preview">
