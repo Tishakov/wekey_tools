@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNewsletters } from '../../hooks/useNewslettersAndNews';
 import './AdminNewsletters.css';
 
 const AdminNewsletters: React.FC = () => {
+  const navigate = useNavigate();
   const { 
     newsletters, 
     loading, 
-    error, 
-    fetchNewsletters,
-    createNewsletter,
-    deleteNewsletter,
-    sendNewsletter 
+    fetchNewsletters
   } = useNewsletters();
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -61,7 +58,7 @@ const AdminNewsletters: React.FC = () => {
         </div>
         <button 
           className="create-newsletter-btn"
-          onClick={() => setShowCreateForm(true)}
+          onClick={() => navigate('/admin/newsletters/create')}
         >
           📝 Создать рассылку
         </button>
@@ -114,7 +111,7 @@ const AdminNewsletters: React.FC = () => {
             {!searchTerm && statusFilter === 'all' && (
               <button 
                 className="create-first-newsletter-btn"
-                onClick={() => setShowCreateForm(true)}
+                onClick={() => navigate('/admin/newsletters/create')}
               >
                 📝 Создать первую рассылку
               </button>
@@ -166,7 +163,11 @@ const AdminNewsletters: React.FC = () => {
                     <button className="action-btn view-btn" title="Просмотр">
                       👁️
                     </button>
-                    <button className="action-btn edit-btn" title="Редактировать">
+                    <button 
+                      className="action-btn edit-btn" 
+                      title="Редактировать"
+                      onClick={() => navigate(`/admin/newsletters/edit/${newsletter.id}`)}
+                    >
                       ✏️
                     </button>
                     <button className="action-btn duplicate-btn" title="Дублировать">
@@ -182,45 +183,6 @@ const AdminNewsletters: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* TODO: Модальные окна для создания/редактирования */}
-      {showCreateForm && (
-        <div className="modal-overlay">
-          <div className="create-newsletter-modal">
-            <div className="modal-header">
-              <h2>📝 Создание новой рассылки</h2>
-              <button 
-                className="close-modal-btn"
-                onClick={() => setShowCreateForm(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-content">
-              <p>🚧 Форма создания рассылки в разработке...</p>
-              <p>Здесь будет:</p>
-              <ul>
-                <li>📋 Поле для темы письма</li>
-                <li>📝 Rich-text редактор для содержания</li>
-                <li>👥 Селектор аудитории (все/конкретные/сегменты)</li>
-                <li>📅 Планировщик отправки</li>
-                <li>👀 Предварительный просмотр</li>
-              </ul>
-            </div>
-            <div className="modal-actions">
-              <button 
-                className="cancel-btn"
-                onClick={() => setShowCreateForm(false)}
-              >
-                Отмена
-              </button>
-              <button className="save-btn" disabled>
-                💾 Сохранить черновик
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

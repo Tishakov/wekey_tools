@@ -62,7 +62,11 @@ function App() {
           <Route path="/admin/tools" element={<AdminPanel />} />
           <Route path="/admin/users" element={<AdminPanel />} />
           <Route path="/admin/newsletters" element={<AdminPanel />} />
+          <Route path="/admin/newsletters/create" element={<AdminPanel />} />
+          <Route path="/admin/newsletters/edit/:id" element={<AdminPanel />} />
           <Route path="/admin/news" element={<AdminPanel />} />
+          <Route path="/admin/news/create" element={<AdminPanel />} />
+          <Route path="/admin/news/edit/:id" element={<AdminPanel />} />
           <Route path="/admin/finance" element={<AdminPanel />} />
           <Route path="/admin/admins" element={<AdminPanel />} />
           <Route path="/admin/logs" element={<AdminPanel />} />

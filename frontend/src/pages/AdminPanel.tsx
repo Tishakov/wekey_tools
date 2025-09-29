@@ -9,6 +9,7 @@ import AdminLogs from '../components/admin/AdminLogs';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
 import AdminNewsletters from '../components/admin/AdminNewsletters';
 import AdminNews from '../components/admin/AdminNews';
+import CreateNewsletter from '../components/admin/CreateNewsletter';
 import AnalyticsChart from '../components/AnalyticsChart';
 import { getSectionTitle, getActiveSectionFromUrl } from '../utils/adminSections';
 import DateRangePicker from '../components/DateRangePicker';
@@ -96,10 +97,22 @@ const AdminPanel: React.FC = () => {
 
   // Определяем активную секцию из URL
   const [activeSection, setActiveSection] = useState(getActiveSectionFromUrl(location.pathname));
+  
+  // Определяем подстраницу из URL
+  const getSubPageFromUrl = (pathname: string) => {
+    const parts = pathname.split('/');
+    if (parts.length >= 4) {
+      return parts[3]; // /admin/newsletters/create -> 'create'
+    }
+    return null;
+  };
+  
+  const [subPage, setSubPage] = useState(getSubPageFromUrl(location.pathname));
 
-  // Обновляем активную секцию при изменении URL
+  // Обновляем активную секцию и подстраницу при изменении URL
   useEffect(() => {
     setActiveSection(getActiveSectionFromUrl(location.pathname));
+    setSubPage(getSubPageFromUrl(location.pathname));
   }, [location.pathname]);
 
   // Загружаем данные при смене секции
@@ -852,6 +865,13 @@ const AdminPanel: React.FC = () => {
       case 'users':
         return <AdminUsers />;
       case 'newsletters':
+        // Проверяем подстраницу
+        if (subPage === 'create') {
+          return <CreateNewsletter />;
+        }
+        if (subPage && subPage.startsWith('edit')) {
+          return <CreateNewsletter />;
+        }
         return <AdminNewsletters />;
       case 'news':
         return <AdminNews />;
