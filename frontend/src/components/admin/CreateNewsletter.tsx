@@ -324,16 +324,13 @@ const CreateNewsletter: React.FC = () => {
                     placeholder="Тема, которую увидят получатели"
                     required
                   />
-                  <div className="newsletter-form-hint">
-                    💡 Избегайте спам-слов и используйте персонализацию
-                  </div>
                 </div>
               </div>
             </div>
 
             {/* Содержание */}
             <div className="newsletter-form-section">
-              <div className="newsletter-form-group">
+              <div className="newsletter-content-group">
                 <div className="newsletter-editor-mode-selector">
                   <label>Режим создания письма</label>
                   <div className="mode-buttons">
@@ -618,7 +615,7 @@ const CreateNewsletter: React.FC = () => {
                 <div className="newsletter-email-subject">{formData.subject || 'Тема письма'}</div>
                 <div className="newsletter-email-from">
                   <div>
-                    <div>Wekey Tools &lt;noreply@wekey.tools&gt;</div>
+                    <div><strong>Wekey Tools</strong> &lt;noreply@wekey.tools&gt;</div>
                     <div>кому: мне</div>
                   </div>
                 </div>
