@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SimpleEmailBuilder.css';
 
 export interface EmailBlock {
@@ -7,8 +7,13 @@ export interface EmailBlock {
   content: any;
   settings: {
     padding?: { top: number; right: number; bottom: number; left: number };
+    margin?: { top: number; right: number; bottom: number; left: number };
     backgroundColor?: string;
     alignment?: 'left' | 'center' | 'right';
+    borderRadius?: number;
+    borderColor?: string;
+    borderWidth?: number;
+    borderStyle?: 'solid' | 'dashed' | 'dotted' | 'double';
   };
 }
 
@@ -28,6 +33,13 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
   onBlockSelect
 }) => {
   const [blocks, setBlocks] = useState<EmailBlock[]>(initialBlocks);
+
+  // Синхронизируем внутреннее состояние с внешними изменениями
+  useEffect(() => {
+    if (JSON.stringify(blocks) !== JSON.stringify(initialBlocks)) {
+      setBlocks(initialBlocks);
+    }
+  }, [initialBlocks, blocks]);
 
   const addBlock = (type: EmailBlock['type']) => {
     const newBlock: EmailBlock = {
@@ -99,13 +111,15 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
   };
 
   const blockToHTML = (block: EmailBlock): string => {
-    const { padding, backgroundColor, alignment } = block.settings;
+    const { padding, backgroundColor, alignment, borderRadius, borderColor, borderWidth, borderStyle } = block.settings;
     const paddingStyle = `${padding?.top || 15}px ${padding?.right || 20}px ${padding?.bottom || 15}px ${padding?.left || 20}px`;
     
     const containerStyle = `
       padding: ${paddingStyle};
       background-color: ${backgroundColor || 'transparent'};
       text-align: ${alignment || 'left'};
+      border-radius: ${borderRadius || 0}px;
+      border: ${borderWidth || 0}px ${borderStyle || 'solid'} ${borderColor || 'transparent'};
     `;
 
     switch (block.type) {
@@ -271,8 +285,7 @@ const BlockSettings: React.FC<{
       case 'text':
         return (
           <>
-            <div className="block-settings-group">
-              <label className="block-settings-label">Текст:</label>
+            <div className="block-settings-group full-width">
               <textarea
                 className="block-settings-textarea"
                 value={block.content.text || ''}
@@ -318,30 +331,27 @@ const BlockSettings: React.FC<{
             <div className="block-settings-group">
               <label className="block-settings-label">Форматирование:</label>
               <div className="block-settings-formatting">
-                <label className="block-settings-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={fontWeight === 'bold'}
-                    onChange={(e) => handleFontWeightChange(e.target.checked)}
-                  />
-                  <span className="checkmark-text">Жирный</span>
-                </label>
-                <label className="block-settings-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={fontStyle === 'italic'}
-                    onChange={(e) => handleFontStyleChange(e.target.checked)}
-                  />
-                  <span className="checkmark-text">Курсив</span>
-                </label>
-                <label className="block-settings-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={textDecoration === 'underline'}
-                    onChange={(e) => handleTextDecorationChange(e.target.checked)}
-                  />
-                  <span className="checkmark-text">Подчеркнутый</span>
-                </label>
+                <button
+                  type="button"
+                  className={`text-type-btn ${fontWeight === 'bold' ? 'active' : ''}`}
+                  onClick={() => handleFontWeightChange(fontWeight !== 'bold')}
+                >
+                  <strong>B</strong>
+                </button>
+                <button
+                  type="button"
+                  className={`text-type-btn ${fontStyle === 'italic' ? 'active' : ''}`}
+                  onClick={() => handleFontStyleChange(fontStyle !== 'italic')}
+                >
+                  <em>I</em>
+                </button>
+                <button
+                  type="button"
+                  className={`text-type-btn ${textDecoration === 'underline' ? 'active' : ''}`}
+                  onClick={() => handleTextDecorationChange(textDecoration !== 'underline')}
+                >
+                  <u>U</u>
+                </button>
               </div>
             </div>
 
@@ -357,13 +367,45 @@ const BlockSettings: React.FC<{
               />
             </div>
             <div className="block-settings-group">
-              <label className="block-settings-label">Цвет текста:</label>
-              <input
-                className="block-settings-color"
-                type="color"
-                value={block.content.color || '#333333'}
-                onChange={(e) => updateContent('color', e.target.value)}
-              />
+              <label className="block-settings-label">Выравнивание:</label>
+              <div className="block-settings-formatting">
+                <button
+                  type="button"
+                  className={`text-type-btn alignment-btn ${(block.settings.alignment || 'left') === 'left' ? 'active' : ''}`}
+                  onClick={() => updateSettings('alignment', 'left')}
+                >
+                  <div className="align-icon">
+                    <div className="line long"></div>
+                    <div className="line medium"></div>
+                    <div className="line short"></div>
+                    <div className="line long"></div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className={`text-type-btn alignment-btn ${(block.settings.alignment || 'left') === 'center' ? 'active' : ''}`}
+                  onClick={() => updateSettings('alignment', 'center')}
+                >
+                  <div className="align-icon center">
+                    <div className="line medium"></div>
+                    <div className="line long"></div>
+                    <div className="line short"></div>
+                    <div className="line long"></div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className={`text-type-btn alignment-btn ${(block.settings.alignment || 'left') === 'right' ? 'active' : ''}`}
+                  onClick={() => updateSettings('alignment', 'right')}
+                >
+                  <div className="align-icon right">
+                    <div className="line long"></div>
+                    <div className="line medium"></div>
+                    <div className="line short"></div>
+                    <div className="line long"></div>
+                  </div>
+                </button>
+              </div>
             </div>
           </>
         );
@@ -491,16 +533,13 @@ const BlockSettings: React.FC<{
   const renderGeneralSettings = () => (
     <>
       <div className="block-settings-group">
-        <label className="block-settings-label">Выравнивание:</label>
-        <select
-          className="block-settings-select"
-          value={block.settings.alignment || 'left'}
-          onChange={(e) => updateSettings('alignment', e.target.value)}
-        >
-          <option value="left">По левому краю</option>
-          <option value="center">По центру</option>
-          <option value="right">По правому краю</option>
-        </select>
+        <label className="block-settings-label">Цвет текста:</label>
+        <input
+          className="block-settings-color"
+          type="color"
+          value={block.content.color || '#333333'}
+          onChange={(e) => updateContent('color', e.target.value)}
+        />
       </div>
       <div className="block-settings-group">
         <label className="block-settings-label">Цвет фона:</label>
@@ -512,48 +551,164 @@ const BlockSettings: React.FC<{
         />
       </div>
       <div className="block-settings-group">
-        <label className="block-settings-label">Отступ сверху:</label>
+        <label className="block-settings-label">Скругление фона:</label>
         <input
           className="block-settings-input"
           type="number"
-          value={block.settings.padding?.top || 15}
-          onChange={(e) => updateSettings('padding', { ...block.settings.padding, top: parseInt(e.target.value) })}
+          value={block.settings.borderRadius || 0}
+          onChange={(e) => updateSettings('borderRadius', parseInt(e.target.value))}
           min="0"
           max="50"
         />
       </div>
-      <div className="block-settings-group">
-        <label className="block-settings-label">Отступ снизу:</label>
-        <input
-          className="block-settings-input"
-          type="number"
-          value={block.settings.padding?.bottom || 15}
-          onChange={(e) => updateSettings('padding', { ...block.settings.padding, bottom: parseInt(e.target.value) })}
-          min="0"
-          max="50"
-        />
+      <div className="block-settings-group full-width">
+        <label className="block-settings-label">Обводка:</label>
+        <div className="border-controls">
+          <div className="border-control-row">
+            <div className="border-control-group">
+              <label className="border-control-label">Цвет:</label>
+              <input
+                className="block-settings-color border-color-input"
+                type="color"
+                value={block.settings.borderColor || '#000000'}
+                onChange={(e) => updateSettings('borderColor', e.target.value)}
+              />
+            </div>
+            <div className="border-control-group">
+              <label className="border-control-label">Толщина:</label>
+              <input
+                className="block-settings-input border-width-input"
+                type="number"
+                value={block.settings.borderWidth || 0}
+                onChange={(e) => updateSettings('borderWidth', parseInt(e.target.value))}
+                min="0"
+                max="10"
+              />
+            </div>
+            <div className="border-control-group">
+              <label className="border-control-label">Тип:</label>
+              <select
+                className="block-settings-select border-style-select"
+                value={block.settings.borderStyle || 'solid'}
+                onChange={(e) => updateSettings('borderStyle', e.target.value)}
+              >
+                <option value="solid">Сплошная</option>
+                <option value="dashed">Пунктир</option>
+                <option value="dotted">Точки</option>
+                <option value="double">Двойная</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="block-settings-group full-width">
+        <label className="block-settings-label">Внутренние отступы:</label>
+        <div className="padding-controls">
+          <div className="padding-control-item">
+            <div className="padding-icon">↑</div>
+            <input
+              className="block-settings-input padding-input"
+              type="number"
+              value={block.settings.padding?.top || 15}
+              onChange={(e) => updateSettings('padding', { ...block.settings.padding, top: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+          <div className="padding-control-item">
+            <div className="padding-icon">↓</div>
+            <input
+              className="block-settings-input padding-input"
+              type="number"
+              value={block.settings.padding?.bottom || 15}
+              onChange={(e) => updateSettings('padding', { ...block.settings.padding, bottom: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+          <div className="padding-control-item">
+            <div className="padding-icon">←</div>
+            <input
+              className="block-settings-input padding-input"
+              type="number"
+              value={block.settings.padding?.left || 20}
+              onChange={(e) => updateSettings('padding', { ...block.settings.padding, left: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+          <div className="padding-control-item">
+            <div className="padding-icon">→</div>
+            <input
+              className="block-settings-input padding-input"
+              type="number"
+              value={block.settings.padding?.right || 20}
+              onChange={(e) => updateSettings('padding', { ...block.settings.padding, right: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="block-settings-group full-width">
+        <label className="block-settings-label">Внешние отступы:</label>
+        <div className="margin-controls">
+          <div className="margin-control-item">
+            <div className="margin-icon">↑</div>
+            <input
+              className="block-settings-input margin-input"
+              type="number"
+              value={block.settings.margin?.top || 0}
+              onChange={(e) => updateSettings('margin', { ...block.settings.margin, top: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+          <div className="margin-control-item">
+            <div className="margin-icon">↓</div>
+            <input
+              className="block-settings-input margin-input"
+              type="number"
+              value={block.settings.margin?.bottom || 0}
+              onChange={(e) => updateSettings('margin', { ...block.settings.margin, bottom: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+          <div className="margin-control-item">
+            <div className="margin-icon">←</div>
+            <input
+              className="block-settings-input margin-input"
+              type="number"
+              value={block.settings.margin?.left || 0}
+              onChange={(e) => updateSettings('margin', { ...block.settings.margin, left: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+          <div className="margin-control-item">
+            <div className="margin-icon">→</div>
+            <input
+              className="block-settings-input margin-input"
+              type="number"
+              value={block.settings.margin?.right || 0}
+              onChange={(e) => updateSettings('margin', { ...block.settings.margin, right: parseInt(e.target.value) })}
+              min="0"
+              max="50"
+            />
+          </div>
+        </div>
       </div>
     </>
   );
 
   return (
     <div className="block-settings-content">
-      <h4>{getBlockLabel(block.type)}</h4>
       {renderContentSettings()}
       {renderGeneralSettings()}
     </div>
   );
-};
-
-const getBlockLabel = (type: EmailBlock['type']): string => {
-  const labels = {
-    text: 'Текст',
-    image: 'Изображение',
-    button: 'Кнопка',
-    divider: 'Разделитель',
-    spacer: 'Отступ'
-  };
-  return labels[type] || type;
 };
 
 export default SimpleEmailBuilder;

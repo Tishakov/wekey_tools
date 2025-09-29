@@ -45,17 +45,38 @@ const CreateNewsletter: React.FC = () => {
   }) => {
     
     const handleContentChange = (newContent: string) => {
-      onUpdate({ content: newContent });
+      onUpdate({ 
+        content: { 
+          ...block.content, 
+          text: newContent 
+        } 
+      });
     };
 
     const renderBlockHTML = (block: EmailBlock): string => {
-      const { padding, backgroundColor, alignment } = block.settings;
+      const { padding, margin, backgroundColor, alignment, borderRadius, borderColor, borderWidth, borderStyle } = block.settings;
       const paddingStyle = `${padding?.top || 15}px ${padding?.right || 20}px ${padding?.bottom || 15}px ${padding?.left || 20}px`;
-      const containerStyle = `padding: ${paddingStyle}; background-color: ${backgroundColor || 'transparent'}; text-align: ${alignment || 'left'};`;
+      const marginStyle = `${margin?.top || 0}px ${margin?.right || 0}px ${margin?.bottom || 0}px ${margin?.left || 0}px`;
+      const containerStyle = `padding: ${paddingStyle}; margin: ${marginStyle}; background-color: ${backgroundColor || 'transparent'}; text-align: ${alignment || 'left'}; border-radius: ${borderRadius || 0}px; border: ${borderWidth || 0}px ${borderStyle || 'solid'} ${borderColor || 'transparent'};`;
 
       switch (block.type) {
         case 'text':
-          return `<div style="${containerStyle}">${block.content}</div>`;
+          const TextTag = block.content.textType || 'p';
+          return `
+            <div style="${containerStyle}">
+              <${TextTag} style="
+                font-size: ${block.content.fontSize || 16}px; 
+                color: ${block.content.color || '#333333'};
+                font-weight: ${block.content.fontWeight || 'normal'};
+                font-style: ${block.content.fontStyle || 'normal'};
+                text-decoration: ${block.content.textDecoration || 'none'};
+                margin: 0;
+                line-height: 1.5;
+              ">
+                ${block.content.text || 'Введите текст...'}
+              </${TextTag}>
+            </div>
+          `;
         case 'image':
           return `<div style="${containerStyle}"><img src="${block.content.src}" alt="${block.content.alt}" style="max-width: 100%; height: auto;" /></div>`;
         case 'button':
@@ -74,43 +95,42 @@ const CreateNewsletter: React.FC = () => {
         className={`block-preview ${isSelected ? 'selected' : ''}`}
         onClick={() => onSelect()}
       >
-        <div className="block-controls">
-          <div className="block-controls-left">
-            <button 
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMove('up');
-              }}
-              disabled={index === 0}
-              className="control-btn"
-            >
-              ↑
-            </button>
-            <button 
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMove('down');
-              }}
-              disabled={index === emailBlocks.length - 1}
-              className="control-btn"
-            >
-              ↓
-            </button>
-          </div>
-          <div className="block-controls-right">
-            <button 
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              className="control-btn delete"
-            >
-              ✕
-            </button>
-          </div>
+        <div className="interactive-block-controls">
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMove('up');
+            }}
+            disabled={index === 0}
+            className="interactive-control-btn"
+            title="Переместить вверх"
+          >
+            ↑
+          </button>
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMove('down');
+            }}
+            disabled={index === emailBlocks.length - 1}
+            className="interactive-control-btn"
+            title="Переместить вниз"
+          >
+            ↓
+          </button>
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="interactive-control-btn delete"
+            title="Удалить блок"
+          >
+            ✕
+          </button>
         </div>
         
         {block.type === 'text' ? (
@@ -119,12 +139,21 @@ const CreateNewsletter: React.FC = () => {
             contentEditable
             suppressContentEditableWarning={true}
             onBlur={(e) => handleContentChange(e.currentTarget.innerHTML)}
-            dangerouslySetInnerHTML={{ __html: block.content }}
+            dangerouslySetInnerHTML={{ __html: block.content.text || 'Введите текст...' }}
             style={{ 
               minHeight: '20px',
-              border: isSelected ? '2px dashed #007acc' : '1px solid transparent',
-              padding: '8px',
-              borderRadius: '4px'
+              border: isSelected ? '2px dashed #007acc' : `${block.settings.borderWidth || 0}px ${block.settings.borderStyle || 'solid'} ${block.settings.borderColor || 'transparent'}`,
+              padding: `${block.settings.padding?.top || 15}px ${block.settings.padding?.right || 20}px ${block.settings.padding?.bottom || 15}px ${block.settings.padding?.left || 20}px`,
+              margin: `${block.settings.margin?.top || 0}px ${block.settings.margin?.right || 0}px ${block.settings.margin?.bottom || 0}px ${block.settings.margin?.left || 0}px`,
+              textAlign: block.settings.alignment || 'left',
+              backgroundColor: block.settings.backgroundColor || 'transparent',
+              borderRadius: `${block.settings.borderRadius || 0}px`,
+              fontSize: `${block.content.fontSize || 16}px`,
+              color: block.content.color || '#333333',
+              fontWeight: block.content.fontWeight || 'normal',
+              fontStyle: block.content.fontStyle || 'normal',
+              textDecoration: block.content.textDecoration || 'none',
+              lineHeight: '1.5'
             }}
           />
         ) : (
