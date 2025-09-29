@@ -176,6 +176,65 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
+// Middleware для обязательной аутентификации
+const authenticateToken = async (req, res, next) => {
+  try {
+    let token;
+    
+    // Проверяем токен в заголовке или cookies
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies?.jwt) {
+      token = req.cookies.jwt;
+    }
+
+    if (!token) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Требуется авторизация' 
+      });
+    }
+
+    const decoded = jwt.verify(token, config.jwt.secret);
+    const currentUser = await db.User.findByPk(decoded.userId);
+    
+    if (!currentUser || currentUser.status !== 'active') {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Пользователь не найден или неактивен' 
+      });
+    }
+
+    req.user = currentUser;
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return res.status(401).json({ 
+      success: false,
+      error: 'Недействительный токен' 
+    });
+  }
+};
+
+// Middleware для проверки прав администратора
+const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ 
+      success: false,
+      error: 'Требуется авторизация' 
+    });
+  }
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ 
+      success: false,
+      error: 'Требуются права администратора' 
+    });
+  }
+
+  next();
+};
+
 module.exports = {
   signToken,
   createSendToken,
@@ -183,5 +242,7 @@ module.exports = {
   restrictTo,
   checkApiLimit,
   incrementApiUsage,
-  optionalAuth
+  optionalAuth,
+  authenticateToken,
+  requireAdmin
 };

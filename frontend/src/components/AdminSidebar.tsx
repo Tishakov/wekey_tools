@@ -36,6 +36,18 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeSection, onSectionCha
       path: '/admin/users'
     },
     {
+      id: 'newsletters',
+      title: 'Рассылки',
+      icon: '/icons/admin/admin_mail.svg',
+      path: '/admin/newsletters'
+    },
+    {
+      id: 'news',
+      title: 'Новости',
+      icon: '/icons/admin/admin_news.svg',
+      path: '/admin/news'
+    },
+    {
       id: 'finance',
       title: 'Финансы',
       icon: '/icons/admin/admin_money.svg',

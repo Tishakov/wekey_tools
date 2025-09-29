@@ -7,6 +7,8 @@ import AdminFinance from '../components/admin/AdminFinance';
 import AdminAdmins from '../components/admin/AdminAdmins';
 import AdminLogs from '../components/admin/AdminLogs';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
+import AdminNewsletters from '../components/admin/AdminNewsletters';
+import AdminNews from '../components/admin/AdminNews';
 import AnalyticsChart from '../components/AnalyticsChart';
 import { getSectionTitle, getActiveSectionFromUrl } from '../utils/adminSections';
 import DateRangePicker from '../components/DateRangePicker';
@@ -849,6 +851,10 @@ const AdminPanel: React.FC = () => {
         return <AdminTools />;
       case 'users':
         return <AdminUsers />;
+      case 'newsletters':
+        return <AdminNewsletters />;
+      case 'news':
+        return <AdminNews />;
       case 'finance':
         return <AdminFinance />;
       case 'admins':

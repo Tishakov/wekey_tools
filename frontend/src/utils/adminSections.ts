@@ -6,6 +6,8 @@ export const getSectionTitle = (section: string): string => {
     case 'dashboard': return 'Дашборд';
     case 'tools': return 'Инструменты';
     case 'users': return 'Пользователи';
+    case 'newsletters': return 'Рассылки';
+    case 'news': return 'Новости';
     case 'finance': return 'Финансы';
     case 'admins': return 'Администраторы';
     case 'logs': return 'Логи';
@@ -19,6 +21,8 @@ export const getActiveSectionFromUrl = (pathname: string): string => {
   if (pathname === '/admin' || pathname === '/admin/dashboard') return 'dashboard';
   if (pathname === '/admin/tools') return 'tools';
   if (pathname === '/admin/users') return 'users';
+  if (pathname === '/admin/newsletters') return 'newsletters';
+  if (pathname === '/admin/news') return 'news';
   if (pathname === '/admin/finance') return 'finance';
   if (pathname === '/admin/admins') return 'admins';
   if (pathname === '/admin/logs') return 'logs';
@@ -27,13 +31,15 @@ export const getActiveSectionFromUrl = (pathname: string): string => {
 };
 
 // Типы для разделов админки
-export type AdminSection = 'dashboard' | 'tools' | 'users' | 'finance' | 'admins' | 'logs' | 'integrations';
+export type AdminSection = 'dashboard' | 'tools' | 'users' | 'newsletters' | 'news' | 'finance' | 'admins' | 'logs' | 'integrations';
 
 // Список всех разделов
 export const adminSections: AdminSection[] = [
   'dashboard',
   'tools', 
   'users',
+  'newsletters',
+  'news',
   'finance',
   'admins',
   'logs',

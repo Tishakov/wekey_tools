@@ -20,6 +20,7 @@ const DashboardCharts: React.FC = () => {
   const [activityData, setActivityData] = useState<ActivityData[]>([]);
   const [topToolsData, setTopToolsData] = useState<TopToolData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasDataInLast30Days, setHasDataInLast30Days] = useState(false);
 
   // Загрузка данных для графиков
   useEffect(() => {
@@ -47,6 +48,9 @@ const DashboardCharts: React.FC = () => {
           const activityResult = await activityResponse.json();
           if (activityResult.success && activityResult.data) {
             setActivityData(activityResult.data);
+            // Проверяем, есть ли реальная активность за последние 30 дней
+            const hasActivity = activityResult.data.some((item: ActivityData) => item.usageCount > 0);
+            setHasDataInLast30Days(hasActivity);
           } else {
             // Для нового пользователя показываем пустые данные (все нули)
             const emptyData = [];
@@ -59,6 +63,7 @@ const DashboardCharts: React.FC = () => {
               });
             }
             setActivityData(emptyData);
+            setHasDataInLast30Days(false);
           }
         } else {
           // При ошибке API тоже показываем пустые данные
@@ -72,12 +77,16 @@ const DashboardCharts: React.FC = () => {
             });
           }
           setActivityData(emptyData);
+          setHasDataInLast30Days(false);
         }
 
         if (topToolsResponse.ok) {
           const topToolsResult = await topToolsResponse.json();
           if (topToolsResult.success && topToolsResult.data && topToolsResult.data.length > 0) {
             setTopToolsData(topToolsResult.data);
+            // Если есть данные по инструментам, проверяем что есть реальная активность
+            const hasToolsActivity = topToolsResult.data.some((tool: TopToolData) => tool.count > 0);
+            setHasDataInLast30Days(prev => prev || hasToolsActivity);
           } else {
             // Для нового пользователя показываем пустые данные
             setTopToolsData([]);
@@ -88,9 +97,19 @@ const DashboardCharts: React.FC = () => {
         }
       } catch (error) {
         console.error('Ошибка загрузки данных графиков:', error);
-        // Генерируем моковые данные при ошибке
-        setActivityData(generateMockActivityData());
-        setTopToolsData(generateMockTopToolsData());
+        // При ошибке показываем пустые данные
+        const emptyData = [];
+        for (let i = 29; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          emptyData.push({
+            date: date.toISOString().split('T')[0],
+            usageCount: 0
+          });
+        }
+        setActivityData(emptyData);
+        setTopToolsData([]);
+        setHasDataInLast30Days(false);
       } finally {
         setLoading(false);
       }
@@ -99,57 +118,7 @@ const DashboardCharts: React.FC = () => {
     fetchChartData();
   }, [user]);
 
-  // Генерация моковых данных активности
-  const generateMockActivityData = (): ActivityData[] => {
-    const data: ActivityData[] = [];
-    const today = new Date();
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      
-      // Генерируем случайное количество использований (0-8)
-      const usageCount = Math.floor(Math.random() * 9);
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        usageCount
-      });
-    }
-    
-    return data;
-  };
 
-  // Генерация моковых данных топ инструментов
-  const generateMockTopToolsData = (): TopToolData[] => {
-    const tools = [
-      'SEO Аудит',
-      'Генератор паролей', 
-      'Проверка грамматики',
-      'Конвертер изображений',
-      'Анализ ключевых слов'
-    ];
-    
-    const total = 100;
-    let remaining = total;
-    
-    return tools.map((tool, index) => {
-      let count;
-      if (index === tools.length - 1) {
-        count = remaining;
-      } else {
-        const maxCount = Math.floor(remaining / (tools.length - index));
-        count = Math.floor(Math.random() * maxCount) + 5;
-        remaining -= count;
-      }
-      
-      return {
-        name: tool,
-        count,
-        percentage: Math.round((count / total) * 100)
-      };
-    }).filter(tool => tool.count > 0).slice(0, 5);
-  };
 
   // Цвета для круговой диаграммы
   const pieColors = ['#5E35F2', '#F22987', '#3b82f6', '#10b981', '#f59e0b'];
@@ -236,6 +205,11 @@ const DashboardCharts: React.FC = () => {
   };
 
   if (!user) {
+    return null;
+  }
+
+  // Скрываем графики для новых пользователей без данных за последние 30 дней
+  if (!loading && !hasDataInLast30Days) {
     return null;
   }
 

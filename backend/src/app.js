@@ -103,6 +103,8 @@ try {
   const seoAuditProRoutes = require('./routes/seoAuditPro');
   const coinsRoutes = require('./routes/coins');
   const userFinancesRoutes = require('./routes/userFinances');
+  const newslettersRoutes = require('./routes/newsletters');
+  const newsRoutes = require('./routes/news');
 
   app.use('/api/auth', authRoutes);
   app.use('/auth', oauthRoutes); // OAuth маршруты без /api префикса
@@ -116,6 +118,8 @@ try {
   app.use('/api/tools', siteAuditRoutes); // Подключаем анализ сайтов
   app.use('/api/tools', seoAuditRoutes); // Подключаем SEO аудит
   app.use('/api/tools', seoAuditProRoutes); // Подключаем SEO аудит PRO
+  app.use('/api/newsletters', newslettersRoutes); // Подключаем систему рассылок
+  app.use('/api/news', newsRoutes); // Подключаем систему новостей
   
   console.log('✅ All routes registered successfully');
 } catch (error) {

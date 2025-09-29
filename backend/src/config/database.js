@@ -40,6 +40,10 @@ const Subscription = require('../models/Subscription')(sequelize);
 const Payment = require('../models/Payment')(sequelize);
 const CoinTransaction = require('../models/CoinTransaction')(sequelize);
 const CoinOperationReason = require('../models/CoinOperationReason')(sequelize);
+const Newsletter = require('../models/Newsletter')(sequelize);
+const News = require('../models/News')(sequelize);
+const NewsReadStatus = require('../models/NewsReadStatus')(sequelize);
+const NewsletterRecipient = require('../models/NewsletterRecipient')(sequelize);
 
 // Определение ассоциаций между моделями
 const db = {
@@ -50,7 +54,11 @@ const db = {
   Subscription,
   Payment,
   CoinTransaction,
-  CoinOperationReason
+  CoinOperationReason,
+  Newsletter,
+  News,
+  NewsReadStatus,
+  NewsletterRecipient
 };
 
 // Связи между таблицами
@@ -68,5 +76,25 @@ Payment.belongsTo(Subscription, { foreignKey: 'subscriptionId', as: 'subscriptio
 
 User.hasMany(CoinTransaction, { foreignKey: 'userId', as: 'coinTransactions' });
 CoinTransaction.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+// Связи для Newsletter
+User.hasMany(Newsletter, { foreignKey: 'createdBy', as: 'newsletters' });
+Newsletter.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
+
+Newsletter.hasMany(NewsletterRecipient, { foreignKey: 'newsletterId', as: 'recipients' });
+NewsletterRecipient.belongsTo(Newsletter, { foreignKey: 'newsletterId', as: 'newsletter' });
+
+User.hasMany(NewsletterRecipient, { foreignKey: 'userId', as: 'newsletterReceipts' });
+NewsletterRecipient.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+// Связи для News
+User.hasMany(News, { foreignKey: 'createdBy', as: 'news' });
+News.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
+
+User.hasMany(NewsReadStatus, { foreignKey: 'userId', as: 'newsReadStatuses' });
+NewsReadStatus.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+News.hasMany(NewsReadStatus, { foreignKey: 'newsId', as: 'readStatuses' });
+NewsReadStatus.belongsTo(News, { foreignKey: 'newsId', as: 'news' });
 
 module.exports = db;
