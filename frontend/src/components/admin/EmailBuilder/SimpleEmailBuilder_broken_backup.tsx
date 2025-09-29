@@ -41,11 +41,6 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
     setBlocks(updatedBlocks);
     onBlocksChange(updatedBlocks);
     generateHTML(updatedBlocks);
-    
-    // Автоматически выбираем новый блок
-    if (onBlockSelect) {
-      onBlockSelect(newBlock.id);
-    }
   };
 
   const updateBlock = (blockId: string, updates: Partial<EmailBlock>) => {
@@ -57,18 +52,22 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
     generateHTML(updatedBlocks);
   };
 
+  const moveBlock = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= blocks.length) return;
+
+    const updatedBlocks = [...blocks];
+    [updatedBlocks[index], updatedBlocks[newIndex]] = [updatedBlocks[newIndex], updatedBlocks[index]];
+    
+    setBlocks(updatedBlocks);
+    onBlocksChange(updatedBlocks);
+    generateHTML(updatedBlocks);
+  };
+
   const getDefaultContent = (type: EmailBlock['type']) => {
     switch (type) {
       case 'text':
-        return { 
-          text: 'Введите ваш текст здесь...', 
-          fontSize: 16, 
-          color: '#333333',
-          textType: 'p',
-          fontWeight: 'normal',
-          fontStyle: 'normal',
-          textDecoration: 'none'
-        };
+        return { text: 'Введите ваш текст здесь...', fontSize: 16, color: '#333333' };
       case 'image':
         return { src: '', alt: '', width: '100%' };
       case 'button':
@@ -110,20 +109,11 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
 
     switch (block.type) {
       case 'text':
-        const TextTag = block.content.textType || 'p';
         return `
           <div style="${containerStyle}">
-            <${TextTag} style="
-              margin: 0; 
-              font-size: ${block.content.fontSize || 16}px; 
-              color: ${block.content.color || '#333333'}; 
-              font-weight: ${block.content.fontWeight || 'normal'};
-              font-style: ${block.content.fontStyle || 'normal'};
-              text-decoration: ${block.content.textDecoration || 'none'};
-              line-height: 1.5;
-            ">
+            <div style="margin: 0; font-size: ${block.content.fontSize || 16}px; color: ${block.content.color || '#333333'}; line-height: 1.5;">
               ${block.content.text || ''}
-            </${TextTag}>
+            </div>
           </div>
         `;
       case 'image':
@@ -210,60 +200,160 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
   );
 };
 
+const getBlockLabel = (type: EmailBlock['type']): string => {
+  
+  const renderContent = () => {
+    const style = {
+      padding: `${block.settings.padding?.top || 15}px ${block.settings.padding?.right || 20}px ${block.settings.padding?.bottom || 15}px ${block.settings.padding?.left || 20}px`,
+      backgroundColor: block.settings.backgroundColor || 'transparent',
+      textAlign: block.settings.alignment || 'left' as const
+    };
+
+    switch (block.type) {
+      case 'text':
+        const TextElement = block.content.textType || 'p';
+        return (
+          <div style={style}>
+            <TextElement
+              contentEditable
+              suppressContentEditableWarning
+              onBlur={(e: React.FocusEvent<HTMLElement>) => {
+                onUpdate({
+                  content: { ...block.content, text: (e.target as HTMLElement).innerHTML }
+                });
+              }}
+              style={{
+                fontSize: `${block.content.fontSize || 16}px`,
+                color: block.content.color || '#333333',
+                fontWeight: block.content.fontWeight || 'normal',
+                fontStyle: block.content.fontStyle || 'normal',
+                textDecoration: block.content.textDecoration || 'none',
+                outline: 'none',
+                minHeight: '20px',
+                lineHeight: '1.5',
+                margin: 0
+              }}
+              dangerouslySetInnerHTML={{ __html: block.content.text || 'Введите текст...' }}
+            />
+          </div>
+        );
+
+      case 'image':
+        return (
+          <div style={style}>
+            {block.content.src ? (
+              <img
+                src={block.content.src}
+                alt={block.content.alt || ''}
+                style={{
+                  width: block.content.width || '100%',
+                  height: 'auto',
+                  display: 'block',
+                  maxWidth: '100%'
+                }}
+              />
+            ) : (
+              <div className="image-placeholder">
+                🖼️ Настройте изображение в панели ниже
+              </div>
+            )}
+          </div>
+        );
+
+      case 'button':
+        return (
+          <div style={style}>
+            <button
+              style={{
+                backgroundColor: block.content.backgroundColor || '#6366f1',
+                color: block.content.textColor || '#ffffff',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '500'
+              }}
+            >
+              {block.content.text || 'Кнопка'}
+            </button>
+          </div>
+        );
+
+      case 'divider':
+        return (
+          <div style={style}>
+            <hr
+              style={{
+                height: `${block.content.height || 1}px`,
+                border: 'none',
+                backgroundColor: block.content.color || '#e5e7eb',
+                margin: 0
+              }}
+            />
+          </div>
+        );
+
+      case 'spacer':
+        return (
+          <div style={{ height: `${block.content.height || 20}px`, position: 'relative' }}>
+            <div className="spacer-label">
+              Отступ: {block.content.height || 20}px
+            </div>
+          </div>
+        );
+
+      default:
+        return <div>Неизвестный блок</div>;
+    }
+  };
+
+  return (
+    <div 
+      className={`block-item ${isSelected ? 'selected' : ''}`}
+      onClick={onSelect}
+    >
+      <div className="block-controls">
+        <span className="block-type">{getBlockLabel(block.type)}</span>
+        <div className="block-actions">
+          <button type="button" onClick={(e) => { e.stopPropagation(); onMove(index, 'up'); }} disabled={index === 0}>
+            ↑
+          </button>
+          <button type="button" onClick={(e) => { e.stopPropagation(); onMove(index, 'down'); }}>
+            ↓
+          </button>
+          <button type="button" onClick={(e) => { e.stopPropagation(); /* TODO: настройки */ }} title="Настройки">
+            ⚙️
+          </button>
+          <button type="button" onClick={(e) => { e.stopPropagation(); onDelete(); }} className="delete-btn">
+            🗑️
+          </button>
+        </div>
+      </div>
+      <div className="block-content">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
+
+
 // Компонент настроек блока
 const BlockSettings: React.FC<{
   block: EmailBlock;
   onUpdate: (updates: Partial<EmailBlock>) => void;
 }> = ({ block, onUpdate }) => {
-  const [textType, setTextType] = useState<'paragraph' | 'h1' | 'h2' | 'h3'>(
-    block.content.textType === 'h1' ? 'h1' :
-    block.content.textType === 'h2' ? 'h2' :
-    block.content.textType === 'h3' ? 'h3' : 'paragraph'
-  );
-  const [fontWeight, setFontWeight] = useState<string>(block.content.fontWeight || 'normal');
-  const [fontStyle, setFontStyle] = useState<string>(block.content.fontStyle || 'normal');
-  const [textDecoration, setTextDecoration] = useState<string>(block.content.textDecoration || 'none');
-
+  
   const updateContent = (key: string, value: any) => {
     onUpdate({
-      content: {
-        ...block.content,
-        [key]: value
-      }
+      content: { ...block.content, [key]: value }
     });
   };
 
   const updateSettings = (key: string, value: any) => {
     onUpdate({
-      settings: {
-        ...block.settings,
-        [key]: value
-      }
+      settings: { ...block.settings, [key]: value }
     });
-  };
-
-  const handleTextTypeChange = (newType: 'paragraph' | 'h1' | 'h2' | 'h3') => {
-    setTextType(newType);
-    const htmlTag = newType === 'paragraph' ? 'p' : newType;
-    updateContent('textType', htmlTag);
-  };
-
-  const handleFontWeightChange = (checked: boolean) => {
-    const newWeight = checked ? 'bold' : 'normal';
-    setFontWeight(newWeight);
-    updateContent('fontWeight', newWeight);
-  };
-
-  const handleFontStyleChange = (checked: boolean) => {
-    const newStyle = checked ? 'italic' : 'normal';
-    setFontStyle(newStyle);
-    updateContent('fontStyle', newStyle);
-  };
-
-  const handleTextDecorationChange = (checked: boolean) => {
-    const newDecoration = checked ? 'underline' : 'none';
-    setTextDecoration(newDecoration);
-    updateContent('textDecoration', newDecoration);
   };
 
   const renderContentSettings = () => {
@@ -272,79 +362,18 @@ const BlockSettings: React.FC<{
         return (
           <>
             <div className="block-settings-group">
-              <label className="block-settings-label">Текст:</label>
-              <textarea
-                className="block-settings-textarea"
-                value={block.content.text || ''}
-                onChange={(e) => updateContent('text', e.target.value)}
-                rows={3}
-              />
-            </div>
-            
-            <div className="block-settings-group">
               <label className="block-settings-label">Тип текста:</label>
-              <div className="block-settings-text-type">
-                <button
-                  type="button"
-                  className={`text-type-btn ${textType === 'paragraph' ? 'active' : ''}`}
-                  onClick={() => handleTextTypeChange('paragraph')}
-                >
-                  P
-                </button>
-                <button
-                  type="button"
-                  className={`text-type-btn ${textType === 'h1' ? 'active' : ''}`}
-                  onClick={() => handleTextTypeChange('h1')}
-                >
-                  H1
-                </button>
-                <button
-                  type="button"
-                  className={`text-type-btn ${textType === 'h2' ? 'active' : ''}`}
-                  onClick={() => handleTextTypeChange('h2')}
-                >
-                  H2
-                </button>
-                <button
-                  type="button"
-                  className={`text-type-btn ${textType === 'h3' ? 'active' : ''}`}
-                  onClick={() => handleTextTypeChange('h3')}
-                >
-                  H3
-                </button>
-              </div>
+              <select
+                className="block-settings-select"
+                value={block.content.textType || 'p'}
+                onChange={(e) => updateContent('textType', e.target.value)}
+              >
+                <option value="p">Параграф</option>
+                <option value="h1">Заголовок 1</option>
+                <option value="h2">Заголовок 2</option>
+                <option value="h3">Заголовок 3</option>
+              </select>
             </div>
-
-            <div className="block-settings-group">
-              <label className="block-settings-label">Форматирование:</label>
-              <div className="block-settings-formatting">
-                <label className="block-settings-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={fontWeight === 'bold'}
-                    onChange={(e) => handleFontWeightChange(e.target.checked)}
-                  />
-                  <span className="checkmark-text">Жирный</span>
-                </label>
-                <label className="block-settings-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={fontStyle === 'italic'}
-                    onChange={(e) => handleFontStyleChange(e.target.checked)}
-                  />
-                  <span className="checkmark-text">Курсив</span>
-                </label>
-                <label className="block-settings-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={textDecoration === 'underline'}
-                    onChange={(e) => handleTextDecorationChange(e.target.checked)}
-                  />
-                  <span className="checkmark-text">Подчеркнутый</span>
-                </label>
-              </div>
-            </div>
-
             <div className="block-settings-group">
               <label className="block-settings-label">Размер шрифта:</label>
               <input
@@ -357,16 +386,44 @@ const BlockSettings: React.FC<{
               />
             </div>
             <div className="block-settings-group">
-              <label className="block-settings-label">Цвет текста:</label>
+              <label className="block-settings-label">Цвет:</label>
               <input
-                className="block-settings-color"
+                className="block-settings-input"
                 type="color"
                 value={block.content.color || '#333333'}
                 onChange={(e) => updateContent('color', e.target.value)}
               />
             </div>
+            <div className="block-settings-group">
+              <label className="block-settings-label">Жирный:</label>
+              <input
+                className="block-settings-input"
+                type="checkbox"
+                checked={block.content.fontWeight === 'bold'}
+                onChange={(e) => updateContent('fontWeight', e.target.checked ? 'bold' : 'normal')}
+              />
+            </div>
+            <div className="block-settings-group">
+              <label className="block-settings-label">Курсив:</label>
+              <input
+                className="block-settings-input"
+                type="checkbox"
+                checked={block.content.fontStyle === 'italic'}
+                onChange={(e) => updateContent('fontStyle', e.target.checked ? 'italic' : 'normal')}
+              />
+            </div>
+            <div className="block-settings-group">
+              <label className="block-settings-label">Подчеркивание:</label>
+              <input
+                className="block-settings-input"
+                type="checkbox"
+                checked={block.content.textDecoration === 'underline'}
+                onChange={(e) => updateContent('textDecoration', e.target.checked ? 'underline' : 'none')}
+              />
+            </div>
           </>
         );
+
       case 'image':
         return (
           <>
@@ -381,7 +438,7 @@ const BlockSettings: React.FC<{
               />
             </div>
             <div className="block-settings-group">
-              <label className="block-settings-label">Альтернативный текст:</label>
+              <label className="block-settings-label">Описание:</label>
               <input
                 className="block-settings-input"
                 type="text"
@@ -390,18 +447,9 @@ const BlockSettings: React.FC<{
                 placeholder="Описание изображения"
               />
             </div>
-            <div className="block-settings-group">
-              <label className="block-settings-label">Ширина:</label>
-              <input
-                className="block-settings-input"
-                type="text"
-                value={block.content.width || '100%'}
-                onChange={(e) => updateContent('width', e.target.value)}
-                placeholder="100%, 300px, и т.д."
-              />
-            </div>
           </>
         );
+
       case 'button':
         return (
           <>
@@ -412,6 +460,7 @@ const BlockSettings: React.FC<{
                 type="text"
                 value={block.content.text || ''}
                 onChange={(e) => updateContent('text', e.target.value)}
+                placeholder="Нажмите здесь"
               />
             </div>
             <div className="block-settings-group">
@@ -425,9 +474,9 @@ const BlockSettings: React.FC<{
               />
             </div>
             <div className="block-settings-group">
-              <label className="block-settings-label">Цвет фона:</label>
+              <label className="block-settings-label">Цвет кнопки:</label>
               <input
-                className="block-settings-color"
+                className="block-settings-input"
                 type="color"
                 value={block.content.backgroundColor || '#6366f1'}
                 onChange={(e) => updateContent('backgroundColor', e.target.value)}
@@ -436,7 +485,7 @@ const BlockSettings: React.FC<{
             <div className="block-settings-group">
               <label className="block-settings-label">Цвет текста:</label>
               <input
-                className="block-settings-color"
+                className="block-settings-input"
                 type="color"
                 value={block.content.textColor || '#ffffff'}
                 onChange={(e) => updateContent('textColor', e.target.value)}
@@ -444,24 +493,25 @@ const BlockSettings: React.FC<{
             </div>
           </>
         );
+
       case 'divider':
         return (
           <>
             <div className="block-settings-group">
-              <label className="block-settings-label">Высота (px):</label>
+              <label className="block-settings-label">Толщина:</label>
               <input
                 className="block-settings-input"
                 type="number"
                 value={block.content.height || 1}
                 onChange={(e) => updateContent('height', parseInt(e.target.value))}
                 min="1"
-                max="20"
+                max="10"
               />
             </div>
             <div className="block-settings-group">
               <label className="block-settings-label">Цвет:</label>
               <input
-                className="block-settings-color"
+                className="block-settings-input"
                 type="color"
                 value={block.content.color || '#e5e7eb'}
                 onChange={(e) => updateContent('color', e.target.value)}
@@ -469,20 +519,24 @@ const BlockSettings: React.FC<{
             </div>
           </>
         );
+
       case 'spacer':
         return (
-          <div className="block-settings-group">
-            <label className="block-settings-label">Высота (px):</label>
-            <input
-              className="block-settings-input"
-              type="number"
-              value={block.content.height || 20}
-              onChange={(e) => updateContent('height', parseInt(e.target.value))}
-              min="5"
-              max="100"
-            />
-          </div>
+          <>
+            <div className="block-settings-group">
+              <label className="block-settings-label">Высота:</label>
+              <input
+                className="block-settings-input"
+                type="number"
+                value={block.content.height || 20}
+                onChange={(e) => updateContent('height', parseInt(e.target.value))}
+                min="5"
+                max="200"
+              />
+            </div>
+          </>
         );
+
       default:
         return null;
     }
@@ -497,18 +551,18 @@ const BlockSettings: React.FC<{
           value={block.settings.alignment || 'left'}
           onChange={(e) => updateSettings('alignment', e.target.value)}
         >
-          <option value="left">По левому краю</option>
+          <option value="left">Слева</option>
           <option value="center">По центру</option>
-          <option value="right">По правому краю</option>
+          <option value="right">Справа</option>
         </select>
       </div>
       <div className="block-settings-group">
         <label className="block-settings-label">Цвет фона:</label>
         <input
-          className="block-settings-color"
+          className="block-settings-input"
           type="color"
           value={block.settings.backgroundColor || '#ffffff'}
-          onChange={(e) => updateSettings('backgroundColor', e.target.value)}
+          onChange={(e) => updateSettings('backgroundColor', e.target.value === '#ffffff' ? 'transparent' : e.target.value)}
         />
       </div>
       <div className="block-settings-group">
@@ -538,7 +592,6 @@ const BlockSettings: React.FC<{
 
   return (
     <div className="block-settings-content">
-      <h4>{getBlockLabel(block.type)}</h4>
       {renderContentSettings()}
       {renderGeneralSettings()}
     </div>

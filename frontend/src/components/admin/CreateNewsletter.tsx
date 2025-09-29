@@ -452,6 +452,8 @@ const CreateNewsletter: React.FC = () => {
                       onContentChange={(html: string) => {
                         setFormData(prev => ({ ...prev, content: html }));
                       }}
+                      selectedBlockId={selectedBlockId}
+                      onBlockSelect={setSelectedBlockId}
                     />
                   </div>
                 )}
