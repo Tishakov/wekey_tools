@@ -150,9 +150,6 @@ const CreateNewsletter: React.FC = () => {
               borderRadius: `${block.settings.borderRadius || 0}px`,
               fontSize: `${block.content.fontSize || 16}px`,
               color: block.content.color || '#333333',
-              fontWeight: block.content.fontWeight || 'normal',
-              fontStyle: block.content.fontStyle || 'normal',
-              textDecoration: block.content.textDecoration || 'none',
               lineHeight: '1.5'
             }}
           />

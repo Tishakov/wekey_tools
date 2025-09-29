@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './SimpleEmailBuilder.css';
+import RichTextEditor from './RichTextEditor';
 
 export interface EmailBlock {
   id: string;
@@ -104,6 +105,14 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
     const html = currentBlocks.map(block => blockToHTML(block)).join('');
     const fullHTML = `
       <div style="max-width: 600px; margin: 0 auto; font-family: 'Google Sans', Arial, sans-serif; background: #ffffff;">
+        <style>
+          strong, b { font-weight: bold !important; }
+          em, i { font-style: italic !important; }
+          u { text-decoration: underline !important; }
+          a { color: #007cba !important; text-decoration: underline !important; }
+          ul, ol { margin: 8px 0 !important; padding-left: 20px !important; }
+          li { margin: 4px 0 !important; line-height: 1.5 !important; }
+        </style>
         ${html}
       </div>
     `;
@@ -124,16 +133,14 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
 
     switch (block.type) {
       case 'text':
-        const TextTag = block.content.textType || 'p';
+        const TextTag = block.content.textType || 'div';
+        // Для HTML контента используем div, чтобы сохранить внутреннее форматирование
         return `
           <div style="${containerStyle}">
             <${TextTag} style="
               margin: 0; 
               font-size: ${block.content.fontSize || 16}px; 
               color: ${block.content.color || '#333333'}; 
-              font-weight: ${block.content.fontWeight || 'normal'};
-              font-style: ${block.content.fontStyle || 'normal'};
-              text-decoration: ${block.content.textDecoration || 'none'};
               line-height: 1.5;
             ">
               ${block.content.text || ''}
@@ -234,9 +241,6 @@ const BlockSettings: React.FC<{
     block.content.textType === 'h2' ? 'h2' :
     block.content.textType === 'h3' ? 'h3' : 'paragraph'
   );
-  const [fontWeight, setFontWeight] = useState<string>(block.content.fontWeight || 'normal');
-  const [fontStyle, setFontStyle] = useState<string>(block.content.fontStyle || 'normal');
-  const [textDecoration, setTextDecoration] = useState<string>(block.content.textDecoration || 'none');
 
   const updateContent = (key: string, value: any) => {
     onUpdate({
@@ -262,35 +266,16 @@ const BlockSettings: React.FC<{
     updateContent('textType', htmlTag);
   };
 
-  const handleFontWeightChange = (checked: boolean) => {
-    const newWeight = checked ? 'bold' : 'normal';
-    setFontWeight(newWeight);
-    updateContent('fontWeight', newWeight);
-  };
-
-  const handleFontStyleChange = (checked: boolean) => {
-    const newStyle = checked ? 'italic' : 'normal';
-    setFontStyle(newStyle);
-    updateContent('fontStyle', newStyle);
-  };
-
-  const handleTextDecorationChange = (checked: boolean) => {
-    const newDecoration = checked ? 'underline' : 'none';
-    setTextDecoration(newDecoration);
-    updateContent('textDecoration', newDecoration);
-  };
-
   const renderContentSettings = () => {
     switch (block.type) {
       case 'text':
         return (
           <>
             <div className="block-settings-group full-width">
-              <textarea
-                className="block-settings-textarea"
+              <RichTextEditor
                 value={block.content.text || ''}
-                onChange={(e) => updateContent('text', e.target.value)}
-                rows={3}
+                onChange={(value) => updateContent('text', value)}
+                placeholder="Введите текст блока..."
               />
             </div>
             
@@ -328,44 +313,6 @@ const BlockSettings: React.FC<{
               </div>
             </div>
 
-            <div className="block-settings-group">
-              <label className="block-settings-label">Форматирование:</label>
-              <div className="block-settings-formatting">
-                <button
-                  type="button"
-                  className={`text-type-btn ${fontWeight === 'bold' ? 'active' : ''}`}
-                  onClick={() => handleFontWeightChange(fontWeight !== 'bold')}
-                >
-                  <strong>B</strong>
-                </button>
-                <button
-                  type="button"
-                  className={`text-type-btn ${fontStyle === 'italic' ? 'active' : ''}`}
-                  onClick={() => handleFontStyleChange(fontStyle !== 'italic')}
-                >
-                  <em>I</em>
-                </button>
-                <button
-                  type="button"
-                  className={`text-type-btn ${textDecoration === 'underline' ? 'active' : ''}`}
-                  onClick={() => handleTextDecorationChange(textDecoration !== 'underline')}
-                >
-                  <u>U</u>
-                </button>
-              </div>
-            </div>
-
-            <div className="block-settings-group">
-              <label className="block-settings-label">Размер шрифта:</label>
-              <input
-                className="block-settings-input"
-                type="number"
-                value={block.content.fontSize || 16}
-                onChange={(e) => updateContent('fontSize', parseInt(e.target.value))}
-                min="8"
-                max="72"
-              />
-            </div>
             <div className="block-settings-group">
               <label className="block-settings-label">Выравнивание:</label>
               <div className="block-settings-formatting">
@@ -406,6 +353,18 @@ const BlockSettings: React.FC<{
                   </div>
                 </button>
               </div>
+            </div>
+
+            <div className="block-settings-group">
+              <label className="block-settings-label">Размер шрифта:</label>
+              <input
+                className="block-settings-input"
+                type="number"
+                value={block.content.fontSize || 16}
+                onChange={(e) => updateContent('fontSize', parseInt(e.target.value))}
+                min="8"
+                max="72"
+              />
             </div>
           </>
         );
@@ -542,15 +501,6 @@ const BlockSettings: React.FC<{
         />
       </div>
       <div className="block-settings-group">
-        <label className="block-settings-label">Цвет фона:</label>
-        <input
-          className="block-settings-color"
-          type="color"
-          value={block.settings.backgroundColor || '#ffffff'}
-          onChange={(e) => updateSettings('backgroundColor', e.target.value)}
-        />
-      </div>
-      <div className="block-settings-group">
         <label className="block-settings-label">Скругление фона:</label>
         <input
           className="block-settings-input"
@@ -559,6 +509,15 @@ const BlockSettings: React.FC<{
           onChange={(e) => updateSettings('borderRadius', parseInt(e.target.value))}
           min="0"
           max="50"
+        />
+      </div>
+      <div className="block-settings-group">
+        <label className="block-settings-label">Цвет фона:</label>
+        <input
+          className="block-settings-color"
+          type="color"
+          value={block.settings.backgroundColor || '#ffffff'}
+          onChange={(e) => updateSettings('backgroundColor', e.target.value)}
         />
       </div>
       <div className="block-settings-group full-width">

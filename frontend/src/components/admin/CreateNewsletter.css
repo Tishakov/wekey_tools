@@ -863,3 +863,74 @@
   background-color: #f8f9fa;
   border-color: #007acc !important;
 }
+
+/* Форматирование текста в интерактивных блоках */
+.newsletter-email-body.interactive [contenteditable] strong,
+.newsletter-email-body.interactive [contenteditable] b {
+  font-weight: bold !important;
+  color: inherit !important;
+}
+
+.newsletter-email-body.interactive [contenteditable] em,
+.newsletter-email-body.interactive [contenteditable] i {
+  font-style: italic !important;
+  color: inherit !important;
+}
+
+.newsletter-email-body.interactive [contenteditable] u {
+  text-decoration: underline !important;
+  color: inherit !important;
+}
+
+/* Принудительное наследование цвета для всех форматированных элементов */
+.editable-text strong,
+.editable-text b {
+  color: inherit !important;
+}
+
+.editable-text em,
+.editable-text i {
+  color: inherit !important;  
+}
+
+.editable-text u {
+  color: inherit !important;
+}
+
+/* Форматирование текста в простом редакторе (предварительный просмотр) */
+.newsletter-email-body strong,
+.newsletter-email-body b {
+  font-weight: bold !important;
+  color: inherit !important;
+}
+
+.newsletter-email-body em,
+.newsletter-email-body i {
+  font-style: italic !important;
+  color: inherit !important;
+}
+
+.newsletter-email-body u {
+  text-decoration: underline !important;
+  color: inherit !important;
+}
+
+.newsletter-email-body.interactive [contenteditable] a {
+  color: #007cba !important;
+  text-decoration: underline !important;
+}
+
+.newsletter-email-body.interactive [contenteditable] a:hover {
+  color: #005a8b !important;
+}
+
+.newsletter-email-body.interactive [contenteditable] ul,
+.newsletter-email-body.interactive [contenteditable] ol {
+  margin: 8px 0 !important;
+  padding-left: 20px !important;
+}
+
+.newsletter-email-body.interactive [contenteditable] li {
+  margin: 4px 0 !important;
+  line-height: 1.5 !important;
+}

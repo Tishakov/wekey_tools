@@ -1,0 +1,184 @@
+.rich-text-editor {
+  position: relative;
+  width: 100%;
+}
+
+.rich-text-content {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #333335;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #2a2a2a;
+  color: #e2e8f0;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.rich-text-content:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+.rich-text-content:empty:before {
+  content: attr(data-placeholder);
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Стили для форматированного текста внутри редактора */
+.rich-text-content strong,
+.rich-text-content b {
+  font-weight: bold !important;
+  color: inherit !important;
+}
+
+.rich-text-content em,
+.rich-text-content i {
+  font-style: italic;
+  color: inherit !important;
+}
+
+.rich-text-content u {
+  text-decoration: underline;
+  color: inherit !important;
+}
+
+.rich-text-content a {
+  color: #63b3ed;
+  text-decoration: underline;
+}
+
+.rich-text-content a:hover {
+  color: #90cdf4;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.rich-text-content li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+/* Плавающая панель инструментов */
+.rich-text-toolbar {
+  display: flex;
+  background: #2d3748;
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  gap: 2px;
+  animation: fadeInUp 0.2s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Треугольник указатель */
+.rich-text-toolbar::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #2d3748;
+}
+
+.rich-text-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.rich-text-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.rich-text-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(0.95);
+}
+
+.rich-text-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #63b3ed;
+}
+
+/* Иконки кнопок */
+.rich-text-btn strong {
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.rich-text-btn em {
+  font-style: italic;
+  font-size: 16px;
+  font-family: serif;
+}
+
+.rich-text-btn u {
+  text-decoration: underline;
+  font-size: 16px;
+}
+
+/* Светлая тема для редактора (если потребуется) */
+.light .rich-text-content {
+  background: #fff;
+  border-color: #e1e5e9;
+  color: #333;
+}
+
+.light .rich-text-content:focus {
+  border-color: #007cba;
+  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+.light .rich-text-content:empty:before {
+  color: #9ca3af;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .rich-text-toolbar {
+    padding: 4px;
+    gap: 1px;
+  }
+  
+  .rich-text-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+}
