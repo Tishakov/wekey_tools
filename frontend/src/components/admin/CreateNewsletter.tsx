@@ -547,35 +547,31 @@ const CreateNewsletter: React.FC = () => {
 
             {/* Кнопки действий */}
             <div className="form-actions">
-              <div>
-                <button 
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => navigate('/admin/newsletters')}
-                  disabled={isSubmitting}
-                >
-                  ← Отмена
-                </button>
-                
-                <div className="action-buttons">
-                  <button 
-                    type="button"
-                    className="draft-btn"
-                    onClick={handleSaveDraft}
-                    disabled={isSubmitting || !formData.title}
-                  >
-                    {isSubmitting ? '⏳ Сохранение...' : '💾 Сохранить черновик'}
-                  </button>
-                  
-                  <button 
-                    type="submit"
-                    className="create-btn"
-                    disabled={isSubmitting || !formData.title || !formData.subject || !formData.content}
-                  >
-                    {isSubmitting ? '⏳ Создание...' : formData.sendImmediately ? '🚀 Создать и отправить' : '✅ Создать рассылку'}
-                  </button>
-                </div>
-              </div>
+              <button 
+                type="button"
+                className="cancel-btn"
+                onClick={() => navigate('/admin/newsletters')}
+                disabled={isSubmitting}
+              >
+                ← Отмена
+              </button>
+              
+              <button 
+                type="button"
+                className="draft-btn"
+                onClick={handleSaveDraft}
+                disabled={isSubmitting || !formData.title}
+              >
+                {isSubmitting ? '⏳ Сохранение...' : '💾 Сохранить черновик'}
+              </button>
+              
+              <button 
+                type="submit"
+                className="create-btn"
+                disabled={isSubmitting || !formData.title || !formData.subject || !formData.content}
+              >
+                {isSubmitting ? '⏳ Создание...' : formData.sendImmediately ? '🚀 Создать и отправить' : '✅ Создать рассылку'}
+              </button>
             </div>
           </form>
 
