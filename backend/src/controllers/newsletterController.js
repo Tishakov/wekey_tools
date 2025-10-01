@@ -1,4 +1,4 @@
-const { Newsletter, NewsletterRecipient, User } = require('../models');
+const { Newsletter, NewsletterRecipient, User } = require('../config/database');
 const { Op, literal } = require('sequelize');
 const { sendEmail, sendBulkEmail } = require('../utils/sendEmail');
 const { sequelize } = require('../config/database');
@@ -121,7 +121,13 @@ const newsletterController = {
   // Получить конкретную рассылку
   async getNewsletter(req, res) {
     try {
+      console.log('🔍 getNewsletter called with ID:', req.params.id);
       const { id } = req.params;
+
+      console.log('📊 Attempting to find newsletter with Sequelize...');
+      console.log('📦 Newsletter model:', typeof Newsletter);
+      console.log('📦 NewsletterRecipient model:', typeof NewsletterRecipient);
+      console.log('📦 User model:', typeof User);
 
       const newsletter = await Newsletter.findByPk(id, {
         include: [
@@ -138,14 +144,19 @@ const newsletterController = {
         ]
       });
 
+      console.log('📄 Newsletter found:', !!newsletter);
+
       if (!newsletter) {
+        console.log('❌ Newsletter not found');
         return res.status(404).json({ error: 'Рассылка не найдена' });
       }
 
+      console.log('✅ Returning newsletter:', newsletter.title);
       res.json(newsletter);
     } catch (error) {
-      console.error('Error getting newsletter:', error);
-      res.status(500).json({ error: 'Ошибка получения рассылки' });
+      console.error('❌ Error getting newsletter:', error);
+      console.error('❌ Error stack:', error.stack);
+      res.status(500).json({ error: 'Ошибка получения рассылки', details: error.message });
     }
   },
 

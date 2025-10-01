@@ -121,6 +121,10 @@ try {
   app.use('/api/newsletters', newslettersRoutes); // Подключаем систему рассылок
   app.use('/api/news', newsRoutes); // Подключаем систему новостей
   
+  // Добавляем тестовый route
+  const testRoutes = require('./routes/test');
+  app.use('/api/test', testRoutes);
+  
   console.log('✅ All routes registered successfully');
 } catch (error) {
   console.error('❌ Failed to register routes:', error);

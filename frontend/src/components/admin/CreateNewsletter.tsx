@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useNewsletters } from '../../hooks/useNewslettersAndNews';
 import SimpleEmailBuilder from './EmailBuilder/SimpleEmailBuilder';
 import type { EmailBlock } from './EmailBuilder/SimpleEmailBuilder';
@@ -7,7 +7,8 @@ import './CreateNewsletter.css';
 
 const CreateNewsletter: React.FC = () => {
   const navigate = useNavigate();
-  const { createNewsletter } = useNewsletters();
+  const { id } = useParams();
+  const { createNewsletter, getNewsletter, updateNewsletter } = useNewsletters();
   const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
   
   const [formData, setFormData] = useState({
@@ -24,6 +25,60 @@ const CreateNewsletter: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [useAdvancedBuilder, setUseAdvancedBuilder] = useState(true);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load newsletter data for editing
+  useEffect(() => {
+    if (id) {
+      setIsEditMode(true);
+      setIsLoading(true);
+      
+      const loadNewsletter = async () => {
+        try {
+          const newsletter = await getNewsletter(id);
+          
+          // Populate form data
+          setFormData({
+            title: newsletter.title || '',
+            subject: newsletter.subject || '',
+            content: newsletter.content || '',
+            targetAudience: newsletter.targetAudience || 'all',
+            segmentCriteria: newsletter.segmentCriteria || {},
+            scheduledAt: newsletter.scheduledAt || '',
+            sendImmediately: newsletter.sendImmediately || false
+          });
+
+          // Parse and load email blocks if they exist
+          if (newsletter.emailBlocks) {
+            try {
+              const blocks = typeof newsletter.emailBlocks === 'string' 
+                ? JSON.parse(newsletter.emailBlocks) 
+                : newsletter.emailBlocks;
+              setEmailBlocks(blocks);
+            } catch (error) {
+              console.error('Error parsing email blocks:', error);
+              setEmailBlocks([]);
+            }
+          }
+
+          // Set advanced builder mode if blocks exist
+          if (newsletter.emailBlocks && JSON.parse(newsletter.emailBlocks || '[]').length > 0) {
+            setUseAdvancedBuilder(true);
+          }
+          
+        } catch (error) {
+          console.error('Error loading newsletter:', error);
+          // If loading fails, redirect to newsletters list
+          navigate('/admin/newsletters');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      loadNewsletter();
+    }
+  }, [id, getNewsletter, navigate]);
 
   // Interactive block component for right panel
   const InteractiveBlockComponent = ({ 
@@ -241,16 +296,24 @@ const CreateNewsletter: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      await createNewsletter({
+      const newsletterData = {
         ...formData,
-        status: 'draft',
-        createdBy: 1 // TODO: получить из контекста авторизации
-      });
+        emailBlocks: useAdvancedBuilder ? JSON.stringify(emailBlocks) : null,
+        status: formData.sendImmediately ? 'sent' : 'scheduled',
+        createdBy: 1
+      };
+
+      if (isEditMode && id) {
+        // Update existing newsletter
+        await updateNewsletter(id, newsletterData);
+      } else {
+        // Create new newsletter
+        await createNewsletter(newsletterData);
+      }
       
-      // Переход обратно к списку рассылок
       navigate('/admin/newsletters');
     } catch (error) {
-      console.error('Error creating newsletter:', error);
+      console.error('Error saving newsletter:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -260,11 +323,20 @@ const CreateNewsletter: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      await createNewsletter({
+      const newsletterData = {
         ...formData,
+        emailBlocks: useAdvancedBuilder ? JSON.stringify(emailBlocks) : null,
         status: 'draft',
         createdBy: 1
-      });
+      };
+
+      if (isEditMode && id) {
+        // Update existing draft
+        await updateNewsletter(id, newsletterData);
+      } else {
+        // Create new draft
+        await createNewsletter(newsletterData);
+      }
       
       navigate('/admin/newsletters');
     } catch (error) {
@@ -286,14 +358,21 @@ const CreateNewsletter: React.FC = () => {
             📧 Рассылки
           </button>
           <span className="breadcrumb-separator">→</span>
-          <span className="breadcrumb-current">Создание рассылки</span>
+          <span className="breadcrumb-current">
+            {isEditMode ? 'Редактирование рассылки' : 'Создание рассылки'}
+          </span>
         </div>
         
 
       </div>
 
       <div className="create-content">
-        {/* Основная форма */}
+        {isLoading ? (
+          <div className="loading-container">
+            <div className="spinner"></div>
+            <p>Загрузка данных рассылки...</p>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="newsletter-form with-preview">
             {/* Основная информация */}
             <div className="newsletter-form-section">
@@ -562,7 +641,8 @@ const CreateNewsletter: React.FC = () => {
                 onClick={handleSaveDraft}
                 disabled={isSubmitting || !formData.title}
               >
-                {isSubmitting ? '⏳ Сохранение...' : '💾 Сохранить черновик'}
+                {isSubmitting ? '⏳ Сохранение...' : 
+                 isEditMode ? '💾 Сохранить изменения' : '💾 Сохранить черновик'}
               </button>
               
               <button 
@@ -570,10 +650,13 @@ const CreateNewsletter: React.FC = () => {
                 className="create-btn"
                 disabled={isSubmitting || !formData.title || !formData.subject || !formData.content}
               >
-                {isSubmitting ? '⏳ Создание...' : formData.sendImmediately ? '🚀 Создать и отправить' : '✅ Создать рассылку'}
+                {isSubmitting ? (isEditMode ? '⏳ Сохранение...' : '⏳ Создание...') : 
+                 isEditMode ? '✅ Сохранить рассылку' : 
+                 formData.sendImmediately ? '🚀 Создать и отправить' : '✅ Создать рассылку'}
               </button>
             </div>
           </form>
+        )}
 
         {/* Предварительный просмотр */}
         <div className="newsletter-preview-container">
@@ -677,7 +760,7 @@ const CreateNewsletter: React.FC = () => {
                 </div>
               )}
             </div>
-        </div>
+          </div>
       </div>
     </div>
   );
