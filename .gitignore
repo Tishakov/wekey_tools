@@ -12,12 +12,21 @@ dist
 dist-ssr
 *.local
 
-# Environment variables
+# Environment variables - КРИТИЧНО для безопасности!
+# .env файлы содержат секретные ключи и пароли
 .env
 .env.local
+.env.*.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+
+# Исключение: .env.example (шаблоны без реальных ключей)
+!.env.example
+!**/.env.example
 
 # Editor directories and files
 .vscode/*
@@ -46,6 +55,12 @@ AUX
 # Database backups
 *.db.backup
 *.sqlite.backup
+
+# Database files - содержат пользовательские данные
+*.sqlite
+*.sqlite3
+*.db
+database.sqlite
 
 # Test files (temporary)
 test-*.js
