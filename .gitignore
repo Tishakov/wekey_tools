@@ -36,9 +36,45 @@ CON
 PRN
 AUX
 
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+*~
+
+# Database backups
+*.db.backup
+*.sqlite.backup
+
 # Test files (temporary)
 test-*.js
 test-*.json
+
+# Test result files
+test_result*.json
+test_colors*.json
+test_organic*.json
+pagespeed_test.json
+
+# Audit files
+audit_result.txt
+admin_token.txt
+tool_names_audit.json
+
+# Temporary files
+/temp/*
+!/temp/.gitkeep
+
+# Archives
+*.tar.gz
+*.zip
+/archives/*
+!/archives/.gitkeep
+
+# Test files
+/tests/coverage
+/tests/.nyc_output
 
 # Root level package files (use backend/ and frontend/ instead)
 /package.json
