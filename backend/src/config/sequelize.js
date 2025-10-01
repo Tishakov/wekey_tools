@@ -1,4 +1,15 @@
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+// Приоритетная загрузка: .env.local → .env
+const envLocalPath = path.join(__dirname, '../../.env.local');
+const envPath = path.join(__dirname, '../../.env');
+
+if (fs.existsSync(envLocalPath)) {
+  require('dotenv').config({ path: envLocalPath });
+} else if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+}
 
 module.exports = {
   development: {
