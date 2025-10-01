@@ -330,12 +330,18 @@ const CreateNewsletter: React.FC = () => {
         createdBy: 1
       };
 
+      console.log('📝 Saving draft with data:', newsletterData);
+
       if (isEditMode && id) {
         // Update existing draft
-        await updateNewsletter(id, newsletterData);
+        console.log('📝 Updating draft:', id);
+        const result = await updateNewsletter(id, newsletterData);
+        console.log('✅ Draft updated:', result);
       } else {
         // Create new draft
-        await createNewsletter(newsletterData);
+        console.log('📝 Creating new draft');
+        const result = await createNewsletter(newsletterData);
+        console.log('✅ Draft created:', result);
       }
       
       navigate('/admin/newsletters');

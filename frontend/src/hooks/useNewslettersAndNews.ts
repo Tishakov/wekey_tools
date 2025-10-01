@@ -1,19 +1,7 @@
 import { useState, useEffect } from 'react';
+import { api } from '../utils/api';
 
 const API_BASE_URL = 'http://localhost:8880/api';
-
-// Вспомогательная функция для получения заголовков с авторизацией
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('adminToken');
-  if (!token) {
-    return null; // Возвращаем null вместо исключения
-  }
-  
-  return {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  };
-};
 
 // Hook для работы с рассылками
 export const useNewsletters = () => {
@@ -25,19 +13,10 @@ export const useNewsletters = () => {
 
   // Получить все рассылки
   const fetchNewsletters = async (params = {}) => {
-    // Проверяем токен сразу - если его нет, не делаем запрос
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      setError('Необходима авторизация');
-      setLoading(false);
-      return;
-    }
-    
     setLoading(true);
     setError(null);
     
     try {
-
       const searchParams = new URLSearchParams();
       
       Object.keys(params).forEach(key => {
@@ -46,23 +25,12 @@ export const useNewsletters = () => {
         }
       });
 
-      const response = await fetch(`${API_BASE_URL}/newsletters?${searchParams}`, {
-        credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await api.get(`/newsletters?${searchParams}`);
+      
       setNewsletters(data.newsletters || []);
       setTotalCount(data.totalCount || 0);
       setTotalPages(data.totalPages || 0);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching newsletters:', err);
       setError(err.message);
     } finally {
@@ -71,27 +39,20 @@ export const useNewsletters = () => {
   };
 
   // Создать рассылку
-  const createNewsletter = async (newsletterData) => {
+  const createNewsletter = async (newsletterData: any) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(newsletterData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка создания рассылки');
-      }
-
-      const newNewsletter = await response.json();
-      setNewsletters(prev => [newNewsletter, ...prev]);
+      console.log('🔵 API Call: Creating newsletter', newsletterData);
+      
+      const newNewsletter = await api.post('/newsletters', newsletterData);
+      
+      console.log('✅ Newsletter created successfully:', newNewsletter);
+      
+      setNewsletters((prev: any) => [newNewsletter, ...prev]);
       return newNewsletter;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating newsletter:', err);
       setError(err.message);
       throw err;

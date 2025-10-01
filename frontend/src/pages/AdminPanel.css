@@ -25,6 +25,53 @@
   font-weight: 600;
 }
 
+.session-expired-warning {
+  display: flex;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.session-expired-warning .warning-icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.session-expired-warning .warning-content {
+  flex: 1;
+}
+
+.session-expired-warning strong {
+  display: block;
+  color: #ffc107;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.session-expired-warning p {
+  color: #BCBBBD;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .admin-login-form {
   display: flex;
   flex-direction: column;

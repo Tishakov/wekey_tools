@@ -82,39 +82,57 @@ const newsletterController = {
   // Создать новую рассылку
   async createNewsletter(req, res) {
     try {
+      console.log('📝 Creating newsletter with data:', JSON.stringify(req.body, null, 2));
+      
       const {
         title,
         description,
         subject,
         content,
+        htmlContent,
+        emailBlocks,
         targetAudience,
         segmentCriteria,
-        scheduledAt
+        specificUsers,
+        scheduledAt,
+        status
       } = req.body;
 
       // Валидация обязательных полей
-      if (!title || !subject || !content) {
+      if (!title) {
         return res.status(400).json({ 
-          error: 'Название, тема письма и содержание обязательны' 
+          error: 'Название обязательно' 
+        });
+      }
+
+      // Для черновиков разрешаем пустые subject и content
+      const isDraft = status === 'draft';
+      if (!isDraft && (!subject || !content)) {
+        return res.status(400).json({ 
+          error: 'Для отправки рассылки необходимы тема письма и содержание' 
         });
       }
 
       const newsletter = await Newsletter.create({
         title,
-        description,
-        subject,
-        content,
+        description: description || '',
+        subject: subject || '',
+        content: content || '',
+        htmlContent: htmlContent || null,
+        emailBlocks: emailBlocks || null,
         targetAudience: targetAudience || 'all',
         segmentCriteria: segmentCriteria || {},
+        specificUsers: specificUsers || [],
         scheduledAt: scheduledAt || null,
-        status: 'draft',
-        createdBy: req.user.id // Предполагаем, что у нас есть middleware для аутентификации
+        status: status || 'draft',
+        createdBy: req.user.id
       });
 
+      console.log('✅ Newsletter created:', newsletter.id, newsletter.title);
       res.status(201).json(newsletter);
     } catch (error) {
-      console.error('Error creating newsletter:', error);
-      res.status(500).json({ error: 'Ошибка создания рассылки' });
+      console.error('❌ Error creating newsletter:', error);
+      res.status(500).json({ error: 'Ошибка создания рассылки', details: error.message });
     }
   },
 

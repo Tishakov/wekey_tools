@@ -11,13 +11,34 @@ import AdminNewsletters from '../components/admin/AdminNewsletters';
 import AdminNews from '../components/admin/AdminNews';
 import CreateNewsletter from '../components/admin/CreateNewsletter';
 import AnalyticsChart from '../components/AnalyticsChart';
+import { AuthDebug } from '../components/common/AuthDebug';
 import { getSectionTitle, getActiveSectionFromUrl } from '../utils/adminSections';
 import DateRangePicker from '../components/DateRangePicker';
 import MiniBarChart from '../components/MiniBarChart';
 import historicalAnalyticsService from '../services/historicalAnalyticsService';
 import type { HistoricalDataPoint } from '../services/historicalAnalyticsService';
 import { getToolName } from '../utils/toolsRegistry';
+import { performLogout, getAuthHeaders } from '../utils/api';
 import './AdminPanel.css';
+
+// Безопасный fetch с автоматическим logout при 401
+const safeFetch = async (url: string, options: RequestInit = {}) => {
+  try {
+    const response = await fetch(url, options);
+    
+    // Проверяем на 401 - токен недействителен
+    if (response.status === 401) {
+      console.error('❌ 401 Unauthorized - выполняем автоматический logout');
+      performLogout('Токен недействителен или устарел');
+      throw new Error('Сессия истекла');
+    }
+    
+    return response;
+  } catch (error) {
+    // Если это ошибка сети, пробрасываем её дальше
+    throw error;
+  }
+};
 
 const AdminPanel: React.FC = () => {
   const location = useLocation();
@@ -223,7 +244,7 @@ const AdminPanel: React.FC = () => {
       console.log('🔑 [ADMIN] Using token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
       console.log('🔗 [ADMIN] Request URL:', `${API_BASE}/api/admin/period-stats?${params}`);
       
-      const response = await fetch(`${API_BASE}/api/admin/period-stats?${params}`, {
+      const response = await safeFetch(`${API_BASE}/api/admin/period-stats?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -277,7 +298,7 @@ const AdminPanel: React.FC = () => {
       
       console.log('🛠️ [ADMIN] Fetching period tools data:', startDateStr, 'to', endDateStr);
       
-      const response = await fetch(`${API_BASE}/api/admin/period-tools?startDate=${startDateStr}&endDate=${endDateStr}`, {
+      const response = await safeFetch(`${API_BASE}/api/admin/period-tools?startDate=${startDateStr}&endDate=${endDateStr}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -307,7 +328,7 @@ const AdminPanel: React.FC = () => {
         throw new Error('Токен авторизации не найден');
       }
 
-      const response = await fetch('http://localhost:8880/api/tools', {
+      const response = await safeFetch('http://localhost:8880/api/tools', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -440,7 +461,7 @@ const AdminPanel: React.FC = () => {
       const token = localStorage.getItem('adminToken');
       const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8880';
       
-      const response = await fetch(`${API_BASE}/api/admin/stats`, {
+      const response = await safeFetch(`${API_BASE}/api/admin/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -523,10 +544,25 @@ const AdminPanel: React.FC = () => {
   };
 
   if (!isLoggedIn) {
+    // Проверяем, пришли ли мы сюда после автоматического logout
+    const urlParams = new URLSearchParams(location.search);
+    const sessionExpired = urlParams.get('session') === 'expired';
+    
     return (
       <div className="admin-login">
         <div className="admin-login-container">
           <h1>Вход в админ-панель</h1>
+          
+          {sessionExpired && (
+            <div className="session-expired-warning">
+              <div className="warning-icon">⚠️</div>
+              <div className="warning-content">
+                <strong>Сессия истекла</strong>
+                <p>Ваш токен авторизации устарел. Пожалуйста, войдите снова.</p>
+              </div>
+            </div>
+          )}
+          
           <form onSubmit={handleLogin} className="admin-login-form">
             <div className="form-group">
               <label htmlFor="email">Email:</label>
@@ -1031,6 +1067,9 @@ const AdminPanel: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Debug компонент для проверки авторизации */}
+      <AuthDebug />
     </div>
   );
 };
