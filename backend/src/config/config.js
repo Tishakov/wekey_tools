@@ -1,9 +1,24 @@
 const path = require('path');
+const fs = require('fs');
 
-// Ищем .env файл в папке backend
-require('dotenv').config({ 
-  path: path.join(__dirname, '../../.env') 
-});
+// Приоритет загрузки: .env.local → .env
+// .env.local содержит реальные ключи (не коммитится в git)
+// .env содержит шаблоны (коммитится в git)
+const envLocalPath = path.join(__dirname, '../../.env.local');
+const envPath = path.join(__dirname, '../../.env');
+
+if (fs.existsSync(envLocalPath)) {
+  console.log('✅ Loading environment from .env.local');
+  require('dotenv').config({ path: envLocalPath });
+} else if (fs.existsSync(envPath)) {
+  console.log('⚠️  Loading environment from .env (using template values)');
+  console.log('💡 Create .env.local for real API keys. See: SECURITY_QUICK_START.md');
+  require('dotenv').config({ path: envPath });
+} else {
+  console.error('❌ No .env or .env.local file found!');
+  console.error('📖 Please create .env.local from .env.example');
+  process.exit(1);
+}
 
 // Определяем тип БД
 const usesSQLite = process.env.DB_DIALECT === 'sqlite';
