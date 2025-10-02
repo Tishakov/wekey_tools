@@ -424,7 +424,7 @@
 
 .email-column:hover {
   border-color: rgba(102, 126, 234, 0.3);
-  background: rgba(102, 126, 234, 0.02);
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .email-column.drag-over {
@@ -609,6 +609,90 @@
 }
 
 .column-delete-btn:hover:not(:disabled) {
+  background: #ffebee;
+  border-color: #dc3545;
+}
+
+/* Контролы блоков */
+.block-controls {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: fit-content;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 4px 4px 0 0;
+  padding: 4px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e1e4e8;
+  white-space: nowrap;
+}
+
+.email-block.selected .block-controls {
+  opacity: 1;
+}
+
+/* Скрываем column-controls когда блок выбран */
+.email-block.selected ~ .column-controls,
+.email-column:has(.email-block.selected) .column-controls {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.block-control-btn {
+  background: white;
+  border: 1px solid #e1e4e8;
+  border-radius: 3px;
+  padding: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  line-height: 1;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.block-control-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.block-control-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.block-control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.block-move-up:hover:not(:disabled) {
+  background: #e3f2fd;
+  border-color: #42a5f5;
+}
+
+.block-move-down:hover:not(:disabled) {
+  background: #e8f5e9;
+  border-color: #66bb6a;
+}
+
+.block-duplicate-btn:hover:not(:disabled) {
+  background: #fff3e0;
+  border-color: #ffa726;
+}
+
+.block-delete-btn:hover:not(:disabled) {
   background: #ffebee;
   border-color: #dc3545;
 }

@@ -496,6 +496,89 @@ const EmailBuilderPro: React.FC = () => {
     }
   };
 
+  const moveBlockUp = (sectionId: string, columnId: string, blockId: string) => {
+    const newTemplate = {
+      ...template,
+      sections: template.sections.map(section => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            columns: section.columns.map(column => {
+              if (column.id === columnId) {
+                const blockIndex = column.blocks.findIndex(b => b.id === blockId);
+                if (blockIndex > 0) {
+                  const newBlocks = [...column.blocks];
+                  [newBlocks[blockIndex - 1], newBlocks[blockIndex]] = [newBlocks[blockIndex], newBlocks[blockIndex - 1]];
+                  return { ...column, blocks: newBlocks };
+                }
+              }
+              return column;
+            })
+          };
+        }
+        return section;
+      })
+    };
+    updateTemplate(newTemplate);
+  };
+
+  const moveBlockDown = (sectionId: string, columnId: string, blockId: string) => {
+    const newTemplate = {
+      ...template,
+      sections: template.sections.map(section => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            columns: section.columns.map(column => {
+              if (column.id === columnId) {
+                const blockIndex = column.blocks.findIndex(b => b.id === blockId);
+                if (blockIndex >= 0 && blockIndex < column.blocks.length - 1) {
+                  const newBlocks = [...column.blocks];
+                  [newBlocks[blockIndex], newBlocks[blockIndex + 1]] = [newBlocks[blockIndex + 1], newBlocks[blockIndex]];
+                  return { ...column, blocks: newBlocks };
+                }
+              }
+              return column;
+            })
+          };
+        }
+        return section;
+      })
+    };
+    updateTemplate(newTemplate);
+  };
+
+  const duplicateBlock = (sectionId: string, columnId: string, blockId: string) => {
+    const newTemplate = {
+      ...template,
+      sections: template.sections.map(section => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            columns: section.columns.map(column => {
+              if (column.id === columnId) {
+                const blockIndex = column.blocks.findIndex(b => b.id === blockId);
+                if (blockIndex >= 0) {
+                  const originalBlock = column.blocks[blockIndex];
+                  const duplicatedBlock = {
+                    ...originalBlock,
+                    id: generateId()
+                  };
+                  const newBlocks = [...column.blocks];
+                  newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
+                  return { ...column, blocks: newBlocks };
+                }
+              }
+              return column;
+            })
+          };
+        }
+        return section;
+      })
+    };
+    updateTemplate(newTemplate);
+  };
+
   const updateBlock = (sectionId: string, columnId: string, blockId: string, updates: Partial<EmailBlock>) => {
     const newTemplate = {
       ...template,
@@ -713,7 +796,7 @@ const EmailBuilderPro: React.FC = () => {
               className={`panel-tab ${leftPanel === 'structures' ? 'active' : ''}`}
               onClick={() => setLeftPanel('structures')}
             >
-              📐 Структуры
+              📐 Секции
             </button>
             <button
               className={`panel-tab ${leftPanel === 'content' ? 'active' : ''}`}
@@ -788,7 +871,7 @@ const EmailBuilderPro: React.FC = () => {
                 <div className="empty-message">
                   <span className="empty-icon">📥</span>
                   <h3>Начните создание письма</h3>
-                  <p>Перетащите структуру слева для начала работы</p>
+                  <p>Перетащите секцию слева для начала работы</p>
                 </div>
               </div>
             ) : (
@@ -871,7 +954,7 @@ const EmailBuilderPro: React.FC = () => {
                                 <span>Drop content here</span>
                               </div>
                             ) : (
-                              column.blocks.map((block) => (
+                              column.blocks.map((block, blockIndex) => (
                                 <div
                                   key={block.id}
                                   className={`email-block block-${block.type} ${
@@ -887,6 +970,53 @@ const EmailBuilderPro: React.FC = () => {
                                     });
                                   }}
                                 >
+                                  {/* Контролы блока */}
+                                  {selectedElement.blockId === block.id && (
+                                    <div className="block-controls">
+                                      <button
+                                        className="block-control-btn block-move-up"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          moveBlockUp(section.id, column.id, block.id);
+                                        }}
+                                        disabled={blockIndex === 0}
+                                        title="Переместить вверх"
+                                      >
+                                        ⬆️
+                                      </button>
+                                      <button
+                                        className="block-control-btn block-move-down"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          moveBlockDown(section.id, column.id, block.id);
+                                        }}
+                                        disabled={blockIndex === column.blocks.length - 1}
+                                        title="Переместить вниз"
+                                      >
+                                        ⬇️
+                                      </button>
+                                      <button
+                                        className="block-control-btn block-duplicate-btn"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          duplicateBlock(section.id, column.id, block.id);
+                                        }}
+                                        title="Дублировать блок"
+                                      >
+                                        📋
+                                      </button>
+                                      <button
+                                        className="block-control-btn block-delete-btn"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          deleteBlock(section.id, column.id, block.id);
+                                        }}
+                                        title="Удалить блок"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
+                                  )}
                                   <BlockRenderer block={block} />
                                 </div>
                               ))
@@ -931,7 +1061,7 @@ const EmailBuilderPro: React.FC = () => {
                       )}
                     </div>
                     
-                    {/* Drop zone после каждой секции - показывается только при драге структуры */}
+                    {/* Drop zone после каждой секции - показывается только при драге секции */}
                     {isDragging && draggedItem?.widths && (
                       <div
                         className="section-drop-zone active"
@@ -939,7 +1069,7 @@ const EmailBuilderPro: React.FC = () => {
                         onDrop={(e) => handleDropSection(e, sectionIndex + 1)}
                       >
                         <div className="drop-zone-hint">
-                          <span>Перетащите структуру сюда</span>
+                          <span>Перетащите секцию сюда</span>
                         </div>
                       </div>
                     )}
