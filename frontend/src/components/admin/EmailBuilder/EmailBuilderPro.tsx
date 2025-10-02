@@ -27,10 +27,81 @@ export interface EmailSection {
   id: string;
   columns: EmailColumn[];
   styles: {
+    // Background
     backgroundColor?: string;
-    padding?: string;
     backgroundImage?: string;
+    backgroundPosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+    backgroundSize?: 'cover' | 'contain' | 'auto';
+    backgroundRepeat?: 'no-repeat' | 'repeat' | 'repeat-x' | 'repeat-y';
+    backgroundType?: 'solid' | 'gradient' | 'image';
+    gradient?: {
+      type: 'linear' | 'radial';
+      angle: number;
+      colors: Array<{ color: string; position: number }>;
+    };
+    
+    // Spacing
+    padding?: string;
+    paddingTop?: number;
+    paddingRight?: number;
+    paddingBottom?: number;
+    paddingLeft?: number;
+    paddingLocked?: boolean; // Для синхронизации всех padding
+    margin?: string;
+    marginTop?: number;
+    marginBottom?: number;
+    
+    // Layout
     columnGap?: number; // Отступ между колонками в px
+    verticalAlign?: 'top' | 'middle' | 'bottom';
+    minHeight?: string;
+    height?: 'auto' | string;
+    
+    // Border & Shadow
+    borderWidth?: number;
+    borderStyle?: 'none' | 'solid' | 'dashed' | 'dotted';
+    borderColor?: string;
+    borderRadius?: number;
+    boxShadow?: string;
+    
+    // Mobile Responsive
+    mobileReverse?: boolean;
+    mobileStack?: 'none' | 'vertical';
+    
+    // Visibility
+    visibility?: {
+      desktop?: boolean;
+      mobile?: boolean;
+      tablet?: boolean;
+    };
+    
+    // Responsive Breakpoints
+    responsive?: {
+      desktop?: {
+        columnGap?: number;
+        padding?: string;
+        paddingTop?: number;
+        paddingRight?: number;
+        paddingBottom?: number;
+        paddingLeft?: number;
+      };
+      tablet?: {
+        columnGap?: number;
+        padding?: string;
+        paddingTop?: number;
+        paddingRight?: number;
+        paddingBottom?: number;
+        paddingLeft?: number;
+      };
+      mobile?: {
+        columnGap?: number;
+        padding?: string;
+        paddingTop?: number;
+        paddingRight?: number;
+        paddingBottom?: number;
+        paddingLeft?: number;
+      };
+    };
   };
 }
 
@@ -128,9 +199,46 @@ const EmailBuilderPro: React.FC = () => {
         blocks: []
       })),
       styles: {
+        // Background
         backgroundColor: '#ffffff',
+        backgroundType: 'solid',
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        
+        // Spacing
         padding: '20px 10px',
-        columnGap: columnGap
+        paddingTop: 20,
+        paddingRight: 10,
+        paddingBottom: 20,
+        paddingLeft: 10,
+        paddingLocked: true,
+        marginTop: 0,
+        marginBottom: 0,
+        
+        // Layout
+        columnGap: columnGap,
+        verticalAlign: 'top',
+        height: 'auto',
+        minHeight: 'auto',
+        
+        // Border & Shadow
+        borderWidth: 0,
+        borderStyle: 'none',
+        borderColor: '#e5e7eb',
+        borderRadius: 0,
+        boxShadow: 'none',
+        
+        // Mobile
+        mobileReverse: false,
+        mobileStack: 'vertical',
+        
+        // Visibility
+        visibility: {
+          desktop: true,
+          mobile: true,
+          tablet: true
+        }
       }
     };
   };
@@ -644,18 +752,84 @@ const EmailBuilderPro: React.FC = () => {
 
   const generateEmailHTML = (template: EmailTemplate): string => {
     const sectionsHTML = template.sections.map(section => {
-      const columnsHTML = section.columns.map(column => {
+      // Генерация стилей секции для email
+      const generateSectionStyle = () => {
+        const styles: string[] = [];
+        
+        // Background
+        if (section.styles.backgroundType === 'solid') {
+          styles.push(`background-color: ${section.styles.backgroundColor || '#ffffff'}`);
+        } else if (section.styles.backgroundType === 'gradient' && section.styles.gradient) {
+          const { type, angle, colors } = section.styles.gradient;
+          if (colors && colors.length > 0) {
+            const gradientColors = colors.map(c => `${c.color} ${c.position}%`).join(', ');
+            const gradientStyle = type === 'linear' 
+              ? `linear-gradient(${angle}deg, ${gradientColors})`
+              : `radial-gradient(circle, ${gradientColors})`;
+            styles.push(`background: ${gradientStyle}`);
+          }
+        } else if (section.styles.backgroundType === 'image' && section.styles.backgroundImage) {
+          styles.push(`background-image: url(${section.styles.backgroundImage})`);
+          styles.push(`background-size: ${section.styles.backgroundSize || 'cover'}`);
+          styles.push(`background-position: ${section.styles.backgroundPosition || 'center'}`);
+          styles.push(`background-repeat: ${section.styles.backgroundRepeat || 'no-repeat'}`);
+        }
+        
+        // Padding
+        if (section.styles.paddingTop !== undefined) {
+          styles.push(`padding: ${section.styles.paddingTop}px ${section.styles.paddingRight}px ${section.styles.paddingBottom}px ${section.styles.paddingLeft}px`);
+        } else {
+          styles.push(`padding: ${section.styles.padding || '20px 10px'}`);
+        }
+        
+        // Margin
+        if (section.styles.marginTop || section.styles.marginBottom) {
+          styles.push(`margin-top: ${section.styles.marginTop || 0}px`);
+          styles.push(`margin-bottom: ${section.styles.marginBottom || 0}px`);
+        }
+        
+        // Height
+        if (section.styles.minHeight && section.styles.minHeight !== 'auto') {
+          styles.push(`min-height: ${section.styles.minHeight}`);
+        }
+        if (section.styles.height && section.styles.height !== 'auto') {
+          styles.push(`height: ${section.styles.height}`);
+        }
+        
+        // Border
+        if (section.styles.borderStyle && section.styles.borderStyle !== 'none') {
+          styles.push(`border: ${section.styles.borderWidth || 1}px ${section.styles.borderStyle} ${section.styles.borderColor || '#e5e7eb'}`);
+        }
+        if (section.styles.borderRadius) {
+          styles.push(`border-radius: ${section.styles.borderRadius}px`);
+        }
+        if (section.styles.boxShadow && section.styles.boxShadow !== 'none') {
+          styles.push(`box-shadow: ${section.styles.boxShadow}`);
+        }
+        
+        return styles.join('; ');
+      };
+
+      const columnsHTML = section.columns.map((column, index) => {
         const blocksHTML = column.blocks.map(block => generateBlockHTML(block)).join('');
+        const valign = section.styles.verticalAlign === 'middle' ? 'middle' 
+          : section.styles.verticalAlign === 'bottom' ? 'bottom' 
+          : 'top';
+        
         return `
-          <td width="${column.width}%" valign="top" style="padding: 10px;">
+          <td width="${column.width}px" valign="${valign}" style="padding: ${index < section.columns.length - 1 ? `0 ${(section.styles.columnGap || 10) / 2}px 0 0` : '0'};">
             ${blocksHTML}
           </td>
         `;
       }).join('');
       
+      // Visibility check
+      const isVisible = section.styles.visibility?.desktop !== false;
+      if (!isVisible) return '';
+      
       return `
         <tr>
-          <td style="background-color: ${section.styles.backgroundColor}; padding: ${section.styles.padding};">
+          <td style="${generateSectionStyle()}">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 ${columnsHTML}
@@ -673,6 +847,18 @@ const EmailBuilderPro: React.FC = () => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Email Template</title>
+  <style>
+    /* Mobile Responsive Styles */
+    @media only screen and (max-width: 600px) {
+      .mobile-stack {
+        display: block !important;
+        width: 100% !important;
+      }
+      .mobile-hide {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: ${template.globalStyles.backgroundColor}; font-family: ${template.globalStyles.fontFamily};">
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -852,10 +1038,25 @@ const EmailBuilderPro: React.FC = () => {
         </div>
 
         {/* РАБОЧАЯ ОБЛАСТЬ */}
-        <div className="canvas-area" ref={canvasAreaRef}>
+        <div 
+          className="canvas-area" 
+          ref={canvasAreaRef}
+          onClick={(e) => {
+            // Сброс выделения при клике на пустую область canvas-area
+            if (e.target === e.currentTarget) {
+              setSelectedElement({ type: null });
+            }
+          }}
+        >
           {viewMode === 'editor' && (
             <div 
               className="email-canvas"
+              onClick={(e) => {
+                // Сброс выделения при клике на canvas (но не на его дочерние элементы)
+                if (e.target === e.currentTarget) {
+                  setSelectedElement({ type: null });
+                }
+              }}
               style={{
                 backgroundColor: template.globalStyles.backgroundColor,
                 maxWidth: `${template.globalStyles.contentWidth}px`,
@@ -867,6 +1068,7 @@ const EmailBuilderPro: React.FC = () => {
                 className="canvas-empty"
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDropSection(e)}
+                onClick={() => setSelectedElement({ type: null })}
               >
                 <div className="empty-message">
                   <span className="empty-icon">📥</span>
@@ -876,7 +1078,84 @@ const EmailBuilderPro: React.FC = () => {
               </div>
             ) : (
               <>
-                {template.sections.map((section, sectionIndex) => (
+                {/* Drop zone перед первой секцией - показывается только при драге секции */}
+                {isDragging && draggedItem?.widths && (
+                  <div
+                    className="section-drop-zone active"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDropSection(e, 0)}
+                  >
+                    <div className="drop-zone-hint">
+                      <span>Перетащите секцию сюда</span>
+                    </div>
+                  </div>
+                )}
+
+                {template.sections.map((section, sectionIndex) => {
+                  // Генерация стилей для секции
+                  const generateSectionStyles = (): React.CSSProperties => {
+                    const styles: React.CSSProperties = {};
+                    
+                    // Background
+                    if (section.styles.backgroundType === 'solid') {
+                      styles.backgroundColor = section.styles.backgroundColor;
+                    } else if (section.styles.backgroundType === 'gradient' && section.styles.gradient) {
+                      const { type, angle, colors } = section.styles.gradient;
+                      if (colors && colors.length > 0) {
+                        const gradientColors = colors
+                          .map(c => `${c.color} ${c.position}%`)
+                          .join(', ');
+                        styles.background = type === 'linear' 
+                          ? `linear-gradient(${angle}deg, ${gradientColors})`
+                          : `radial-gradient(circle, ${gradientColors})`;
+                      }
+                    } else if (section.styles.backgroundType === 'image' && section.styles.backgroundImage) {
+                      styles.backgroundImage = `url(${section.styles.backgroundImage})`;
+                      styles.backgroundSize = section.styles.backgroundSize || 'cover';
+                      styles.backgroundPosition = section.styles.backgroundPosition || 'center';
+                      styles.backgroundRepeat = section.styles.backgroundRepeat || 'no-repeat';
+                    }
+                    
+                    // Spacing
+                    if (section.styles.paddingTop !== undefined) {
+                      styles.paddingTop = `${section.styles.paddingTop}px`;
+                      styles.paddingRight = `${section.styles.paddingRight}px`;
+                      styles.paddingBottom = `${section.styles.paddingBottom}px`;
+                      styles.paddingLeft = `${section.styles.paddingLeft}px`;
+                    } else {
+                      styles.padding = section.styles.padding;
+                    }
+                    
+                    if (section.styles.marginTop) {
+                      styles.marginTop = `${section.styles.marginTop}px`;
+                    }
+                    if (section.styles.marginBottom) {
+                      styles.marginBottom = `${section.styles.marginBottom}px`;
+                    }
+                    
+                    // Layout
+                    if (section.styles.minHeight && section.styles.minHeight !== 'auto') {
+                      styles.minHeight = section.styles.minHeight;
+                    }
+                    if (section.styles.height && section.styles.height !== 'auto') {
+                      styles.height = section.styles.height;
+                    }
+                    
+                    // Border
+                    if (section.styles.borderStyle && section.styles.borderStyle !== 'none') {
+                      styles.border = `${section.styles.borderWidth || 1}px ${section.styles.borderStyle} ${section.styles.borderColor || '#e5e7eb'}`;
+                    }
+                    if (section.styles.borderRadius) {
+                      styles.borderRadius = `${section.styles.borderRadius}px`;
+                    }
+                    if (section.styles.boxShadow && section.styles.boxShadow !== 'none') {
+                      styles.boxShadow = section.styles.boxShadow;
+                    }
+                    
+                    return styles;
+                  };
+
+                  return (
                   <React.Fragment key={section.id}>
                     <div
                       className={`email-section ${selectedElement.sectionId === section.id ? 'selected' : ''}`}
@@ -884,14 +1163,16 @@ const EmailBuilderPro: React.FC = () => {
                         e.stopPropagation();
                         setSelectedElement({ type: 'section', sectionId: section.id });
                       }}
-                      style={{
-                        backgroundColor: section.styles.backgroundColor,
-                        padding: section.styles.padding
-                      }}
+                      style={generateSectionStyles()}
                     >
                       <div 
                         className="section-columns"
-                        style={{ gap: `${section.styles.columnGap || 10}px` }}
+                        style={{ 
+                          gap: `${section.styles.columnGap || 10}px`,
+                          alignItems: section.styles.verticalAlign === 'middle' ? 'center' 
+                            : section.styles.verticalAlign === 'bottom' ? 'flex-end' 
+                            : 'flex-start'
+                        }}
                       >
                         {section.columns.map((column, columnIndex) => (
                           <div
@@ -1059,6 +1340,31 @@ const EmailBuilderPro: React.FC = () => {
                           </button>
                         </div>
                       )}
+
+                      {/* Индикаторы видимости секции */}
+                      {section.styles.visibility && (
+                        section.styles.visibility.desktop === false ||
+                        section.styles.visibility.tablet === false ||
+                        section.styles.visibility.mobile === false
+                      ) && (
+                        <div className="section-visibility-indicators">
+                          {section.styles.visibility.desktop === false && (
+                            <div className="visibility-indicator visibility-hidden" title="Скрыто на Desktop">
+                              🖥️
+                            </div>
+                          )}
+                          {section.styles.visibility.tablet === false && (
+                            <div className="visibility-indicator visibility-hidden" title="Скрыто на Tablet">
+                              📱
+                            </div>
+                          )}
+                          {section.styles.visibility.mobile === false && (
+                            <div className="visibility-indicator visibility-hidden" title="Скрыто на Mobile">
+                              📱
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     
                     {/* Drop zone после каждой секции - показывается только при драге секции */}
@@ -1074,7 +1380,8 @@ const EmailBuilderPro: React.FC = () => {
                       </div>
                     )}
                   </React.Fragment>
-                ))}
+                );
+                })}
               </>
             )}
           </div>
@@ -1244,7 +1551,7 @@ const GlobalSettings: React.FC<{
       </div>
 
       <div className="form-group form-group-checkbox">
-        <label className="checkbox-label">
+        <label className="toggle-switch-label">
           <input
             type="checkbox"
             checked={styles.underlineLinks}
@@ -1255,7 +1562,7 @@ const GlobalSettings: React.FC<{
       </div>
 
       <div className="form-group form-group-checkbox">
-        <label className="checkbox-label">
+        <label className="toggle-switch-label">
           <input
             type="checkbox"
             checked={styles.responsive}
@@ -1273,6 +1580,8 @@ const SectionSettings: React.FC<{
   onUpdate: (updates: Partial<EmailSection>) => void;
   onDelete: () => void;
 }> = ({ section, onUpdate, onDelete }) => {
+  const [activeTab, setActiveTab] = React.useState<'layout' | 'background' | 'spacing' | 'border' | 'responsive' | 'advanced'>('layout');
+
   // Защита от undefined после удаления
   if (!section || !section.styles) {
     return (
@@ -1290,24 +1599,21 @@ const SectionSettings: React.FC<{
     const oldWidth = updatedColumns[columnIndex].width;
     const widthDiff = newWidth - oldWidth;
     
-    // Обновляем ширину выбранной колонки
     updatedColumns[columnIndex] = {
       ...updatedColumns[columnIndex],
       width: Math.round(newWidth)
     };
 
-    // Если колонок больше одной, распределяем разницу между остальными
     if (updatedColumns.length > 1) {
       const otherColumns = updatedColumns.filter((_, idx) => idx !== columnIndex);
       const totalOtherWidth = otherColumns.reduce((sum, col) => sum + col.width, 0);
       
-      // Пересчитываем ширину остальных колонок пропорционально
       updatedColumns.forEach((col, idx) => {
         if (idx !== columnIndex && totalOtherWidth > 0) {
           const proportion = col.width / totalOtherWidth;
           updatedColumns[idx] = {
             ...col,
-            width: Math.max(50, Math.round(col.width - (widthDiff * proportion))) // Минимум 50px
+            width: Math.max(50, Math.round(col.width - (widthDiff * proportion)))
           };
         }
       });
@@ -1316,14 +1622,13 @@ const SectionSettings: React.FC<{
     onUpdate({ columns: updatedColumns });
   };
 
-  // Функция для изменения отступа между колонками с пересчётом ширины колонок
+  // Функция для изменения отступа между колонками
   const handleColumnGapChange = (newGap: number) => {
     const oldGap = section.styles.columnGap || 10;
     const gapDiff = newGap - oldGap;
     const numColumns = section.columns.length;
     
     if (numColumns <= 1) {
-      // Для одной колонки просто обновляем gap
       onUpdate({ 
         styles: { 
           ...section.styles, 
@@ -1333,10 +1638,7 @@ const SectionSettings: React.FC<{
       return;
     }
 
-    // Вычисляем освобождённое/занятое пространство
     const totalGapDiff = gapDiff * (numColumns - 1);
-    
-    // Распределяем изменение между всеми колонками пропорционально
     const updatedColumns = section.columns.map((col) => {
       const totalCurrentWidth = section.columns.reduce((sum, c) => sum + c.width, 0);
       const proportion = col.width / totalCurrentWidth;
@@ -1344,7 +1646,7 @@ const SectionSettings: React.FC<{
       
       return {
         ...col,
-        width: Math.max(50, col.width - widthChange) // Минимум 50px на колонку
+        width: Math.max(50, col.width - widthChange)
       };
     });
 
@@ -1357,23 +1659,508 @@ const SectionSettings: React.FC<{
     });
   };
 
+  // Функция для быстрого выравнивания колонок
+  const distributeColumnsEvenly = () => {
+    const totalWidth = section.columns.reduce((sum, col) => sum + col.width, 0);
+    const columnGap = section.styles.columnGap || 10;
+    const numColumns = section.columns.length;
+    const totalGaps = (numColumns - 1) * columnGap;
+    const availableWidth = totalWidth + totalGaps;
+    const evenWidth = Math.floor((availableWidth - totalGaps) / numColumns);
+
+    const updatedColumns = section.columns.map(col => ({
+      ...col,
+      width: evenWidth
+    }));
+
+    onUpdate({ columns: updatedColumns });
+  };
+
+  // Функция для обновления padding
+  const handlePaddingChange = (side: 'top' | 'right' | 'bottom' | 'left', value: number) => {
+    const styles = { ...section.styles };
+    
+    if (styles.paddingLocked) {
+      // Обновляем все стороны
+      styles.paddingTop = value;
+      styles.paddingRight = value;
+      styles.paddingBottom = value;
+      styles.paddingLeft = value;
+      styles.padding = `${value}px`;
+    } else {
+      // Обновляем только одну сторону
+      styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof styles] = value as any;
+      styles.padding = `${styles.paddingTop || 0}px ${styles.paddingRight || 0}px ${styles.paddingBottom || 0}px ${styles.paddingLeft || 0}px`;
+    }
+    
+    onUpdate({ styles });
+  };
+
+  // Добавление градиента
+  const addGradientColor = () => {
+    const gradient = section.styles.gradient || {
+      type: 'linear',
+      angle: 90,
+      colors: []
+    };
+
+    const newColor = {
+      color: '#0066ff',
+      position: gradient.colors.length === 0 ? 0 : 100
+    };
+
+    onUpdate({
+      styles: {
+        ...section.styles,
+        backgroundType: 'gradient',
+        gradient: {
+          ...gradient,
+          colors: [...gradient.colors, newColor]
+        }
+      }
+    });
+  };
+
   return (
     <div className="settings-form">
-      <h4>Настройки секции</h4>
+      <h4>⚙️ Настройки секции</h4>
       
-      {/* Ширина колонок */}
-      {section.columns.length > 1 && (
-        <div className="form-group">
-          <label>Ширина колонок (px)</label>
-          {section.columns.map((column, index) => (
-            <div key={column.id} style={{ marginBottom: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <label style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
-                  Колонка {index + 1}
+      {/* Табы */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '4px', 
+        marginBottom: '16px', 
+        borderBottom: '1px solid #e5e7eb',
+        flexWrap: 'wrap'
+      }}>
+        {[
+          { id: 'layout', label: '📐', title: 'Макет' },
+          { id: 'background', label: '🎨', title: 'Фон' },
+          { id: 'spacing', label: '📏', title: 'Отступы' },
+          { id: 'border', label: '🔲', title: 'Рамка' },
+          { id: 'responsive', label: '📱', title: 'Адаптация' },
+          { id: 'advanced', label: '⚡', title: 'Дополнительно' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            style={{
+              padding: '8px 12px',
+              border: 'none',
+              background: activeTab === tab.id ? '#0066ff' : 'transparent',
+              color: activeTab === tab.id ? 'white' : '#6b7280',
+              cursor: 'pointer',
+              borderRadius: '4px 4px 0 0',
+              fontSize: '12px',
+              fontWeight: activeTab === tab.id ? 'bold' : 'normal'
+            }}
+            title={tab.title}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* LAYOUT TAB */}
+      {activeTab === 'layout' && (
+        <>
+          {/* Ширина колонок */}
+          {section.columns.length > 1 && (
+            <>
+              <div className="form-group">
+                <label>Ширина колонок (px)</label>
+                <button
+                  onClick={distributeColumnsEvenly}
+                  className="distribute-columns-btn"
+                >
+                  ⚖️ Выровнять равномерно
+                </button>
+                {section.columns.map((column, index) => (
+                  <div key={column.id} style={{ marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
+                        Колонка {index + 1}
+                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          onClick={() => handleColumnWidthChange(index, column.width - 10)}
+                          style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                          className="btn-secondary"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          value={column.width}
+                          onChange={(e) => handleColumnWidthChange(index, parseInt(e.target.value) || column.width)}
+                          style={{ width: '60px', textAlign: 'center', padding: '4px' }}
+                          min="50"
+                          max="500"
+                        />
+                        <button
+                          onClick={() => handleColumnWidthChange(index, column.width + 10)}
+                          style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                          className="btn-secondary"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Отступ между колонками */}
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ margin: 0 }}>Отступ между колонками</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      onClick={() => handleColumnGapChange((section.styles.columnGap || 10) - 5)}
+                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                      className="btn-secondary"
+                      disabled={(section.styles.columnGap || 10) <= 0}
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      value={section.styles.columnGap || 10}
+                      onChange={(e) => handleColumnGapChange(parseInt(e.target.value) || 10)}
+                      style={{ width: '60px', textAlign: 'center', padding: '4px' }}
+                      min="0"
+                      max="50"
+                    />
+                    <button
+                      onClick={() => handleColumnGapChange((section.styles.columnGap || 10) + 5)}
+                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                      className="btn-secondary"
+                      disabled={(section.styles.columnGap || 10) >= 50}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Вертикальное выравнивание */}
+          <div className="form-group">
+            <label>Вертикальное выравнивание</label>
+            <select
+              value={section.styles.verticalAlign || 'top'}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, verticalAlign: e.target.value as any } })}
+            >
+              <option value="top">Сверху</option>
+              <option value="middle">По центру</option>
+              <option value="bottom">Снизу</option>
+            </select>
+          </div>
+
+          {/* Высота */}
+          <div className="form-group">
+            <label>Минимальная высота</label>
+            <input
+              type="text"
+              value={section.styles.minHeight || 'auto'}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, minHeight: e.target.value } })}
+              placeholder="auto, 300px"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Высота</label>
+            <input
+              type="text"
+              value={section.styles.height || 'auto'}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, height: e.target.value } })}
+              placeholder="auto, 400px"
+            />
+          </div>
+        </>
+      )}
+
+      {/* BACKGROUND TAB */}
+      {activeTab === 'background' && (
+        <>
+          <div className="form-group">
+            <label>Тип фона</label>
+            <select
+              value={section.styles.backgroundType || 'solid'}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundType: e.target.value as any } })}
+            >
+              <option value="solid">Сплошной цвет</option>
+              <option value="gradient">Градиент</option>
+              <option value="image">Изображение</option>
+            </select>
+          </div>
+
+          {section.styles.backgroundType === 'solid' && (
+            <div className="form-group">
+              <label>Цвет фона</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  type="color"
+                  value={section.styles.backgroundColor || '#ffffff'}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundColor: e.target.value } })}
+                  style={{ width: '50px', height: '40px' }}
+                />
+                <input
+                  type="text"
+                  value={section.styles.backgroundColor || '#ffffff'}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundColor: e.target.value } })}
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+          )}
+
+          {section.styles.backgroundType === 'gradient' && (
+            <>
+              <div className="form-group">
+                <label>Тип градиента</label>
+                <select
+                  value={section.styles.gradient?.type || 'linear'}
+                  onChange={(e) => onUpdate({ 
+                    styles: { 
+                      ...section.styles, 
+                      gradient: { 
+                        ...(section.styles.gradient || { colors: [], angle: 90 }), 
+                        type: e.target.value as any 
+                      } 
+                    } 
+                  })}
+                >
+                  <option value="linear">Линейный</option>
+                  <option value="radial">Радиальный</option>
+                </select>
+              </div>
+
+              {section.styles.gradient?.type === 'linear' && (
+                <div className="form-group">
+                  <label>Угол (градусы)</label>
+                  <input
+                    type="number"
+                    value={section.styles.gradient?.angle || 90}
+                    onChange={(e) => onUpdate({ 
+                      styles: { 
+                        ...section.styles, 
+                        gradient: { 
+                          ...(section.styles.gradient || { colors: [], type: 'linear' }), 
+                          angle: parseInt(e.target.value) || 90 
+                        } 
+                      } 
+                    })}
+                    min="0"
+                    max="360"
+                  />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>Цвета градиента</label>
+                {section.styles.gradient?.colors?.map((colorStop, index) => (
+                  <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                    <input
+                      type="color"
+                      value={colorStop.color}
+                      onChange={(e) => {
+                        const newColors = [...(section.styles.gradient?.colors || [])];
+                        newColors[index] = { ...newColors[index], color: e.target.value };
+                        onUpdate({ 
+                          styles: { 
+                            ...section.styles, 
+                            gradient: { 
+                              ...(section.styles.gradient || { type: 'linear', angle: 90 }), 
+                              colors: newColors 
+                            } 
+                          } 
+                        });
+                      }}
+                      style={{ width: '40px', height: '30px' }}
+                    />
+                    <input
+                      type="number"
+                      value={colorStop.position}
+                      onChange={(e) => {
+                        const newColors = [...(section.styles.gradient?.colors || [])];
+                        newColors[index] = { ...newColors[index], position: parseInt(e.target.value) || 0 };
+                        onUpdate({ 
+                          styles: { 
+                            ...section.styles, 
+                            gradient: { 
+                              ...(section.styles.gradient || { type: 'linear', angle: 90 }), 
+                              colors: newColors 
+                            } 
+                          } 
+                        });
+                      }}
+                      placeholder="%"
+                      min="0"
+                      max="100"
+                      style={{ width: '60px' }}
+                    />
+                    <button
+                      onClick={() => {
+                        const newColors = (section.styles.gradient?.colors || []).filter((_, i) => i !== index);
+                        onUpdate({ 
+                          styles: { 
+                            ...section.styles, 
+                            gradient: { 
+                              ...(section.styles.gradient || { type: 'linear', angle: 90 }), 
+                              colors: newColors 
+                            } 
+                          } 
+                        });
+                      }}
+                      style={{ padding: '4px 8px', fontSize: '12px' }}
+                      className="btn-danger"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button 
+                  onClick={addGradientColor}
+                  style={{ width: '100%', padding: '6px', fontSize: '12px' }}
+                  className="btn-secondary"
+                >
+                  ➕ Добавить цвет
+                </button>
+              </div>
+            </>
+          )}
+
+          {section.styles.backgroundType === 'image' && (
+            <>
+              <div className="form-group">
+                <label>URL изображения</label>
+                <input
+                  type="text"
+                  value={section.styles.backgroundImage || ''}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundImage: e.target.value } })}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Размер</label>
+                <select
+                  value={section.styles.backgroundSize || 'cover'}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundSize: e.target.value as any } })}
+                >
+                  <option value="cover">Покрыть</option>
+                  <option value="contain">Вместить</option>
+                  <option value="auto">Авто</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Позиция</label>
+                <select
+                  value={section.styles.backgroundPosition || 'center'}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundPosition: e.target.value as any } })}
+                >
+                  <option value="center">По центру</option>
+                  <option value="top">Сверху</option>
+                  <option value="bottom">Снизу</option>
+                  <option value="left">Слева</option>
+                  <option value="right">Справа</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Повтор</label>
+                <select
+                  value={section.styles.backgroundRepeat || 'no-repeat'}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, backgroundRepeat: e.target.value as any } })}
+                >
+                  <option value="no-repeat">Без повтора</option>
+                  <option value="repeat">Повторять</option>
+                  <option value="repeat-x">По горизонтали</option>
+                  <option value="repeat-y">По вертикали</option>
+                </select>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* SPACING TAB */}
+      {activeTab === 'spacing' && (
+        <>
+          <div className="form-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ margin: 0 }}>Внутренние отступы (Padding)</label>
+              <button
+                onClick={() => onUpdate({ 
+                  styles: { 
+                    ...section.styles, 
+                    paddingLocked: !section.styles.paddingLocked 
+                  } 
+                })}
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  background: section.styles.paddingLocked ? '#0066ff' : '#f3f4f6',
+                  color: section.styles.paddingLocked ? 'white' : '#6b7280',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+                title={section.styles.paddingLocked ? 'Отвязать отступы' : 'Связать отступы'}
+              >
+                {section.styles.paddingLocked ? '🔒' : '🔓'}
+              </button>
+            </div>
+            
+            {['top', 'right', 'bottom', 'left'].map(side => (
+              <div key={side} style={{ marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
+                    {side === 'top' ? 'Сверху' : side === 'right' ? 'Справа' : side === 'bottom' ? 'Снизу' : 'Слева'}
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      onClick={() => handlePaddingChange(side as any, (section.styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof section.styles] as number || 0) - 5)}
+                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                      className="btn-secondary"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      value={section.styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof section.styles] as number || 0}
+                      onChange={(e) => handlePaddingChange(side as any, parseInt(e.target.value) || 0)}
+                      style={{ width: '60px', textAlign: 'center', padding: '4px' }}
+                      min="0"
+                      disabled={section.styles.paddingLocked && side !== 'top'}
+                    />
+                    <button
+                      onClick={() => handlePaddingChange(side as any, (section.styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof section.styles] as number || 0) + 5)}
+                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                      className="btn-secondary"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="form-group">
+            <label>Внешние отступы (Margin)</label>
+            
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
+                  Сверху
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button
-                    onClick={() => handleColumnWidthChange(index, column.width - 10)}
+                    onClick={() => onUpdate({ styles: { ...section.styles, marginTop: (section.styles.marginTop || 0) - 5 } })}
                     style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
                     className="btn-secondary"
                   >
@@ -1381,14 +2168,13 @@ const SectionSettings: React.FC<{
                   </button>
                   <input
                     type="number"
-                    value={column.width}
-                    onChange={(e) => handleColumnWidthChange(index, parseInt(e.target.value) || column.width)}
+                    value={section.styles.marginTop || 0}
+                    onChange={(e) => onUpdate({ styles: { ...section.styles, marginTop: parseInt(e.target.value) || 0 } })}
                     style={{ width: '60px', textAlign: 'center', padding: '4px' }}
-                    min="50"
-                    max="500"
+                    min="0"
                   />
                   <button
-                    onClick={() => handleColumnWidthChange(index, column.width + 10)}
+                    onClick={() => onUpdate({ styles: { ...section.styles, marginTop: (section.styles.marginTop || 0) + 5 } })}
                     style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
                     className="btn-secondary"
                   >
@@ -1397,71 +2183,230 @@ const SectionSettings: React.FC<{
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Отступ между колонками */}
-      {section.columns.length > 1 && (
-        <div className="form-group">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <label style={{ margin: 0 }}>Отступ между колонками</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                onClick={() => handleColumnGapChange((section.styles.columnGap || 10) - 5)}
-                style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                className="btn-secondary"
-                disabled={(section.styles.columnGap || 10) <= 0}
-              >
-                −
-              </button>
-              <input
-                type="number"
-                value={section.styles.columnGap || 10}
-                onChange={(e) => handleColumnGapChange(parseInt(e.target.value) || 10)}
-                style={{ width: '60px', textAlign: 'center', padding: '4px' }}
-                min="0"
-                max="50"
-              />
-              <button
-                onClick={() => handleColumnGapChange((section.styles.columnGap || 10) + 5)}
-                style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                className="btn-secondary"
-                disabled={(section.styles.columnGap || 10) >= 50}
-              >
-                +
-              </button>
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
+                  Снизу
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    onClick={() => onUpdate({ styles: { ...section.styles, marginBottom: (section.styles.marginBottom || 0) - 5 } })}
+                    style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                    className="btn-secondary"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    value={section.styles.marginBottom || 0}
+                    onChange={(e) => onUpdate({ styles: { ...section.styles, marginBottom: parseInt(e.target.value) || 0 } })}
+                    style={{ width: '60px', textAlign: 'center', padding: '4px' }}
+                    min="0"
+                  />
+                  <button
+                    onClick={() => onUpdate({ styles: { ...section.styles, marginBottom: (section.styles.marginBottom || 0) + 5 } })}
+                    style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
+                    className="btn-secondary"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      <div className="form-group">
-        <label>Цвет фона</label>
-        <input
-          type="color"
-          value={section.styles.backgroundColor}
-          onChange={(e) =>
-            onUpdate({ styles: { ...section.styles, backgroundColor: e.target.value } })
-          }
-        />
-      </div>
+      {/* BORDER TAB */}
+      {activeTab === 'border' && (
+        <>
+          <div className="form-group">
+            <label>Стиль рамки</label>
+            <select
+              value={section.styles.borderStyle || 'none'}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, borderStyle: e.target.value as any } })}
+            >
+              <option value="none">Нет</option>
+              <option value="solid">Сплошная</option>
+              <option value="dashed">Пунктирная</option>
+              <option value="dotted">Точечная</option>
+            </select>
+          </div>
 
-      <div className="form-group">
-        <label>Отступы (padding)</label>
-        <input
-          type="text"
-          value={section.styles.padding}
-          onChange={(e) =>
-            onUpdate({ styles: { ...section.styles, padding: e.target.value } })
-          }
-          placeholder="20px 10px"
-        />
-      </div>
+          {section.styles.borderStyle !== 'none' && (
+            <>
+              <div className="form-group">
+                <label>Толщина рамки (px)</label>
+                <input
+                  type="number"
+                  value={section.styles.borderWidth || 0}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, borderWidth: parseInt(e.target.value) || 0 } })}
+                  min="0"
+                  max="20"
+                />
+              </div>
 
-      <button className="btn-danger" onClick={onDelete}>
-        🗑️ Удалить секцию
-      </button>
+              <div className="form-group">
+                <label>Цвет рамки</label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="color"
+                    value={section.styles.borderColor || '#e5e7eb'}
+                    onChange={(e) => onUpdate({ styles: { ...section.styles, borderColor: e.target.value } })}
+                    style={{ width: '50px', height: '40px' }}
+                  />
+                  <input
+                    type="text"
+                    value={section.styles.borderColor || '#e5e7eb'}
+                    onChange={(e) => onUpdate({ styles: { ...section.styles, borderColor: e.target.value } })}
+                    style={{ flex: 1 }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="form-group">
+            <label>Скругление углов (px)</label>
+            <input
+              type="number"
+              value={section.styles.borderRadius || 0}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, borderRadius: parseInt(e.target.value) || 0 } })}
+              min="0"
+              max="50"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Тень (box-shadow)</label>
+            <select
+              value={section.styles.boxShadow || 'none'}
+              onChange={(e) => onUpdate({ styles: { ...section.styles, boxShadow: e.target.value } })}
+            >
+              <option value="none">Нет</option>
+              <option value="0 1px 3px rgba(0,0,0,0.1)">Легкая</option>
+              <option value="0 4px 6px rgba(0,0,0,0.1)">Средняя</option>
+              <option value="0 10px 15px rgba(0,0,0,0.1)">Сильная</option>
+              <option value="0 20px 25px rgba(0,0,0,0.15)">Очень сильная</option>
+            </select>
+          </div>
+        </>
+      )}
+
+      {/* RESPONSIVE TAB */}
+      {activeTab === 'responsive' && (
+        <>
+          <div className="form-group">
+            <label>Видимость на устройствах</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label className="toggle-switch-label">
+                <input
+                  type="checkbox"
+                  checked={section.styles.visibility?.desktop !== false}
+                  onChange={(e) => onUpdate({ 
+                    styles: { 
+                      ...section.styles, 
+                      visibility: { 
+                        ...(section.styles.visibility || {}), 
+                        desktop: e.target.checked 
+                      } 
+                    } 
+                  })}
+                />
+                <span>🖥️ Desktop</span>
+              </label>
+              <label className="toggle-switch-label">
+                <input
+                  type="checkbox"
+                  checked={section.styles.visibility?.tablet !== false}
+                  onChange={(e) => onUpdate({ 
+                    styles: { 
+                      ...section.styles, 
+                      visibility: { 
+                        ...(section.styles.visibility || {}), 
+                        tablet: e.target.checked 
+                      } 
+                    } 
+                  })}
+                />
+                <span>📱 Tablet</span>
+              </label>
+              <label className="toggle-switch-label">
+                <input
+                  type="checkbox"
+                  checked={section.styles.visibility?.mobile !== false}
+                  onChange={(e) => onUpdate({ 
+                    styles: { 
+                      ...section.styles, 
+                      visibility: { 
+                        ...(section.styles.visibility || {}), 
+                        mobile: e.target.checked 
+                      } 
+                    } 
+                  })}
+                />
+                <span>📱 Mobile</span>
+              </label>
+            </div>
+          </div>
+
+          {section.columns.length > 1 && (
+            <>
+              <div className="form-group">
+                <label>Поведение на мобильных</label>
+                <select
+                  value={section.styles.mobileStack || 'vertical'}
+                  onChange={(e) => onUpdate({ styles: { ...section.styles, mobileStack: e.target.value as any } })}
+                >
+                  <option value="none">Не складывать</option>
+                  <option value="vertical">Складывать вертикально</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="toggle-switch-label">
+                  <input
+                    type="checkbox"
+                    checked={section.styles.mobileReverse || false}
+                    onChange={(e) => onUpdate({ styles: { ...section.styles, mobileReverse: e.target.checked } })}
+                  />
+                  <span>Изменить порядок на мобильных</span>
+                </label>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* ADVANCED TAB */}
+      {activeTab === 'advanced' && (
+        <>
+          <div className="form-group">
+            <label>CSS класс</label>
+            <input
+              type="text"
+              placeholder="custom-section-class"
+              style={{ fontSize: '12px' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Пользовательский CSS</label>
+            <textarea
+              placeholder="/* Дополнительные стили */"
+              rows={5}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+            />
+          </div>
+        </>
+      )}
+
+      <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
+        <button className="btn-danger" onClick={onDelete} style={{ width: '100%' }}>
+          🗑️ Удалить секцию
+        </button>
+      </div>
     </div>
   );
 };
