@@ -1,0 +1,119 @@
+/* Coming Soon Shared Styles */
+.blocks-library-container,
+.campaigns-container,
+.audiences-container,
+.automations-container {
+  padding: 40px 24px;
+}
+
+.coming-soon {
+  max-width: 600px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 40px;
+  background: #1C1D1F;
+  border: 2px dashed #333335;
+  border-radius: 16px;
+}
+
+.coming-soon-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  opacity: 0.6;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.coming-soon h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 16px 0;
+}
+
+.coming-soon p {
+  font-size: 16px;
+  color: #BCBBBD;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.features-preview {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #28282A;
+  border-radius: 12px;
+  min-width: 140px;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: #333335;
+  transform: translateY(-2px);
+}
+
+.feature-icon {
+  font-size: 32px;
+}
+
+.feature-item span:last-child {
+  font-size: 13px;
+  color: #BCBBBD;
+  font-weight: 500;
+}
+
+.badge-coming-soon {
+  display: inline-block;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(94, 53, 242, 0.2) 0%, rgba(242, 41, 135, 0.2) 100%);
+  border: 1px solid #5E35F2;
+  border-radius: 20px;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .coming-soon {
+    margin: 20px auto;
+    padding: 24px;
+  }
+
+  .coming-soon-icon {
+    font-size: 60px;
+  }
+
+  .coming-soon h2 {
+    font-size: 22px;
+  }
+
+  .coming-soon p {
+    font-size: 14px;
+  }
+
+  .features-preview {
+    gap: 12px;
+  }
+
+  .feature-item {
+    min-width: 100px;
+    padding: 12px;
+  }
+}

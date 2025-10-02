@@ -25,6 +25,19 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
+    // System email fields
+    type: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: 'custom',
+      comment: 'custom, system_welcome, system_password_reset, system_verification, system_balance_refill'
+    },
+    isSystem: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      comment: 'Is this a system email that cannot be deleted'
+    },
     htmlContent: {
       type: DataTypes.TEXT,
       allowNull: true

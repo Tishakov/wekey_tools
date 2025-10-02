@@ -67,17 +67,14 @@ export const useNewsletters = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters/${id}`, {
-        credentials: 'include',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (err) {
+      console.log('🔵 API Call: Getting newsletter', id);
+      
+      const newsletter = await api.get(`/newsletters/${id}`);
+      
+      console.log('✅ Newsletter fetched successfully:', newsletter);
+      
+      return newsletter;
+    } catch (err: any) {
       console.error('Error fetching newsletter:', err);
       setError(err.message);
       throw err;
@@ -87,31 +84,24 @@ export const useNewsletters = () => {
   };
 
   // Обновить рассылку
-  const updateNewsletter = async (id, updates) => {
+  const updateNewsletter = async (id: any, updates: any) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(updates)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка обновления рассылки');
-      }
-
-      const updatedNewsletter = await response.json();
-      setNewsletters(prev => 
-        prev.map(newsletter => 
+      console.log('🔵 API Call: Updating newsletter', id, updates);
+      
+      const updatedNewsletter = await api.put(`/newsletters/${id}`, updates);
+      
+      console.log('✅ Newsletter updated successfully:', updatedNewsletter);
+      
+      setNewsletters((prev: any) => 
+        prev.map((newsletter: any) => 
           newsletter.id === id ? updatedNewsletter : newsletter
         )
       );
       return updatedNewsletter;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating newsletter:', err);
       setError(err.message);
       throw err;
@@ -121,25 +111,16 @@ export const useNewsletters = () => {
   };
 
   // Удалить рассылку
-  const deleteNewsletter = async (id) => {
+  const deleteNewsletter = async (id: any) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка удаления рассылки');
-      }
-
-      setNewsletters(prev => prev.filter(newsletter => newsletter.id !== id));
+      await api.delete(`/newsletters/${id}`);
+      
+      setNewsletters((prev: any) => prev.filter((newsletter: any) => newsletter.id !== id));
       return true;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting newsletter:', err);
       setError(err.message);
       throw err;
@@ -149,24 +130,14 @@ export const useNewsletters = () => {
   };
 
   // Предварительный просмотр аудитории
-  const previewAudience = async (targetAudience, segmentCriteria) => {
+  const previewAudience = async (targetAudience: any, segmentCriteria: any) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters/audience/preview`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ targetAudience, segmentCriteria })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (err) {
+      const result = await api.post('/newsletters/audience/preview', { targetAudience, segmentCriteria });
+      return result;
+    } catch (err: any) {
       console.error('Error previewing audience:', err);
       setError(err.message);
       throw err;
@@ -176,27 +147,16 @@ export const useNewsletters = () => {
   };
 
   // Отправить рассылку
-  const sendNewsletter = async (id) => {
+  const sendNewsletter = async (id: any) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters/${id}/send`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка отправки рассылки');
-      }
-
-      const result = await response.json();
+      const result = await api.post(`/newsletters/${id}/send`, {});
       
       // Обновляем рассылку в списке
-      setNewsletters(prev => 
-        prev.map(newsletter => 
+      setNewsletters((prev: any) => 
+        prev.map((newsletter: any) => 
           newsletter.id === id 
             ? { ...newsletter, status: 'sent', sentAt: new Date().toISOString() }
             : newsletter
@@ -204,7 +164,7 @@ export const useNewsletters = () => {
       );
 
       return result;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error sending newsletter:', err);
       setError(err.message);
       throw err;
@@ -214,19 +174,11 @@ export const useNewsletters = () => {
   };
 
   // Получить статистику рассылки
-  const getNewsletterStats = async (id) => {
+  const getNewsletterStats = async (id: any) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/newsletters/${id}/stats`, {
-        credentials: 'include',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (err) {
+      const stats = await api.get(`/newsletters/${id}/stats`);
+      return stats;
+    } catch (err: any) {
       console.error('Error fetching newsletter stats:', err);
       throw err;
     }

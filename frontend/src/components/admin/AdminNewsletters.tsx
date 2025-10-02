@@ -120,10 +120,17 @@ const AdminNewsletters: React.FC = () => {
         ) : (
           <div className="newsletters-list">
             {filteredNewsletters.map((newsletter: any) => (
-              <div key={newsletter.id} className="newsletter-card">
+              <div key={newsletter.id} className={`newsletter-card ${newsletter.isSystem ? 'system-email' : ''}`}>
                 <div className="newsletter-header">
                   <div className="newsletter-title">
-                    <h3>{newsletter.title}</h3>
+                    <h3>
+                      {newsletter.title}
+                      {newsletter.isSystem && (
+                        <span className="system-badge" title="Системное письмо">
+                          ⚙️ Системное
+                        </span>
+                      )}
+                    </h3>
                     <p className="newsletter-subject">{newsletter.subject}</p>
                   </div>
                   <div className="newsletter-status">
@@ -170,12 +177,16 @@ const AdminNewsletters: React.FC = () => {
                     >
                       ✏️
                     </button>
-                    <button className="action-btn duplicate-btn" title="Дублировать">
-                      📋
-                    </button>
-                    <button className="action-btn delete-btn" title="Удалить">
-                      🗑️
-                    </button>
+                    {!newsletter.isSystem && (
+                      <>
+                        <button className="action-btn duplicate-btn" title="Дублировать">
+                          📋
+                        </button>
+                        <button className="action-btn delete-btn" title="Удалить">
+                          🗑️
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

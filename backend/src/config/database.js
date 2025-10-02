@@ -44,6 +44,7 @@ const Newsletter = require('../models/Newsletter')(sequelize);
 const News = require('../models/News')(sequelize);
 const NewsReadStatus = require('../models/NewsReadStatus')(sequelize);
 const NewsletterRecipient = require('../models/NewsletterRecipient')(sequelize);
+const EmailVariable = require('../models/EmailVariable')(sequelize);
 
 // Определение ассоциаций между моделями
 const db = {
@@ -58,7 +59,8 @@ const db = {
   Newsletter,
   News,
   NewsReadStatus,
-  NewsletterRecipient
+  NewsletterRecipient,
+  EmailVariable
 };
 
 // Связи между таблицами

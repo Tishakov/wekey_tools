@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testAuth()">Test Auth</button>
+    <button onclick="testNewsletter()">Test Newsletter</button>
+    <pre id="output"></pre>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(msg) {
+            output.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        async function testAuth() {
+            output.textContent = '';
+            log('🔍 Testing authentication...');
+            
+            const token = localStorage.getItem('adminToken');
+            log('Token: ' + (token ? token.substring(0, 20) + '...' : 'NOT FOUND'));
+            
+            if (!token) {
+                log('❌ No token found in localStorage');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8880/api/admin/profile', {
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log(`Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Auth OK: ' + JSON.stringify(data, null, 2));
+                } else {
+                    const error = await response.text();
+                    log('❌ Auth failed: ' + error);
+                }
+            } catch (error) {
+                log('❌ Network error: ' + error.message);
+            }
+        }
+
+        async function testNewsletter() {
+            output.textContent = '';
+            log('🔍 Testing newsletter fetch...');
+            
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                log('❌ No token found');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8880/api/newsletters?page=1&limit=10', {
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log(`Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Newsletters OK: ' + JSON.stringify(data, null, 2));
+                } else {
+                    const error = await response.text();
+                    log('❌ Fetch failed: ' + error);
+                }
+            } catch (error) {
+                log('❌ Network error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,14 +1,45 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useNewsletters } from '../../hooks/useNewslettersAndNews';
-import SimpleEmailBuilder from './EmailBuilder/SimpleEmailBuilder';
-import type { EmailBlock } from './EmailBuilder/SimpleEmailBuilder';
+import { useEmailVariables } from '../../hooks/useEmailVariables';
+import SimpleEmailBuilder, { 
+  type EmailBlock,
+  type EmailSection 
+} from './EmailBuilder/SimpleEmailBuilder';
+import VariableInserter from './newsletters/VariableInserter';
+import IsolatedPreview from './newsletters/IsolatedPreview';
 import './CreateNewsletter.css';
 
 const CreateNewsletter: React.FC = () => {
+  console.log('🟢 CreateNewsletter component mounting...');
+  
   const navigate = useNavigate();
   const { id } = useParams();
-  const { createNewsletter, getNewsletter, updateNewsletter } = useNewsletters();
+  
+  console.log('📌 Route params:', { id });
+  
+  let hookData;
+  try {
+    hookData = useNewsletters();
+    console.log('✅ useNewsletters hook initialized');
+  } catch (error) {
+    console.error('❌ useNewsletters hook failed:', error);
+    throw error;
+  }
+  
+  const { createNewsletter, getNewsletter, updateNewsletter } = hookData;
+  
+  let emailVariables;
+  try {
+    emailVariables = useEmailVariables();
+    console.log('✅ useEmailVariables hook initialized');
+  } catch (error) {
+    console.error('❌ useEmailVariables hook failed:', error);
+    throw error;
+  }
+  
+  const { replaceWithExamples, getUsedVariables } = emailVariables;
+  
   const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
   
   const [formData, setFormData] = useState({
@@ -22,21 +53,28 @@ const CreateNewsletter: React.FC = () => {
   });
   
   const [emailBlocks, setEmailBlocks] = useState<EmailBlock[]>([]);
+  const [emailSections, setEmailSections] = useState<EmailSection[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [useAdvancedBuilder, setUseAdvancedBuilder] = useState(true);
+  const [editorMode, setEditorMode] = useState<'simple' | 'blocks' | 'sections'>('blocks');
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Load newsletter data for editing
   useEffect(() => {
+    console.log('📍 useEffect triggered. ID:', id);
+    
     if (id) {
+      console.log('📖 Starting to load newsletter...');
       setIsEditMode(true);
       setIsLoading(true);
       
       const loadNewsletter = async () => {
         try {
+          console.log('🔄 Calling getNewsletter API...');
           const newsletter = await getNewsletter(id);
+          console.log('✅ Newsletter loaded:', newsletter);
           
           // Populate form data
           setFormData({
@@ -55,20 +93,30 @@ const CreateNewsletter: React.FC = () => {
               const blocks = typeof newsletter.emailBlocks === 'string' 
                 ? JSON.parse(newsletter.emailBlocks) 
                 : newsletter.emailBlocks;
-              setEmailBlocks(blocks);
+              
+              // Проверяем это блоки или секции (временно)
+              if (Array.isArray(blocks) && blocks.length > 0 && blocks[0].type === 'section') {
+                console.log('✅ Loaded as sections:', blocks);
+                setEmailSections(blocks);
+                setEditorMode('sections');
+              } else {
+                console.log('✅ Loaded as blocks:', blocks);
+                setEmailBlocks(blocks);
+                setEditorMode('blocks');
+              }
             } catch (error) {
-              console.error('Error parsing email blocks:', error);
+              console.error('❌ Error parsing email blocks:', error);
               setEmailBlocks([]);
+              setEditorMode('blocks');
             }
-          }
-
-          // Set advanced builder mode if blocks exist
-          if (newsletter.emailBlocks && JSON.parse(newsletter.emailBlocks || '[]').length > 0) {
-            setUseAdvancedBuilder(true);
+          } else {
+            console.log('ℹ️ No saved content - default to blocks mode');
+            setEditorMode('blocks');
           }
           
         } catch (error) {
-          console.error('Error loading newsletter:', error);
+          console.error('❌ CRITICAL: Error loading newsletter:', error);
+          alert(`Ошибка загрузки: ${error instanceof Error ? error.message : String(error)}`);
           // If loading fails, redirect to newsletters list
           navigate('/admin/newsletters');
         } finally {
@@ -77,6 +125,8 @@ const CreateNewsletter: React.FC = () => {
       };
 
       loadNewsletter();
+    } else {
+      console.log('ℹ️ No ID - new newsletter mode');
     }
   }, [id, getNewsletter, navigate]);
 
@@ -291,6 +341,30 @@ const CreateNewsletter: React.FC = () => {
     }, 0);
   };
 
+  // Функция вставки переменных
+  const handleInsertVariable = (variableKey: string) => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const variableText = `{{${variableKey}}}`;
+    
+    const newContent = 
+      formData.content.substring(0, start) + 
+      variableText + 
+      formData.content.substring(end);
+    
+    setFormData({ ...formData, content: newContent });
+    
+    // Устанавливаем курсор после вставленной переменной
+    setTimeout(() => {
+      textarea.focus();
+      const newPosition = start + variableText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+    }, 0);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -298,10 +372,14 @@ const CreateNewsletter: React.FC = () => {
     try {
       const newsletterData = {
         ...formData,
-        emailBlocks: useAdvancedBuilder ? JSON.stringify(emailBlocks) : null,
+        // ВРЕМЕННО: Сохраняем секции в emailBlocks пока нет отдельного поля
+        emailBlocks: editorMode === 'sections' ? JSON.stringify(emailSections) : 
+                     editorMode === 'blocks' ? JSON.stringify(emailBlocks) : null,
         status: formData.sendImmediately ? 'sent' : 'scheduled',
         createdBy: 1
       };
+
+      console.log('💾 Saving newsletter:', newsletterData);
 
       if (isEditMode && id) {
         // Update existing newsletter
@@ -313,7 +391,8 @@ const CreateNewsletter: React.FC = () => {
       
       navigate('/admin/newsletters');
     } catch (error) {
-      console.error('Error saving newsletter:', error);
+      console.error('❌ Error saving newsletter:', error);
+      alert('Ошибка при сохранении: ' + (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -325,7 +404,9 @@ const CreateNewsletter: React.FC = () => {
     try {
       const newsletterData = {
         ...formData,
-        emailBlocks: useAdvancedBuilder ? JSON.stringify(emailBlocks) : null,
+        // ВРЕМЕННО: Сохраняем секции в emailBlocks пока нет отдельного поля
+        emailBlocks: editorMode === 'sections' ? JSON.stringify(emailSections) : 
+                     editorMode === 'blocks' ? JSON.stringify(emailBlocks) : null,
         status: 'draft',
         createdBy: 1
       };
@@ -346,7 +427,8 @@ const CreateNewsletter: React.FC = () => {
       
       navigate('/admin/newsletters');
     } catch (error) {
-      console.error('Error saving draft:', error);
+      console.error('❌ Error saving draft:', error);
+      alert('Ошибка при сохранении черновика: ' + (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -421,27 +503,43 @@ const CreateNewsletter: React.FC = () => {
                   <div className="mode-buttons">
                     <button
                       type="button"
-                      className={!useAdvancedBuilder ? 'active' : ''}
-                      onClick={() => setUseAdvancedBuilder(false)}
+                      className={editorMode === 'simple' ? 'active' : ''}
+                      onClick={() => setEditorMode('simple')}
                     >
                       📝 Простой редактор
                     </button>
                     <button
                       type="button"
-                      className={useAdvancedBuilder ? 'active' : ''}
-                      onClick={() => setUseAdvancedBuilder(true)}
+                      className={editorMode === 'blocks' ? 'active' : ''}
+                      onClick={() => setEditorMode('blocks')}
                     >
                       🧱 Блочный конструктор
+                    </button>
+                    <button
+                      type="button"
+                      className={editorMode === 'sections' ? 'active' : ''}
+                      onClick={() => setEditorMode('sections')}
+                    >
+                      📧 Секции с колонками
                     </button>
                   </div>
                 </div>
 
-                {!useAdvancedBuilder ? (
+                {editorMode === 'simple' ? (
                   <>
                     <label htmlFor="content">Текст рассылки *</label>
                     
                     {/* Панель инструментов форматирования */}
                     <div className="formatting-toolbar">
+                      {/* Вставка переменных */}
+                      <VariableInserter 
+                        onInsert={handleInsertVariable}
+                        buttonText="Переменная"
+                        buttonIcon="{{}}"
+                      />
+                      
+                      <div className="toolbar-separator"></div>
+                      
                       <div className="toolbar-group">
                         <button
                           type="button"
@@ -551,20 +649,59 @@ const CreateNewsletter: React.FC = () => {
                       rows={12}
                       required
                     />
+                    
+                    {/* Информация об используемых переменных */}
+                    {formData.content && getUsedVariables(formData.content).length > 0 && (
+                      <div className="used-variables-info">
+                        <div className="used-variables-header">
+                          <span className="info-icon">ℹ️</span>
+                          <strong>Используемые переменные:</strong>
+                        </div>
+                        <div className="used-variables-list">
+                          {getUsedVariables(formData.content).map((variable) => (
+                            <div key={variable.key} className="variable-tag">
+                              <span className="variable-key">{`{{${variable.key}}}`}</span>
+                              <span className="variable-desc">{variable.description}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="newsletter-form-hint">
                       💡 Поддерживается HTML разметка для форматирования текста
                     </div>
                   </>
-                ) : (
+                ) : editorMode === 'blocks' ? (
                   <div className="newsletter-advanced-builder">
                     <SimpleEmailBuilder
                       initialBlocks={emailBlocks}
+                      initialSections={emailSections}
                       onBlocksChange={setEmailBlocks}
+                      onSectionsChange={setEmailSections}
                       onContentChange={(html: string) => {
                         setFormData(prev => ({ ...prev, content: html }));
                       }}
                       selectedBlockId={selectedBlockId}
                       onBlockSelect={setSelectedBlockId}
+                      selectedSectionId={selectedSectionId}
+                      onSectionSelect={setSelectedSectionId}
+                    />
+                  </div>
+                ) : (
+                  <div className="newsletter-advanced-builder">
+                    <SimpleEmailBuilder
+                      initialBlocks={[]}
+                      initialSections={emailSections}
+                      onBlocksChange={setEmailBlocks}
+                      onSectionsChange={setEmailSections}
+                      onContentChange={(html: string) => {
+                        setFormData(prev => ({ ...prev, content: html }));
+                      }}
+                      selectedBlockId={selectedBlockId}
+                      onBlockSelect={setSelectedBlockId}
+                      selectedSectionId={selectedSectionId}
+                      onSectionSelect={setSelectedSectionId}
                     />
                   </div>
                 )}
@@ -668,6 +805,12 @@ const CreateNewsletter: React.FC = () => {
         <div className="newsletter-preview-container">
           <div className="newsletter-preview-header">
             <h3>👁️ Предварительный просмотр</h3>
+            {getUsedVariables(formData.content).length > 0 && (
+              <div className="preview-hint">
+                <span className="hint-icon">💡</span>
+                <span>Переменные заменены на примеры</span>
+              </div>
+            )}
           </div>
           
           {/* Индикатор прогресса заполнения */}
@@ -705,7 +848,7 @@ const CreateNewsletter: React.FC = () => {
                 </div>
               </div>
               
-              {useAdvancedBuilder ? (
+              {editorMode === 'blocks' ? (
                 <div 
                   className="newsletter-email-body interactive"
                   onClick={(e) => {
@@ -758,11 +901,95 @@ const CreateNewsletter: React.FC = () => {
                     ))
                   )}
                 </div>
+              ) : editorMode === 'sections' ? (
+                <div className="newsletter-email-body interactive">
+                  {emailSections.length === 0 ? (
+                    <div className="empty-state">
+                      <p>Добавьте секции для создания письма</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {emailSections.map((section) => (
+                        <div key={section.id} style={{ marginBottom: '10px' }}>
+                          {/* Render section preview */}
+                          <div style={{
+                            backgroundColor: section.settings.backgroundColor || '#ffffff',
+                            padding: `${section.settings.padding?.top || 20}px ${section.settings.padding?.right || 20}px ${section.settings.padding?.bottom || 20}px ${section.settings.padding?.left || 20}px`
+                          }}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              {section.columns.map((column) => (
+                                <div key={column.id} style={{ flex: `0 0 ${column.width}%`, padding: '0 10px' }}>
+                                  {column.blocks.map((block: any) => (
+                                    <div key={block.id} style={{ marginBottom: '15px' }}>
+                                      {block.type === 'text' && (
+                                        <div style={{ 
+                                          fontSize: `${block.content.fontSize || 16}px`,
+                                          color: block.content.color || '#333',
+                                          lineHeight: 1.5
+                                        }}>
+                                          {block.content.text || 'Текст'}
+                                        </div>
+                                      )}
+                                      {block.type === 'heading' && (
+                                        <div style={{ 
+                                          fontSize: `${block.content.fontSize || 24}px`,
+                                          fontWeight: 'bold',
+                                          color: block.content.color || '#333',
+                                          textAlign: block.content.align || 'left'
+                                        }}>
+                                          {block.content.text || 'Заголовок'}
+                                        </div>
+                                      )}
+                                      {block.type === 'image' && (
+                                        <img 
+                                          src={block.content.url || 'https://via.placeholder.com/300x200'} 
+                                          alt={block.content.alt || ''} 
+                                          style={{ maxWidth: '100%', height: 'auto' }} 
+                                        />
+                                      )}
+                                      {block.type === 'button' && (
+                                        <div style={{ textAlign: block.content.align || 'center' }}>
+                                          <a 
+                                            href={block.content.url || '#'} 
+                                            style={{ 
+                                              display: 'inline-block',
+                                              padding: block.content.padding || '12px 30px',
+                                              backgroundColor: block.content.backgroundColor || '#007bff',
+                                              color: block.content.color || '#fff',
+                                              textDecoration: 'none',
+                                              borderRadius: `${block.content.borderRadius || 4}px`
+                                            }}
+                                          >
+                                            {block.content.text || 'Button'}
+                                          </a>
+                                        </div>
+                                      )}
+                                      {block.type === 'divider' && (
+                                        <hr style={{ 
+                                          border: 'none', 
+                                          borderTop: `${block.content.height || 1}px ${block.content.style || 'solid'} ${block.content.color || '#ddd'}` 
+                                        }} />
+                                      )}
+                                      {block.type === 'spacer' && (
+                                        <div style={{ height: `${block.content.height || 20}px` }}></div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <div className="newsletter-email-body">
-                  <div dangerouslySetInnerHTML={{ 
-                    __html: formData.content || '<p>Содержание письма появится здесь...</p>' 
-                  }} />
+                <div className="newsletter-email-body newsletter-email-body-isolated">
+                  <IsolatedPreview 
+                    html={replaceWithExamples(formData.content)} 
+                    className="email-content-preview"
+                  />
                 </div>
               )}
             </div>

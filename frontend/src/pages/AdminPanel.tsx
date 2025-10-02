@@ -7,9 +7,11 @@ import AdminFinance from '../components/admin/AdminFinance';
 import AdminAdmins from '../components/admin/AdminAdmins';
 import AdminLogs from '../components/admin/AdminLogs';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
-import AdminNewsletters from '../components/admin/AdminNewsletters';
+import AdminNewsletters from '../components/admin/AdminNewslettersNew';
 import AdminNews from '../components/admin/AdminNews';
 import CreateNewsletter from '../components/admin/CreateNewsletter';
+import EmailBuilderPro from '../components/admin/EmailBuilder/EmailBuilderPro';
+import ErrorBoundary from '../components/ErrorBoundary';
 import AnalyticsChart from '../components/AnalyticsChart';
 import { AuthDebug } from '../components/common/AuthDebug';
 import { getSectionTitle, getActiveSectionFromUrl } from '../utils/adminSections';
@@ -903,10 +905,18 @@ const AdminPanel: React.FC = () => {
       case 'newsletters':
         // Проверяем подстраницу
         if (subPage === 'create') {
-          return <CreateNewsletter />;
+          return (
+            <ErrorBoundary>
+              <EmailBuilderPro />
+            </ErrorBoundary>
+          );
         }
         if (subPage && subPage.startsWith('edit')) {
-          return <CreateNewsletter />;
+          return (
+            <ErrorBoundary>
+              <EmailBuilderPro />
+            </ErrorBoundary>
+          );
         }
         return <AdminNewsletters />;
       case 'news':

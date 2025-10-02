@@ -18,22 +18,57 @@ export interface EmailBlock {
   };
 }
 
+export type SectionLayout = '1col' | '2col-50-50' | '2col-33-66' | '2col-66-33' | '3col' | '4col';
+
+export interface EmailSection {
+  id: string;
+  type: 'section';
+  layout: SectionLayout;
+  columns: EmailColumn[];
+  settings: {
+    backgroundColor?: string;
+    padding?: { top: number; right: number; bottom: number; left: number };
+    fullWidth?: boolean;
+  };
+}
+
+export interface EmailColumn {
+  id: string;
+  width: number; // percentage
+  blocks: EmailBlock[];
+  settings: {
+    backgroundColor?: string;
+    padding?: { top: number; right: number; bottom: number; left: number };
+  };
+}
+
 interface SimpleEmailBuilderProps {
   initialBlocks?: EmailBlock[];
+  initialSections?: EmailSection[];
   onBlocksChange: (blocks: EmailBlock[]) => void;
+  onSectionsChange?: (sections: EmailSection[]) => void;
   onContentChange: (html: string) => void;
   selectedBlockId?: string | null;
   onBlockSelect?: (blockId: string | null) => void;
+  selectedSectionId?: string | null;
+  onSectionSelect?: (sectionId: string | null) => void;
 }
 
 const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
   initialBlocks = [],
+  initialSections = [],
   onBlocksChange,
+  onSectionsChange,
   onContentChange,
   selectedBlockId = null,
-  onBlockSelect
+  onBlockSelect,
+  selectedSectionId: externalSelectedSectionId = null,
+  onSectionSelect
 }) => {
   const [blocks, setBlocks] = useState<EmailBlock[]>(initialBlocks);
+  const [sections, setSections] = useState<EmailSection[]>(initialSections);
+  const [sidebarTab, setSidebarTab] = useState<'blocks' | 'sections'>('sections');
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(externalSelectedSectionId);
 
   // Синхронизируем внутреннее состояние с внешними изменениями
   useEffect(() => {
@@ -41,6 +76,16 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
       setBlocks(initialBlocks);
     }
   }, [initialBlocks, blocks]);
+
+  useEffect(() => {
+    if (JSON.stringify(sections) !== JSON.stringify(initialSections)) {
+      setSections(initialSections);
+    }
+  }, [initialSections, sections]);
+
+  useEffect(() => {
+    setSelectedSectionId(externalSelectedSectionId);
+  }, [externalSelectedSectionId]);
 
   const addBlock = (type: EmailBlock['type']) => {
     const newBlock: EmailBlock = {
@@ -68,6 +113,117 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
     setBlocks(updatedBlocks);
     onBlocksChange(updatedBlocks);
     generateHTML(updatedBlocks);
+  };
+
+  // ============ SECTION FUNCTIONS ============
+  
+  const getColumnWidths = (layout: SectionLayout): number[] => {
+    switch (layout) {
+      case '1col': return [100];
+      case '2col-50-50': return [50, 50];
+      case '2col-33-66': return [33, 67];
+      case '2col-66-33': return [67, 33];
+      case '3col': return [33, 33, 34];
+      case '4col': return [25, 25, 25, 25];
+      default: return [100];
+    }
+  };
+
+  const createColumns = (layout: SectionLayout): EmailColumn[] => {
+    const widths = getColumnWidths(layout);
+    return widths.map((width, index) => ({
+      id: `column-${Date.now()}-${index}`,
+      width,
+      blocks: [],
+      settings: {
+        backgroundColor: 'transparent',
+        padding: { top: 10, right: 10, bottom: 10, left: 10 }
+      }
+    }));
+  };
+
+  const addSection = (layout: SectionLayout) => {
+    const newSection: EmailSection = {
+      id: `section-${Date.now()}`,
+      type: 'section',
+      layout,
+      columns: createColumns(layout),
+      settings: {
+        backgroundColor: '#ffffff',
+        padding: { top: 20, right: 20, bottom: 20, left: 20 },
+        fullWidth: false
+      }
+    };
+
+    const updatedSections = [...sections, newSection];
+    setSections(updatedSections);
+    setSelectedSectionId(newSection.id);
+    if (onSectionsChange) {
+      onSectionsChange(updatedSections);
+    }
+    if (onSectionSelect) {
+      onSectionSelect(newSection.id);
+    }
+    // TODO: Обновить генерацию HTML
+  };
+
+  const updateSection = (sectionId: string, updates: Partial<EmailSection>) => {
+    const updatedSections = sections.map(section =>
+      section.id === sectionId ? { ...section, ...updates } : section
+    );
+    setSections(updatedSections);
+    if (onSectionsChange) {
+      onSectionsChange(updatedSections);
+    }
+    // TODO: Обновить генерацию HTML
+  };
+
+  const deleteSection = (sectionId: string) => {
+    const updatedSections = sections.filter(s => s.id !== sectionId);
+    setSections(updatedSections);
+    if (selectedSectionId === sectionId) {
+      setSelectedSectionId(null);
+      if (onSectionSelect) {
+        onSectionSelect(null);
+      }
+    }
+    if (onSectionsChange) {
+      onSectionsChange(updatedSections);
+    }
+    // TODO: Обновить генерацию HTML
+  };
+
+  const addBlockToColumn = (sectionId: string, columnId: string, type: EmailBlock['type']) => {
+    const newBlock: EmailBlock = {
+      id: `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type,
+      content: getDefaultContent(type),
+      settings: getDefaultSettings()
+    };
+
+    const updatedSections = sections.map(section => {
+      if (section.id === sectionId) {
+        return {
+          ...section,
+          columns: section.columns.map(column => {
+            if (column.id === columnId) {
+              return {
+                ...column,
+                blocks: [...column.blocks, newBlock]
+              };
+            }
+            return column;
+          })
+        };
+      }
+      return section;
+    });
+
+    setSections(updatedSections);
+    if (onBlockSelect) {
+      onBlockSelect(newBlock.id);
+    }
+    // TODO: Обновить генерацию HTML
   };
 
   const getDefaultContent = (type: EmailBlock['type']) => {
@@ -192,34 +348,151 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
           // Сбрасываем выделение при клике в пустое место сайдбара
           if (e.target === e.currentTarget && onBlockSelect) {
             onBlockSelect(null);
+            setSelectedSectionId(null);
           }
         }}
       >
-        <div className="block-toolbox" onClick={(e) => e.stopPropagation()}>
-          <h4>Добавить блок</h4>
-          <div className="toolbox-buttons-container">
-            <div className="toolbox-buttons">
-              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('text'); }} className="block-btn">
-                📝 Текст
-              </button>
-              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('image'); }} className="block-btn">
-                🖼️ Изображение
-              </button>
-              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('button'); }} className="block-btn">
-                🔘 Кнопка
-              </button>
-              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('divider'); }} className="block-btn">
-                ➖ Разделитель
-              </button>
-              <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('spacer'); }} className="block-btn">
-                📏 Отступ
-              </button>
-            </div>
-          </div>
+        {/* Вкладки переключения */}
+        <div className="sidebar-tabs">
+          <button
+            type="button"
+            className={`sidebar-tab ${sidebarTab === 'sections' ? 'active' : ''}`}
+            onClick={() => setSidebarTab('sections')}
+          >
+            📐 Структури
+          </button>
+          <button
+            type="button"
+            className={`sidebar-tab ${sidebarTab === 'blocks' ? 'active' : ''}`}
+            onClick={() => setSidebarTab('blocks')}
+          >
+            🧱 Блоки
+          </button>
         </div>
 
+        {/* Контент вкладок */}
+        {sidebarTab === 'sections' ? (
+          <div className="block-toolbox" onClick={(e) => e.stopPropagation()}>
+            <h4>Додати секцію</h4>
+            <div className="toolbox-buttons-container">
+              <div className="section-buttons">
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); addSection('1col'); }} 
+                  className="section-btn"
+                >
+                  <div className="section-preview">
+                    <div className="section-col" style={{width: '100%'}}></div>
+                  </div>
+                  <span>1 Колонка</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); addSection('2col-50-50'); }} 
+                  className="section-btn"
+                >
+                  <div className="section-preview">
+                    <div className="section-col" style={{width: '48%'}}></div>
+                    <div className="section-col" style={{width: '48%'}}></div>
+                  </div>
+                  <span>2 Колонки 50/50</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); addSection('2col-33-66'); }} 
+                  className="section-btn"
+                >
+                  <div className="section-preview">
+                    <div className="section-col" style={{width: '30%'}}></div>
+                    <div className="section-col" style={{width: '65%'}}></div>
+                  </div>
+                  <span>2 Колонки 33/66</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); addSection('2col-66-33'); }} 
+                  className="section-btn"
+                >
+                  <div className="section-preview">
+                    <div className="section-col" style={{width: '65%'}}></div>
+                    <div className="section-col" style={{width: '30%'}}></div>
+                  </div>
+                  <span>2 Колонки 66/33</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); addSection('3col'); }} 
+                  className="section-btn"
+                >
+                  <div className="section-preview">
+                    <div className="section-col" style={{width: '31%'}}></div>
+                    <div className="section-col" style={{width: '31%'}}></div>
+                    <div className="section-col" style={{width: '31%'}}></div>
+                  </div>
+                  <span>3 Колонки</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); addSection('4col'); }} 
+                  className="section-btn"
+                >
+                  <div className="section-preview">
+                    <div className="section-col" style={{width: '22%'}}></div>
+                    <div className="section-col" style={{width: '22%'}}></div>
+                    <div className="section-col" style={{width: '22%'}}></div>
+                    <div className="section-col" style={{width: '22%'}}></div>
+                  </div>
+                  <span>4 Колонки</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="block-toolbox" onClick={(e) => e.stopPropagation()}>
+            <h4>Добавить блок</h4>
+            <div className="toolbox-buttons-container">
+              <div className="toolbox-buttons">
+                <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('text'); }} className="block-btn">
+                  📝 Текст
+                </button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('image'); }} className="block-btn">
+                  🖼️ Изображение
+                </button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('button'); }} className="block-btn">
+                  🔘 Кнопка
+                </button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('divider'); }} className="block-btn">
+                  ➖ Разделитель
+                </button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); addBlock('spacer'); }} className="block-btn">
+                  📏 Отступ
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="block-settings" onClick={(e) => e.stopPropagation()}>
-          {selectedBlockId ? (
+          {selectedSectionId ? (
+            (() => {
+              const selectedSection = sections.find(s => s.id === selectedSectionId);
+              return selectedSection ? (
+                <>
+                  <div className="block-settings-scroll-container">
+                    <SectionSettings 
+                      section={selectedSection}
+                      onUpdate={(updates: Partial<EmailSection>) => updateSection(selectedSectionId, updates)}
+                      onDelete={() => deleteSection(selectedSectionId)}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="block-settings-empty">
+                  Виберіть секцію для редагування
+                </div>
+              );
+            })()
+          ) : selectedBlockId ? (
             (() => {
               const selectedBlock = blocks.find(b => b.id === selectedBlockId);
               return selectedBlock ? (
@@ -239,12 +512,119 @@ const SimpleEmailBuilder: React.FC<SimpleEmailBuilderProps> = ({
             })()
           ) : (
             <div className="block-settings-empty">
-              Выберите блок для редактирования его настроек
+              Выберите секцію або блок для редактирования его настроек
             </div>
           )}
         </div>
       </div>
     </div>
+  );
+};
+
+// Компонент настроек секции
+const SectionSettings: React.FC<{
+  section: EmailSection;
+  onUpdate: (updates: Partial<EmailSection>) => void;
+  onDelete: () => void;
+}> = ({ section, onUpdate, onDelete }) => {
+  const updateSettings = (key: string, value: any) => {
+    onUpdate({
+      settings: {
+        ...section.settings,
+        [key]: value
+      }
+    });
+  };
+
+  const updatePadding = (side: 'top' | 'right' | 'bottom' | 'left', value: number) => {
+    const currentPadding = section.settings.padding || { top: 20, right: 20, bottom: 20, left: 20 };
+    onUpdate({
+      settings: {
+        ...section.settings,
+        padding: {
+          ...currentPadding,
+          [side]: value
+        }
+      }
+    });
+  };
+
+  return (
+    <>
+      <div className="block-settings-header">
+        <h4>⚙️ Налаштування секції</h4>
+        <button 
+          type="button"
+          className="delete-block-btn"
+          onClick={onDelete}
+        >
+          🗑️ Видалити секцію
+        </button>
+      </div>
+
+      <div className="block-settings-group">
+        <label className="block-settings-label">Макет:</label>
+        <div className="setting-value">{section.layout}</div>
+      </div>
+
+      <div className="block-settings-group">
+        <label className="block-settings-label">Колір фону:</label>
+        <input
+          type="color"
+          value={section.settings.backgroundColor || '#ffffff'}
+          onChange={(e) => updateSettings('backgroundColor', e.target.value)}
+          className="color-input"
+        />
+        <input
+          type="text"
+          value={section.settings.backgroundColor || '#ffffff'}
+          onChange={(e) => updateSettings('backgroundColor', e.target.value)}
+          className="color-text-input"
+        />
+      </div>
+
+      <div className="block-settings-group">
+        <label className="block-settings-label">Відступи (padding):</label>
+        <div className="padding-inputs">
+          <div className="padding-input-group">
+            <label>Верх:</label>
+            <input
+              type="number"
+              value={section.settings.padding?.top || 20}
+              onChange={(e) => updatePadding('top', parseInt(e.target.value))}
+              min="0"
+            />
+          </div>
+          <div className="padding-input-group">
+            <label>Право:</label>
+            <input
+              type="number"
+              value={section.settings.padding?.right || 20}
+              onChange={(e) => updatePadding('right', parseInt(e.target.value))}
+              min="0"
+            />
+          </div>
+          <div className="padding-input-group">
+            <label>Низ:</label>
+            <input
+              type="number"
+              value={section.settings.padding?.bottom || 20}
+              onChange={(e) => updatePadding('bottom', parseInt(e.target.value))}
+              min="0"
+            />
+          </div>
+          <div className="padding-input-group">
+            <label>Ліво:</label>
+            <input
+              type="number"
+              value={section.settings.padding?.left || 20}
+              onChange={(e) => updatePadding('left', parseInt(e.target.value))}
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
