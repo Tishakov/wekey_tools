@@ -65,6 +65,8 @@ const BLOCK_TYPES: BlockType[] = [
 const SECTION_LAYOUTS = [
   { cols: 1, widths: [100], label: '1 колонка' },
   { cols: 2, widths: [50, 50], label: '2 колонки' },
+  { cols: 2, widths: [33.33, 66.67], label: '1:2 колонки' },
+  { cols: 2, widths: [66.67, 33.33], label: '2:1 колонки' },
   { cols: 3, widths: [33.33, 33.33, 33.34], label: '3 колонки' },
   { cols: 4, widths: [25, 25, 25, 25], label: '4 колонки' }
 ];
@@ -97,7 +99,10 @@ const EmailBuilderPro: React.FC = () => {
   const [historyIndex, setHistoryIndex] = useState(0);
   const [draggedItem, setDraggedItem] = useState<any>(null);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [viewMode, setViewMode] = useState<'editor' | 'html' | 'preview'>('editor');
   const [isDragging, setIsDragging] = useState(false);
+  const canvasAreaRef = React.useRef<HTMLDivElement>(null);
+  const autoScrollIntervalRef = React.useRef<number | null>(null);
 
   // ==================== ГЕНЕРАТОРЫ ID ====================
 
@@ -194,6 +199,38 @@ const EmailBuilderPro: React.FC = () => {
 
   // ==================== DRAG & DROP ====================
 
+  const handleAutoScroll = (e: React.DragEvent) => {
+    const canvasArea = canvasAreaRef.current;
+    if (!canvasArea) return;
+
+    const rect = canvasArea.getBoundingClientRect();
+    const scrollThreshold = 100; // Порог в пикселях от края
+    const scrollSpeed = 10; // Скорость прокрутки
+
+    const mouseY = e.clientY;
+    const distanceFromTop = mouseY - rect.top;
+    const distanceFromBottom = rect.bottom - mouseY;
+
+    // Очищаем предыдущий интервал
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+      autoScrollIntervalRef.current = null;
+    }
+
+    // Скролл вверх
+    if (distanceFromTop < scrollThreshold && distanceFromTop > 0) {
+      autoScrollIntervalRef.current = window.setInterval(() => {
+        canvasArea.scrollTop -= scrollSpeed;
+      }, 20);
+    }
+    // Скролл вниз
+    else if (distanceFromBottom < scrollThreshold && distanceFromBottom > 0) {
+      autoScrollIntervalRef.current = window.setInterval(() => {
+        canvasArea.scrollTop += scrollSpeed;
+      }, 20);
+    }
+  };
+
   const handleDragStart = (e: DragEvent, item: any) => {
     setDraggedItem(item);
     setIsDragging(true);
@@ -203,11 +240,18 @@ const EmailBuilderPro: React.FC = () => {
   const handleDragEnd = () => {
     setIsDragging(false);
     setDraggedItem(null);
+    // Очищаем автоскролл
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+      autoScrollIntervalRef.current = null;
+    }
   };
 
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
+    // Добавляем автоскролл
+    handleAutoScroll(e as any);
   };
 
   const handleDropSection = (e: DragEvent, insertIndex?: number) => {
@@ -592,17 +636,13 @@ const EmailBuilderPro: React.FC = () => {
       {/* ВЕРХНЯЯ ПАНЕЛЬ */}
       <div className="top-toolbar">
         <div className="toolbar-left">
-          <h1 className="toolbar-title">📧 Email Builder Pro</h1>
-        </div>
-        
-        <div className="toolbar-center">
           <button 
             className="toolbar-btn" 
             onClick={undo} 
             disabled={historyIndex === 0}
             title="Отменить (Ctrl+Z)"
           >
-            ↶ Назад
+            ↶
           </button>
           <button 
             className="toolbar-btn" 
@@ -610,24 +650,48 @@ const EmailBuilderPro: React.FC = () => {
             disabled={historyIndex === history.length - 1}
             title="Повторить (Ctrl+Y)"
           >
-            ↷ Вперед
+            ↷
           </button>
           
           <div className="toolbar-divider"></div>
           
           <button 
+            className={`toolbar-btn ${viewMode === 'editor' ? 'active' : ''}`}
+            onClick={() => setViewMode('editor')}
+            title="Режим редактора"
+          >
+            ✏️ Редактор
+          </button>
+          <button 
+            className={`toolbar-btn ${viewMode === 'html' ? 'active' : ''}`}
+            onClick={() => setViewMode('html')}
+            title="Показать HTML код"
+          >
+            &lt;/&gt; HTML
+          </button>
+          <button 
+            className={`toolbar-btn ${viewMode === 'preview' ? 'active' : ''}`}
+            onClick={() => setViewMode('preview')}
+            title="Предпросмотр письма"
+          >
+            👁️ Предпросмотр
+          </button>
+        </div>
+        
+        <div className="toolbar-center">
+          <button 
             className={`toolbar-btn ${previewMode === 'desktop' ? 'active' : ''}`}
             onClick={() => setPreviewMode('desktop')}
             title="Desktop Preview"
           >
-            🖥️ Desktop
+            🖥️
           </button>
           <button 
             className={`toolbar-btn ${previewMode === 'mobile' ? 'active' : ''}`}
             onClick={() => setPreviewMode('mobile')}
             title="Mobile Preview"
           >
-            � Mobile
+            📱
           </button>
         </div>
         
@@ -705,15 +769,16 @@ const EmailBuilderPro: React.FC = () => {
         </div>
 
         {/* РАБОЧАЯ ОБЛАСТЬ */}
-        <div className="canvas-area">
-          <div 
-            className="email-canvas"
-            style={{
-              backgroundColor: template.globalStyles.backgroundColor,
-              maxWidth: `${template.globalStyles.contentWidth}px`,
-              fontFamily: template.globalStyles.fontFamily
-            }}
-          >
+        <div className="canvas-area" ref={canvasAreaRef}>
+          {viewMode === 'editor' && (
+            <div 
+              className="email-canvas"
+              style={{
+                backgroundColor: template.globalStyles.backgroundColor,
+                maxWidth: `${template.globalStyles.contentWidth}px`,
+                fontFamily: template.globalStyles.fontFamily
+              }}
+            >
             {template.sections.length === 0 ? (
               <div 
                 className="canvas-empty"
@@ -874,7 +939,6 @@ const EmailBuilderPro: React.FC = () => {
                         onDrop={(e) => handleDropSection(e, sectionIndex + 1)}
                       >
                         <div className="drop-zone-hint">
-                          <span className="drop-zone-icon">➕</span>
                           <span>Перетащите структуру сюда</span>
                         </div>
                       </div>
@@ -884,14 +948,34 @@ const EmailBuilderPro: React.FC = () => {
               </>
             )}
           </div>
+          )}
+          
+          {viewMode === 'html' && (
+            <div className="html-view">
+              <pre className="html-code">
+                <code>{generateEmailHTML(template)}</code>
+              </pre>
+            </div>
+          )}
+          
+          {viewMode === 'preview' && (
+            <div className="preview-view">
+              <iframe 
+                title="Email Preview"
+                srcDoc={generateEmailHTML(template)}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  backgroundColor: 'white'
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* ПРАВАЯ ПАНЕЛЬ */}
         <div className="right-panel">
-          <div className="panel-header">
-            <h3>⚙️ Настройки</h3>
-          </div>
-          
           <div className="panel-content">
             {selectedElement.type === null ? (
               <GlobalSettings
@@ -1029,25 +1113,25 @@ const GlobalSettings: React.FC<{
         </select>
       </div>
 
-      <div className="form-group">
-        <label>
+      <div className="form-group form-group-checkbox">
+        <label className="checkbox-label">
           <input
             type="checkbox"
             checked={styles.underlineLinks}
             onChange={(e) => onChange({ ...styles, underlineLinks: e.target.checked })}
           />
-          Подчеркивать ссылки
+          <span>Подчеркивать ссылки</span>
         </label>
       </div>
 
-      <div className="form-group">
-        <label>
+      <div className="form-group form-group-checkbox">
+        <label className="checkbox-label">
           <input
             type="checkbox"
             checked={styles.responsive}
             onChange={(e) => onChange({ ...styles, responsive: e.target.checked })}
           />
-          Адаптивный дизайн
+          <span>Адаптивный дизайн</span>
         </label>
       </div>
     </div>

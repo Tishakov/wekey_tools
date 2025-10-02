@@ -3,8 +3,9 @@
 .email-builder-pro {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: #f0f2f5;
+  height: 80vh;
+  background: #1a1d2e;
+  border-radius: 15px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', sans-serif;
   overflow: hidden;
 }
@@ -15,12 +16,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #28282A;
+  border-bottom: 1px solid #333335;
   color: white;
-  padding: 12px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   z-index: 100;
-  min-height: 60px;
+  min-height: 56px;
+  gap: 16px;
 }
 
 .toolbar-left,
@@ -28,19 +31,29 @@
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+}
+
+.toolbar-left {
+  flex: 0 1 auto;
+  justify-content: flex-start;
 }
 
 .toolbar-center {
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+.toolbar-right {
+  flex: 0 1 auto;
+  justify-content: flex-end;
 }
 
 .toolbar-divider {
   width: 1px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.3);
-  margin: 0 8px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 6px;
 }
 
 .toolbar-title {
@@ -51,45 +64,51 @@
 }
 
 .toolbar-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 8px 16px;
+  padding: 7px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   transition: all 0.2s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
 
 .toolbar-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .toolbar-btn.active {
-  background: rgba(255, 255, 255, 0.95);
-  color: #667eea;
+  background: rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+  color: #a8b4ff;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .toolbar-btn-primary {
-  background: rgba(255, 255, 255, 0.95);
-  color: #667eea;
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
   font-weight: 600;
 }
 
 .toolbar-btn-primary:hover {
-  background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #7689f5;
+  border-color: #7689f5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 /* ==================== РАБОЧЕЕ ПРОСТРАНСТВО ==================== */
@@ -104,17 +123,17 @@
 
 .left-panel {
   width: 280px;
-  background: white;
-  border-right: 1px solid #e1e4e8;
+  background: #28282A;
+  border-right: 1px solid #333335;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
 }
 
 .panel-tabs {
   display: flex;
-  border-bottom: 1px solid #e1e4e8;
-  background: #fafbfc;
+  border-bottom: 1px solid #333335;
+  background: #28282A;
 }
 
 .panel-tab {
@@ -122,23 +141,24 @@
   padding: 12px;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-radius: 0px;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  color: #586069;
+  color: #8b92a7;
   transition: all 0.2s;
 }
 
 .panel-tab:hover {
-  color: #24292e;
-  background: rgba(102, 126, 234, 0.05);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .panel-tab.active {
   color: #667eea;
   border-bottom-color: #667eea;
-  background: white;
+  background: transparent;
 }
 
 .panel-content {
@@ -149,10 +169,10 @@
 
 .panel-hint {
   font-size: 12px;
-  color: #6a737d;
+  color: #8b92a7;
   margin: 0 0 16px 0;
   padding: 8px 12px;
-  background: #f6f8fa;
+  background: #1f2230;
   border-radius: 6px;
   border-left: 3px solid #667eea;
 }
@@ -166,8 +186,8 @@
 }
 
 .structure-item {
-  background: white;
-  border: 2px solid #e1e4e8;
+  background: #2d3142;
+  border: 2px solid #3d4152;
   border-radius: 8px;
   padding: 12px;
   cursor: grab;
@@ -177,7 +197,7 @@
 .structure-item:hover {
   border-color: #667eea;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .structure-item:active {
@@ -199,16 +219,16 @@
 }
 
 .structure-col {
-  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 4px;
-  border: 1px solid #9fa8da;
+  border: 1px solid #667eea;
 }
 
 .structure-label {
   display: block;
   font-size: 12px;
   font-weight: 500;
-  color: #24292e;
+  color: #ffffff;
   text-align: center;
 }
 
@@ -230,8 +250,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: white;
-  border: 2px solid #e1e4e8;
+  background: #FFFFFF08;
+  border: 1px solid #FFFFFF14;
   border-radius: 8px;
   padding: 12px;
   cursor: grab;
@@ -241,7 +261,7 @@
 .content-block:hover {
   border-color: #667eea;
   transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .content-block:active {
@@ -263,7 +283,7 @@
 .content-block-label {
   font-size: 14px;
   font-weight: 500;
-  color: #24292e;
+  color: #ffffff;
 }
 
 /* ==================== РАБОЧАЯ ОБЛАСТЬ (КАНВАС) ==================== */
@@ -271,7 +291,7 @@
 .canvas-area {
   flex: 1;
   overflow-y: auto;
-  background: #f0f2f5;
+  background: #28282a;
   padding: 20px;
   display: flex;
   justify-content: center;
@@ -287,6 +307,7 @@
 }
 
 .canvas-empty {
+  height: calc(100% - 40px);
   min-height: 400px;
   display: flex;
   align-items: center;
@@ -347,20 +368,17 @@
 
 /* Drop zone между секциями */
 .section-drop-zone {
-  min-height: 80px;
-  margin: 15px 20px;
-  border: 3px dashed #c5cae9;
-  border-radius: 8px;
+  min-height: 40px;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  background: #f8f9ff;
 }
 
 .section-drop-zone:hover {
   border-color: #667eea;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  background: #f0f3ff;
   transform: scale(1.02);
 }
 
@@ -620,17 +638,17 @@
 
 .right-panel {
   width: 320px;
-  background: white;
-  border-left: 1px solid #e1e4e8;
+  background: #28282A;
+  border-left: 1px solid #333335;
   display: flex;
   flex-direction: column;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
   overflow-y: auto;
 }
 
 .panel-header {
   padding: 16px;
-  border-bottom: 1px solid #e1e4e8;
+  border-bottom: 1px solid #2d3142;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
@@ -650,10 +668,10 @@
 .settings-form h4 {
   font-size: 14px;
   font-weight: 600;
-  color: #24292e;
+  color: #ffffff;
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 2px solid #e1e4e8;
+  border-bottom: 2px solid #2d3142;
 }
 
 .form-group {
@@ -664,7 +682,7 @@
   display: block;
   font-size: 13px;
   font-weight: 500;
-  color: #24292e;
+  color: #8b92a7;
   margin-bottom: 6px;
 }
 
@@ -675,12 +693,13 @@
 .form-group textarea {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #e1e4e8;
+  border: 1px solid #333335;
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
   transition: all 0.2s;
-  background: white;
+  background: #1C1D1F;
+  color: #ffffff;
 }
 
 .form-group input:focus,
@@ -688,15 +707,16 @@
 .form-group textarea:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
 .form-group input[type="color"] {
   width: 100%;
   height: 40px;
-  border: 1px solid #e1e4e8;
+  border: 1px solid #333335;
   border-radius: 6px;
   cursor: pointer;
+  background: #1C1D1F;
 }
 
 .form-group input[type="checkbox"] {
@@ -708,6 +728,43 @@
   resize: vertical;
   min-height: 80px;
 }
+
+/* ==================== CHECKBOX СТИЛИ ==================== */
+
+.form-group-checkbox {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  color: #e1e7ef;
+  font-size: 14px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  margin-right: 10px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.checkbox-label span {
+  flex: 1;
+}
+
+.checkbox-label:hover {
+  color: #ffffff;
+}
+
+/* ==================== КНОПКИ ==================== */
 
 .btn-danger {
   width: 100%;
@@ -729,6 +786,20 @@
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
+.btn-secondary {
+  background: #2d3142;
+  color: #ffffff;
+  border: 1px solid #3d4152;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #3d4152;
+  border-color: #667eea;
+}
+
 /* ==================== СКРОЛЛБАРЫ ==================== */
 
 .panel-content::-webkit-scrollbar,
@@ -741,13 +812,13 @@
 .panel-content::-webkit-scrollbar-track,
 .canvas-area::-webkit-scrollbar-track,
 .right-panel::-webkit-scrollbar-track {
-  background: #f6f8fa;
+  background: #1f2230;
 }
 
 .panel-content::-webkit-scrollbar-thumb,
 .canvas-area::-webkit-scrollbar-thumb,
 .right-panel::-webkit-scrollbar-thumb {
-  background: #c5cae9;
+  background: #3d4152;
   border-radius: 4px;
 }
 
@@ -795,6 +866,42 @@
 
 .email-section {
   animation: fadeIn 0.3s ease-out;
+}
+
+/* ==================== HTML ПРОСМОТР ==================== */
+
+.html-view {
+  flex: 1;
+  padding: 20px;
+  background: #1a1b1e;
+  overflow: auto;
+}
+
+.html-code {
+  margin: 0;
+  padding: 20px;
+  background: #28282a;
+  border: none;
+  border-radius: 8px;
+  color: #e1e7ef;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.html-code code {
+  color: #e1e7ef;
+}
+
+/* ==================== ПРЕДПРОСМОТР ==================== */
+
+.preview-view {
+  flex: 1;
+  background: #f5f5f5;
+  overflow: hidden;
 }
 
 /* ==================== АНИМАЦИИ ==================== */
