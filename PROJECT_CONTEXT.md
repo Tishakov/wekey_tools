@@ -8,7 +8,38 @@
 
 ## 📋 Текущая версия
 
-### project_refactor_1.1 (01.10.2025) 🎯 CURRENT
+### email_builder_pro_2.3 (02.10.2025) 🎯 CURRENT
+
+**Email Builder Pro - Professional email construction system with advanced controls**
+
+#### ✅ Выполнено:
+- **Pixel-based column system** - колонки с фиксированной шириной в пикселях, автоматическое перераспределение gaps
+- **Section-based architecture** - письма из секций → колонок → блоков (как Mailchimp/Stripo)
+- **6 section layouts** - 1col, 2col (50/50), 1:2, 2:1, 3col, 4col
+- **Triple control system**:
+  - Section controls (⬆️⬇️📋🗑️) - слева от секции, perfect UX
+  - Column controls (⬅️➡️📋🗑️) - сверху колонки on hover, auto-resize on delete
+  - Block controls (⬆️⬇️📋🗑️) - сверху блока on select, compact и adaptive
+- **Drag & Drop** - перетаскивание секций и блоков с auto-scroll (100px threshold)
+- **Dark theme** - полностью применен (#28282A, #333335, #1C1D1F)
+- **Professional UI** - reorganized toolbar, form inputs styling, hover effects
+- **5 block types** - Text, Image, Button, Divider, Spacer с rich settings
+
+#### 📚 Документация:
+- `docs/EMAIL_BUILDER_PRO_PROGRESS.md` - полная история разработки news_2.0-2.3
+- `docs/EMAIL_BUILDER_AUDIT_AND_ROADMAP.md` - аудит системы + roadmap на 6-10 недель
+- `docs/EMAIL_SYSTEM_STAGE_*.md` - история развития email системы
+
+#### 🎯 Git теги:
+- `news_2.3` - Refined block-controls (compact, adaptive, no collision)
+- `news_2.2` - Section-drop-zone refinement + "Секции" naming
+- `news_2.1` - Auto-scroll during drag & drop
+- `news_2.0` - Toolbar reorganization + Dark theme
+- `email_2.1` - Pixel columns + Column controls
+
+---
+
+### project_refactor_1.1 (01.10.2025)
 
 **Глубокая реорганизация структуры проекта + Enterprise-grade организация**
 
@@ -145,6 +176,76 @@ wekey_tools/
 - **Professional UI**: Современный дизайн с градиентами, тенями и анимациями
 - **Responsive Design**: Адаптивный интерфейс для всех устройств
 
+#### Email Builder Pro (news_2.3) 🚀 NEW:
+**Professional email construction system** - конструктор email-рассылок уровня Mailchimp/Stripo
+
+**Архитектура:**
+- **Section-based**: Письма состоят из секций → колонок → блоков
+- **Pixel-based columns**: Колонки с фиксированной шириной в пикселях (не проценты!)
+- **Automatic gap redistribution**: Умное перераспределение отступов при изменении ширины
+- **6 section layouts**: 1col, 2col (50/50), 1:2 (33/67), 2:1 (67/33), 3col, 4col
+- **Content width**: 600px (email standard)
+
+**Triple Control System:**
+1. **Section Controls** (⬆️⬇️📋🗑️)
+   - Позиция: слева от секции
+   - Триггер: клик на секцию
+   - Функции: move up/down, duplicate, delete
+   - Размер: 20×20px, вертикальная колонка
+
+2. **Column Controls** (⬅️➡️📋🗑️)
+   - Позиция: сверху колонки (top: -28px, centered)
+   - Триггер: hover на колонку
+   - Функции: move left/right, duplicate, delete (auto-resize при delete)
+   - Размер: 22×22px, горизонтальный ряд
+
+3. **Block Controls** (⬆️⬇️📋🗑️)
+   - Позиция: сверху блока (top: -34px, centered)
+   - Триггер: клик на блок (только selection, не hover)
+   - Функции: move up/down, duplicate, delete
+   - Размер: 22×22px, компактный width: fit-content
+   - Особенность: автоматически скрывает column-controls (`:has()` selector)
+
+**UI/UX Features:**
+- **Dark theme**: Консистентный дизайн (#28282A panels, #333335 borders, #1C1D1F inputs)
+- **Reorganized toolbar**: Назад/Вперед (left), Редактор/HTML/Предпросмотр (center), Desktop/Mobile (right)
+- **Drag & Drop**: Перетаскивание секций и блоков с auto-scroll (100px threshold)
+- **Section drop zones**: Компактные (40px), белый фон (#f8f9ff), без border
+- **Column hover**: Subtle highlight (rgba(102, 126, 234, 0.05))
+- **Block selection**: Outline 2px solid #667eea
+- **Inline editing**: Клик на блок в preview → selection → edit в панели
+
+**Block Types (5 types):**
+- Text (📝) - Rich text editor с форматированием
+- Image (🖼️) - Вставка по URL (upload pending)
+- Button (🔘) - Настройка цвета, border, padding (alignment pending)
+- Divider (➖) - Горизонтальная линия
+- Spacer (📏) - Вертикальный отступ
+
+**Technical Stack:**
+- EmailBuilderPro.tsx: 1520+ lines
+- EmailBuilderPro.css: 990+ lines  
+- React DnD для drag & drop
+- Pixel math для column widths
+- CSS `:has()` для control collision avoidance
+
+**Roadmap** (см. `docs/EMAIL_BUILDER_AUDIT_AND_ROADMAP.md`):
+- 🔴 Priority 1: Image upload, Save/Load, Button alignment, More blocks
+- 🟡 Priority 2: Template library, Mobile responsive, Version control
+- 🟢 Priority 3: AI assistant, A/B testing, Collaboration
+
+**Git Tags:**
+- `news_2.3` - Block controls refinement (compact, adaptive)
+- `news_2.2` - Drop zones + "Секции" naming
+- `news_2.1` - Auto-scroll during drag
+- `news_2.0` - Toolbar + Dark theme
+- `email_2.1` - Pixel columns system
+
+**Документация:**
+- `docs/EMAIL_BUILDER_PRO_PROGRESS.md` - полная история разработки
+- `docs/EMAIL_BUILDER_AUDIT_AND_ROADMAP.md` - аудит + план на 6-10 недель
+- `docs/EMAIL_SYSTEM_STAGE_*.md` - история email системы
+
 #### Система пользователей:
 - Полная регистрация и авторизация
 - User Tracking с UUID для анонимных пользователей
@@ -193,7 +294,9 @@ SQLite Database
 
 ## 📈 Roadmap и развитие
 
-### ✅ Выполненные задачи (all_check_ok_1.0):
+### ✅ Выполненные задачи:
+
+#### Инфраструктура и система:
 1. **Система аутентификации** - JWT с автоматическим refresh ✅
 2. **Админ-панель Enterprise** - полнофункциональное управление ✅
 3. **User Management** - расширенное управление пользователями ✅  
@@ -204,7 +307,23 @@ SQLite Database
 8. **Error Handling** - comprehensive error management ✅
 9. **Professional UI/UX** - современный дизайн с интеллектуальной цветовой группировкой ✅
 
-### Приоритет 1 (следующие задачи):
+#### Email Builder Pro (news_2.3):
+10. **Section-based architecture** - секции → колонки → блоки ✅
+11. **Pixel-based columns** - фиксированная ширина с auto gap redistribution ✅
+12. **Triple control system** - section/column/block controls с perfect UX ✅
+13. **Drag & Drop + Auto-scroll** - профессиональный DnD опыт ✅
+14. **Dark theme integration** - консистентный дизайн с платформой ✅
+15. **6 section layouts** - от 1 до 4 колонок с разными соотношениями ✅
+
+### 🎯 Текущие приоритеты (Email Builder):
+1. **Image upload** - загрузка изображений с компьютера (must have) 🔴
+2. **Save/Load system** - сохранение sections в БД (критично!) 🔴
+3. **Button alignment** - left/center/right для кнопок 🟡
+4. **More block types** - Heading, Social, Video, HTML, Menu, Footer 🟡
+5. **Template library** - готовые секции и полные шаблоны 🟡
+6. **Mobile responsive** - адаптивность и mobile preview 🟢
+
+### Приоритет 1 (платформа):
 1. **Payment Gateway** - интеграция платежных систем (Stripe/PayPal)
 2. **Premium Features** - развитие freemium модели
 3. **Email Notifications** - система уведомлений
@@ -217,6 +336,8 @@ SQLite Database
 - **Advanced Analytics** с ML предсказаниями
 - **Multi-tenant architecture** для enterprise клиентов
 - **CDN интеграция** для глобальной производительности
+- **Email Builder AI assistant** - генерация контента и улучшение текстов
+- **A/B testing для email** - оптимизация эффективности рассылок
 
 ### Приоритет 3 (долгосрочно):
 - **Microservices migration** для масштабируемости

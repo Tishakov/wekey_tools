@@ -4,7 +4,12 @@
 
 ## 📁 Структура документации
 
-### 🚀 Основные документы (для начала работы)
+### � ДЛЯ НОВОГО АГЕНТА (START HERE!)
+- **[QUICK_START_FOR_NEW_AGENT.md](QUICK_START_FOR_NEW_AGENT.md)** ⭐⭐⭐⭐⭐ - Обязательный quick start для нового AI агента
+- **[EMAIL_BUILDER_PRO_PROGRESS.md](EMAIL_BUILDER_PRO_PROGRESS.md)** ⭐⭐⭐⭐⭐ - Полная история Email Builder (news_2.0-2.3)
+- **[EMAIL_BUILDER_AUDIT_AND_ROADMAP.md](EMAIL_BUILDER_AUDIT_AND_ROADMAP.md)** ⭐⭐⭐⭐⭐ - Аудит + roadmap на 6-10 недель
+
+### �🚀 Основные документы (для начала работы)
 - **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Полная API документация
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Гайд для разработчиков
 - **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Руководство по развертыванию
@@ -28,11 +33,24 @@
 - **[FREEMIUM_IMPLEMENTATION_REPORT.md](FREEMIUM_IMPLEMENTATION_REPORT.md)** - Реализация фримиум-модели
 - **[ACCOUNT_2.0_RELEASE_NOTES.md](ACCOUNT_2.0_RELEASE_NOTES.md)** - Обновление системы аккаунтов
 
-### 📧 Система рассылок
+### 📧 Система рассылок и Email Builder 🆕
+- **[EMAIL_BUILDER_PRO_PROGRESS.md](EMAIL_BUILDER_PRO_PROGRESS.md)** - Полная история разработки Email Builder Pro (news_2.0-2.3)
+- **[EMAIL_BUILDER_AUDIT_AND_ROADMAP.md](EMAIL_BUILDER_AUDIT_AND_ROADMAP.md)** - Детальный аудит + roadmap на 6-10 недель
+- **[EMAIL_SYSTEM_ROADMAP.md](EMAIL_SYSTEM_ROADMAP.md)** - Общий roadmap email системы
+- **[EMAIL_SYSTEM_STAGE_0_COMPLETE.md](EMAIL_SYSTEM_STAGE_0_COMPLETE.md)** - Stage 0: Foundation
+- **[EMAIL_SYSTEM_STAGE_1_COMPLETE.md](EMAIL_SYSTEM_STAGE_1_COMPLETE.md)** - Stage 1: Core features
+- **[EMAIL_SYSTEM_STAGE_2_COMPLETE.md](EMAIL_SYSTEM_STAGE_2_COMPLETE.md)** - Stage 2: Advanced features
+- **[EMAIL_SYSTEM_STAGE_2.5_COMPLETE.md](EMAIL_SYSTEM_STAGE_2.5_COMPLETE.md)** - Stage 2.5: Enhanced UI
 - **[NEWSLETTER_DRAFT_EDITING_FIX_REPORT.md](NEWSLETTER_DRAFT_EDITING_FIX_REPORT.md)** - Исправление редактирования черновиков
 - **[NEWSLETTER_NEWS_FINAL_REPORT.md](NEWSLETTER_NEWS_FINAL_REPORT.md)** - Финальный отчет о системе новостей
 - **[NEWSLETTER_NEWS_SYSTEM_REPORT.md](NEWSLETTER_NEWS_SYSTEM_REPORT.md)** - Система рассылок
 - **[NEWSLETTER_NEWS_USER_GUIDE.md](NEWSLETTER_NEWS_USER_GUIDE.md)** - Пользовательский гайд
+- **[FEATURE_VARIABLES_IN_BLOCK_EDITOR.md](FEATURE_VARIABLES_IN_BLOCK_EDITOR.md)** - Переменные в блочном редакторе
+- **[FEATURE_CONSOLIDATED_TOOLBAR.md](FEATURE_CONSOLIDATED_TOOLBAR.md)** - Консолидация toolbar
+- **[FIX_HTML_STYLES_ISOLATION.md](FIX_HTML_STYLES_ISOLATION.md)** - Изоляция HTML стилей
+- **[FINAL_IMPROVEMENTS_SUMMARY.md](FINAL_IMPROVEMENTS_SUMMARY.md)** - Финальные улучшения
+
+### 📰 Система новостей (Legacy)
 
 ### 🔍 SEO инструменты
 - **[SEO_AUDIT_PRO_TOOL_V2.5_GUIDE.md](SEO_AUDIT_PRO_TOOL_V2.5_GUIDE.md)** - SEO Audit Pro v2.5
@@ -57,6 +75,12 @@
 ---
 
 ## 🔍 Быстрый поиск
+
+### 🆕 Я новый AI агент, продолжаю работу
+1. **ОБЯЗАТЕЛЬНО:** [QUICK_START_FOR_NEW_AGENT.md](QUICK_START_FOR_NEW_AGENT.md) - начните отсюда!
+2. Прочитайте [EMAIL_BUILDER_PRO_PROGRESS.md](EMAIL_BUILDER_PRO_PROGRESS.md) - история Email Builder
+3. Изучите [EMAIL_BUILDER_AUDIT_AND_ROADMAP.md](EMAIL_BUILDER_AUDIT_AND_ROADMAP.md) - что делать дальше
+4. Откройте [PROJECT_CONTEXT.md](../PROJECT_CONTEXT.md) - общий контекст проекта
 
 ### Хочу начать разработку
 1. Прочитайте [CONTRIBUTING.md](CONTRIBUTING.md)
