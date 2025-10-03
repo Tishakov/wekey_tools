@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { DragEvent } from 'react';
 import './EmailBuilderPro.css';
+import * as emailTemplateService from '../../../services/emailTemplateService';
+
+// ==================== КОНСТАНТЫ ====================
+
+const AUTOSAVE_DELAY = 2000; // Автосохранение через 2 секунды после изменения
 
 // ==================== ТИПЫ ====================
 
@@ -108,6 +113,8 @@ export interface EmailSection {
 export interface EmailTemplate {
   sections: EmailSection[];
   globalStyles: {
+    subject: string;
+    preheader: string;
     backgroundColor: string;
     contentWidth: number;
     fontFamily: string;
@@ -148,6 +155,8 @@ const EmailBuilderPro: React.FC = () => {
   const [template, setTemplate] = useState<EmailTemplate>({
     sections: [],
     globalStyles: {
+      subject: 'Тема письма',
+      preheader: 'Краткое описание письма',
       backgroundColor: '#f5f5f5',
       contentWidth: 600,
       fontFamily: 'Arial, sans-serif',
@@ -174,6 +183,111 @@ const EmailBuilderPro: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const canvasAreaRef = React.useRef<HTMLDivElement>(null);
   const autoScrollIntervalRef = React.useRef<number | null>(null);
+  const editableTextRef = React.useRef<HTMLDivElement | null>(null);
+  const autosaveTimerRef = React.useRef<number | null>(null);
+
+  // Состояния для работы с сервером
+  const [currentTemplateId, setCurrentTemplateId] = useState<number | null>(null);
+  const [templateName, setTemplateName] = useState<string>('Новый шаблон');
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // ==================== ЗАГРУЗКА ПОСЛЕДНЕГО ШАБЛОНА ====================
+
+  // Загрузка последнего шаблона при монтировании компонента
+  useEffect(() => {
+    const loadLastTemplate = async () => {
+      try {
+        // Получаем список шаблонов, отсортированный по дате обновления (последний первым)
+        const response = await emailTemplateService.getTemplates({ limit: 1, offset: 0 });
+        
+        if (response.data && response.data.length > 0) {
+          const lastTemplate = response.data[0];
+          
+          // Загружаем данные шаблона
+          setCurrentTemplateId(lastTemplate.id);
+          setTemplateName(lastTemplate.name);
+          
+          if (lastTemplate.templateData) {
+            setTemplate({
+              sections: lastTemplate.templateData.sections || [],
+              globalStyles: lastTemplate.templateData.globalStyles || template.globalStyles
+            });
+          }
+          
+          console.log('✅ Загружен последний шаблон:', lastTemplate.name);
+        }
+      } catch (error: any) {
+        console.error('Ошибка загрузки шаблона:', error);
+        // Не показываем ошибку пользователю, просто начинаем с пустого шаблона
+      }
+    };
+
+    loadLastTemplate();
+  }, []); // Пустой массив зависимостей - выполнится только один раз при монтировании
+
+  // ==================== АВТОСОХРАНЕНИЕ ====================
+
+  // Автосохранение при изменении template
+  useEffect(() => {
+    // Очищаем предыдущий таймер
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+
+    // Пропускаем первый рендер (пустой шаблон)
+    if (template.sections.length === 0 && !currentTemplateId) {
+      return;
+    }
+
+    // Устанавливаем новый таймер
+    autosaveTimerRef.current = window.setTimeout(async () => {
+      try {
+        setIsSaving(true);
+        setSaveError(null);
+
+        const templateData = {
+          name: templateName,
+          templateData: {
+            sections: template.sections,
+            globalStyles: template.globalStyles
+          }
+        };
+
+        if (currentTemplateId) {
+          // Обновляем существующий шаблон
+          await emailTemplateService.updateTemplate(currentTemplateId, templateData);
+        } else {
+          // Создаём новый шаблон
+          const response = await emailTemplateService.createTemplate(templateData);
+          setCurrentTemplateId(response.data.id);
+        }
+
+        setLastSaved(new Date());
+        setIsSaving(false);
+      } catch (error: any) {
+        console.error('Ошибка автосохранения:', error);
+        setSaveError(error.response?.data?.message || 'Ошибка сохранения');
+        setIsSaving(false);
+      }
+    }, AUTOSAVE_DELAY);
+
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+    };
+  }, [template, templateName, currentTemplateId]);
+
+  // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ФОРМАТИРОВАНИЯ ====================
+
+  const applyFormatting = (command: string, value?: string) => {
+    if (editableTextRef.current) {
+      editableTextRef.current.focus();
+      document.execCommand(command, false, value);
+    }
+  };
 
   // ==================== ГЕНЕРАТОРЫ ID ====================
 
@@ -255,8 +369,29 @@ const EmailBuilderPro: React.FC = () => {
       case 'text':
         return {
           ...baseBlock,
-          content: { html: '<p style="margin: 0;">Введите текст...</p>' },
-          styles: { fontSize: '16px', color: '#333333', padding: '10px' }
+          content: { 
+            text: 'Введите текст...',
+            html: '<p style="margin: 0;">Введите текст...</p>' 
+          },
+          styles: { 
+            fontSize: '16px', 
+            color: '#333333', 
+            paddingTop: 10,
+            paddingRight: 10,
+            paddingBottom: 10,
+            paddingLeft: 10,
+            paddingLocked: true,
+            marginTop: 0,
+            marginRight: 0,
+            marginBottom: 0,
+            marginLeft: 0,
+            marginLocked: true,
+            textAlign: 'left',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            textDecoration: 'none',
+            lineHeight: '1.5'
+          }
         };
       case 'image':
         return {
@@ -846,7 +981,7 @@ const EmailBuilderPro: React.FC = () => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Template</title>
+  <title>${template.globalStyles.subject}</title>
   <style>
     /* Mobile Responsive Styles */
     @media only screen and (max-width: 600px) {
@@ -861,6 +996,11 @@ const EmailBuilderPro: React.FC = () => {
   </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: ${template.globalStyles.backgroundColor}; font-family: ${template.globalStyles.fontFamily};">
+  <!-- Preheader (скрытый текст) -->
+  <div style="display: none; max-height: 0px; overflow: hidden; mso-hide: all;">
+    ${template.globalStyles.preheader}
+  </div>
+  
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
       <td align="${template.globalStyles.textAlign}">
@@ -945,9 +1085,9 @@ const EmailBuilderPro: React.FC = () => {
           >
             👁️ Предпросмотр
           </button>
-        </div>
-        
-        <div className="toolbar-center">
+
+          <div className="toolbar-divider"></div>
+
           <button 
             className={`toolbar-btn ${previewMode === 'desktop' ? 'active' : ''}`}
             onClick={() => setPreviewMode('desktop')}
@@ -964,10 +1104,32 @@ const EmailBuilderPro: React.FC = () => {
           </button>
         </div>
         
-        <div className="toolbar-right">
+        <div className="toolbar-center">
           <button className="toolbar-btn" onClick={exportHTML}>
             📤 Экспорт
           </button>
+        </div>
+        
+        <div className="toolbar-right">
+          {/* Индикатор сохранения */}
+          <div className="save-indicator" style={{ marginRight: '16px', display: 'flex', alignItems: 'center', gap: '30px' }}>
+            {isSaving && <span style={{ color: '#667eea', fontSize: '12px' }}>💾 Сохранение...</span>}
+            {!isSaving && lastSaved && (
+              <span style={{ color: '#4ade80', fontSize: '12px' }}>
+                ✓ Сохранено {new Date(lastSaved).toLocaleTimeString()}
+              </span>
+            )}
+            {saveError && <span style={{ color: '#ef4444', fontSize: '12px' }}>❌ {saveError}</span>}
+            
+            <input
+              type="text"
+              className="template-name-input"
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              placeholder="Название шаблона"
+            />
+          </div>
+
           <button className="toolbar-btn toolbar-btn-primary" onClick={saveTemplate}>
             💾 Сохранить
           </button>
@@ -1232,7 +1394,7 @@ const EmailBuilderPro: React.FC = () => {
                             {column.blocks.length === 0 ? (
                               <div className="column-empty">
                                 <span className="drop-icon">📥</span>
-                                <span>Drop content here</span>
+                                <span>Перетащите блок сюда</span>
                               </div>
                             ) : (
                               column.blocks.map((block, blockIndex) => (
@@ -1298,7 +1460,16 @@ const EmailBuilderPro: React.FC = () => {
                                       </button>
                                     </div>
                                   )}
-                                  <BlockRenderer block={block} />
+                                  <BlockRenderer 
+                                    block={block} 
+                                    isSelected={selectedElement.blockId === block.id && block.type === 'text'}
+                                    onTextChange={(html) => {
+                                      updateBlock(section.id, column.id, block.id, {
+                                        content: { ...block.content, text: html }
+                                      });
+                                    }}
+                                    textRef={editableTextRef}
+                                  />
                                 </div>
                               ))
                             )}
@@ -1446,6 +1617,8 @@ const EmailBuilderPro: React.FC = () => {
                     selectedElement.blockId!
                   )
                 }
+                applyFormatting={applyFormatting}
+                editableTextRef={editableTextRef}
               />
             )}
           </div>
@@ -1457,15 +1630,64 @@ const EmailBuilderPro: React.FC = () => {
 
 // ==================== ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ ====================
 
-const BlockRenderer: React.FC<{ block: EmailBlock }> = ({ block }) => {
+const BlockRenderer: React.FC<{ 
+  block: EmailBlock; 
+  isSelected?: boolean;
+  onTextChange?: (html: string) => void;
+  textRef?: React.RefObject<HTMLDivElement>;
+}> = ({ block, isSelected = false, onTextChange, textRef }) => {
   switch (block.type) {
     case 'text':
-      return (
-        <div
-          style={block.styles}
-          dangerouslySetInnerHTML={{ __html: block.content.html || '' }}
-        />
-      );
+      const textContent = block.content.text || 'Введите текст...';
+      const commonStyles = {
+        fontSize: block.styles.fontSize,
+        color: block.styles.color,
+        textAlign: block.styles.textAlign as any,
+        fontWeight: block.styles.fontWeight,
+        fontStyle: block.styles.fontStyle,
+        textDecoration: block.styles.textDecoration,
+        lineHeight: block.styles.lineHeight,
+        paddingTop: block.styles.paddingTop ? `${block.styles.paddingTop}px` : undefined,
+        paddingRight: block.styles.paddingRight ? `${block.styles.paddingRight}px` : undefined,
+        paddingBottom: block.styles.paddingBottom ? `${block.styles.paddingBottom}px` : undefined,
+        paddingLeft: block.styles.paddingLeft ? `${block.styles.paddingLeft}px` : undefined,
+        marginTop: block.styles.marginTop ? `${block.styles.marginTop}px` : undefined,
+        marginRight: block.styles.marginRight ? `${block.styles.marginRight}px` : undefined,
+        marginBottom: block.styles.marginBottom ? `${block.styles.marginBottom}px` : undefined,
+        marginLeft: block.styles.marginLeft ? `${block.styles.marginLeft}px` : undefined,
+        outline: isSelected ? '2px solid #667eea' : 'none',
+        cursor: isSelected ? 'text' : 'default'
+      };
+      
+      if (isSelected) {
+        return (
+          <div
+            ref={textRef}
+            contentEditable={true}
+            suppressContentEditableWarning
+            onInput={(e) => {
+              if (onTextChange) {
+                onTextChange(e.currentTarget.innerHTML);
+              }
+            }}
+            onBlur={(e) => {
+              if (onTextChange) {
+                onTextChange(e.currentTarget.innerHTML);
+              }
+            }}
+            style={commonStyles}
+            dangerouslySetInnerHTML={{ __html: textContent }}
+          />
+        );
+      } else {
+        return (
+          <div
+            style={commonStyles}
+            dangerouslySetInnerHTML={{ __html: textContent }}
+          />
+        );
+      }
+    
     case 'image':
       return (
         <img
@@ -1517,6 +1739,32 @@ const GlobalSettings: React.FC<{
   return (
     <div className="settings-form">
       <h4>Глобальные настройки</h4>
+      
+      {/* Email Settings */}
+      <div className="form-group">
+        <label>Тема письма (Subject)</label>
+        <input
+          type="text"
+          value={styles.subject}
+          onChange={(e) => onChange({ ...styles, subject: e.target.value })}
+          placeholder="Введите тему письма"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Прехедер (Preheader)</label>
+        <input
+          type="text"
+          value={styles.preheader}
+          onChange={(e) => onChange({ ...styles, preheader: e.target.value })}
+          placeholder="Краткое описание (отображается в списке писем)"
+        />
+        <small style={{ color: '#9ca3af', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+          Показывается рядом с темой в почтовых клиентах
+        </small>
+      </div>
+
+      <hr style={{ border: 'none', borderTop: '1px solid #2a2a2a', margin: '16px 0' }} />
       
       <div className="form-group">
         <label>Цвет фона</label>
@@ -1726,37 +1974,55 @@ const SectionSettings: React.FC<{
       <h4>⚙️ Настройки секции</h4>
       
       {/* Табы */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '4px', 
-        marginBottom: '16px', 
-        borderBottom: '1px solid #e5e7eb',
-        flexWrap: 'wrap'
-      }}>
+      {/* Vertical Icon Navigation */}
+      <div className="section-tabs-grid">
         {[
-          { id: 'layout', label: '📐', title: 'Макет' },
-          { id: 'background', label: '🎨', title: 'Фон' },
-          { id: 'spacing', label: '📏', title: 'Отступы' },
-          { id: 'border', label: '🔲', title: 'Рамка' },
-          { id: 'responsive', label: '📱', title: 'Адаптация' },
-          { id: 'advanced', label: '⚡', title: 'Дополнительно' }
+          { id: 'layout', icon: '📐', title: 'Макет' },
+          { id: 'background', icon: '🎨', title: 'Фон' },
+          { id: 'spacing', icon: '📏', title: 'Отступы' },
+          { id: 'border', icon: '🔲', title: 'Рамка' },
+          { id: 'responsive', icon: '📱', title: 'Адаптация' },
+          { id: 'advanced', icon: '⚡', title: 'Ещё' }
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             style={{
-              padding: '8px 12px',
-              border: 'none',
-              background: activeTab === tab.id ? '#0066ff' : 'transparent',
-              color: activeTab === tab.id ? 'white' : '#6b7280',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '12px 8px',
+              border: activeTab === tab.id 
+                ? '2px solid #667eea' 
+                : '2px solid transparent',
+              background: activeTab === tab.id 
+                ? 'rgba(102, 126, 234, 0.1)' 
+                : '#28282a',
+              color: activeTab === tab.id ? '#667eea' : '#9ca3af',
               cursor: 'pointer',
-              borderRadius: '4px 4px 0 0',
-              fontSize: '12px',
-              fontWeight: activeTab === tab.id ? 'bold' : 'normal'
+              borderRadius: '8px',
+              fontSize: '11px',
+              fontWeight: activeTab === tab.id ? '600' : '500',
+              transition: 'all 0.2s ease',
+              gap: '4px',
+              minHeight: '60px'
             }}
-            title={tab.title}
+            onMouseEnter={(e) => {
+              if (activeTab !== tab.id) {
+                e.currentTarget.style.background = '#2f2f31';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== tab.id) {
+                e.currentTarget.style.background = '#28282a';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }
+            }}
           >
-            {tab.label}
+            <span style={{ fontSize: '20px' }}>{tab.icon}</span>
+            <span style={{ textAlign: 'center' }}>{tab.title}</span>
           </button>
         ))}
       </div>
@@ -1781,11 +2047,10 @@ const SectionSettings: React.FC<{
                       <label style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
                         Колонка {index + 1}
                       </label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="email-builder-number-stepper">
                         <button
                           onClick={() => handleColumnWidthChange(index, column.width - 10)}
-                          style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                          className="btn-secondary"
+                          className="btn-secondary number-btn"
                         >
                           −
                         </button>
@@ -1793,14 +2058,12 @@ const SectionSettings: React.FC<{
                           type="number"
                           value={column.width}
                           onChange={(e) => handleColumnWidthChange(index, parseInt(e.target.value) || column.width)}
-                          style={{ width: '60px', textAlign: 'center', padding: '4px' }}
                           min="50"
                           max="500"
                         />
                         <button
                           onClick={() => handleColumnWidthChange(index, column.width + 10)}
-                          style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                          className="btn-secondary"
+                          className="btn-secondary number-btn"
                         >
                           +
                         </button>
@@ -1814,11 +2077,10 @@ const SectionSettings: React.FC<{
               <div className="form-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <label style={{ margin: 0 }}>Отступ между колонками</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="email-builder-number-stepper">
                     <button
                       onClick={() => handleColumnGapChange((section.styles.columnGap || 10) - 5)}
-                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                      className="btn-secondary"
+                      className="btn-secondary number-btn"
                       disabled={(section.styles.columnGap || 10) <= 0}
                     >
                       −
@@ -1827,14 +2089,12 @@ const SectionSettings: React.FC<{
                       type="number"
                       value={section.styles.columnGap || 10}
                       onChange={(e) => handleColumnGapChange(parseInt(e.target.value) || 10)}
-                      style={{ width: '60px', textAlign: 'center', padding: '4px' }}
                       min="0"
                       max="50"
                     />
                     <button
                       onClick={() => handleColumnGapChange((section.styles.columnGap || 10) + 5)}
-                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                      className="btn-secondary"
+                      className="btn-secondary number-btn"
                       disabled={(section.styles.columnGap || 10) >= 50}
                     >
                       +
@@ -2092,7 +2352,7 @@ const SectionSettings: React.FC<{
         <>
           <div className="form-group">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <label style={{ margin: 0 }}>Внутренние отступы (Padding)</label>
+              <label style={{ margin: 0 }}>Внутренние отступы</label>
               <button
                 onClick={() => onUpdate({ 
                   styles: { 
@@ -2121,11 +2381,10 @@ const SectionSettings: React.FC<{
                   <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
                     {side === 'top' ? 'Сверху' : side === 'right' ? 'Справа' : side === 'bottom' ? 'Снизу' : 'Слева'}
                   </label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="email-builder-number-stepper">
                     <button
                       onClick={() => handlePaddingChange(side as any, (section.styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof section.styles] as number || 0) - 5)}
-                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                      className="btn-secondary"
+                      className="btn-secondary number-btn"
                     >
                       −
                     </button>
@@ -2133,14 +2392,12 @@ const SectionSettings: React.FC<{
                       type="number"
                       value={section.styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof section.styles] as number || 0}
                       onChange={(e) => handlePaddingChange(side as any, parseInt(e.target.value) || 0)}
-                      style={{ width: '60px', textAlign: 'center', padding: '4px' }}
                       min="0"
                       disabled={section.styles.paddingLocked && side !== 'top'}
                     />
                     <button
                       onClick={() => handlePaddingChange(side as any, (section.styles[`padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof section.styles] as number || 0) + 5)}
-                      style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                      className="btn-secondary"
+                      className="btn-secondary number-btn"
                     >
                       +
                     </button>
@@ -2151,18 +2408,17 @@ const SectionSettings: React.FC<{
           </div>
 
           <div className="form-group">
-            <label>Внешние отступы (Margin)</label>
+            <label>Внешние отступы</label>
             
             <div style={{ marginBottom: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
                   Сверху
                 </label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="email-builder-number-stepper">
                   <button
                     onClick={() => onUpdate({ styles: { ...section.styles, marginTop: (section.styles.marginTop || 0) - 5 } })}
-                    style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                    className="btn-secondary"
+                    className="btn-secondary number-btn"
                   >
                     −
                   </button>
@@ -2170,13 +2426,11 @@ const SectionSettings: React.FC<{
                     type="number"
                     value={section.styles.marginTop || 0}
                     onChange={(e) => onUpdate({ styles: { ...section.styles, marginTop: parseInt(e.target.value) || 0 } })}
-                    style={{ width: '60px', textAlign: 'center', padding: '4px' }}
                     min="0"
                   />
                   <button
                     onClick={() => onUpdate({ styles: { ...section.styles, marginTop: (section.styles.marginTop || 0) + 5 } })}
-                    style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                    className="btn-secondary"
+                    className="btn-secondary number-btn"
                   >
                     +
                   </button>
@@ -2189,11 +2443,10 @@ const SectionSettings: React.FC<{
                 <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
                   Снизу
                 </label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="email-builder-number-stepper">
                   <button
                     onClick={() => onUpdate({ styles: { ...section.styles, marginBottom: (section.styles.marginBottom || 0) - 5 } })}
-                    style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                    className="btn-secondary"
+                    className="btn-secondary number-btn"
                   >
                     −
                   </button>
@@ -2201,13 +2454,11 @@ const SectionSettings: React.FC<{
                     type="number"
                     value={section.styles.marginBottom || 0}
                     onChange={(e) => onUpdate({ styles: { ...section.styles, marginBottom: parseInt(e.target.value) || 0 } })}
-                    style={{ width: '60px', textAlign: 'center', padding: '4px' }}
                     min="0"
                   />
                   <button
                     onClick={() => onUpdate({ styles: { ...section.styles, marginBottom: (section.styles.marginBottom || 0) + 5 } })}
-                    style={{ width: '24px', height: '24px', padding: 0, fontSize: '16px' }}
-                    className="btn-secondary"
+                    className="btn-secondary number-btn"
                   >
                     +
                   </button>
@@ -2415,7 +2666,9 @@ const BlockSettings: React.FC<{
   block: EmailBlock;
   onUpdate: (updates: Partial<EmailBlock>) => void;
   onDelete: () => void;
-}> = ({ block, onUpdate, onDelete }) => {
+  applyFormatting?: (command: string, value?: string) => void;
+  editableTextRef?: React.RefObject<HTMLDivElement>;
+}> = ({ block, onUpdate, onDelete, applyFormatting, editableTextRef }) => {
   // Защита от undefined после удаления
   if (!block || !block.type) {
     return (
@@ -2429,17 +2682,255 @@ const BlockSettings: React.FC<{
 
   return (
     <div className="settings-form">
-      <h4>Настройки блока: {block.type}</h4>
+      <h4>Настройки блока: {block.type === 'text' ? 'Текст' : block.type === 'button' ? 'Кнопка' : block.type === 'image' ? 'Изображение' : block.type}</h4>
+      
       
       {block.type === 'text' && (
-        <div className="form-group">
-          <label>Текст</label>
-          <textarea
-            value={block.content.html}
-            onChange={(e) => onUpdate({ content: { ...block.content, html: e.target.value } })}
-            rows={5}
-          />
-        </div>
+        <>
+          {/* Paragraph Style */}
+          <div className="form-group">
+            <label>Paragraph Style</label>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <button onClick={() => applyFormatting?.('formatBlock', 'p')} className="toolbar-style-btn" title="Параграф">P</button>
+              <button onClick={() => applyFormatting?.('formatBlock', 'h1')} className="toolbar-style-btn" title="Заголовок 1">H1</button>
+              <button onClick={() => applyFormatting?.('formatBlock', 'h2')} className="toolbar-style-btn" title="Заголовок 2">H2</button>
+              <button onClick={() => applyFormatting?.('formatBlock', 'h3')} className="toolbar-style-btn" title="Заголовок 3">H3</button>
+            </div>
+          </div>
+
+          {/* Text Style */}
+          <div className="form-group">
+            <label>Text Style</label>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              <button onClick={() => applyFormatting?.('bold')} className="toolbar-style-btn"><strong>B</strong></button>
+              <button onClick={() => applyFormatting?.('italic')} className="toolbar-style-btn"><em>I</em></button>
+              <button onClick={() => applyFormatting?.('underline')} className="toolbar-style-btn"><u>U</u></button>
+              <button onClick={() => applyFormatting?.('strikeThrough')} className="toolbar-style-btn"><s>S</s></button>
+              <button onClick={() => applyFormatting?.('subscript')} className="toolbar-style-btn">x₂</button>
+              <button onClick={() => applyFormatting?.('superscript')} className="toolbar-style-btn">x²</button>
+            </div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <select 
+                onChange={(e) => {
+                  const size = e.target.value;
+                  if (editableTextRef?.current) {
+                    editableTextRef.current.focus();
+                    document.execCommand('fontSize', false, '7');
+                    const fontElements = document.querySelectorAll('font[size="7"]');
+                    fontElements.forEach(el => {
+                      const span = document.createElement('span');
+                      span.style.fontSize = size + 'px';
+                      span.innerHTML = el.innerHTML;
+                      el.parentNode?.replaceChild(span, el);
+                    });
+                  }
+                }}
+                className="toolbar-select"
+                defaultValue="14"
+              >
+                <option value="10">10px</option>
+                <option value="12">12px</option>
+                <option value="14">14px</option>
+                <option value="16">16px</option>
+                <option value="18">18px</option>
+                <option value="20">20px</option>
+                <option value="24">24px</option>
+                <option value="28">28px</option>
+                <option value="32">32px</option>
+              </select>
+              <label className="toolbar-color-btn" title="Цвет текста">
+                🎨
+                <input type="color" onChange={(e) => applyFormatting?.('foreColor', e.target.value)} style={{ display: 'none' }} />
+              </label>
+              <label className="toolbar-color-btn" title="Цвет фона">
+                🖍️
+                <input type="color" defaultValue="#ffff00" onChange={(e) => applyFormatting?.('backColor', e.target.value)} style={{ display: 'none' }} />
+              </label>
+            </div>
+          </div>
+
+          {/* Alignment */}
+          <div className="form-group">
+            <label>Text Alignment</label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={() => applyFormatting?.('justifyLeft')} className="toolbar-style-btn align-btn" title="По левому краю">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="2" width="12" height="2" rx="1"/><rect x="0" y="6" width="14" height="2" rx="1"/><rect x="0" y="10" width="10" height="2" rx="1"/></svg>
+              </button>
+              <button onClick={() => applyFormatting?.('justifyCenter')} className="toolbar-style-btn align-btn" title="По центру">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="1"/><rect x="1" y="6" width="14" height="2" rx="1"/><rect x="3" y="10" width="10" height="2" rx="1"/></svg>
+              </button>
+              <button onClick={() => applyFormatting?.('justifyRight')} className="toolbar-style-btn align-btn" title="По правому краю">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="2" width="12" height="2" rx="1"/><rect x="2" y="6" width="14" height="2" rx="1"/><rect x="6" y="10" width="10" height="2" rx="1"/></svg>
+              </button>
+              <button onClick={() => applyFormatting?.('justifyFull')} className="toolbar-style-btn align-btn" title="По ширине">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="2" width="16" height="2" rx="1"/><rect x="0" y="6" width="16" height="2" rx="1"/><rect x="0" y="10" width="16" height="2" rx="1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Insert */}
+          <div className="form-group">
+            <label>Insert</label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={() => { const url = prompt('Введите URL:'); if (url) applyFormatting?.('createLink', url); }} className="toolbar-style-btn" title="Ссылка">🔗</button>
+              <button onClick={() => applyFormatting?.('insertUnorderedList')} className="toolbar-style-btn" title="Маркированный список">•</button>
+              <button onClick={() => applyFormatting?.('insertOrderedList')} className="toolbar-style-btn" title="Нумерованный список">1.</button>
+              <button onClick={() => { if (editableTextRef?.current) { editableTextRef.current.focus(); applyFormatting?.('removeFormat'); applyFormatting?.('unlink'); } }} className="toolbar-style-btn" title="Очистить форматирование">✂️</button>
+            </div>
+          </div>
+
+          {/* Внутренние отступы */}
+          <div className="form-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ margin: 0 }}>Внутренние отступы</label>
+              <button
+                onClick={() => onUpdate({ 
+                  styles: { 
+                    ...block.styles, 
+                    paddingLocked: !block.styles.paddingLocked 
+                  } 
+                })}
+                className="spacing-lock-btn"
+                title={block.styles.paddingLocked ? 'Отвязать отступы' : 'Связать отступы'}
+              >
+                {block.styles.paddingLocked ? '🔒' : '🔓'}
+              </button>
+            </div>
+            
+            {['top', 'right', 'bottom', 'left'].map((side) => {
+              const sideNames = { top: 'Сверху', right: 'Справа', bottom: 'Снизу', left: 'Слева' };
+              const propertyName = `padding${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof block.styles;
+              const currentValue = (block.styles[propertyName] as number) || 10;
+
+              const handleChange = (newValue: number) => {
+                if (block.styles.paddingLocked) {
+                  onUpdate({
+                    styles: {
+                      ...block.styles,
+                      paddingTop: newValue,
+                      paddingRight: newValue,
+                      paddingBottom: newValue,
+                      paddingLeft: newValue
+                    }
+                  });
+                } else {
+                  onUpdate({
+                    styles: {
+                      ...block.styles,
+                      [propertyName]: newValue
+                    }
+                  });
+                }
+              };
+
+              return (
+                <div key={side} style={{ marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
+                      {sideNames[side as keyof typeof sideNames]}
+                    </label>
+                    <div className="email-builder-number-stepper">
+                      <button
+                        onClick={() => handleChange(Math.max(0, currentValue - 2))}
+                        className="btn-secondary number-btn"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        value={currentValue}
+                        onChange={(e) => handleChange(parseInt(e.target.value) || 0)}
+                        min="0"
+                      />
+                      <button
+                        onClick={() => handleChange(currentValue + 2)}
+                        className="btn-secondary number-btn"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Внешние отступы */}
+          <div className="form-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ margin: 0 }}>Внешние отступы</label>
+              <button
+                onClick={() => onUpdate({ 
+                  styles: { 
+                    ...block.styles, 
+                    marginLocked: !block.styles.marginLocked 
+                  } 
+                })}
+                className="spacing-lock-btn"
+                title={block.styles.marginLocked ? 'Отвязать отступы' : 'Связать отступы'}
+              >
+                {block.styles.marginLocked ? '🔒' : '🔓'}
+              </button>
+            </div>
+            
+            {['top', 'right', 'bottom', 'left'].map((side) => {
+              const sideNames = { top: 'Сверху', right: 'Справа', bottom: 'Снизу', left: 'Слева' };
+              const propertyName = `margin${side.charAt(0).toUpperCase() + side.slice(1)}` as keyof typeof block.styles;
+              const currentValue = (block.styles[propertyName] as number) || 0;
+
+              const handleChange = (newValue: number) => {
+                if (block.styles.marginLocked) {
+                  onUpdate({
+                    styles: {
+                      ...block.styles,
+                      marginTop: newValue,
+                      marginRight: newValue,
+                      marginBottom: newValue,
+                      marginLeft: newValue
+                    }
+                  });
+                } else {
+                  onUpdate({
+                    styles: {
+                      ...block.styles,
+                      [propertyName]: newValue
+                    }
+                  });
+                }
+              };
+
+              return (
+                <div key={side} style={{ marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontSize: '12px', color: '#6b7280', margin: 0, width: '60px' }}>
+                      {sideNames[side as keyof typeof sideNames]}
+                    </label>
+                    <div className="email-builder-number-stepper">
+                      <button
+                        onClick={() => handleChange(Math.max(0, currentValue - 2))}
+                        className="btn-secondary number-btn"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        value={currentValue}
+                        onChange={(e) => handleChange(parseInt(e.target.value) || 0)}
+                        min="0"
+                      />
+                      <button
+                        onClick={() => handleChange(currentValue + 2)}
+                        className="btn-secondary number-btn"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {block.type === 'button' && (

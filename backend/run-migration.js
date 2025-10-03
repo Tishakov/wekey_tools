@@ -16,7 +16,7 @@ async function runMigration() {
   try {
     console.log('🚀 Starting migration...\n');
     
-    const migration = require('./src/migrations/20251001-add-system-emails-support.js');
+    const migration = require('./src/migrations/20251003_create_email_templates.js');
     
     await migration.up(sequelize.getQueryInterface(), Sequelize);
     

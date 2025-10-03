@@ -96,7 +96,6 @@ const VariableInserter: React.FC<VariableInserterProps> = ({
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="btn-icon">{buttonIcon}</span>
-        <span className="btn-text">{buttonText}</span>
         <span className={`btn-arrow ${isOpen ? 'open' : ''}`}>▼</span>
       </button>
 

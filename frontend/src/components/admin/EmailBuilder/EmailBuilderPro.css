@@ -102,6 +102,7 @@
   border-color: #667eea;
   color: white;
   font-weight: 600;
+  height: 30px;
 }
 
 .toolbar-btn-primary:hover {
@@ -109,6 +110,27 @@
   border-color: #7689f5;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.template-name-input {
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-size: 14px;
+  width: 300px;
+  border: 1px solid #333335;
+  background: #1C1D1F;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.template-name-input:hover {
+  border-color: #667eea;
+}
+
+.template-name-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
 }
 
 /* ==================== РАБОЧЕЕ ПРОСТРАНСТВО ==================== */
@@ -418,7 +440,7 @@
 
 .email-column {
   flex-shrink: 1; /* Разрешаем сжатие при необходимости */
-  min-height: 100px;
+  min-height: auto;
   border-radius: 4px;
   transition: all 0.2s;
   position: relative;
@@ -441,7 +463,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100px;
+  min-height: 120px;
+  padding: 20px;
   border: 2px dashed #c5cae9;
   border-radius: 6px;
   background: linear-gradient(135deg, #fafbfc 0%, #f6f8fa 100%);
@@ -556,6 +579,253 @@
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
+}
+
+/* Сетка табов настроек секции */
+.section-tabs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #3d4152;
+  position: relative;
+}
+
+.section-tabs-grid::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #667eea 50%, 
+    transparent 100%);
+  opacity: 0.5;
+}
+
+/* Контрол для числовых инпутов с кнопками +/- */
+.email-builder-number-stepper {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #3d4152;
+  width: 111px;
+  min-width: 111px;
+}
+
+.email-builder-number-stepper input[type="number"] {
+  width: 55px;
+  text-align: center;
+  padding: 6px 8px;
+  background: #28282a;
+  border: none;
+  color: #e5e7eb;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.email-builder-number-stepper input[type="number"]:focus {
+  outline: none;
+  background: #28282a;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+}
+
+.email-builder-number-stepper input[type="number"]::-webkit-inner-spin-button,
+.email-builder-number-stepper input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.email-builder-number-stepper .number-btn {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #28282a;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.email-builder-number-stepper .number-btn:hover {
+  background: #667eea;
+  color: #ffffff;
+  border-radius: 0;
+}
+
+.email-builder-number-stepper .number-btn:active {
+  background: #5568d3;
+}
+
+.email-builder-number-stepper .number-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: #28282a;
+}
+
+.email-builder-number-stepper .number-btn:disabled:hover {
+  background: #28282a;
+  color: #9ca3af;
+}
+
+/* Кнопка блокировки/отвязки отступов */
+.spacing-lock-btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: #667eea;
+  color: white;
+  border: 1px solid #5568d3;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spacing-lock-btn:hover {
+  background: #5568d3;
+  transform: scale(1.05);
+}
+
+.spacing-lock-btn:active {
+  transform: scale(0.95);
+}
+
+/* Toolbar style buttons (P, H1, H2, H3, B, I, U, S, etc.) */
+.toolbar-style-btn {
+  padding: 6px 10px;
+  min-width: 32px;
+  height: 32px;
+  background: #28282a;
+  color: #9ca3af;
+  border: 1px solid #3d4152;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-style-btn:hover {
+  background: #3d4152;
+  color: #ffffff;
+  border-color: #667eea;
+}
+
+.toolbar-style-btn:active {
+  background: #667eea;
+  color: #ffffff;
+  transform: scale(0.95);
+}
+
+/* Font size select dropdown */
+.toolbar-select {
+  width: 65px;
+  height: 32px;
+  padding: 6px 8px;
+  background: #28282a;
+  color: #ffffff;
+  border: 1px solid #3d4152;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.toolbar-select:hover {
+  border-color: #667eea;
+  background: #3d4152;
+}
+
+.toolbar-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Color picker buttons */
+.toolbar-color-btn {
+  padding: 6px 10px;
+  min-width: 32px;
+  height: 32px;
+  background: #28282a;
+  color: #9ca3af;
+  border: 1px solid #3d4152;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-color-btn:hover {
+  background: #3d4152;
+  border-color: #667eea;
+  transform: scale(1.05);
+}
+
+.toolbar-color-btn input[type="color"] {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+/* Alignment buttons with SVG icons */
+.align-btn {
+  padding: 6px 10px;
+  min-width: 32px;
+  height: 32px;
+  background: #28282a;
+  color: #9ca3af;
+  border: 1px solid #3d4152;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.align-btn:hover {
+  background: #3d4152;
+  color: #ffffff;
+  border-color: #667eea;
+}
+
+.align-btn:active {
+  background: #667eea;
+  color: #ffffff;
+  transform: scale(0.95);
+}
+
+.align-btn svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .visibility-indicator {
@@ -773,7 +1043,7 @@
 /* ==================== ПРАВАЯ ПАНЕЛЬ ==================== */
 
 .right-panel {
-  width: 320px;
+  width: 400px;
   background: #28282A;
   border-left: 1px solid #333335;
   display: flex;
@@ -829,12 +1099,12 @@
 }
 
 .form-group input[type="text"],
-.form-group input[type="number"],
+.form-group input[type="number"]:not(.email-builder-number-stepper input[type="number"]),
 .form-group input[type="url"],
-.form-group select,
+.form-group select:not(.rich-text-select),
 .form-group textarea {
-  width: 100%;
-  padding: 10px 14px;
+  width: initial;
+  padding: 4px 16px;
   border: 1px solid #333335;
   border-radius: 6px;
   font-size: 14px;
@@ -845,16 +1115,16 @@
 }
 
 .form-group input[type="text"]:hover,
-.form-group input[type="number"]:hover,
+.form-group input[type="number"]:not(.email-builder-number-stepper input[type="number"]):hover,
 .form-group input[type="url"]:hover,
-.form-group select:hover,
+.form-group select:not(.rich-text-select):hover,
 .form-group textarea:hover {
   border-color: #4a5568;
   background: #22232a;
 }
 
 .form-group input:focus,
-.form-group select:focus,
+.form-group select:not(.rich-text-select):focus,
 .form-group textarea:focus {
   outline: none;
   border-color: #667eea;

@@ -106,6 +106,7 @@ try {
   const newslettersRoutes = require('./routes/newsletters');
   const newsRoutes = require('./routes/news');
   const emailVariablesRoutes = require('./routes/emailVariables');
+  const emailTemplatesRoutes = require('./routes/emailTemplates');
 
   app.use('/api/auth', authRoutes);
   app.use('/auth', oauthRoutes); // OAuth маршруты без /api префикса
@@ -122,6 +123,7 @@ try {
   app.use('/api/newsletters', newslettersRoutes); // Подключаем систему рассылок
   app.use('/api/news', newsRoutes); // Подключаем систему новостей
   app.use('/api/email-variables', emailVariablesRoutes); // Подключаем переменные для email
+  app.use('/api/email-templates', emailTemplatesRoutes); // Подключаем шаблоны писем
   
   // Добавляем тестовый route
   const testRoutes = require('./routes/test');

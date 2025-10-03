@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './SimpleEmailBuilder.css';
-import RichTextEditor from './RichTextEditor';
 
 export interface EmailBlock {
   id: string;
@@ -669,10 +668,23 @@ const BlockSettings: React.FC<{
         return (
           <>
             <div className="block-settings-group full-width">
-              <RichTextEditor
+              <label className="block-settings-label">Текст:</label>
+              <textarea
                 value={block.content.text || ''}
-                onChange={(value) => updateContent('text', value)}
+                onChange={(e) => updateContent('text', e.target.value)}
                 placeholder="Введите текст блока..."
+                rows={6}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  background: '#28282a',
+                  color: '#ffffff',
+                  border: '1px solid #3d4152',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
               />
             </div>
             

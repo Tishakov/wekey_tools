@@ -45,6 +45,7 @@ const News = require('../models/News')(sequelize);
 const NewsReadStatus = require('../models/NewsReadStatus')(sequelize);
 const NewsletterRecipient = require('../models/NewsletterRecipient')(sequelize);
 const EmailVariable = require('../models/EmailVariable')(sequelize);
+const EmailTemplate = require('../models/EmailTemplate')(sequelize);
 
 // Определение ассоциаций между моделями
 const db = {
@@ -60,7 +61,8 @@ const db = {
   News,
   NewsReadStatus,
   NewsletterRecipient,
-  EmailVariable
+  EmailVariable,
+  EmailTemplate
 };
 
 // Связи между таблицами
@@ -98,5 +100,9 @@ NewsReadStatus.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 News.hasMany(NewsReadStatus, { foreignKey: 'newsId', as: 'readStatuses' });
 NewsReadStatus.belongsTo(News, { foreignKey: 'newsId', as: 'news' });
+
+// Связи для EmailTemplate
+User.hasMany(EmailTemplate, { foreignKey: 'createdBy', as: 'emailTemplates' });
+EmailTemplate.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
 
 module.exports = db;
